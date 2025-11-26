@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="The Club">
+    
+    <link rel="apple-touch-icon" href="Logos/logo_club.png"> 
+
+    <title>Iberostar The Club</title>
+    <style>
+        /* --- PLATINUM DESIGN SYSTEM --- */
+        :root {
+            --navy: #0A2240;
+            --navy-soft: #143055;
+            --gold: #C5A065;
+            --gold-light: #E6C890;
+            --sand: #F5F5F7;
+            --white: #FFFFFF;
+            --text-main: #1D1D1F;
+            --text-sec: #86868B;
+            
+            --glass-nav: rgba(255, 255, 255, 0.9);
+            --glass-card: rgba(255, 255, 255, 0.95);
+            --blur-strength: blur(30px);
+            
+            --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
+            --shadow-subtle: 0 10px 40px -10px rgba(0,0,0,0.05);
+            --shadow-deep: 0 30px 60px -12px rgba(0,0,0,0.25);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(160deg, #eef2f3 0%, #d9e4f5 100%); 
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- SPLASH SCREEN --- */
+        #splash {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease;
+        }
+        .splash-logo {
+            width: 450px; 
+            max-width: 90%;
+            opacity: 0;
+            animation: logoEntrance 1.5s ease forwards;
+        }
+        @keyframes logoEntrance {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- FLOATING DOCK (SIDEBAR) --- */
+        nav {
+            width: 100px;
+            height: 94vh;
+            margin: 3vh 0 3vh 3vh;
+            background: var(--glass-nav);
+            backdrop-filter: var(--blur-strength);
+            -webkit-backdrop-filter: var(--blur-strength);
+            border-radius: 35px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+            z-index: 100;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.6);
+            transition: all 0.3s ease;
+        }
+
+        .logo-wrap { display: none; }
+
+        .nav-btn {
+            width: 60px; height: 60px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: transparent; border: none;
+            color: var(--text-sec);
+            cursor: pointer;
+            transition: all 0.3s var(--ease-elastic);
+            position: relative;
+        }
+        .nav-btn:last-child { margin-bottom: 0; }
+
+        .nav-btn svg { width: 28px; height: 28px; margin-bottom: 4px; fill: currentColor; transition: transform 0.3s; }
+        .nav-btn span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0; transform: translateY(5px); transition: all 0.3s; }
+        
+        .nav-btn.active { background: var(--navy); color: white; box-shadow: 0 8px 20px rgba(10, 34, 64, 0.2); }
+        .nav-btn.active svg { transform: translateY(-2px); fill: var(--gold); }
+        .nav-btn.active span { opacity: 1; transform: translateY(0); color: white; }
+
+        /* --- MAIN STAGE --- */
+        main {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 50px 60px;
+            scroll-behavior: smooth;
+        }
+
+        /* --- HEADER --- */
+        header { margin-bottom: 50px; }
+        
+        .header-logo {
+            width: 280px; 
+            height: auto;
+            display: block;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .greeting { font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 700; margin-bottom: 5px; opacity: 0; animation: fadeUp 0.8s forwards; }
+        .date-display { font-size: 0.9rem; color: var(--text-sec); margin-bottom: 10px; font-weight: 500; opacity: 0; animation: fadeUp 0.8s 0.1s forwards; }
+
+        h1 { font-size: 3.5rem; font-weight: 800; color: var(--navy); margin: 0; letter-spacing: -1.5px; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+        .subtitle { font-size: 1.3rem; color: var(--text-sec); margin-top: 15px; max-width: 600px; line-height: 1.5; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- GRID --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 35px;
+            padding-bottom: 120px;
+        }
+
+        /* --- CARD --- */
+        .card {
+            background: var(--white);
+            border-radius: 28px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth);
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid rgba(0,0,0,0.03);
+            opacity: 0;
+            animation: scaleIn 0.6s var(--ease-smooth) forwards;
+        }
+        
+        .card:hover { transform: translateY(-10px) scale(1.01); box-shadow: var(--shadow-deep); z-index: 10; }
+        .card:active { transform: scale(0.98); }
+
+        .card-media { height: 260px; position: relative; overflow: hidden; }
+        .card-img { width: 100%; height: 100%; background-color: #eee; background-size: cover; background-position: center; transition: transform 0.8s ease; }
+        .card:hover .card-img { transform: scale(1.1); }
+
+        .tag-pill {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(10px);
+            padding: 8px 16px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--navy);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .tag-pill.highlight { background: var(--gold); color: white; }
+
+        .card-content { padding: 30px; display: flex; flex-direction: column; }
+        .card-title { font-size: 1.6rem; font-weight: 700; color: var(--navy); margin: 0 0 10px 0; letter-spacing: -0.5px; }
+        .card-desc { font-size: 1rem; color: var(--text-sec); line-height: 1.5; margin: 0; }
+
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* --- SEPARATORS --- */
+        .section-header { grid-column: 1 / -1; display: flex; align-items: center; margin: 40px 0 20px; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+        .section-header h3 { font-size: 1.5rem; color: var(--navy); margin: 0; font-weight: 800; }
+        .section-header .line { flex: 1; height: 2px; background: rgba(0,0,0,0.05); margin-left: 20px; border-radius: 2px; }
+
+        /* --- ROCKA BANNER --- */
+        .rocka-banner {
+            grid-column: 1 / -1; height: 200px; border-radius: 35px; position: relative; overflow: hidden;
+            display: flex; align-items: center; padding: 0 60px; box-shadow: var(--shadow-deep);
+            color: var(--navy); 
+            cursor: default; margin-bottom: 30px; opacity: 0; animation: scaleIn 0.8s 0.2s forwards;
+            background: #fff;
+        }
+        .rocka-bg { position: absolute; inset: 0; z-index: 1; background-size: cover; background-position: center; filter: brightness(0.6); transition: transform 10s ease; }
+        .rocka-banner:hover .rocka-bg { transform: scale(1.1); }
+        .rocka-info { position: relative; z-index: 2; display: flex; align-items: center; }
+        
+        .partner-logo-img { 
+            width: 150px; 
+            height: auto; 
+            object-fit: contain; 
+            margin-right: 30px; 
+        }
+
+        /* --- MODALS --- */
+        .modal-wrap {
+            position: fixed; inset: 0; z-index: 1000;
+            background: rgba(255,255,255,0.01); backdrop-filter: blur(0px);
+            pointer-events: none; transition: all 0.5s var(--ease-smooth);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-wrap.active { background: rgba(0,0,0,0.3); backdrop-filter: blur(20px); pointer-events: all; }
+
+        .modal {
+            width: 90vw; height: 90vh; background: #fff; border-radius: 40px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.3); display: flex; flex-direction: column;
+            overflow: hidden; transform: translateY(100vh) scale(0.9);
+            transition: transform 0.6s var(--ease-elastic); position: relative;
+        }
+        .modal-wrap.active .modal { transform: translateY(0) scale(1); }
+
+        .modal-close-btn {
+            position: absolute; top: 25px; right: 25px; width: 44px; height: 44px;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); border-radius: 50%; border: none;
+            color: white; font-size: 24px; cursor: pointer; z-index: 20;
+            display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
+        }
+        .modal-close-btn:active { transform: scale(0.9); }
+
+        .modal-hero { height: 45vh; flex-shrink: 0; position: relative; cursor: pointer; }
+        .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
+        .modal-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.6)); }
+        
+        .expand-hint {
+            position: absolute; bottom: 20px; right: 20px; background: rgba(255,255,255,0.2); backdrop-filter: blur(5px);
+            padding: 8px 12px; border-radius: 12px; color: white; font-size: 12px;
+            display: flex; align-items: center; pointer-events: none;
+        }
+
+        .modal-content { flex: 1; padding: 50px 60px; overflow-y: auto; background: white; }
+        .modal-meta h2 { font-size: 2.8rem; color: var(--navy); margin: 0; line-height: 1; letter-spacing: -1px; }
+        .modal-meta span { color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; display: block; margin-bottom: 10px; }
+        
+        .modal-desc { margin-top: 20px; font-size: 1.1rem; color: var(--text-sec); line-height: 1.6; max-width: 700px; white-space: pre-wrap; }
+
+        .action-bar { margin: 40px 0; display: flex; gap: 20px; }
+        .btn-big {
+            flex: 1; padding: 22px; border-radius: 18px; background: var(--navy); color: white;
+            font-size: 1.1rem; font-weight: 700; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: transform 0.2s; box-shadow: 0 10px 25px rgba(10,34,64,0.3);
+        }
+        .btn-big:active { transform: scale(0.97); }
+        .btn-big svg { width: 24px; height: 24px; fill: white; }
+
+        .gallery-scroller {
+            display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; margin-top: 20px;
+            scroll-snap-type: x mandatory;
+        }
+        .gallery-item {
+            scroll-snap-align: start; width: 280px; height: 180px; flex-shrink: 0;
+            border-radius: 20px; overflow: hidden; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.3s;
+        }
+        .gallery-item:hover { transform: translateY(-5px); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- ADMIN PANEL --- */
+        .admin-panel { position: fixed; inset: 0; z-index: 2000; background: #f5f5f7; display: none; flex-direction: column; }
+        .admin-panel.active { display: flex; }
+        .admin-header { padding: 20px; background: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        .admin-body { flex: 1; padding: 20px; overflow-y: auto; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
+        .btn-admin { padding: 10px 20px; border-radius: 8px; background: #007aff; color: white; border: none; font-weight: bold; cursor: pointer; }
+        .btn-cancel { background: #ff3b30; }
+        .btn-secondary { background: #8e8e93; margin-right: 10px; }
+        
+        .item-list { margin-bottom: 20px; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; }
+        .item-row { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; background: white; }
+        .item-row:hover { background: #f0f0f5; }
+        .item-row strong { color: #333; font-size: 14px; }
+        .item-row span { color: #888; font-size: 12px; }
+
+        /* --- FULLSCREEN VIEWER --- */
+        .fs-viewer { position: fixed; inset: 0; z-index: 1100; background: black; display: none; align-items: center; justify-content: center; }
+        .fs-viewer.active { display: flex; animation: fadeIn 0.3s; }
+        .fs-close { position: absolute; top: 30px; right: 30px; color: white; background: rgba(255,255,255,0.2); width: 50px; height: 50px; border-radius: 50%; font-size: 30px; border:none; cursor: pointer; z-index: 1200; }
+
+        @media (max-width: 1024px) {
+            body { flex-direction: column; }
+            nav { width: 90%; height: 80px; margin: 0 auto; flex-direction: row; position: fixed; bottom: 25px; left: 5%; right: 5%; padding: 0 25px; justify-content: space-between; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+            .nav-btn { margin: 0; width: 60px; height: 100%; }
+            main { padding: 40px 25px 130px 25px; }
+            .modal { width: 100vw; height: 100vh; border-radius: 0; }
+            .modal-hero { height: 35vh; }
+            .modal-content { padding: 30px 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SPLASH SCREEN -->
+    <div id="splash">
+        <img id="splashLogo" src="Logos/logo_club.png" alt="Loading" class="splash-logo" onerror="handleImgError(this)">
+    </div>
+
+    <!-- FLOATING DOCK -->
+    <nav>
+        <button class="nav-btn active" onclick="nav('portfolio')">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Club</span>
+        </button>
+        <button class="nav-btn" onclick="nav('dining')">
+            <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg><span>Dining</span>
+        </button>
+        <button class="nav-btn" onclick="nav('activities')">
+            <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg><span>Fun</span>
+        </button>
+    </nav>
+
+    <!-- CONTENT -->
+    <main id="mainContainer">
+        <header>
+            <img id="headerLogo" src="Logos/logo_club.png" alt="Iberostar Logo" class="header-logo" onerror="handleImgError(this)">
+            
+            <div class="greeting" id="greeting">Bon Bini</div>
+            <div class="date-display" id="dateDisplay">...</div>
+            <h1>Iberostar The Club</h1>
+            <p class="subtitle">Experience the ultimate Iberostar hotels on Aruba.</p>
+        </header>
+        <div id="appContent"></div>
+    </main>
+
+    <!-- MODAL -->
+    <div class="modal-wrap" id="detailModal">
+        <div class="modal">
+            <button class="modal-close-btn" onclick="closeModal()">✕</button>
+            <div class="modal-hero" onclick="expandMainImage()">
+                <img id="dImg" src="" onerror="handleImgError(this)">
+                <div class="expand-hint">Tap to expand</div>
+            </div>
+            <div class="modal-content">
+                <div class="modal-meta"><span id="dSub">SUBTITLE</span><h2 id="dTitle">Title</h2></div>
+                <div class="action-bar" id="dAction"></div>
+                <p class="modal-desc" id="dDesc">Description.</p>
+                <h4 style="margin-top:40px; color:var(--navy);">Gallery</h4>
+                <div class="gallery-scroller" id="dGallery"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-header"><h3>Admin Editor</h3><div><button class="btn-admin" onclick="exportData()">Copy Data</button> <button class="btn-admin btn-cancel" onclick="closeAdmin()">Close</button></div></div>
+        <div class="admin-body">
+            <div style="background:#fff; padding:20px; border-radius:12px; margin-bottom: 20px;">
+                <h4>Edit Existing Items</h4>
+                <div id="adminList" class="item-list"></div>
+            </div>
+
+            <div style="background:#fff; padding:20px; border-radius:12px;">
+                <h4>Add / Update Item</h4>
+                <div class="form-group"><label>Type</label><select id="newType"><option value="food">Restaurant</option><option value="fun">Activity</option><option value="club">Hotel/Club</option></select></div>
+                <div class="form-group"><label>ID (Unique)</label><input type="text" id="newKey" placeholder="e.g. MyNewItem"></div>
+                <div class="form-group"><label>Title</label><input type="text" id="newTitle"></div>
+                <div class="form-group"><label>Subtitle</label><input type="text" id="newSub"></div>
+                <div class="form-group"><label>Partner Logo Path (Activities only)</label><input type="text" id="newPartnerLogo" placeholder="e.g. Logos/my_logo.png"></div>
+                <div class="form-group"><label>Description</label><textarea id="newDesc" rows="5"></textarea></div>
+                <div class="form-group"><label>Gallery Images (Comma separated)</label><textarea id="newGallery" rows="3" placeholder="path/to/img1.jpg, path/to/img2.jpg"></textarea></div>
+                <div class="form-group"><label>PDF/Video Path</label><input type="text" id="newFile"></div>
+                
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button class="btn-admin" onclick="saveItem()">Save Item</button>
+                    <button class="btn-admin" style="background:#d32f2f;" onclick="deleteItem()">Delete Item</button>
+                    <button class="btn-admin btn-secondary" onclick="clearForm()">Clear Form</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEWER -->
+    <div class="fs-viewer" id="fsViewer"><button class="fs-close" onclick="closeFs()">✕</button><div id="fsContent" style="width:100%; height:100%;"></div></div>
+
+    <script>
+        function handleImgError(img) {
+            if (!img.src) return;
+            if (img.getAttribute('data-tried-fix')) return;
+            img.setAttribute('data-tried-fix', 'true');
+            if (img.src.endsWith('.jpg')) img.src = img.src + '.jpg';
+            else if (img.src.endsWith('.png')) img.src = img.src + '.png';
+            else img.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMjAwIiB2aWV3Qm94PSIwIDAgMzAwIDIwMCI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNlZWUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9Im1pZGRsZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM5OTkiPkltYWdlPC90ZXh0Pjwvc3ZnPg==';
+        }
+
+        const defaultData = {
+            'Joia': { type:'club', title: 'Iberostar Joia', sub: 'Eagle Beach', desc: 'A masterpiece of adults-only luxury.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg', 'Hotels/Joia/hotel_joia_3.jpg', 'Hotels/Joia/hotel_joia_4.jpg', 'Hotels/Joia/hotel_joia_5.jpg'], video: 'Hotels/Joia/hotel_joia.mp4' },
+            'Tierra': { type:'club', title: 'Tierra del Sol', sub: 'Golf & Estates', desc: 'Play on the only 18-hole championship golf course.', gallery: ['Hotels/Tierra/golf_tierra_1.jpg', 'Hotels/Tierra/golf_tierra_2.jpg', 'Hotels/Tierra/golf_tierra_3.jpg', 'Hotels/Tierra/golf_tierra_4.jpg', 'Hotels/Tierra/golf_tierra_5.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4' },
+            'Selection': { type:'club', title: 'Iberostar Selection', sub: 'Coming Soon', desc: 'Bringing the premium Selection family experience.', gallery: ['Hotels/Selection/hotel_selection_1.png'], video: '' },
+            'Joia2': { type:'club', title: 'Iberostar Joia (Lighthouse)', sub: 'In Development', desc: 'The next chapter of the Joia collection.', gallery: ['Hotels/Joia2/hotel_joia2_1.jpg'], video: '' },
+            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg', 'Restaurants/Screaming%20Eagle/rest_screaming_2.jpg', 'Restaurants/Screaming%20Eagle/rest_screaming_3.jpg', 'Restaurants/Screaming%20Eagle/rest_screaming_4.jpg', 'Restaurants/Screaming%20Eagle/rest_screaming_5.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf' },
+            'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'An Aruba landmark.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg', 'Restaurants/Gianni%27s%20Ristorante/rest_giannis_2.jpg', 'Restaurants/Gianni%27s%20Ristorante/rest_giannis_3.jpg', 'Restaurants/Gianni%27s%20Ristorante/rest_giannis_4.jpg', 'Restaurants/Gianni%27s%20Ristorante/rest_giannis_5.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf' },
+            'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg', 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_2.jpg', 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_3.jpg', 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_4.jpg', 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_5.jpg'], pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf' },
+            'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg', 'Restaurants/Azia%20Restaurant/rest_azia_2.jpg', 'Restaurants/Azia%20Restaurant/rest_azia_3.jpg', 'Restaurants/Azia%20Restaurant/rest_azia_4.jpg', 'Restaurants/Azia%20Restaurant/rest_azia_5.jpg'], pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf' },
+            'Azzurro': { type:'food', title: 'Azzurro Ristorante', sub: 'Seafood', desc: 'Located right on the beach.', gallery: ['Restaurants/Azzurro%20Ristorante/rest_azzurro_1.jpg', 'Restaurants/Azzurro%20Ristorante/rest_azzurro_2.jpg', 'Restaurants/Azzurro%20Ristorante/rest_azzurro_3.jpg', 'Restaurants/Azzurro%20Ristorante/rest_azzurro_4.jpg', 'Restaurants/Azzurro%20Ristorante/rest_azzurro_5.jpg'], pdf: 'Restaurants/Azzurro%20Ristorante/menu_azzurro.pdf' },
+            'AmoreMio': { type:'food', title: 'Amore Mio', sub: 'Pizzeria', desc: 'Authentic Neapolitan pizza.', gallery: ['Restaurants/Amore%20Mio/rest_amoremio_1.jpg', 'Restaurants/Amore%20Mio/rest_amoremio_2.jpg', 'Restaurants/Amore%20Mio/rest_amoremio_3.jpg', 'Restaurants/Amore%20Mio/rest_amoremio_4.jpg', 'Restaurants/Amore%20Mio/rest_amoremio_5.jpg'], pdf: 'Restaurants/Amore%20Mio/menu_amoremio.pdf' },
+            'Dushi': { type:'food', title: 'Dushi Bagels & Burgers', sub: 'Casual', desc: 'The go-to spot for New York style bagels.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg', 'Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_2.jpg', 'Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_3.jpg', 'Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_4.jpg', 'Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_5.jpg'], pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf' },
+            'BeachBar': { type:'food', title: 'The Beach Bar', sub: 'Beachside', desc: 'The longest happy hour on the island.', gallery: ['Restaurants/The%20Beach%20Bar/rest_beachbar_1.jpg', 'Restaurants/The%20Beach%20Bar/rest_beachbar_2.jpg', 'Restaurants/The%20Beach%20Bar/rest_beachbar_3.jpg', 'Restaurants/The%20Beach%20Bar/rest_beachbar_4.jpg', 'Restaurants/The%20Beach%20Bar/rest_beachbar_5.jpg'], pdf: 'Restaurants/The%20Beach%20Bar/menu_beachbar.pdf' },
+            'Gelatissimo': { type:'food', title: 'Gelatissimo', sub: 'Bistro', desc: 'Authentic Italian gelato.', gallery: ['Restaurants/Gelatissimo/rest_gelatissimo_1.jpg', 'Restaurants/Gelatissimo/rest_gelatissimo_2.jpg', 'Restaurants/Gelatissimo/rest_gelatissimo_3.jpg', 'Restaurants/Gelatissimo/rest_gelatissimo_4.jpg', 'Restaurants/Gelatissimo/rest_gelatissimo_5.jpg'], pdf: 'Restaurants/Gelatissimo/menu_gelatissimo.pdf' },
+            'Garden': { type: 'food', title: 'Garden Fresh', sub: 'Healthy', desc: 'The best spot for fresh smoothies.', gallery: ['Restaurants/Garden%20Fresh/rest_garden_1.jpg', 'Restaurants/Garden%20Fresh/rest_garden_2.jpg', 'Restaurants/Garden%20Fresh/rest_garden_3.jpg', 'Restaurants/Garden%20Fresh/rest_garden_4.jpg', 'Restaurants/Garden%20Fresh/rest_garden_5.jpg'], pdf: 'Restaurants/Garden%20Fresh/menu_garden.pdf' },
+            
+            'UTV': { type:'fun', title: 'Aruba UTV & ATV Tour', sub: 'Rocka Beach Tours', desc: 'Get ready for a thrill ride!', gallery: ['Activites/Rockabeach/act_utv_1.jpg'], partnerLogo: 'Logos/logo_rocka.png' },
+            'Jeep': { type:'fun', title: 'Aruba Jeep Excursions', sub: 'Rocka Beach Tours', desc: 'Explore the island in open-air Land Rovers.', gallery: ['Activites/Rockabeach/act_jeep_1.jpg'], partnerLogo: 'Logos/logo_rocka.png' },
+            'HalfIsland': { type:'fun', title: 'Half Island Tour', sub: 'Rocka Beach Tours', desc: 'A perfect overview of Aruba.', gallery: ['Activites/Rockabeach/act_half_1.jpg'], partnerLogo: 'Logos/logo_rocka.png' },
+            'Rentals': { type:'fun', title: 'UTV & ATV Rentals', sub: 'Rocka Beach Tours', desc: 'Freedom to explore at your own pace.', gallery: ['Activites/Rockabeach/act_rentals_1.jpg'], partnerLogo: 'Logos/logo_rocka.png' },
+            'GoKart': { type:'fun', title: 'Go Kart Racing', sub: 'Rocka Beach Tours', desc: 'Adrenaline-pumping fun.', gallery: ['Activites/Rockabeach/act_gokart_1.jpg'], partnerLogo: 'Logos/logo_rocka.png' },
+            'Sail': { type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', desc: 'Relax on a catamaran cruise.', gallery: ['Activites/Rockabeach/act_sail_1.jpg'], partnerLogo: 'Logos/logo_rocka.png' },
+        };
+
+        let appData = {};
+
+        window.onload = function() {
+            const saved = localStorage.getItem('ib_app_data');
+            if(saved) { try { appData = JSON.parse(saved); } catch(e) { appData = defaultData; } } else { appData = defaultData; }
+            
+            const hour = new Date().getHours();
+            let greet = "Bon Bini";
+            if(hour < 12) greet = "Bon Dia";
+            else if(hour < 18) greet = "Bon Tardi";
+            else greet = "Bon Nochi";
+            document.getElementById('greeting').innerText = greet;
+
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('en-US', options);
+
+            setTimeout(() => {
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 800);
+            }, 1500);
+
+            renderApp('portfolio');
+        };
+
+        function renderApp(sectionId) {
+            const container = document.getElementById('appContent');
+            container.innerHTML = ''; 
+            const h1 = document.querySelector('h1');
+            const sub = document.querySelector('.subtitle');
+            
+            if(sectionId === 'portfolio') { h1.innerText = "The Club"; sub.innerText = "Experience the ultimate Iberostar hotels on Aruba."; } 
+            else if(sectionId === 'dining') { h1.innerText = "Restaurants"; sub.innerText = "Explore our exclusive restaurant partners where you can redeem your vouchers."; } 
+            else if(sectionId === 'activities') { h1.innerText = "Adventures"; sub.innerText = "Discover thrill and adventure with our official tour partners."; }
+
+            let html = '';
+            if(sectionId === 'dining') { html += `<div class="section-header"><h3>Exclusive Partner</h3><div class="line"></div></div>`; } 
+            
+            html += `<div class="grid">`;
+            const filterMap = { 'portfolio': 'club', 'dining': 'food', 'activities': 'fun' };
+            const type = filterMap[sectionId];
+            
+            Object.keys(appData).forEach(key => {
+                const item = appData[key];
+                if(item.type === type) {
+                    let logoHtml = '';
+                    if(item.partnerLogo) {
+                        logoHtml = `<img src="${item.partnerLogo}" onerror="this.style.display='none'" style="position:absolute; top:20px; left:20px; width:40px; height:40px; border-radius:50%; background:white; padding:2px; z-index:10;">`;
+                    }
+
+                    // Fix: use first image of gallery as main image
+                    const mainImg = (item.gallery && item.gallery.length > 0) ? item.gallery[0] : item.img;
+
+                    html += `<div class="card" onclick="openDetails('${key}')">
+                        <div class="card-media">
+                            ${logoHtml}
+                            <div class="tag-pill ${item.sub.includes('Open') || item.sub.includes('Popular') ? 'highlight' : ''}">${item.sub}</div>
+                            <div class="card-img"><img src="${mainImg}" onerror="handleImgError(this)" style="width:100%;height:100%;object-fit:cover;"></div>
+                        </div>
+                        <div class="card-content"><h3 class="card-title">${item.title}</h3><p class="card-desc">${item.desc.substring(0, 60)}...</p></div>
+                    </div>`;
+                }
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            const map = {'portfolio':0, 'dining':1, 'activities':2}[sectionId];
+            document.querySelectorAll('.nav-btn')[map].classList.add('active');
+        }
+
+        function nav(id) { renderApp(id); }
+
+        function openDetails(key) {
+            const item = appData[key];
+            const modal = document.getElementById('detailModal');
+            const mainImg = document.getElementById('dImg');
+            mainImg.src = (item.gallery && item.gallery.length > 0) ? item.gallery[0] : item.img;
+
+            document.getElementById('dTitle').innerText = item.title;
+            document.getElementById('dSub').innerText = item.sub;
+            document.getElementById('dDesc').innerText = item.desc;
+
+            const actBar = document.getElementById('dAction');
+            if(item.type === 'food') {
+                actBar.innerHTML = `<button class="btn-big" onclick="viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V8h2v4zm6 2h-4v-2h4v2zm0-4h-4V8h4v2z"/></svg> View Digital Menu</button>`;
+            } else if (item.type === 'club' && item.video) {
+                actBar.innerHTML = `<button class="btn-big" onclick="viewVideo('${item.video}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Play Video Tour</button>`;
+            } else {
+                actBar.innerHTML = '';
+            }
+
+            const gal = document.getElementById('dGallery');
+            let gHtml = '';
+            // Use the gallery array if it exists and has items
+            if(item.gallery && item.gallery.length > 0) {
+                item.gallery.forEach(img => {
+                    gHtml += `<div class="gallery-item" onclick="viewFull('${img}')"><img src="${img}" onerror="handleImgError(this)"></div>`;
+                });
+            } else {
+                // Fallback to single image if no gallery
+                gHtml = `<div class="gallery-item" onclick="viewFull('${item.img}')"><img src="${item.img}" onerror="handleImgError(this)"></div>`;
+            }
+            gal.innerHTML = gHtml;
+            modal.classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('detailModal').classList.remove('active'); }
+        function expandMainImage() { viewFull(document.getElementById('dImg').src); }
+
+        function viewPdf(url) {
+            const fs = document.getElementById('fsViewer');
+            const content = document.getElementById('fsContent');
+            content.innerHTML = `<object data="${url}" type="application/pdf" width="100%" height="100%" onerror="this.data='${url}.pdf'"><div style="color:white;text-align:center;padding-top:100px;"><p>Loading PDF...</p></div></object>`;
+            fs.classList.add('active');
+        }
+
+        function viewVideo(url) {
+            const fs = document.getElementById('fsViewer');
+            const content = document.getElementById('fsContent');
+            content.innerHTML = `<video controls autoplay style="width:100%;height:100%"><source src="${url}" type="video/mp4"></video>`;
+            fs.classList.add('active');
+        }
+        
+        function viewFull(url) {
+            const fs = document.getElementById('fsViewer');
+            const content = document.getElementById('fsContent');
+            content.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:contain;" onerror="handleImgError(this)">`;
+            fs.classList.add('active');
+        }
+        
+        function closeFs() {
+            document.getElementById('fsViewer').classList.remove('active');
+            setTimeout(() => document.getElementById('fsContent').innerHTML = '', 300);
+        }
+
+        let tapCount = 0;
+        document.getElementById('headerLogo').addEventListener('click', function() {
+            tapCount++;
+            if(tapCount >= 5) { 
+                document.getElementById('adminPanel').classList.add('active'); 
+                tapCount = 0; 
+                renderAdminList(); 
+            }
+            setTimeout(() => tapCount = 0, 2000); 
+        });
+
+        function closeAdmin() { document.getElementById('adminPanel').classList.remove('active'); }
+        
+        function renderAdminList() {
+            let listContainer = document.getElementById('itemListContainer');
+            if (!listContainer) {
+                const body = document.querySelector('.admin-body');
+                listContainer = document.createElement('div');
+                listContainer.id = 'itemListContainer';
+                listContainer.style.marginBottom = '20px';
+                listContainer.style.background = 'white';
+                listContainer.style.padding = '15px';
+                listContainer.style.borderRadius = '12px';
+                listContainer.innerHTML = '<h4>Edit Existing Items</h4><div id="adminItemsList" style="max-height:150px; overflow-y:auto; border:1px solid #eee;"></div>';
+                body.insertBefore(listContainer, body.firstChild);
+            }
+            const listDiv = document.getElementById('adminItemsList');
+            listDiv.innerHTML = '';
+            Object.keys(appData).forEach(key => {
+                const item = appData[key];
+                const div = document.createElement('div');
+                div.style.padding = '8px';
+                div.style.borderBottom = '1px solid #eee';
+                div.style.cursor = 'pointer';
+                div.innerText = `${item.title} (${key})`;
+                div.onclick = () => loadItemIntoForm(key);
+                listDiv.appendChild(div);
+            });
+        }
+
+        function loadItemIntoForm(key) {
+            const item = appData[key];
+            document.getElementById('newKey').value = key;
+            document.getElementById('newType').value = item.type;
+            document.getElementById('newTitle').value = item.title;
+            document.getElementById('newSub').value = item.sub;
+            document.getElementById('newDesc').value = item.desc;
+            
+            // If gallery exists, join with comma for text area
+            if(item.gallery && item.gallery.length > 0) {
+                document.getElementById('newGallery').value = item.gallery.join(', ');
+                // Set main image as first gallery item for backward compatibility or fallback
+                document.getElementById('newImg').value = item.gallery[0];
+            } else {
+                document.getElementById('newGallery').value = item.img; 
+                document.getElementById('newImg').value = item.img;
+            }
+
+            document.getElementById('newPartnerLogo').value = item.partnerLogo || '';
+            let fileVal = '';
+            if(item.type === 'food') fileVal = item.pdf || '';
+            else if(item.type === 'club') fileVal = item.video || '';
+            document.getElementById('newFile').value = fileVal;
+        }
+
+        function clearForm() {
+             document.getElementById('newKey').value = '';
+             document.getElementById('newTitle').value = '';
+             document.getElementById('newSub').value = '';
+             document.getElementById('newDesc').value = '';
+             document.getElementById('newGallery').value = '';
+             document.getElementById('newImg').value = '';
+             document.getElementById('newFile').value = '';
+             document.getElementById('newPartnerLogo').value = '';
+        }
+
+        function saveItem() {
+            const type = document.getElementById('newType').value;
+            const title = document.getElementById('newTitle').value;
+            const sub = document.getElementById('newSub').value;
+            const desc = document.getElementById('newDesc').value;
+            
+            // Get gallery from text area
+            const galleryRaw = document.getElementById('newGallery').value;
+            const gallery = galleryRaw ? galleryRaw.split(',').map(s => s.trim()).filter(s => s.length > 0) : [];
+            // Main image is first image of gallery
+            const img = gallery.length > 0 ? gallery[0] : document.getElementById('newImg').value;
+
+            const file = document.getElementById('newFile').value;
+            const key = document.getElementById('newKey').value;
+            const partnerLogo = document.getElementById('newPartnerLogo').value;
+            
+            if(!key || !title) { alert('ID/Title required'); return; }
+            
+            appData[key] = { 
+                type: type, 
+                title: title, 
+                sub: sub, 
+                desc: desc, 
+                img: img, 
+                gallery: gallery, 
+                pdf: (type === 'food' ? file : ''), 
+                video: (type === 'club' ? file : ''),
+                partnerLogo: (type === 'fun' ? partnerLogo : '')
+            };
+            localStorage.setItem('ib_app_data', JSON.stringify(appData));
+            alert('Saved!'); 
+            closeAdmin(); 
+            location.reload();
+        }
+        
+        function deleteItem() {
+            const key = document.getElementById('newKey').value;
+            if(!key) { alert('Enter the ID (Unique ID) of the item to delete'); return; }
+            if(appData[key]) {
+                if(confirm("Are you sure you want to delete " + appData[key].title + "?")) {
+                    delete appData[key];
+                    localStorage.setItem('ib_app_data', JSON.stringify(appData));
+                    alert('Item Deleted!');
+                    closeAdmin();
+                    location.reload();
+                }
+            } else {
+                alert('Item ID not found');
+            }
+        }
+
+        function exportData() { const dataStr = JSON.stringify(appData, null, 4); navigator.clipboard.writeText(`const defaultData = ${dataStr};`); alert('Data copied!'); }
+    </script>
+</body>
+</html>
