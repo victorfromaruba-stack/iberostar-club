@@ -2,76 +2,94 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- VIEWPORT: Fixed to prevent zooming on inputs, optimized for all screens -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- APPLE PWA SETTINGS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     
     <!-- APP ICON -->
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=7"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=7" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=3"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=3" type="image/png">
     
-    <!-- TYPOGRAPHY -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 
     <title>Iberostar Aruba</title>
 
-    <!-- IMAGE ERROR HANDLER -->
+    <!-- CRITICAL: Image Error Handler -->
     <script>
         function handleImgError(img) {
-            // Prevent infinite loops
-            if (img.getAttribute('data-tried-fix') === 'true') return;
-            img.setAttribute('data-tried-fix', 'true');
+            // 1. If inside Lightbox, handle skipping
+            if (img.classList.contains('fs-image')) {
+                // If lightbox image fails, try fixing extension or just ignore
+                // (Logic handled in lightbox functions)
+                return;
+            }
 
-            // 1. LOGOS: Try to swap extensions if PNG fails, but DO NOT switch to SVG
-            if (img.classList.contains('header-logo') || img.classList.contains('splash-logo')) {
-                const src = img.src;
-                if (src.endsWith('.png')) {
-                    // Try .jpg just in case, otherwise stop.
-                    img.src = src.replace('.png', '.jpg');
+            // 2. Prevent Infinite Loops
+            if (img.getAttribute('data-tried-fix')) {
+                // If it failed twice...
+                if (img.id === 'dImg') {
+                    // Main Hero: hide it
+                    img.style.display = 'none';
+                    const spinner = img.parentElement.querySelector('.image-spinner');
+                    if(spinner) spinner.classList.remove('active');
+                } else {
+                    // Thumbnail: Remove container completely to prevent white box
+                    const galleryItem = img.closest('.gallery-item');
+                    if (galleryItem) galleryItem.remove();
+                    else img.style.display = 'none';
                 }
-                // If it fails again, we just let it be (or user can fix file path), 
-                // but we won't replace it with the generic Star SVG you didn't like.
                 return;
             }
-
-            // 2. MAIN MODAL IMAGE: Show a nice placeholder if main image is missing
-            if (img.id === 'dImg') {
-                img.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80';
-                return;
-            }
-
-            // 3. CARDS/GALLERY: Remove container if image fails
+            
+            img.setAttribute('data-tried-fix', 'true'); 
             const src = img.src;
-            if (src.includes('.jpg')) {
-                img.src = src.replace('.jpg', '.png');
-            } else if (src.includes('.png')) {
-                img.src = src.replace('.png', '.jpg');
+            
+            // 3. Extension Fixer
+            if (src.endsWith('.jpg')) {
+                 img.src = src.replace('.jpg', '.png');
+            } else if (src.endsWith('.png')) {
+                 // Try appending .png for the double extension issue you have
+                 img.src = src + '.png';
             } else {
-                // If extension swap fails, remove the container so no "broken image" icon shows
-                if (img.closest('.gallery-item')) img.closest('.gallery-item').remove();
-                else if (img.closest('.card-media')) img.src = 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=800&q=80'; // Card fallback
+                // Fallback removal
+                const galleryItem = img.closest('.gallery-item');
+                if (galleryItem) galleryItem.remove();
+                else img.style.display = 'none';
+            }
+        }
+        
+        // Helper to show image once loaded
+        function handleImgLoad(img) {
+            img.style.display = 'block';
+            img.classList.add('loaded');
+            if(img.id === 'dImg') {
+                const spinner = img.parentElement.querySelector('.image-spinner');
+                if(spinner) spinner.classList.remove('active');
             }
         }
     </script>
 
     <style>
-        /* --- CSS VARIABLES --- */
+        /* --- 2026 MASTERMIND SYSTEM --- */
         :root {
             --bg-gradient-1: #4facfe;
             --bg-gradient-2: #00f2fe;
             --ocean-deep: #0F2D4A; 
             --gold: #C5A065;
-            --glass-card: rgba(255, 255, 255, 0.85);
-            --glass-nav: rgba(255, 255, 255, 0.9);
+            --gold-light: #E6C890;
+            --glass-card: rgba(255, 255, 255, 0.8);
+            --glass-nav: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shine: rgba(255, 255, 255, 0.9);
             --text-main: #0F2D4A;
             --text-muted: #425b76;
+            --shadow-soft: 0 15px 35px rgba(15, 45, 74, 0.1);
+            --shadow-hover: 0 25px 50px rgba(15, 45, 74, 0.25);
+            --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
             --font-head: 'Playfair Display', serif;
             --font-body: 'Inter', sans-serif;
         }
@@ -79,288 +97,295 @@
         body.dark-theme {
             --text-main: #FFFFFF;
             --text-muted: rgba(255, 255, 255, 0.8);
-            --glass-card: rgba(15, 23, 42, 0.7);
+            --glass-card: rgba(15, 23, 42, 0.6);
             --glass-nav: rgba(15, 23, 42, 0.85);
             --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shine: rgba(255, 255, 255, 0.2);
             --ocean-deep: #FFFFFF;
-        }
-
-        /* PRELOAD FIX */
-        body.preload *:not(#splash):not(.splash-logo) {
-            transition: none !important;
-            animation: none !important;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-font-smoothing: antialiased; }
         
         body {
-            margin: 0;
-            font-family: var(--font-body);
-            background-color: #FDFBF7;
-            color: var(--text-main);
-            height: 100vh;
-            /* SAFE AREA PADDING */
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-            display: flex;
-            overflow: hidden;
+            margin: 0; font-family: var(--font-body); background-color: #FDFBF7; color: var(--text-main); height: 100vh;
+            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);
+            display: flex; overflow: hidden;
             background: linear-gradient(180deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
-            transition: background 2.5s ease;
+            transition: background 2.5s ease, color 1.5s ease; position: relative;
         }
 
-        /* --- LOADING SPLASH (HUGE LOGO) --- */
-        #splash {
-            position: fixed; inset: 0; z-index: 999999; 
-            background: #fff; display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.8s ease; opacity: 1;
-        }
-        .splash-logo {
-            width: 500px; /* Big Size */
-            max-width: 80%;
-            height: auto;
-            object-fit: contain;
-            animation: pulseLogo 2s infinite ease-in-out;
-        }
-        @keyframes pulseLogo { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
-        /* --- BACKGROUND ANIMATIONS --- */
-        .ocean-waves { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E"); opacity: 0.2; }
-        .palm-shadows { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(circle at 100% 0%, rgba(0,0,0,0.05) 0%, transparent 40%); opacity: 0; transition: opacity 3s; }
-        .shadows-active { opacity: 1; }
-        .night-glow { position: absolute; bottom: 0; left: 0; width: 100%; height: 60vh; background: linear-gradient(to top, rgba(212, 175, 55, 0.15), transparent); opacity: 0; z-index: 0; transition: opacity 3s; }
-        .glow-active { opacity: 1; }
-
-        /* --- SIDEBAR (CENTERED FLOATING DOCK) --- */
-        nav {
-            position: fixed; 
-            left: 24px; 
-            top: 50%; 
-            transform: translateY(-50%); /* Keeps it perfectly centered vertically */
-            
-            width: 140px; /* Thicker but not too thick */
-            height: 85vh; /* Dock style, doesn't touch top/bottom edges */
-            
-            background: var(--glass-nav); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border-radius: 40px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 1px solid var(--glass-border); 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.15); 
-            z-index: 100;
-        }
+        /* --- ATMOSPHERE LAYERS --- */
+        .ocean-waves { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E"); opacity: 0.2; animation: waveDrift 60s linear infinite; }
+        @keyframes waveDrift { 0% { background-position: 0 0; } 100% { background-position: 1000px 20px; } }
         
-        .nav-btn {
-            width: 100px; height: 100px; /* Big touch targets */
-            border-radius: 30px; 
-            margin-bottom: 20px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: transparent; border: none; color: var(--text-muted); cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        
-        .nav-btn svg { 
-            width: 44px; height: 44px; /* Large readable icons */
-            fill: currentColor; transition: transform 0.3s; 
-        }
-        
-        .nav-btn.active { 
-            background: var(--gold); 
-            color: white; 
-            box-shadow: 0 15px 30px rgba(197, 160, 101, 0.4); 
-            transform: scale(1.05);
-        }
-        .nav-btn.active svg { fill: white; transform: scale(1.1); }
+        .palm-shadows { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(circle at 100% 0%, rgba(0,0,0,0.05) 0%, transparent 40%), radial-gradient(circle at 90% 10%, rgba(0,0,0,0.03) 0%, transparent 30%); opacity: 0; transition: opacity 3s ease; filter: blur(40px); }
+        .shadows-active { opacity: 1 !important; animation: palmSway 10s ease-in-out infinite alternate; }
+        @keyframes palmSway { 0% { transform: translateX(0); } 100% { transform: translateX(-20px); } }
 
-        /* --- MAIN LAYOUT --- */
-        main { 
-            flex: 1; height: 100vh; overflow-y: auto; overflow-x: hidden; 
-            /* Padding Left = Sidebar Width (140) + Left Gap (24) + Extra Gap (40) */
-            padding: 60px 60px 60px 220px; 
-            scroll-behavior: smooth; z-index: 10; -webkit-overflow-scrolling: touch;
-        }
+        .night-glow { position: absolute; bottom: 0; left: 0; width: 100%; height: 60vh; background: linear-gradient(to top, rgba(212, 175, 55, 0.15), transparent); opacity: 0; transition: opacity 3s ease; z-index: 0; pointer-events: none; }
+        .glow-active { opacity: 1 !important; }
+
+        .horizon-boat { position: absolute; bottom: 18%; left: -100px; width: 60px; height: 60px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.4'%3E%3Cpath d='M14 6l5 11h-5v-11zm-2 0v11h-5l5-11zm-9 13l2 3h16l2-3h-20z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
+        body.dark-theme .horizon-boat { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF' opacity='0.3'%3E%3Cpath d='M14 6l5 11h-5v-11zm-2 0v11h-5l5-11zm-9 13l2 3h16l2-3h-20z'/%3E%3C/svg%3E"); }
+        .boat-active { opacity: 1 !important; animation: sailAcross 140s linear infinite; }
+        @keyframes sailAcross { 0% { transform: translateX(-20vw) rotate(1deg); } 100% { transform: translateX(120vw) rotate(1deg); } }
+
+        .clouds { position: absolute; top: 0; left: 0; width: 100%; height: 300px; background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 60px 60px; filter: blur(40px); opacity: 0; transition: opacity 3s ease; z-index: 0; animation: cloudDrift 90s linear infinite; }
+        .clouds-active { opacity: 0.7 !important; }
+        @keyframes cloudDrift { 0% { transform: translateX(-30px); } 50% { transform: translateX(30px); } 100% { transform: translateX(-30px); } }
+
+        .fireflies { position: absolute; inset: 0; opacity: 0; transition: opacity 3s ease; pointer-events: none; z-index: 0; }
+        .fireflies::before, .fireflies::after { content: ''; position: absolute; width: 3px; height: 3px; background: #FFD700; border-radius: 50%; box-shadow: 0 0 8px #FFD700; animation: fireflyMove 20s infinite alternate; }
+        .fireflies::after { left: 60%; top: 40%; animation-duration: 25s; animation-direction: alternate-reverse; width: 2px; height: 2px; }
+        .fireflies-active { opacity: 0.6 !important; }
+        @keyframes fireflyMove { 0% { transform: translate(0,0); opacity: 0.2; } 50% { opacity: 1; } 100% { transform: translate(80px, -40px); opacity: 0.2; } }
+
+        .living-turtle { position: absolute; bottom: 8%; right: -120px; width: 100px; height: 80px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='%230F2D4A' opacity='0.2'%3E%3Cpath d='M32,12 c-6,0-10,4-10,10 c0,1.5,0.3,3,0.8,4.3 C18,27.5,15,31,15,35 c0,2.8,1.5,5.2,3.7,6.6 c-0.5,1.5-0.7,3.1-0.7,4.8 c0,6,4,11,9.5,12.4 c-0.3,0.5-0.5,1-0.5,1.6 c0,2.2,1.8,4,4,4 c2.2,0,4-1.8,4-4 c0-0.4-0.1-0.8-0.2-1.2 c2.2,0.5,4.5,0.8,7,0.8 s4.8-0.3,7-0.8 c-0.1,0.4-0.2,0.8-0.2,1.2 c0,2.2,1.8,4,4,4 c2.2,0,4-1.8,4-4 c0-0.6-0.2-1.1-0.5-1.6 c5.5-1.4,9.5-6.4,9.5-12.4 c0-1.7-0.2-3.3-0.7-4.8 c2.2-1.4,3.7-3.8,3.7-6.6 c0-4-3-7.5-7.8-8.7 c0.5-1.3,0.8-2.8,0.8-4.3 C52,16,48,12,32,12 z M32,16 c4,0,8,3,8,8 c0,4-3,8-8,8 s-8-4-8-8 C24,19,28,16,32,16 z M19,35 c0-2,2-4,5-4 c0.5,0,1,0.1,1.5,0.2 c-0.3,1.5-0.5,3-0.5,4.8 c0,5,2,10,5,13 c-2,0-4-1-6-3 C21,43,19,39,19,35 z M45,35 c3,0,5,2,5,4 c0,4-2,8-5,10 c-2,2-4,3-6,3 c3-3,5-8,5-13 C44,37.2,44.5,35.5,45,35 z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
+        .turtle-active { opacity: 1 !important; animation: turtleSwim 90s linear infinite; }
+        @keyframes turtleSwim { 0% { transform: translateX(0) rotate(5deg); } 50% { transform: translateX(-60vw) rotate(-5deg); } 100% { transform: translateX(-120vw) rotate(5deg); } }
+
+        .living-birds { position: absolute; top: 15%; left: -100px; width: 100px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' fill='%230F2D4A' opacity='0.15'%3E%3Cpath d='M10 25 Q25 10 40 25 Q25 30 10 25 M60 15 Q75 0 90 15 Q75 20 60 15' stroke='%230F2D4A' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
+        .birds-active { opacity: 1 !important; animation: birdsFly 60s linear infinite; }
+        @keyframes birdsFly { 0% { transform: translateX(0) translateY(0); } 100% { transform: translateX(120vw) translateY(-20px); } }
+
+        .living-dolphin { position: absolute; bottom: 25%; left: 20%; width: 50px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.15'%3E%3Cpath d='M2 12s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
+        .dolphin-active { opacity: 1 !important; animation: dolphinJump 20s ease-in-out infinite; }
+        @keyframes dolphinJump { 0%, 80% { transform: translateY(20px) rotate(0); opacity: 0; } 90% { transform: translateY(-20px) rotate(-10deg); opacity: 0.4; } 100% { transform: translateY(20px) rotate(10deg); opacity: 0; } }
+
+        .living-star { position: absolute; top: 15%; right: 10%; width: 120px; height: 2px; background: linear-gradient(to right, white, transparent); z-index: 0; opacity: 0; transform: rotate(-35deg); border-radius: 50%; filter: drop-shadow(0 0 6px white); }
+        body.dark-theme .living-star { animation: shootStar 8s ease-in-out infinite 5s; }
+        @keyframes shootStar { 0% { opacity: 0; transform: translateX(0) translateY(0) rotate(-35deg); } 10% { opacity: 1; } 20% { opacity: 0; transform: translateX(-300px) translateY(200px) rotate(-35deg); } 100% { opacity: 0; transform: translateX(-300px) translateY(200px) rotate(-35deg); } }
+
+        .stars-overlay { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 3s ease; background-image: radial-gradient(white, rgba(255,255,255,.3) 1px, transparent 2px); background-size: 300px 300px; }
+        .stars-active { opacity: 0.7 !important; }
+
+        /* --- RIPPLES --- */
+        .ripple-btn { position: absolute; border-radius: 50%; transform: scale(0); animation: rippleBtnAnim 0.6s linear; background: rgba(255, 255, 255, 0.4); pointer-events: none; z-index: 9999; }
+        @keyframes rippleBtnAnim { to { transform: scale(4); opacity: 0; } }
+        .ripple-water { position: absolute; border-radius: 50%; transform: scale(0); animation: rippleWaterAnim 1.2s ease-out; border: 2px solid rgba(255, 255, 255, 0.3); background: transparent; pointer-events: none; z-index: 5; }
+        @keyframes rippleWaterAnim { 0% { transform: scale(0); opacity: 0.6; border-width: 4px; } 100% { transform: scale(2.5); opacity: 0; border-width: 0px; } }
+
+        /* --- TOAST --- */
+        #modeToast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: white; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(12px); pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-body); }
+
+        /* --- NAV --- */
+        nav { width: 90px; height: 94vh; margin: 3vh 0 3vh 3vh; background: var(--glass-nav); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-btn { width: 60px; height: 60px; border-radius: 20px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s var(--ease-out); position: relative; overflow: hidden; user-select: none; -webkit-user-select: none; }
+        .nav-btn.active { background: var(--gold); color: white; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes spring { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
+        .nav-btn svg { width: 28px; height: 28px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
+        .nav-btn.active svg { transform: scale(1.1); fill: white; }
+
+        /* --- MAIN --- */
+        main { flex: 1; height: 100vh; overflow-y: auto; overflow-x: hidden; padding: 50px 70px; scroll-behavior: smooth; z-index: 10; -webkit-overflow-scrolling: touch; }
         main::-webkit-scrollbar { display: none; }
 
-        header { margin-bottom: 50px; }
+        /* --- HEADER --- */
+        header { margin-bottom: 40px; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        
-        /* HEADER LOGO BIG */
-        .header-logo { height: 120px; width: auto; object-fit: contain; transition: filter 0.5s; }
+        /* HEADER LOGO CSS UPDATED: Height constrained to 80px, auto width */
+        .header-logo { height: 80px; width: auto; cursor: pointer; mix-blend-mode: normal; transition: filter 0.5s; object-fit: contain; }
+        /* LOGO FILTER CLASS: To be toggled by JS */
         .logo-white { filter: brightness(0) invert(1); }
+        
+        .greeting-wrap { text-align: right; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.2s; }
+        .greeting-wrap:active { transform: scale(0.95); }
+        .greeting { font-family: var(--font-body); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 800; }
+        .date-display { font-family: var(--font-body); font-size: 1rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; transition: color 1s; }
+        body.dark-theme .date-display { color: rgba(255,255,255,0.7); }
 
-        .greeting { font-family: var(--font-body); font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 800; text-align: right; }
-        .date-display { font-family: var(--font-body); font-size: 1.1rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; text-align: right; }
+        h1 { font-family: var(--font-head); font-size: 4rem; font-weight: 700; color: var(--text-main); margin: 0; letter-spacing: -1px; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; position: relative; display: inline-block; transition: color 1s; }
+        h1::after { content: attr(data-text); position: absolute; left: 0; top: 0; color: transparent; background-size: 200% 100%; background-clip: text; -webkit-background-clip: text; animation: shimmer 5s infinite linear; pointer-events: none; mix-blend-mode: overlay; }
+        h1::after { background-image: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.8) 45%, #fff 50%, rgba(255,255,255,0.8) 55%, transparent 70%); }
+        body.dark-theme h1::after { background-image: linear-gradient(110deg, transparent 30%, #D4AF37 45%, #FFF8E7 50%, #D4AF37 55%, transparent 70%); }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        h1 { 
-            font-family: var(--font-head); font-size: 4.5rem; font-weight: 700; color: var(--text-main); margin: 0; letter-spacing: -1.5px; 
-            opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
-        }
-        .subtitle { font-family: var(--font-body); font-size: 1.5rem; color: var(--text-muted); margin-top: 10px; max-width: 600px; font-weight: 300; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; }
+        .subtitle { font-family: var(--font-body); font-size: 1.4rem; color: var(--text-muted); margin-top: 10px; max-width: 600px; font-weight: 300; opacity: 0; animation: fadeUp 0.8s 0.3s forwards; transition: color 1s; }
+        body.dark-theme .subtitle { color: rgba(255,255,255,0.7); }
 
         .search-container { margin-top: 35px; position: relative; max-width: 500px; opacity: 0; animation: fadeUp 0.8s 0.4s forwards; display: none; }
-        .search-input {
-            width: 100%; padding: 20px 24px 20px 60px; border-radius: 24px;
-            border: 1px solid var(--glass-border); background: var(--glass-card);
-            backdrop-filter: blur(20px); font-size: 1.1rem; color: var(--text-main); font-family: var(--font-body);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: all 0.3s ease;
-        }
+        .search-input { width: 100%; padding: 20px 24px 20px 60px; border-radius: 24px; border: 1px solid var(--glass-border); background: var(--glass-card); backdrop-filter: blur(20px); font-size: 1.1rem; color: var(--text-main); font-family: var(--font-body); box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: all 0.3s ease; }
         .search-input:focus { background: white; border-color: var(--gold); box-shadow: 0 15px 40px rgba(197, 160, 101, 0.15); }
         body.dark-theme .search-input:focus { background: rgba(30, 60, 90, 0.9); }
         .search-icon { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; fill: var(--gold); pointer-events: none; }
-
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- GRID & TRANSITION --- */
         .fade-wrapper { animation: fadeInSection 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
         @keyframes fadeInSection { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 40px; padding-bottom: 120px; 
-        }
-        
-        .card {
-            background: var(--glass-card); backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border); border-radius: 35px;
-            overflow: hidden; position: relative; cursor: pointer;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .card:hover { box-shadow: var(--shadow-hover); border-color: var(--gold); z-index: 10; }
-        .card:active { transform: scale(0.97); }
-        
-        .card-media { height: 240px; position: relative; overflow: hidden; background: #eee; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
-        
-        .tag-pill { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #0F2D4A; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .cash-badge { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 45, 74, 0.9); color: var(--gold); padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; z-index: 2; }
-        
-        .media-badge {
-            position: absolute; top: 20px; right: 20px;
-            width: 44px; height: 44px; border-radius: 50%;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center; z-index: 5;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        .media-badge:active { transform: scale(0.9); }
-        .media-badge svg { width: 20px; height: 20px; fill: #0F2D4A; }
-        
-        .partner-badge { position: absolute; bottom: 15px; right: 15px; width: 40px; height: 40px; background: white; border-radius: 50%; padding: 5px; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit: contain; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 35px; padding-bottom: 120px; perspective: 1000px; }
 
-        .card-content { padding: 30px; }
-        .card-title { font-family: var(--font-head); font-size: 1.8rem; margin: 0 0 10px 0; color: var(--text-main); }
-        .card-desc { font-family: var(--font-body); font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
+        /* --- PARALLAX CARD --- */
+        .card { background: var(--glass-card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 30px; overflow: hidden; position: relative; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.1s ease, box-shadow 0.4s var(--ease-out); box-shadow: var(--shadow-soft); transform-style: preserve-3d; border-top: 1px solid var(--glass-shine); border-left: 1px solid var(--glass-shine); }
+        .card:hover { box-shadow: var(--shadow-hover); border-color: var(--gold); z-index: 10; }
+        .card::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); transition: 0.5s; pointer-events: none; z-index: 5; }
+        .card:hover::before { left: 150%; transition: 0.7s; }
+        .card:active { transform: scale(0.98) !important; }
+
+        .card-media { height: 220px; position: relative; overflow: hidden; pointer-events: none; }
+        .card-img { width: 100%; height: 100%; background-color: #eee; background-size: cover; background-position: center; transition: transform 0.1s ease-out; will-change: transform; }
+        
+        .tag-pill { position: absolute; top: 18px; left: 18px; background: rgba(255,255,255,0.95); padding: 6px 14px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-body); color: #0F2D4A; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 2; }
+        .tag-pill.highlight { background: var(--gold); color: white; }
+        .cash-badge { position: absolute; bottom: 18px; left: 18px; background: rgba(15, 45, 74, 0.9); backdrop-filter: blur(4px); color: var(--gold); padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-body); z-index: 2; display: flex; align-items: center; gap: 4px; border: 1px solid rgba(197, 160, 101, 0.3); }
+        .media-badge { position: absolute; top: 18px; right: 18px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .media-badge svg { width: 16px; height: 16px; fill: #0F2D4A; }
+        .partner-badge { position: absolute; bottom: 10px; right: 10px; width: 36px; height: 36px; background: white; border-radius: 50%; padding: 4px; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit: contain; }
+
+        .card-content { padding: 25px 28px; pointer-events: none; }
+        .card-title { font-family: var(--font-head); font-size: 1.6rem; font-weight: 700; color: var(--text-main); margin: 0 0 6px 0; letter-spacing: -0.5px; }
+        .card-desc { font-family: var(--font-body); font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+        body.dark-theme .card-desc { color: rgba(255,255,255,0.7); }
+
+        /* --- SPLASH --- */
+        #splash { position: fixed; inset: 0; z-index: 9999; background: #fff; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
+        .splash-logo { width: 450px; max-width: 85%; opacity: 0; animation: logoEntrance 2s var(--ease-out) forwards; will-change: transform, opacity; -webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(0); }
+        .splash-logo { animation: logoEntrance 2s cubic-bezier(0.22, 1, 0.36, 1) forwards, logoPulse 2s ease-in-out infinite alternate 1.5s; }
+        @keyframes logoEntrance { 0% { opacity: 0; transform: scale(0.9) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes logoPulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
 
         /* --- MODAL --- */
-        .modal-wrap {
-            position: fixed; inset: 0; z-index: 2000;
-            background: rgba(0,0,0,0.3); backdrop-filter: blur(20px);
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
-        .modal-wrap.active { opacity: 1; pointer-events: all; }
+        .modal-wrap { position: fixed; inset: 0; z-index: 1000; background: rgba(15, 45, 74, 0.01); backdrop-filter: blur(0px); pointer-events: none; transition: all 0.5s var(--ease-out); display: flex; align-items: center; justify-content: center; }
+        .modal-wrap.active { background: rgba(15, 45, 74, 0.4); backdrop-filter: blur(20px); pointer-events: all; }
+
+        .modal { width: 85vw; height: 90vh; background: #fff; border-radius: 40px; box-shadow: 0 50px 100px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; transform: translateY(100vh) scale(0.95); transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
+        body.dark-theme .modal { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); }
+        .modal-wrap.active .modal { transform: translateY(0) scale(1); }
+
+        .modal-close-btn { position: absolute; top: 25px; right: 25px; width: 44px; height: 44px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 50%; border: none; color: #0F2D4A; font-size: 20px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .modal-close-btn:active { transform: scale(0.9); background: var(--gold); color: white; }
+
+        .modal-hero { height: 45vh; flex-shrink: 0; position: relative; cursor: pointer; }
+        .modal-hero img { width: 100%; height: 100%; object-fit: cover; display: none; } /* Hidden until loaded */
+        .modal-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.4)); }
+
+        .image-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; opacity: 0; transition: opacity 0.3s; z-index: -1; }
+        .image-spinner.active { opacity: 1; z-index: 1; }
+        @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .modal-content { flex: 1; padding: 40px 60px; overflow-y: auto; background: #fff; -webkit-overflow-scrolling: touch; }
+        body.dark-theme .modal-content { background: #1a1a1a; }
         
-        .modal {
-            width: 85vw; height: 90vh; background: #fff; border-radius: 40px;
-            display: flex; flex-direction: column; overflow: hidden;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.3);
-            transform: translateY(50px); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-        body.dark-theme .modal { background: #1a1a1a; }
-        .modal-wrap.active .modal { transform: translateY(0); }
+        .modal-meta h2 { font-family: var(--font-head); font-size: 3.5rem; color: var(--text-main); margin: 0; line-height: 1; letter-spacing: -1px; }
+        .modal-meta span { font-family: var(--font-body); color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; font-size: 0.85rem; display: block; margin-bottom: 8px; }
+        .modal-desc { margin-top: 25px; font-size: 1.15rem; color: var(--text-muted); line-height: 1.7; max-width: 750px; white-space: pre-wrap; font-family: var(--font-body); }
+        body.dark-theme .modal-desc { color: rgba(255,255,255,0.7); }
 
-        .modal-hero { height: 45vh; position: relative; background: #eee; }
-        .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .modal-close-btn {
-            position: absolute; top: 30px; right: 30px; width: 50px; height: 50px;
-            background: rgba(255,255,255,0.8); border-radius: 50%; border: none;
-            font-size: 24px; cursor: pointer; z-index: 10;
-        }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-top: 30px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; }
+        body.dark-theme .info-grid { border-top: 1px solid rgba(255,255,255,0.1); }
+        .info-item h5 { margin: 0 0 5px 0; font-size: 0.8rem; text-transform: uppercase; color: var(--gold); letter-spacing: 1px; }
+        .info-item p { margin: 0; font-size: 1rem; font-weight: 600; color: var(--text-main); }
 
-        .modal-content { padding: 50px; overflow-y: auto; flex: 1; }
-        .modal-title { font-family: var(--font-head); font-size: 3.5rem; margin: 0 0 10px 0; color: var(--text-main); }
-        .modal-sub { color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
-        .modal-text { font-size: 1.2rem; line-height: 1.8; color: var(--text-muted); margin-top: 20px; }
+        .details-section { margin-top: 30px; }
+        .details-section h4 { font-family: var(--font-head); font-size: 1.5rem; color: var(--text-main); margin-bottom: 15px; }
+        .details-list { list-style: none; padding: 0; margin: 0; }
+        .details-list li { position: relative; padding-left: 25px; margin-bottom: 10px; color: var(--text-muted); font-size: 1rem; line-height: 1.5; }
+        body.dark-theme .details-list li { color: rgba(255,255,255,0.8); }
+        .details-list li::before { content: '•'; color: var(--gold); font-size: 1.5rem; position: absolute; left: 0; top: -5px; }
 
-        /* --- GALLERY IN MODAL --- */
-        .gallery-scroller { display: flex; gap: 20px; overflow-x: auto; padding: 20px 0; margin-top: 40px; }
-        .gallery-item { 
-            width: 280px; height: 200px; flex-shrink: 0; border-radius: 20px; overflow: hidden; background: #ddd;
-            position: relative; cursor: pointer;
-        }
+        .action-bar { margin: 35px 0; display: flex; gap: 15px; }
+        .btn-big { flex: 1; padding: 22px; border-radius: 18px; background: #0F2D4A; color: white; font-size: 1.05rem; font-weight: 700; border: none; cursor: pointer; user-select: none; display: flex; align-items: center; justify-content: center; gap: 10px; transition: transform 0.2s; box-shadow: 0 10px 25px rgba(15, 45, 74, 0.2); font-family: var(--font-body); }
+        body.dark-theme .btn-big { background: var(--gold); color: #0F2D4A; }
+        .btn-big:active { transform: scale(0.97); }
+        .btn-big svg { width: 22px; height: 22px; fill: currentColor; }
+
+        .gallery-scroller { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; margin-top: 40px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .gallery-item { scroll-snap-align: start; width: 260px; height: 180px; flex-shrink: 0; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.08); transition: transform 0.3s; }
+        .gallery-item:hover { transform: translateY(-5px); }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- FULLSCREEN VIEWER --- */
-        .fs-viewer { position: fixed; inset: 0; background: black; z-index: 3000; display: none; justify-content: center; align-items: center; }
-        .fs-viewer.active { display: flex; }
-        .fs-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .fs-close { position: absolute; top: 40px; right: 40px; color: white; background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; font-size: 30px; border: none; }
-
-        /* MEDIA QUERY FOR PHONES (Keep mobile functional) */
-        @media (max-width: 768px) {
-            nav { width: 100%; height: 80px; bottom: 0; margin: 0; border-radius: 0; flex-direction: row; position: fixed; top: auto; left: 0; right: 0; background: rgba(255,255,255,0.95); transform: none; }
-            .nav-btn { width: auto; height: 100%; margin: 0; flex: 1; background: none !important; box-shadow: none !important; }
-            .nav-btn svg { width: 28px; height: 28px; fill: #aaa; }
-            .nav-btn.active svg { fill: var(--gold); transform: scale(1.2); }
-            main { padding: 20px 20px 120px 20px; }
-            h1 { font-size: 3rem; }
-            .modal { width: 100%; height: 100%; border-radius: 0; }
+        .admin-panel { position: fixed; inset: 0; z-index: 2000; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); display: none; flex-direction: column; height: 100%; width: 100%; }
+        .admin-panel.active { display: flex; animation: fadeIn 0.3s; }
+        .admin-header { padding: 25px 40px; background: rgba(255,255,255,0.4); border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .admin-header h3 { margin: 0; color: #0F2D4A; font-size: 1.5rem; letter-spacing: -0.5px; font-family: var(--font-head); }
+        .admin-body { flex: 1; padding: 40px; overflow-y: auto; max-width: 900px; margin: 0 auto; width: 100%; -webkit-overflow-scrolling: touch; }
+        .admin-card { background: rgba(255,255,255,0.8); border-radius: 24px; padding: 35px; margin-bottom: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.6); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 800; margin-bottom: 8px; color: #0F2D4A; text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-body); }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 16px; border: 1px solid rgba(0,0,0,0.1); border-radius: 16px; font-size: 1rem; background: rgba(255,255,255,0.5); transition: 0.3s; color: #0F2D4A; }
+        .form-group input:focus { background: white; border-color: var(--gold); outline: none; box-shadow: 0 0 0 4px rgba(197, 160, 101, 0.15); }
+        .btn-admin { padding: 14px 28px; border-radius: 14px; background: #0F2D4A; color: white; border: none; font-weight: 700; cursor: pointer; font-size: 1rem; transition: 0.2s; font-family: var(--font-body); }
+        .btn-admin:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(15, 45, 74, 0.2); }
+        
+        .fs-viewer { position: fixed; inset: 0; z-index: 1100; background: #000; display: none; align-items: center; justify-content: center; }
+        .fs-viewer.active { display: flex; animation: fadeIn 0.3s; }
+        .fs-backdrop { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(30px) brightness(0.4); transform: scale(1.1); z-index: -1; opacity: 0.6; }
+        .fs-image { max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 20px 50px rgba(0,0,0,0.5); opacity: 0; animation: scaleInFs 0.4s forwards; }
+        @keyframes scaleInFs { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .fs-close { position: absolute; top: 30px; right: 30px; color: white; background: rgba(255,255,255,0.2); width: 60px; height: 60px; border-radius: 50%; font-size: 32px; border:none; cursor: pointer; z-index: 1200; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .fs-close:active { transform: scale(0.9); background: white; color: black; }
+        .fs-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 30px; cursor: pointer; z-index: 1200; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .fs-nav:hover { background: rgba(255,255,255,0.3); }
+        .fs-nav:active { transform: translateY(-50%) scale(0.9); }
+        .fs-prev { left: 30px; } .fs-next { right: 30px; }
+        .fs-caption { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.9); font-family: var(--font-body); font-size: 15px; font-weight: 600; background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(5px); }
+        @media (max-width: 768px) { 
+            .fs-nav { width: 50px; height: 50px; font-size: 24px; } .fs-prev { left: 10px; } .fs-next { right: 10px; } 
+            nav { width: 92%; height: 70px; padding-bottom: env(safe-area-inset-bottom); bottom: 20px; }
+            main { padding: 30px 20px 140px 20px; }
+            h1 { font-size: 2.5rem; }
+            .modal { width: 100%; height: 100%; border-radius: 0; top: 0; left: 0; transform: translateY(100vh); }
+            .modal-wrap.active .modal { transform: translateY(0); }
+            .modal-hero { height: 35vh; }
+            .modal-content { padding: 30px 25px; }
         }
+
+        .no-results { grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-muted); font-size: 1.2rem; display: none; font-family: var(--font-body); }
     </style>
 </head>
-<body class="preload">
+<body>
 
-    <!-- ATMOSPHERE -->
+    <!-- BACKGROUND LAYERS -->
     <div class="ocean-waves"></div>
     <div class="palm-shadows" id="palmShadows"></div>
     <div class="night-glow" id="nightGlow"></div>
+    <div class="clouds" id="clouds"></div>
+    <div class="living-turtle" id="turtle"></div>
+    <div class="living-dolphin" id="dolphin"></div>
+    <div class="living-birds" id="birds"></div>
+    <div class="fireflies" id="fireflies"></div>
+    <div class="stars-overlay" id="stars"></div>
+    <div class="living-star" id="shootingStar"></div>
+    <div class="horizon-boat" id="boat"></div>
+    <div id="modeToast">Mode: Auto</div>
 
-    <!-- LOADING SCREEN (FIXED BIGGER) -->
+    <!-- SPLASH SCREEN -->
     <div id="splash">
-        <!-- Reverted to PNG per instructions -->
-        <img src="Logos/app_logo_club.png" class="splash-logo" onerror="handleImgError(this)" alt="Loading...">
+        <!-- Restored original Double Extension filename per user request -->
+        <img id="splashLogo" src="Logos/logo_club.png.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
     </div>
 
-    <!-- SIDEBAR -->
+    <!-- FLOATING DOCK -->
     <nav>
-        <button class="nav-btn active" onclick="nav('portfolio')">
-            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        </button>
-        <button class="nav-btn" onclick="nav('dining')">
-            <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>
-        </button>
-        <button class="nav-btn" onclick="nav('activities')">
-            <svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg>
-        </button>
-        <button class="nav-btn" onclick="nav('spa')">
-            <svg viewBox="0 0 24 24"><path d="M12 2C9 7 4 9 4 14c0 3 3 5 8 5s8-2 8-5c0-5-5-7-8-12zm0 18c-4.4 0-8-1.8-8-5 0-2.4 2.3-4.5 5-5.8 1.5 1.7 3 3.4 3 5.8 0-2.4 1.5-4.1 3-5.8 2.7 1.3 5 3.4 5 5.8 0 3.2-3.6 5-8 5z"/></svg>
-        </button>
-        <button class="nav-btn" onclick="nav('golf')">
-            <svg viewBox="0 0 24 24"><path d="M19.5 19.5c-1 0-1.7-.6-2.1-1.5l-2.9-6.2c-.2-.4-.3-.8-.3-1.3 0-.2 0-.4.1-.6l.5-1.9c.2-.8-.2-1.7-1-2L12 5.5c-.1 0-.2-.1-.3-.1-1 0-1.8.7-2 1.7l-.3 1.7c-.2.9-.9 1.6-1.8 1.9l-2.1.6C4.7 11.6 4 12.4 4 13.3v.2c0 1 .6 1.9 1.5 2.3l2.2.9c.8.3 1.3 1.1 1.3 1.9v1.1c0 1.5 1.2 2.8 2.8 2.8h5.9c1 0 1.8-.8 1.8-1.8v-1.2zm-10-17c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg>
-        </button>
+        <button class="nav-btn active" onclick="nav('portfolio')" title="Club"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+        <button class="nav-btn" onclick="nav('dining')" title="Dining"><svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg></button>
+        <button class="nav-btn" onclick="nav('activities')" title="Fun"><svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg></button>
+        <button class="nav-btn" onclick="nav('spa')" title="Wellness"><svg viewBox="0 0 24 24"><path d="M12 2C9 7 4 9 4 14c0 3 3 5 8 5s8-2 8-5c0-5-5-7-8-12zm0 18c-4.4 0-8-1.8-8-5 0-2.4 2.3-4.5 5-5.8 1.5 1.7 3 3.4 3 5.8 0-2.4 1.5-4.1 3-5.8 2.7 1.3 5 3.4 5 5.8 0 3.2-3.6 5-8 5z"/></svg></button>
+        <button class="nav-btn" onclick="nav('golf')" title="Golf"><svg viewBox="0 0 24 24"><path d="M19.5 19.5c-1 0-1.7-.6-2.1-1.5l-2.9-6.2c-.2-.4-.3-.8-.3-1.3 0-.2 0-.4.1-.6l.5-1.9c.2-.8-.2-1.7-1-2L12 5.5c-.1 0-.2-.1-.3-.1-1 0-1.8.7-2 1.7l-.3 1.7c-.2.9-.9 1.6-1.8 1.9l-2.1.6C4.7 11.6 4 12.4 4 13.3v.2c0 1 .6 1.9 1.5 2.3l2.2.9c.8.3 1.3 1.1 1.3 1.9v1.1c0 1.5 1.2 2.8 2.8 2.8h5.9c1 0 1.8-.8 1.8-1.8v-1.2zm-10-17c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg></button>
     </nav>
 
+    <!-- CONTENT -->
     <main id="mainContainer">
         <header>
             <div class="header-top">
-                <!-- Reverted to PNG per instructions -->
-                <img src="Logos/logo_club.png" class="header-logo" id="headerLogo" onerror="handleImgError(this)" alt="Logo">
-                <div onclick="toggleTime()">
-                    <div class="greeting" id="greeting">BON BINI</div>
+                <!-- Restored original Double Extension filename per user request -->
+                <img id="headerLogo" src="Logos/logo_club.png.png" alt="Iberostar Logo" class="header-logo" onerror="handleImgError(this)">
+                <div class="greeting-wrap" onclick="toggleTimeMode()">
+                    <div class="greeting" id="greeting">Bon Bini</div>
                     <div class="date-display" id="dateDisplay">...</div>
                 </div>
             </div>
-            <h1 id="pageTitle">Iberostar Aruba</h1>
-            <p class="subtitle" id="pageSub">Experience the ultimate Iberostar hotels on Aruba.</p>
+            
+            <h1 id="pageTitle" data-text="Iberostar Aruba">Iberostar Aruba</h1>
+            <p class="subtitle" id="pageSub">The official guide to redeeming Iberocash on Aruba.</p>
             
             <div class="search-container" id="searchBox">
                 <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                 <input type="text" id="searchInput" class="search-input" placeholder="Search dining, tours, or hotels..." onkeyup="filterContent()">
             </div>
         </header>
+
         <div id="appContent"></div>
     </main>
 
@@ -368,248 +393,672 @@
     <div class="modal-wrap" id="detailModal">
         <div class="modal">
             <button class="modal-close-btn" onclick="closeModal()">✕</button>
-            <div class="modal-hero">
-                <img id="dImg" src="" onerror="handleImgError(this)">
+            <div class="modal-hero" onclick="expandMainImage()">
+                <!-- handleHeroLoad ensures spinner is removed only on success -->
+                <img id="dImg" src="" onerror="handleImgError(this)" onload="handleHeroLoad(this)">
+                <div class="image-spinner active"></div>
+                <div style="position:absolute; bottom:20px; right:20px; background:rgba(255,255,255,0.8); padding:6px 12px; border-radius:20px; color:var(--text-main); font-size:11px; font-weight:700; backdrop-filter:blur(5px);">TAP TO EXPAND</div>
             </div>
             <div class="modal-content">
-                <div class="modal-sub" id="dSub">SUB</div>
-                <h2 class="modal-title" id="dTitle">Title</h2>
-                <div id="dDetails"></div>
-                <p class="modal-text" id="dDesc">Description</p>
-                
-                <h4 style="margin-top:40px; font-family:var(--font-head); font-size:2rem; color:var(--text-main);">Gallery</h4>
+                <div class="modal-meta"><span id="dSub">SUBTITLE</span><h2 id="dTitle">Title</h2></div>
+                <div class="action-bar" id="dAction"></div>
+                <div id="dInfoGrid" class="info-grid"></div> 
+                <div id="dDetails" class="details-section"></div> 
+                <p class="modal-desc" id="dDesc">Description.</p>
+                <h4 style="margin-top:50px; color:var(--text-main); font-size:1.4rem; letter-spacing:-0.5px; font-family:var(--font-head);">Gallery</h4>
                 <div class="gallery-scroller" id="dGallery"></div>
             </div>
         </div>
     </div>
 
-    <!-- FS VIEWER -->
-    <div class="fs-viewer" id="fsViewer" onclick="this.classList.remove('active')">
-        <button class="fs-close">✕</button>
-        <img class="fs-img" id="fsImg" src="">
-        <div id="fsVideoContainer" style="width:100%; height:100%; display:none; align-items:center; justify-content:center;"></div>
+    <!-- PREMIUM ADMIN PANEL -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-header"><h3>Admin Editor</h3><div><button class="btn-admin" onclick="exportData()">Copy Code</button> <button class="btn-admin" style="background:#ff3b30;" onclick="closeAdmin()">Close</button></div></div>
+        <div class="admin-body">
+            <div class="admin-card">
+                <h4 style="margin-top:0; color:#0F2D4A; font-family:var(--font-head);">Edit Existing Items</h4>
+                <div id="itemListContainer"></div>
+            </div>
+
+            <div class="admin-card">
+                <h4 style="margin-top:0; color:#0F2D4A; font-family:var(--font-head);">Add / Update Item</h4>
+                <div class="form-group"><label>Type</label>
+                    <select id="newType">
+                        <option value="food">Restaurant</option>
+                        <option value="fun">Activity</option>
+                        <option value="club">Hotel/Club</option>
+                        <option value="spa">Spa & Wellness</option>
+                        <option value="golf">Golf & Nature</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>ID (Unique)</label><input type="text" id="newKey" placeholder="e.g. MyNewItem"></div>
+                <div class="form-group"><label>Title</label><input type="text" id="newTitle"></div>
+                <div class="form-group"><label>Subtitle</label><input type="text" id="newSub"></div>
+                <div class="form-group"><label>Partner Logo (Activities)</label><input type="text" id="newPartnerLogo" placeholder="e.g. Logos/my_logo.png"></div>
+                <div class="form-group"><label>Main Image</label><input type="text" id="newImg" placeholder="e.g. Hotels/my_hotel.jpg"></div>
+                <div class="form-group"><label>Image Count (Auto-Gallery)</label><input type="number" id="newImageCount" placeholder="e.g. 20"></div>
+                <div class="form-group"><label>Description</label><textarea id="newDesc" rows="5"></textarea></div>
+                <div class="form-group"><label>Duration</label><input type="text" id="newDuration" placeholder="e.g. 4 Hours"></div>
+                <div class="form-group"><label>Departure Time</label><input type="text" id="newTime" placeholder="e.g. 9:00 AM & 2:00 PM"></div>
+                <div class="form-group"><label>Itinerary (Comma separated)</label><textarea id="newItinerary" rows="3" placeholder="Stop 1, Stop 2, Stop 3"></textarea></div>
+                <div class="form-group"><label>What to Bring (Comma separated)</label><textarea id="newEssentials" rows="3" placeholder="Sunscreen, Hat, Camera"></textarea></div>
+                <div class="form-group"><label>Gallery (Comma separated)</label><textarea id="newGallery" rows="3" placeholder="path/to/img1.jpg, path/to/img2.jpg"></textarea></div>
+                <div class="form-group"><label>PDF/Video Path</label><input type="text" id="newFile"></div>
+                
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button class="btn-admin" onclick="saveItem()">Save</button>
+                    <button class="btn-admin" style="background:#d32f2f;" onclick="deleteItem()">Delete</button>
+                    <button class="btn-admin" style="background:#8e8e93;" onclick="clearForm()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX VIEWER -->
+    <div class="fs-viewer" id="fsViewer">
+        <button class="fs-close" onclick="closeFs()">✕</button>
+        <button class="fs-nav fs-prev" id="fsPrev" onclick="prevFs()">‹</button>
+        <button class="fs-nav fs-next" id="fsNext" onclick="nextFs()">›</button>
+        
+        <div class="fs-backdrop" id="fsBackdrop"></div>
+        <div id="fsContent" style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div>
+        <div class="fs-caption" id="fsCaption">1 / 5</div>
     </div>
 
     <script>
-        // DATA
-        const appData = {
-            'Joia': { type:'club', title: 'Iberostar Joia', sub: 'Eagle Beach', desc: 'Experience the crown jewel of Aruba. Located on the pristine shores of Eagle Beach, Joia is an adults-only haven offering butler service, swim-up suites, and a level of exclusivity that redefines Caribbean luxury.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg', 'Hotels/Joia/hotel_joia_3.jpg'], img: 'Hotels/Joia/hotel_joia_1.jpg', video: 'Hotels/Joia/hotel_joia.mp4' },
-            'Tierra': { type:'club', title: 'Tierra del Sol', sub: 'Golf & Estates', desc: 'Escape to the island\'s most prestigious gated community. Featuring luxury villas, a championship golf course, and panoramic views of the California Lighthouse and rugged North Coast.', gallery: ['Hotels/Tierra/golf_tierra_1.jpg', 'Hotels/Tierra/golf_tierra_2.jpg', 'Hotels/Tierra/golf_tierra_3.jpg', 'Hotels/Tierra/golf_tierra_4.jpg'], img: 'Hotels/Tierra/golf_tierra_1.jpg', video: 'Hotels/Tierra/golf_tierra.mp4' },
-            'Selection': { type:'club', title: 'Iberostar Selection', sub: 'Coming Soon', desc: 'Bringing the premium Selection family experience to the Caribbean. Designed for families who refuse to compromise on luxury.', gallery: ['Hotels/Selection/hotel_selection_1.png'], img: 'Hotels/Selection/hotel_selection_1.png' },
-            
-            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, dinner in bed experience.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], img: 'Restaurants/Screaming%20Eagle/rest_screaming_1.jpg', pdf: 'Restaurants/Screaming%20Eagle/menu.pdf' },
-            'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], img: 'Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg', pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf' },
-            'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], img: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg', pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf' },
-            'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas and modern atmosphere.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], img: 'Restaurants/Azia%20Restaurant/rest_azia_1.jpg', pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf' },
-            
-            'UTV': { type:'fun', title: 'UTV Adventure', sub: 'Rocka Beach Tours', desc: 'Take the wheel of a rugged UTV and conquer Aruba’s wild side!', gallery: ['Activites/Rockabeach/act_utv_1.jpg'], img: 'Activites/Rockabeach/act_utv_1.jpg', partnerLogo: 'Logos/logo_rocka.png', duration: '4 Hours' },
-            'Sail': { type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', desc: 'Set sail on a luxury catamaran for a relaxing day.', gallery: ['Activites/Rockabeach/act_sail_1.jpg'], img: 'Activites/Rockabeach/act_sail_1.jpg', partnerLogo: 'Logos/logo_rocka.png', duration: '3.5 Hours' },
-            
-            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba', desc: 'A sanctuary of relaxation.', gallery: ['Spa/General/spa_1.jpg'], img: 'Spa/General/spa_1.jpg', pdf: 'Spa/General/menu_spa.pdf' },
-            'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Aruba\'s premier 18-hole course.', gallery: ['Golf/Course/golf_1.jpg'], img: 'Golf/Course/golf_1.jpg', video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm' }
-        };
+        // --- RIPPLES ---
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.nav-btn')) createRipple(e, 'ripple-btn');
+            else if (!e.target.closest('.card') && !e.target.closest('.modal') && !e.target.closest('nav') && !e.target.closest('.admin-panel') && !e.target.closest('.fs-nav') && !e.target.closest('.media-badge')) createRipple(e, 'ripple-water');
+        });
 
-        // INIT
+        function createRipple(e, type) {
+            const ripple = document.createElement('div');
+            ripple.classList.add(type);
+            document.body.appendChild(ripple);
+            const size = type === 'ripple-water' ? 120 : 80;
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = e.clientX - size/2 + 'px';
+            ripple.style.top = e.clientY - size/2 + 'px';
+            setTimeout(() => ripple.remove(), 1000);
+        }
+
+        // --- GLOBAL VARS ---
+        let appData = {};
+        let currentSection = 'portfolio';
+        let timeState = 0; 
+        let currentGallery = [];
+        let currentImgIndex = 0;
+
+        // --- INIT ---
         window.onload = function() {
-            // FORCED SPLASH DELAY (2.5s to ensure visibility)
-            setTimeout(() => {
-                document.body.classList.remove('preload'); // Re-enable transitions
-                const splash = document.getElementById('splash');
-                splash.style.opacity = '0';
-                setTimeout(() => splash.style.display = 'none', 800);
-            }, 2500); 
-
-            updateTime();
+            const saved = localStorage.getItem('ib_app_data');
+            if(saved) { try { appData = JSON.parse(saved); } catch(e) { appData = defaultData; } } else { appData = defaultData; }
+            
+            updateTimeVibe();
+            setTimeout(() => { document.getElementById('splash').style.opacity = '0'; setTimeout(() => document.getElementById('splash').style.display = 'none', 800); }, 1000);
             renderApp('portfolio');
+            
+            let ticking = false;
+            document.addEventListener('mousemove', (e) => {
+                if (!ticking) { window.requestAnimationFrame(() => { handleTilt(e); ticking = false; }); ticking = true; }
+            });
+            
+            // Keyboard Nav
+            document.addEventListener('keydown', (e) => {
+                if(document.getElementById('fsViewer').style.display === 'flex') {
+                    if(e.key === 'ArrowLeft') prevFs();
+                    if(e.key === 'ArrowRight') nextFs();
+                    if(e.key === 'Escape') closeFs();
+                }
+            });
         };
 
-        function updateTime() {
+        function toggleTimeMode() {
+            timeState++;
+            if(timeState > 4) timeState = 0;
+            updateTimeVibe();
+            const modes = ["Auto", "Morning", "Day", "Sunset", "Night"];
+            showToast("Mode: " + modes[timeState]);
+        }
+
+        function updateTimeVibe() {
             const hour = new Date().getHours();
             const root = document.documentElement;
+            const body = document.body;
+            const els = ['boat', 'turtle', 'birds', 'dolphin', 'stars', 'nightGlow', 'clouds', 'fireflies', 'palmShadows'];
+            els.forEach(id => document.getElementById(id).className = document.getElementById(id).className.split(' ')[0]); 
+            
+            // Logo Element
             const logo = document.getElementById('headerLogo');
-            
-            // Simple Logic for Backgrounds
-            let colors = ['#4facfe', '#00f2fe']; // Default Day
-            let isDark = false;
 
-            if (hour >= 18 || hour < 6) {
-                colors = ['#0f172a', '#1e293b']; // Night
-                isDark = true;
-                document.getElementById('greeting').innerText = 'BON NOCHI';
-                document.body.classList.add('dark-theme');
-                if(logo) logo.classList.add('logo-white');
+            body.classList.remove('night-mode', 'dark-theme');
+            if(logo) logo.classList.remove('logo-white'); // Default state
+
+            let phase = 'day';
+            if (timeState === 0) { 
+                if(hour >= 5 && hour < 11) phase = 'morning';
+                else if(hour >= 11 && hour < 17) phase = 'day';
+                else if(hour >= 17 && hour < 19) phase = 'sunset';
+                else phase = 'night';
             } else {
-                document.getElementById('greeting').innerText = 'BON TARDI';
-                document.body.classList.remove('dark-theme');
-                if(logo) logo.classList.remove('logo-white');
+                const phases = ['', 'morning', 'day', 'sunset', 'night'];
+                phase = phases[timeState];
             }
-            
-            root.style.setProperty('--bg-gradient-1', colors[0]);
-            root.style.setProperty('--bg-gradient-2', colors[1]);
+
+            if(phase === 'morning') {
+                document.getElementById('greeting').innerText = "Bon Dia";
+                root.style.setProperty('--bg-gradient-1', '#A0E6FF'); root.style.setProperty('--bg-gradient-2', '#F9F7E8');
+                document.getElementById('birds').classList.add('birds-active');
+                document.getElementById('turtle').classList.add('turtle-active');
+                document.getElementById('clouds').classList.add('clouds-active');
+                document.getElementById('palmShadows').classList.add('shadows-active');
+            } else if(phase === 'day') {
+                document.getElementById('greeting').innerText = "Bon Tardi";
+                root.style.setProperty('--bg-gradient-1', '#00c6ff'); root.style.setProperty('--bg-gradient-2', '#0072ff');
+                document.getElementById('birds').classList.add('birds-active');
+                document.getElementById('turtle').classList.add('turtle-active');
+                document.getElementById('dolphin').classList.add('dolphin-active');
+                document.getElementById('clouds').classList.add('clouds-active');
+                document.getElementById('palmShadows').classList.add('shadows-active');
+                if(logo) logo.classList.add('logo-white'); 
+            } else if(phase === 'sunset') {
+                document.getElementById('greeting').innerText = "Bon Tardi";
+                body.classList.add('dark-theme');
+                root.style.setProperty('--bg-gradient-1', '#355C7D'); root.style.setProperty('--bg-gradient-2', '#F8B195');
+                document.getElementById('boat').classList.add('boat-active'); 
+                document.getElementById('dolphin').classList.add('dolphin-active');
+                document.getElementById('nightGlow').classList.add('glow-active');
+                if(logo) logo.classList.add('logo-white'); 
+            } else {
+                document.getElementById('greeting').innerText = "Bon Nochi";
+                body.classList.add('night-mode', 'dark-theme');
+                root.style.setProperty('--bg-gradient-1', '#0f172a'); root.style.setProperty('--bg-gradient-2', '#1e293b');
+                document.getElementById('boat').classList.add('boat-active');
+                document.getElementById('stars').classList.add('stars-active');
+                document.getElementById('nightGlow').classList.add('glow-active');
+                document.getElementById('fireflies').classList.add('fireflies-active');
+                if(logo) logo.classList.add('logo-white'); 
+            }
             
             const options = { weekday: 'long', month: 'long', day: 'numeric' };
             document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('en-US', options);
         }
 
-        function renderApp(section) {
+        function handleTilt(e) {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                if(x > 0 && x < rect.width && y > 0 && y < rect.height) {
+                    const centerX = rect.width / 2; const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -3; const rotateY = ((x - centerX) / centerX) * 3;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+                    const img = card.querySelector('.card-img');
+                    if(img) img.style.transform = `scale(1.1) translateX(${rotateY * -1.5}px) translateY(${rotateX * -1.5}px)`;
+                } else {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+                    const img = card.querySelector('.card-img');
+                    if(img) img.style.transform = 'scale(1.08)'; 
+                }
+            });
+        }
+
+        function renderApp(sectionId) {
+            currentSection = sectionId;
             const container = document.getElementById('appContent');
             const h1 = document.getElementById('pageTitle');
             const sub = document.getElementById('pageSub');
             const searchBox = document.getElementById('searchBox');
             
-            // Fix: Check for null elements to prevent crash
-            if (!container || !h1 || !sub || !searchBox) {
-                console.warn("Missing DOM elements, retrying render...");
-                return;
-            }
+            document.getElementById('mainContainer').scrollTop = 0;
             
-            // Map section to type
-            const map = { 'portfolio':'club', 'dining':'food', 'activities':'fun', 'spa':'spa', 'golf':'golf' };
-            const type = map[section];
+            const noResults = document.createElement('div'); noResults.className = 'no-results'; noResults.innerText = "No experiences found.";
             
-            // Update Headers
-            if(section === 'portfolio') { h1.innerText = "Iberostar Aruba"; sub.innerText = "Experience the ultimate Iberostar hotels."; searchBox.style.display='none'; }
-            else if(section === 'dining') { h1.innerText = "Taste"; sub.innerText = "Culinary journeys from Joia to the island's best."; searchBox.style.display='block'; }
-            else if(section === 'activities') { h1.innerText = "Discover"; sub.innerText = "Thrill and adventure with our partners."; searchBox.style.display='block'; }
-            else if(section === 'spa') { h1.innerText = "Wellness"; sub.innerText = "Rejuvenate your body and mind."; searchBox.style.display='none'; }
-            else if(section === 'golf') { h1.innerText = "Golf & Nature"; sub.innerText = "Championship golf and bird sanctuary."; searchBox.style.display='none'; }
+            if (sectionId === 'dining' || sectionId === 'activities') searchBox.style.display = 'block'; else searchBox.style.display = 'none';
 
-            // Highlight Nav
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            // This relies on order, simple mapping
-            const btns = document.querySelectorAll('.nav-btn');
-            if(section==='portfolio') btns[0].classList.add('active');
-            if(section==='dining') btns[1].classList.add('active');
-            if(section==='activities') btns[2].classList.add('active');
-            if(section==='spa') btns[3].classList.add('active');
-            if(section==='golf') btns[4].classList.add('active');
+            if(sectionId === 'portfolio') { h1.setAttribute('data-text', "Iberostar Aruba"); h1.innerText = "Iberostar Aruba"; sub.innerText = "Experience the ultimate Iberostar hotels on Aruba."; } 
+            else if(sectionId === 'dining') { h1.setAttribute('data-text', "Taste"); h1.innerText = "Taste"; sub.innerText = "Culinary journeys from Joia to the island's best."; } 
+            else if(sectionId === 'activities') { h1.setAttribute('data-text', "Discover"); h1.innerText = "Discover"; sub.innerText = "Thrill and adventure with our official tour partners."; }
+            else if(sectionId === 'spa') { h1.setAttribute('data-text', "Wellness"); h1.innerText = "Wellness"; sub.innerText = "Rejuvenate your body and mind at Spa Sensations."; }
+            else if(sectionId === 'golf') { h1.setAttribute('data-text', "Golf & Nature"); h1.innerText = "Golf & Nature"; sub.innerText = "Championship golf and bird sanctuary tours."; }
 
-            // Render Grid
-            let html = '<div class="grid fade-wrapper">';
-            Object.keys(appData).forEach(key => {
-                const item = appData[key];
-                if(item.type !== type) return;
+            let html = `<div class="grid fade-wrapper">`;
+            const filterMap = { 'portfolio': 'club', 'dining': 'food', 'activities': 'fun', 'spa': 'spa', 'golf': 'golf' };
+            const type = filterMap[sectionId];
+            const itemsToShow = Object.keys(appData).map(key => ({ key, ...appData[key] })).filter(i => i.type === type);
+            
+            itemsToShow.forEach(item => {
+                let logoHtml = ''; if(item.partnerLogo) logoHtml = `<img src="${item.partnerLogo}" class="partner-badge" onerror="this.style.display='none'">`;
+                const mainImg = (item.gallery && item.gallery.length > 0) ? item.gallery[0] : item.img;
                 
-                let logoHtml = ''; if(item.partnerLogo) logoHtml = `<img src="${item.partnerLogo}" class="partner-badge" onerror="handleImgError(this)">`;
-                
-                // --- FIXED MEDIA ICON LOGIC ---
                 let mediaBadge = '';
                 if(item.video) {
-                    // Video icon plays video directly
-                    mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); playVideo('${item.video}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`;
+                    mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); viewVideo('${item.video}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`;
                 }
                 else if(item.pdf) {
-                    // PDF icon opens PDF
                     mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>`;
                 }
 
-                html += `
-                <div class="card" onclick="openDetails('${key}')" onmousemove="cardTilt(event, this)" onmouseleave="cardReset(this)">
+                html += `<div class="card" onclick="openDetails('${item.key}')">
                     <div class="card-media">
                         ${logoHtml} ${mediaBadge}
-                        <div class="tag-pill">${item.sub}</div>
+                        <div class="tag-pill ${item.sub.includes('Joia') || item.sub.includes('Exclusive') ? 'highlight' : ''}">${item.sub}</div>
                         <div class="cash-badge">IBEROCASH</div>
-                        <img class="card-img" src="${item.img}" onerror="handleImgError(this)">
+                        <div class="card-img"><img src="${mainImg}" onerror="handleImgError(this)" style="width:100%;height:100%;object-fit:cover;"></div>
                     </div>
-                    <div class="card-content">
-                        <h3 class="card-title">${item.title}</h3>
-                        <p class="card-desc">${item.desc}</p>
-                    </div>
+                    <div class="card-content"><h3 class="card-title">${item.title}</h3><p class="card-desc">${item.desc.substring(0, 100)}...</p></div>
                 </div>`;
             });
-            html += '</div>';
+            html += `</div>`;
+            
             container.innerHTML = html;
+            container.querySelector('.grid').appendChild(noResults);
+
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            let index = 0;
+            if (sectionId === 'dining') index = 1; if (sectionId === 'activities') index = 2; if (sectionId === 'spa') index = 3; if (sectionId === 'golf') index = 4;
+            document.querySelectorAll('button.nav-btn')[index].classList.add('active');
+        }
+
+        function nav(id) { document.getElementById('searchInput').value = ''; renderApp(id); }
+
+        function filterContent() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            let visibleCount = 0;
+            cards.forEach(card => {
+                const title = card.querySelector('.card-title').innerText.toLowerCase();
+                const sub = card.querySelector('.tag-pill').innerText.toLowerCase();
+                if(title.includes(query) || sub.includes(query)) { card.style.display = 'block'; visibleCount++; } 
+                else { card.style.display = 'none'; }
+            });
+            const noRes = document.querySelector('.no-results');
+            if(visibleCount === 0) noRes.style.display = 'block'; else noRes.style.display = 'none';
         }
 
         function openDetails(key) {
             const item = appData[key];
             const modal = document.getElementById('detailModal');
+            const mainImg = document.getElementById('dImg');
             
-            // Set Text
+            const spinner = modal.querySelector('.image-spinner');
+            spinner.classList.add('active');
+            mainImg.style.display = 'none'; // Hide old image
+            mainImg.classList.remove('loaded'); // Reset load state
+            
+            // --- FIXED: AUTO-GALLERY GENERATION LOGIC ---
+            let galleryData = [];
+            
+            // Priority 1: Generate sequence from folder (Best for "finding" files)
+            // If imageCount > 0, we assume the user wants us to look for that many files
+            if (item.imageCount && item.imageCount > 0) {
+                const mainSrc = item.img || (item.gallery ? item.gallery[0] : '');
+                if (mainSrc) {
+                    const lastUnderscore = mainSrc.lastIndexOf('_');
+                    const lastDot = mainSrc.lastIndexOf('.');
+                    if (lastUnderscore > -1 && lastDot > -1) {
+                        const prefix = mainSrc.substring(0, lastUnderscore + 1); 
+                        const ext = mainSrc.substring(lastDot); 
+                        for (let i = 1; i <= item.imageCount; i++) {
+                            galleryData.push(prefix + i + ext);
+                        }
+                    } else {
+                        galleryData = item.gallery || [item.img];
+                    }
+                }
+            } 
+            // Priority 2: Use explicit gallery list
+            else if (item.gallery && item.gallery.length > 0) {
+                 galleryData = item.gallery;
+            } else {
+                galleryData = [item.img];
+            }
+
+            // Clicking hero opens gallery at 0
+            modal.querySelector('.modal-hero').onclick = () => viewFull(null, galleryData, 0);
+            
+            // FIXED: Ensure main image loads the first valid item
+            if(galleryData.length > 0) {
+                 mainImg.src = galleryData[0];
+                 // Note: Error handler will hide mainImg if it fails, Load handler shows it
+            }
+
             document.getElementById('dTitle').innerText = item.title;
             document.getElementById('dSub').innerText = item.sub;
             document.getElementById('dDesc').innerText = item.desc;
+
+            const grid = document.getElementById('dInfoGrid');
+            grid.innerHTML = '';
+            if(item.duration) grid.innerHTML += `<div class="info-item"><h5>Duration</h5><p>${item.duration}</p></div>`;
+            if(item.time) grid.innerHTML += `<div class="info-item"><h5>Departure</h5><p>${item.time}</p></div>`;
             
-            // Info Grid (Duration etc)
-            const grid = document.getElementById('dDetails');
-            grid.innerHTML = ''; // Reset
-            if(item.duration || item.time) {
-                let infoHtml = '<div class="info-grid">';
-                if(item.duration) infoHtml += `<div class="info-item"><h5>Duration</h5><p>${item.duration}</p></div>`;
-                if(item.time) infoHtml += `<div class="info-item"><h5>Time</h5><p>${item.time}</p></div>`;
-                infoHtml += '</div>';
-                grid.innerHTML = infoHtml;
+            const detailsDiv = document.getElementById('dDetails');
+            detailsDiv.innerHTML = '';
+            if(item.itinerary || item.essentials) {
+                let detHtml = '';
+                if(item.itinerary && item.itinerary.length > 0) {
+                    detHtml += `<h4>Tour Highlights</h4><ul class="details-list">`;
+                    const stops = Array.isArray(item.itinerary) ? item.itinerary : item.itinerary.split(',');
+                    stops.forEach(s => detHtml += `<li>${s.trim()}</li>`);
+                    detHtml += `</ul>`;
+                }
+                if(item.essentials && item.essentials.length > 0) {
+                    detHtml += `<h4 style="margin-top:25px;">What to Bring</h4><ul class="details-list">`;
+                    const pack = Array.isArray(item.essentials) ? item.essentials : item.essentials.split(',');
+                    pack.forEach(s => detHtml += `<li>${s.trim()}</li>`);
+                    detHtml += `</ul>`;
+                }
+                detailsDiv.innerHTML = detHtml;
             }
 
-            // Set Main Image (Try first gallery image, fallback to main img)
-            const mainImg = document.getElementById('dImg');
-            // Reset to prevent showing old image
-            mainImg.src = ''; 
-            
-            // Gallery Logic (STRICT - NO AUTO GENERATION)
-            const galContainer = document.getElementById('dGallery');
-            let galHtml = '';
-            
-            // Use provided gallery or fallback to single image
-            const images = (item.gallery && item.gallery.length > 0) ? item.gallery : [item.img];
-            
-            // Set hero to first image
-            mainImg.src = images[0];
+            const actBar = document.getElementById('dAction');
+            let actionButtons = '';
 
-            images.forEach(src => {
-                galHtml += `<div class="gallery-item" onclick="openFS('${src}')"><img src="${src}" onerror="handleImgError(this)"></div>`;
+            if(item.type === 'food' && item.pdf) {
+                actionButtons += `<button class="btn-big" onclick="viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Digital Menu</button>`;
+            } else if ((item.type === 'club' || item.type === 'golf') && item.video) {
+                actionButtons += `<button class="btn-big" onclick="viewVideo('${item.video}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Video Tour</button>`;
+            } else if (item.type === 'spa' && item.pdf) {
+                actionButtons += `<button class="btn-big" onclick="viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H8v-2h8v2zm0-4h-4V8h4v2z"/></svg> Spa Menu</button>`;
+            }
+            actBar.innerHTML = actionButtons;
+
+            const gal = document.getElementById('dGallery');
+            let gHtml = '';
+            galleryData.forEach((img, idx) => {
+                // Generate all containers; error handler removes broken ones
+                gHtml += `<div class="gallery-item" onclick="openLightboxFromThumb(this)"><img src="${img}" onerror="handleImgError(this)"></div>`;
             });
+            gal.innerHTML = gHtml;
+            modal.classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('detailModal').classList.remove('active'); }
+        function expandMainImage() {
+             // Handled by onclick in HTML now via openDetails logic
+        }
+
+        // --- LIGHTBOX LOGIC ---
+        function getValidImages() {
+            const validImgs = [];
+            const thumbs = document.querySelectorAll('#dGallery .gallery-item img');
+            thumbs.forEach(img => {
+                if (img.style.display !== 'none' && img.parentElement.style.display !== 'none') {
+                    validImgs.push(img.src);
+                }
+            });
+            return validImgs;
+        }
+
+        function openLightboxFromThumb(element) {
+            const imgSrc = element.querySelector('img').src;
+            const validList = getValidImages();
+            let index = validList.indexOf(imgSrc);
+            if (index === -1) index = 0;
+            launchLightbox(validList, index);
+        }
+
+        function openLightboxFromHero() {
+            const heroSrc = document.getElementById('dImg').src;
+            const validList = getValidImages();
+            if (!validList.includes(heroSrc) && document.getElementById('dImg').style.display !== 'none') {
+                validList.unshift(heroSrc);
+            }
+            let index = validList.indexOf(heroSrc);
+            if (index === -1) index = 0;
+            launchLightbox(validList, index);
+        }
+
+        function launchLightbox(list, index) {
+            if (list.length === 0) return;
+            currentGallery = list;
+            currentImgIndex = index;
             
-            galContainer.innerHTML = galHtml;
-            document.querySelector('.modal-wrap').classList.add('active');
+            const fs = document.getElementById('fsViewer');
+            const prevBtn = document.getElementById('fsPrev');
+            const nextBtn = document.getElementById('fsNext');
+            const caption = document.getElementById('fsCaption');
+            
+            prevBtn.style.display = list.length > 1 ? 'flex' : 'none';
+            nextBtn.style.display = list.length > 1 ? 'flex' : 'none';
+            caption.style.display = list.length > 1 ? 'block' : 'none';
+            
+            updateFsImage();
+            fs.classList.add('active');
         }
 
-        function closeModal() {
-            document.querySelector('.modal-wrap').classList.remove('active');
+        function updateFsImage() {
+            const src = currentGallery[currentImgIndex];
+            const content = document.getElementById('fsContent');
+            const caption = document.getElementById('fsCaption');
+            const backdrop = document.getElementById('fsBackdrop');
+            content.innerHTML = `<img class="fs-image" src="${src}" onerror="handleImgError(this)">`;
+            backdrop.style.backgroundImage = `url('${src}')`;
+            caption.innerText = `${currentImgIndex + 1} / ${currentGallery.length}`;
         }
 
-        function openFS(src) {
-            document.getElementById('fsImg').style.display = 'block';
-            document.getElementById('fsVideoContainer').style.display = 'none';
-            document.getElementById('fsImg').src = src;
-            document.getElementById('fsViewer').classList.add('active');
+        function handleLightboxError(img) {
+            if (currentGallery.length <= 1) return; 
+            currentGallery.splice(currentImgIndex, 1);
+            if (currentImgIndex >= currentGallery.length) {
+                currentImgIndex = 0;
+            }
+            updateFsImage();
         }
 
-        function playVideo(url) {
-            const vidContainer = document.getElementById('fsVideoContainer');
-            document.getElementById('fsImg').style.display = 'none';
-            vidContainer.style.display = 'flex';
-            vidContainer.innerHTML = `<video controls autoplay style="width:100%;height:100%"><source src="${url}" type="video/mp4"></video>`;
-            document.getElementById('fsViewer').classList.add('active');
-        }
+        function nextFs() { currentImgIndex++; if(currentImgIndex >= currentGallery.length) currentImgIndex = 0; updateFsImage(); }
+        function prevFs() { currentImgIndex--; if(currentImgIndex < 0) currentImgIndex = currentGallery.length - 1; updateFsImage(); }
 
         function viewPdf(url) {
-            // PDF Viewing Logic (Simplest: New Tab or FS Object)
-            // For iPad, new tab is often safer for PDFs
-            window.open(url, '_blank');
+            const fs = document.getElementById('fsViewer');
+            const content = document.getElementById('fsContent');
+            document.getElementById('fsPrev').style.display = 'none';
+            document.getElementById('fsNext').style.display = 'none';
+            document.getElementById('fsCaption').style.display = 'none';
+            document.getElementById('fsBackdrop').style.backgroundImage = 'none'; 
+            content.innerHTML = `<object data="${url}" type="application/pdf" width="100%" height="100%" onerror="this.data='${url}.pdf'"><div style="color:white;text-align:center;padding-top:100px;"><p>Loading PDF...</p></div></object>`;
+            fs.classList.add('active');
         }
 
-        // TILT LOGIC (OPTIMIZED)
-        function cardTilt(e, card) {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -3; 
-            const rotateY = ((x - centerX) / centerX) * 3;
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-            const img = card.querySelector('.card-img');
-            if(img) img.style.transform = `scale(1.1) translateX(${rotateY * -1.5}px) translateY(${rotateX * -1.5}px)`;
+        function viewVideo(url) {
+            const fs = document.getElementById('fsViewer');
+            const content = document.getElementById('fsContent');
+            document.getElementById('fsPrev').style.display = 'none';
+            document.getElementById('fsNext').style.display = 'none';
+            document.getElementById('fsCaption').style.display = 'none';
+            document.getElementById('fsBackdrop').style.backgroundImage = 'none';
+            content.innerHTML = `<video controls playsinline autoplay muted style="width:100%;height:100%; object-fit:contain;"><source src="${url}" type="video/mp4"></video>`;
+            fs.classList.add('active');
+        }
+        
+        function closeFs() {
+            document.getElementById('fsViewer').classList.remove('active');
+            setTimeout(() => document.getElementById('fsContent').innerHTML = '', 300);
         }
 
-        function cardReset(card) {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-            const img = card.querySelector('.card-img');
-            if(img) img.style.transform = 'scale(1.08)'; 
+        // --- ADMIN ---
+        let tapCount = 0;
+        document.getElementById('headerLogo').addEventListener('click', function() {
+            tapCount++;
+            if(tapCount >= 5) { document.getElementById('adminPanel').classList.add('active'); tapCount = 0; renderAdminList(); }
+            setTimeout(() => tapCount = 0, 2000); 
+        });
+
+        function closeAdmin() { document.getElementById('adminPanel').classList.remove('active'); }
+        
+        function renderAdminList() {
+            let listContainer = document.getElementById('itemListContainer');
+            listContainer.innerHTML = '';
+            const listDiv = document.createElement('div');
+            listDiv.style.maxHeight = '200px'; listDiv.style.overflowY = 'auto'; listDiv.style.border = '1px solid #eee';
+
+            Object.keys(appData).forEach(key => {
+                const item = appData[key];
+                const div = document.createElement('div');
+                div.style.padding = '10px'; div.style.borderBottom = '1px solid #eee'; div.style.cursor = 'pointer';
+                div.style.display = 'flex'; div.style.justifyContent = 'space-between';
+                div.innerHTML = `<strong>${item.title}</strong> <span style="color:#888;font-size:12px;">${key}</span>`;
+                div.onclick = () => loadItemIntoForm(key);
+                listDiv.appendChild(div);
+            });
+            listContainer.appendChild(listDiv);
         }
 
-        function nav(sec) { renderApp(sec); }
+        function loadItemIntoForm(key) {
+            const item = appData[key];
+            document.getElementById('newKey').value = key;
+            document.getElementById('newType').value = item.type;
+            document.getElementById('newTitle').value = item.title;
+            document.getElementById('newSub').value = item.sub;
+            document.getElementById('newDesc').value = item.desc;
+            document.getElementById('newDuration').value = item.duration || '';
+            document.getElementById('newTime').value = item.time || '';
+            document.getElementById('newItinerary').value = item.itinerary ? (Array.isArray(item.itinerary) ? item.itinerary.join(', ') : item.itinerary) : '';
+            document.getElementById('newEssentials').value = item.essentials ? (Array.isArray(item.essentials) ? item.essentials.join(', ') : item.essentials) : '';
+            document.getElementById('newImageCount').value = item.imageCount || '';
+
+            if(item.gallery && item.gallery.length > 0) {
+                document.getElementById('newGallery').value = item.gallery.join(', ');
+                document.getElementById('newImg').value = item.gallery[0];
+            } else {
+                document.getElementById('newGallery').value = ''; 
+                document.getElementById('newImg').value = item.img || '';
+            }
+            document.getElementById('newPartnerLogo').value = item.partnerLogo || '';
+            let fileVal = '';
+            if(item.type === 'food') fileVal = item.pdf || '';
+            else if(item.type === 'club') fileVal = item.video || '';
+            else if(item.type === 'spa') fileVal = item.pdf || '';
+            document.getElementById('newFile').value = fileVal;
+        }
+
+        function clearForm() {
+             document.getElementById('newKey').value = ''; document.getElementById('newTitle').value = '';
+             document.getElementById('newSub').value = ''; document.getElementById('newDesc').value = '';
+             document.getElementById('newGallery').value = ''; document.getElementById('newImg').value = '';
+             document.getElementById('newFile').value = ''; document.getElementById('newPartnerLogo').value = '';
+             document.getElementById('newDuration').value = ''; document.getElementById('newTime').value = '';
+             document.getElementById('newItinerary').value = ''; document.getElementById('newEssentials').value = '';
+             document.getElementById('newImageCount').value = '';
+        }
+
+        function saveItem() {
+            const type = document.getElementById('newType').value;
+            const title = document.getElementById('newTitle').value;
+            const sub = document.getElementById('newSub').value;
+            const desc = document.getElementById('newDesc').value;
+            const galleryRaw = document.getElementById('newGallery').value;
+            const gallery = galleryRaw ? galleryRaw.split(',').map(s => s.trim()).filter(s => s.length > 0) : [];
+            const img = gallery.length > 0 ? gallery[0] : document.getElementById('newImg').value;
+            const file = document.getElementById('newFile').value;
+            const key = document.getElementById('newKey').value;
+            const partnerLogo = document.getElementById('newPartnerLogo').value;
+            
+            const duration = document.getElementById('newDuration').value;
+            const time = document.getElementById('newTime').value;
+            const itinRaw = document.getElementById('newItinerary').value;
+            const itinerary = itinRaw ? itinRaw.split(',').map(s => s.trim()).filter(s => s.length > 0) : [];
+            const essRaw = document.getElementById('newEssentials').value;
+            const essentials = essRaw ? essRaw.split(',').map(s => s.trim()).filter(s => s.length > 0) : [];
+            const imageCount = parseInt(document.getElementById('newImageCount').value) || 0;
+            
+            if(!key || !title) { alert('ID/Title required'); return; }
+            
+            appData[key] = { 
+                type: type, title: title, sub: sub, desc: desc, img: img, gallery: gallery, 
+                pdf: (type === 'food' || type === 'spa' ? file : ''), 
+                video: (type === 'club' || type === 'golf' ? file : ''),
+                partnerLogo: (type === 'fun' ? partnerLogo : ''),
+                duration: duration, time: time, itinerary: itinerary, essentials: essentials,
+                imageCount: imageCount
+            };
+            localStorage.setItem('ib_app_data', JSON.stringify(appData));
+            showToast('Changes Saved'); closeAdmin(); location.reload();
+        }
+        
+        function deleteItem() {
+            const key = document.getElementById('newKey').value;
+            if(!key) { alert('Select an item first'); return; }
+            if(confirm("Delete " + key + "?")) {
+                delete appData[key]; localStorage.setItem('ib_app_data', JSON.stringify(appData));
+                showToast('Item Deleted'); closeAdmin(); location.reload();
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('modeToast');
+            toast.innerText = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => toast.style.opacity = '0', 2000);
+        }
+
+        function exportData() { 
+            const dataStr = JSON.stringify(appData, null, 4); 
+            navigator.clipboard.writeText(`const defaultData = ${dataStr};`); 
+            showToast('Data Copied');
+        }
+
+        const defaultData = {
+            'Joia': { type:'club', title: 'Iberostar Joia', sub: 'Eagle Beach', desc: 'Experience the crown jewel of Aruba. Located on the pristine shores of Eagle Beach, Joia is an adults-only haven offering butler service, swim-up suites, and a level of exclusivity that redefines Caribbean luxury.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg', 'Hotels/Joia/hotel_joia_3.jpg'], video: 'Hotels/Joia/hotel_joia.mp4', imageCount: 10 },
+            'Tierra': { type:'club', title: 'Tierra del Sol', sub: 'Golf & Estates', desc: 'Escape to the island\'s most prestigious gated community. Featuring luxury villas, a championship golf course, and panoramic views of the California Lighthouse and rugged North Coast.', gallery: ['Hotels/Tierra/golf_tierra_1.jpg', 'Hotels/Tierra/golf_tierra_2.jpg', 'Hotels/Tierra/golf_tierra_3.jpg', 'Hotels/Tierra/golf_tierra_4.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', imageCount: 10 },
+            'Selection': { type:'club', title: 'Iberostar Selection', sub: 'Coming Soon', desc: 'Bringing the premium Selection family experience to the Caribbean. Designed for families who refuse to compromise on luxury.', gallery: ['Hotels/Selection/hotel_selection_1.png'], video: '' },
+            'Joia2': { type:'club', title: 'Iberostar Joia (Lighthouse)', sub: 'In Development', desc: 'The next chapter of the Joia collection.', gallery: ['Hotels/Joia2/hotel_joia2_1.jpg'], video: '' },
+
+            'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Tierra del Sol, Aruba\'s premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole.', gallery: ['Golf/Course/golf_1.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm', essentials: ['Golf Shoes', 'Collared Shirt', 'Sunscreen'], imageCount: 10 },
+            'BirdLife': { type:'golf', title: 'Audubon Sanctuary', sub: 'Nature & Wildlife', desc: 'Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).', gallery: ['Golf/Birds/birds_1.jpg'], pdf: '' },
+
+            'UTV': { 
+                type:'fun', title: 'Aruba UTV & ATV Tour', sub: 'Rocka Beach Tours', 
+                desc: 'Take the wheel of a rugged UTV and conquer Aruba’s wild side! This guided off-road safari takes you through the desert terrain of Arikok National Park, past the Natural Bridge ruins, and down to the refreshing waters of the Natural Pool (Conchi).',
+                gallery: ['Activites/Rockabeach/act_utv_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
+                duration: '4 Hours', time: '9:00 AM & 2:30 PM',
+                itinerary: ['Philips Animal Garden', 'Alto Vista Chapel', 'Baby Bridge', 'Bushiribana Gold Ruins', 'Wariruri Beach'],
+                essentials: ['Valid Drivers License', 'Sunblock', 'Sunglasses', 'Bandana', 'Old clothes'],
+                imageCount: 10
+            },
+            'Jeep': { 
+                type:'fun', title: 'Jeep Excursions', sub: 'Rocka Beach Tours', 
+                desc: 'Explore the island comfortably in our open-air Land Rovers. Visit the California Lighthouse, Alto Vista Chapel, and the rugged North Coast. A perfect mix of sightseeing and off-road adventure suitable for the whole family.', 
+                gallery: ['Activites/Rockabeach/act_jeep_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
+                duration: '4.5 Hours', time: '8:30 AM',
+                itinerary: ['California Lighthouse', 'Alto Vista Chapel', 'Natural Pool', 'Baby Beach'],
+                essentials: ['Swimwear', 'Towel', 'Sunscreen', 'Camera'],
+                imageCount: 10
+            },
+            'Sail': { 
+                type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', 
+                desc: 'Set sail on a luxury catamaran for a relaxing day on the turquoise Caribbean Sea. Includes stops at the Antilla Shipwreck for snorkeling, an open bar with tropical cocktails, and a delicious light lunch.', 
+                gallery: ['Activites/Rockabeach/act_sail_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
+                duration: '3.5 Hours', time: '9:30 AM & 2:00 PM',
+                itinerary: ['Antilla Shipwreck', 'Boca Catalina', 'Malmok Reef'],
+                essentials: ['Swimwear', 'Towel', 'Sunscreen'],
+                imageCount: 10
+            },
+            'GoKart': { type:'fun', title: 'Go Kart Racing', sub: 'Rocka Beach Tours', desc: 'Adrenaline-pumping fun for speed enthusiasts. Race around a professionally designed track.', gallery: ['Activites/Rockabeach/act_gokart_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
+            'Rentals': { type:'fun', title: 'UTV & ATV Rentals', sub: 'Rocka Beach Tours', desc: 'Freedom to explore at your own pace. Rent a UTV or ATV and create your own itinerary.', gallery: ['Activites/Rockabeach/act_rentals_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
+            'HalfIsland': { type:'fun', title: 'Half Island Tour', sub: 'Rocka Beach Tours', desc: 'A perfect overview of Aruba in comfort.', gallery: ['Activites/Rockabeach/act_half_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
+
+            'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
+            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit.', gallery: ['Spa/General/spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 5 },
+
+            'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'Joia Aruba • Rooftop', desc: 'Perched atop the Joia hotel, Zima Bar offers the best sunset views.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], pdf: 'Restaurants/Zima/menu_zima.pdf', imageCount: 20 },
+            'Bucatini': { type:'food', title: 'Bucatini', sub: 'Joia Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], pdf: 'Restaurants/Bucatini/menu_bucatini.pdf', imageCount: 20 },
+            'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
+            'Birdie': { type:'food', title: 'The Birdie', sub: 'Tierra del Sol', desc: 'Experience the "Tapas Affair" with breathtaking views.', gallery: ['Restaurants/Birdie/rest_birdie_1.jpg'], pdf: 'Restaurants/Birdie/menu_birdie.pdf', imageCount: 20 },
+            
+            // --- EXTERNAL RESTAURANTS ---
+            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, dinner in bed experience.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
+            'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf', imageCount: 20 },
+            'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf', imageCount: 20 },
+            'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas and modern atmosphere.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf', imageCount: 20 },
+            'Azzurro': { type:'food', title: 'Azzurro Ristorante', sub: 'Seafood', desc: 'Located right on the beach, serving authentic Italian seafood.', gallery: ['Restaurants/Azzurro%20Ristorante/rest_azzurro_1.jpg'], pdf: 'Restaurants/Azzurro%20Ristorante/menu_azzurro.pdf', imageCount: 20 },
+            'AmoreMio': { type:'food', title: 'Amore Mio', sub: 'Pizzeria', desc: 'Authentic Neapolitan pizza with a crispy, airy crust.', gallery: ['Restaurants/Amore%20Mio/rest_amoremio_1.jpg'], pdf: 'Restaurants/Amore%20Mio/menu_amoremio.pdf', imageCount: 20 },
+            'Dushi': { type:'food', title: 'Dushi Bagels', sub: 'Casual', desc: 'The go-to spot for New York style bagels and hearty burgers.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg'], pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf', imageCount: 20 },
+            'BeachBar': { type:'food', title: 'The Beach Bar', sub: 'Beachside', desc: 'The longest happy hour on the island.', gallery: ['Restaurants/The%20Beach%20Bar/rest_beachbar_1.jpg'], pdf: 'Restaurants/The%20Beach%20Bar/menu_beachbar.pdf', imageCount: 20 },
+            'Gelatissimo': { type:'food', title: 'Gelatissimo', sub: 'Bistro', desc: 'Authentic Italian gelato and bistro favorites.', gallery: ['Restaurants/Gelatissimo/rest_gelatissimo_1.jpg'], pdf: 'Restaurants/Gelatissimo/menu_gelatissimo.pdf', imageCount: 20 },
+            'Garden': { type: 'food', title: 'Garden Fresh', sub: 'Healthy', desc: 'The best spot for fresh smoothies, salads, and wraps.', gallery: ['Restaurants/Garden%20Fresh/rest_garden_1.jpg'], pdf: 'Restaurants/Garden%20Fresh/menu_garden.pdf', imageCount: 20 },
+        };
     </script>
 </body>
 </html>
