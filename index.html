@@ -2,26 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- VIEWPORT: Fixed to prevent zooming on inputs, optimized for all screens -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- APPLE PWA SETTINGS: Makes it look like a native app -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     
-    <!-- APP ICON (Home Screen) - Uses the Gold Star Icon -->
     <link rel="apple-touch-icon" href="Logos/unnamed.webp"> 
     <link rel="shortcut icon" href="Logos/unnamed.webp" type="image/webp">
     
-    <!-- PREMIUM TYPOGRAPHY -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 
     <title>Iberostar Aruba</title>
 
-    <!-- CRITICAL: Image Error Handler -->
     <script>
         function handleImgError(img) {
             if (window.handleImgError && window.handleImgError !== handleImgError) return;
@@ -41,17 +36,15 @@
     </script>
 
     <style>
-        /* --- 2026 MASTERMIND SYSTEM --- */
+        /* --- 2026 MASTERMIND SYSTEM (OPTIMIZED) --- */
         :root {
-            /* Palette */
             --bg-gradient-1: #4facfe;
             --bg-gradient-2: #00f2fe;
-            
             --ocean-deep: #0F2D4A; 
             --gold: #C5A065;
             --gold-light: #E6C890;
             
-            /* Glassmorphism */
+            /* Optimized Glass: Reduced blur for mobile performance */
             --glass-card: rgba(255, 255, 255, 0.8);
             --glass-nav: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 0.6);
@@ -69,7 +62,6 @@
             --font-body: 'Inter', sans-serif;
         }
 
-        /* DARK THEME */
         body.dark-theme {
             --text-main: #FFFFFF;
             --text-muted: rgba(255, 255, 255, 0.8);
@@ -83,38 +75,30 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-font-smoothing: antialiased; }
         
         body {
-            margin: 0;
-            font-family: var(--font-body);
-            background-color: #FDFBF7;
-            color: var(--text-main);
-            height: 100vh;
-            /* SAFE AREA PADDING FOR NOTCHED PHONES */
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-            display: flex;
-            overflow: hidden;
-            background: linear-gradient(180deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
-            transition: background 2.5s ease, color 1.5s ease;
-            position: relative;
+            margin: 0; font-family: var(--font-body); background-color: #FDFBF7; color: var(--text-main); height: 100vh;
+            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);
+            display: flex; overflow: hidden; background: linear-gradient(180deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+            transition: background 2.5s ease, color 1.5s ease; position: relative;
         }
 
-        /* --- ATMOSPHERE LAYERS --- */
+        /* --- PERFORMANCE OPTIMIZED ATMOSPHERE LAYERS --- */
+        /* Added will-change to hint GPU for smoother animations */
+        
         .ocean-waves {
             position: absolute; inset: 0; pointer-events: none; z-index: 0;
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
-            opacity: 0.2; animation: waveDrift 60s linear infinite;
+            opacity: 0.2; animation: waveDrift 60s linear infinite; will-change: transform;
         }
-        @keyframes waveDrift { 0% { background-position: 0 0; } 100% { background-position: 1000px 20px; } }
+        @keyframes waveDrift { 0% { transform: translate3d(0,0,0); } 100% { transform: translate3d(1000px, 20px, 0); } }
 
         .palm-shadows {
             position: absolute; inset: 0; pointer-events: none; z-index: 1;
             background: radial-gradient(circle at 100% 0%, rgba(0,0,0,0.05) 0%, transparent 40%),
                         radial-gradient(circle at 90% 10%, rgba(0,0,0,0.03) 0%, transparent 30%);
-            opacity: 0; transition: opacity 3s ease; filter: blur(40px);
+            opacity: 0; transition: opacity 3s ease; filter: blur(25px); /* Reduced blur for performance */
+            will-change: transform, opacity;
         }
-        .shadows-active { opacity: 1 !important; animation: palmSway 10s ease-in-out infinite alternate; }
+        .shadows-active { opacity: 1 !important; animation: palmSway 12s ease-in-out infinite alternate; }
         @keyframes palmSway { 0% { transform: translateX(0); } 100% { transform: translateX(-20px); } }
 
         .night-glow {
@@ -127,7 +111,7 @@
         .horizon-boat {
             position: absolute; bottom: 18%; left: -100px; width: 60px; height: 60px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.4'%3E%3Cpath d='M14 6l5 11h-5v-11zm-2 0v11h-5l5-11zm-9 13l2 3h16l2-3h-20z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease;
+            background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; will-change: transform;
         }
         body.dark-theme .horizon-boat {
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF' opacity='0.3'%3E%3Cpath d='M14 6l5 11h-5v-11zm-2 0v11h-5l5-11zm-9 13l2 3h16l2-3h-20z'/%3E%3C/svg%3E");
@@ -138,8 +122,8 @@
         .clouds {
             position: absolute; top: 0; left: 0; width: 100%; height: 300px;
             background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px);
-            background-size: 60px 60px; filter: blur(40px);
-            opacity: 0; transition: opacity 3s ease; z-index: 0;
+            background-size: 60px 60px; filter: blur(25px); /* Reduced blur */
+            opacity: 0; transition: opacity 3s ease; z-index: 0; will-change: transform;
             animation: cloudDrift 90s linear infinite;
         }
         .clouds-active { opacity: 0.7 !important; }
@@ -150,7 +134,7 @@
         }
         .fireflies::before, .fireflies::after {
             content: ''; position: absolute; width: 3px; height: 3px; background: #FFD700; border-radius: 50%;
-            box-shadow: 0 0 8px #FFD700; animation: fireflyMove 20s infinite alternate;
+            box-shadow: 0 0 8px #FFD700; animation: fireflyMove 20s infinite alternate; will-change: transform;
         }
         .fireflies::after { left: 60%; top: 40%; animation-duration: 25s; animation-direction: alternate-reverse; width: 2px; height: 2px; }
         .fireflies-active { opacity: 0.6 !important; }
@@ -160,7 +144,7 @@
         .living-turtle {
             position: absolute; bottom: 8%; right: -120px; width: 100px; height: 80px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='%230F2D4A' opacity='0.2'%3E%3Cpath d='M32,12 c-6,0-10,4-10,10 c0,1.5,0.3,3,0.8,4.3 C18,27.5,15,31,15,35 c0,2.8,1.5,5.2,3.7,6.6 c-0.5,1.5-0.7,3.1-0.7,4.8 c0,6,4,11,9.5,12.4 c-0.3,0.5-0.5,1-0.5,1.6 c0,2.2,1.8,4,4,4 c2.2,0,4-1.8,4-4 c0-0.4-0.1-0.8-0.2-1.2 c2.2,0.5,4.5,0.8,7,0.8 s4.8-0.3,7-0.8 c-0.1,0.4-0.2,0.8-0.2,1.2 c0,2.2,1.8,4,4,4 c2.2,0,4-1.8,4-4 c0-0.6-0.2-1.1-0.5-1.6 c5.5-1.4,9.5-6.4,9.5-12.4 c0-1.7-0.2-3.3-0.7-4.8 c2.2-1.4,3.7-3.8,3.7-6.6 c0-4-3-7.5-7.8-8.7 c0.5-1.3,0.8-2.8,0.8-4.3 C52,16,48,12,32,12 z M32,16 c4,0,8,3,8,8 c0,4-3,8-8,8 s-8-4-8-8 C24,19,28,16,32,16 z M19,35 c0-2,2-4,5-4 c0.5,0,1,0.1,1.5,0.2 c-0.3,1.5-0.5,3-0.5,4.8 c0,5,2,10,5,13 c-2,0-4-1-6-3 C21,43,19,39,19,35 z M45,35 c3,0,5,2,5,4 c0,4-2,8-5,10 c-2,2-4,3-6,3 c3-3,5-8,5-13 C44,37.2,44.5,35.5,45,35 z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease;
+            background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; will-change: transform;
         }
         .turtle-active { opacity: 1 !important; animation: turtleSwim 90s linear infinite; }
         @keyframes turtleSwim { 0% { transform: translateX(0) rotate(5deg); } 50% { transform: translateX(-60vw) rotate(-5deg); } 100% { transform: translateX(-120vw) rotate(5deg); } }
@@ -168,7 +152,7 @@
         .living-birds {
             position: absolute; top: 15%; left: -100px; width: 100px; height: 50px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' fill='%230F2D4A' opacity='0.15'%3E%3Cpath d='M10 25 Q25 10 40 25 Q25 30 10 25 M60 15 Q75 0 90 15 Q75 20 60 15' stroke='%230F2D4A' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease;
+            background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; will-change: transform;
         }
         .birds-active { opacity: 1 !important; animation: birdsFly 60s linear infinite; }
         @keyframes birdsFly { 0% { transform: translateX(0) translateY(0); } 100% { transform: translateX(120vw) translateY(-20px); } }
@@ -176,7 +160,7 @@
         .living-dolphin {
             position: absolute; bottom: 25%; left: 20%; width: 50px; height: 50px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.15'%3E%3Cpath d='M2 12s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease;
+            background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; will-change: transform;
         }
         .dolphin-active { opacity: 1 !important; animation: dolphinJump 20s ease-in-out infinite; }
         @keyframes dolphinJump { 
@@ -224,7 +208,7 @@
         /* --- NAV --- */
         nav {
             width: 90px; height: 94vh; margin: 3vh 0 3vh 3vh;
-            background: var(--glass-nav); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            background: var(--glass-nav); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); /* Optimized blur */
             border-radius: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100;
             /* SAFE AREA PADDING FOR MOBILE NAV */
@@ -311,7 +295,7 @@
 
         /* --- PARALLAX CARD --- */
         .card {
-            background: var(--glass-card); backdrop-filter: blur(20px);
+            background: var(--glass-card); backdrop-filter: blur(12px); /* Reduced blur */
             border: 1px solid var(--glass-border); border-radius: 30px;
             overflow: hidden; position: relative; cursor: pointer; user-select: none; -webkit-user-select: none;
             transition: transform 0.1s ease, box-shadow 0.4s var(--ease-out);
@@ -457,7 +441,7 @@
         /* --- GLASS ADMIN PANEL --- */
         .admin-panel { 
             position: fixed; inset: 0; z-index: 2000; 
-            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             display: none; flex-direction: column; 
             /* MOBILE KEYBOARD FIX */
             height: 100%; width: 100%;
@@ -809,23 +793,33 @@
         }
 
         function handleTilt(e) {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-                if(x > 0 && x < rect.width && y > 0 && y < rect.height) {
-                    const centerX = rect.width / 2; const centerY = rect.height / 2;
-                    const rotateX = ((y - centerY) / centerY) * -3; const rotateY = ((x - centerX) / centerX) * 3;
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-                    const img = card.querySelector('.card-img');
-                    if(img) img.style.transform = `scale(1.1) translateX(${rotateY * -1.5}px) translateY(${rotateX * -1.5}px)`;
-                } else {
-                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-                    const img = card.querySelector('.card-img');
-                    if(img) img.style.transform = 'scale(1.08)'; 
-                }
-            });
+            const card = e.target.closest('.card');
+            if (!card) return;
+            
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left; 
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2; 
+            const centerY = rect.height / 2;
+            
+            const rotateX = ((y - centerY) / centerY) * -3; 
+            const rotateY = ((x - centerX) / centerX) * 3;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            
+            const img = card.querySelector('.card-img');
+            if(img) img.style.transform = `scale(1.1) translateX(${rotateY * -1.5}px) translateY(${rotateX * -1.5}px)`;
         }
+
+        // Reset tilt on mouse leave
+        document.addEventListener('mouseout', (e) => {
+            if(e.target.classList && e.target.classList.contains('card')) {
+                e.target.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+                const img = e.target.querySelector('.card-img');
+                if(img) img.style.transform = 'scale(1)';
+            }
+        });
 
         function renderApp(sectionId) {
             currentSection = sectionId;
@@ -1024,25 +1018,6 @@
         function closeFs() {
             document.getElementById('fsViewer').classList.remove('active');
             setTimeout(() => document.getElementById('fsContent').innerHTML = '', 300);
-        }
-
-        function handleTilt(e) {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-                if(x > 0 && x < rect.width && y > 0 && y < rect.height) {
-                    const centerX = rect.width / 2; const centerY = rect.height / 2;
-                    const rotateX = ((y - centerY) / centerY) * -3; const rotateY = ((x - centerX) / centerX) * 3;
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-                    const img = card.querySelector('.card-img');
-                    if(img) img.style.transform = `scale(1.1) translateX(${rotateY * -1.5}px) translateY(${rotateX * -1.5}px)`;
-                } else {
-                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-                    const img = card.querySelector('.card-img');
-                    if(img) img.style.transform = 'scale(1.08)'; 
-                }
-            });
         }
 
         // --- ADMIN ---
