@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- VIEWPORT: Fixed to prevent zooming on inputs, optimized for all screens -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
+    <!-- APPLE PWA SETTINGS: Native App Feel -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
@@ -12,6 +14,7 @@
     <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=3"> 
     <link rel="shortcut icon" href="Logos/app_logo_club.png?v=3" type="image/png">
     
+    <!-- PREMIUM TYPOGRAPHY -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
@@ -21,29 +24,21 @@
     <!-- CRITICAL: Image Error Handler -->
     <script>
         function handleImgError(img) {
-            // 1. If inside Lightbox, just hide it (logic handled in lightbox functions)
+            // 1. If inside Lightbox, let the lightbox logic handle it
             if (img.classList.contains('fs-image')) return;
-
-            // Stop spinner immediately if main image fails
-            if (img.id === 'dImg') {
-                const spinner = img.parentElement.querySelector('.image-spinner');
-                if(spinner) spinner.classList.remove('active');
-                
-                // Instead of hiding, show a subtle placeholder or just keep transparent
-                img.style.display = 'none'; 
-            }
 
             // 2. Prevent Infinite Loops
             if (img.getAttribute('data-tried-fix')) {
-                // If it failed twice...
-                if (img.id !== 'dImg') {
-                    // Thumbnail: DESTROY the container immediately
+                // If main hero fails repeatedly, hide it and kill spinner
+                if (img.id === 'dImg') {
+                    img.style.display = 'none'; 
+                    const spinner = img.parentElement.querySelector('.image-spinner');
+                    if(spinner) spinner.classList.remove('active');
+                } else {
+                    // For thumbnails, remove the parent container to keep grid clean
                     const galleryItem = img.closest('.gallery-item');
-                    if (galleryItem) {
-                        galleryItem.remove();
-                    } else {
-                        img.style.display = 'none';
-                    }
+                    if (galleryItem) galleryItem.remove();
+                    else img.style.display = 'none';
                 }
                 return;
             }
@@ -51,23 +46,26 @@
             img.setAttribute('data-tried-fix', 'true'); 
             const src = img.src;
             
-            // 3. Extension Fixer (Only try to fix Main Image, don't waste time on thumbnails)
-            if (img.id === 'dImg') {
-                if (src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
-                else if (src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
+            // 3. Extension Fixer (Try to swap jpg/png)
+            if (src.endsWith('.jpg')) {
+                img.src = src.replace('.jpg', '.png');
+            } else if (src.endsWith('.png')) {
+                // Try appending .png if that was the issue (rare but possible)
+                // or swapping to jpg
+                img.src = src.replace('.png', '.jpg');
             } else {
-                // For gallery thumbnails, if it fails, kill it immediately to keep UI clean
-                const galleryItem = img.closest('.gallery-item');
-                if (galleryItem) galleryItem.remove();
-                else img.style.display = 'none';
+                // Fallback
+                if (img.id !== 'dImg') {
+                    const galleryItem = img.closest('.gallery-item');
+                    if (galleryItem) galleryItem.remove();
+                }
             }
         }
         
-        // Helper to show image once loaded
+        // Helper: When Main Image loads successfully
         function handleImgLoad(img) {
             img.style.display = 'block';
             img.classList.add('loaded');
-            // Remove spinner if it exists sibling
             const spinner = img.parentElement.querySelector('.image-spinner');
             if(spinner) spinner.classList.remove('active');
         }
@@ -76,24 +74,33 @@
     <style>
         /* --- 2026 MASTERMIND SYSTEM --- */
         :root {
+            /* Palette */
             --bg-gradient-1: #4facfe;
             --bg-gradient-2: #00f2fe;
+            
             --ocean-deep: #0F2D4A; 
             --gold: #C5A065;
             --gold-light: #E6C890;
-            --glass-card: rgba(255, 255, 255, 0.8);
+            
+            /* Glassmorphism */
+            --glass-card: rgba(255, 255, 255, 0.75);
             --glass-nav: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --glass-shine: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shine: rgba(255, 255, 255, 0.8);
+            
             --text-main: #0F2D4A;
             --text-muted: #425b76;
+            
             --shadow-soft: 0 15px 35px rgba(15, 45, 74, 0.1);
             --shadow-hover: 0 25px 50px rgba(15, 45, 74, 0.25);
+            
             --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+            
             --font-head: 'Playfair Display', serif;
             --font-body: 'Inter', sans-serif;
         }
 
+        /* DARK THEME */
         body.dark-theme {
             --text-main: #FFFFFF;
             --text-muted: rgba(255, 255, 255, 0.8);
@@ -104,15 +111,40 @@
             --ocean-deep: #FFFFFF;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-font-smoothing: antialiased; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            outline: none; 
+            -webkit-font-smoothing: antialiased;
+            /* DISABLE SELECT FOR NATIVE APP FEEL */
+            user-select: none; 
+            -webkit-user-select: none;
+            /* PREVENT LONG PRESS MENUS */
+            -webkit-touch-callout: none;
+        }
         
+        /* Allow text selection only on paragraphs for readability if needed */
+        p, .modal-desc { user-select: text; -webkit-user-select: text; }
+
         body {
-            margin: 0; font-family: var(--font-body); background-color: #FDFBF7; color: var(--text-main); height: 100vh;
-            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
-            padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);
-            display: flex; overflow: hidden;
+            margin: 0; 
+            font-family: var(--font-body); 
+            background-color: #FDFBF7; 
+            color: var(--text-main); 
+            height: 100vh;
+            /* NATIVE APP SCROLLING (NO BOUNCE) */
+            overscroll-behavior: none;
+            overflow: hidden;
+            
+            padding-top: env(safe-area-inset-top); 
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left); 
+            padding-right: env(safe-area-inset-right);
+            
+            display: flex; 
             background: linear-gradient(180deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
-            transition: background 2.5s ease, color 1.5s ease; position: relative;
+            transition: background 2.5s ease, color 1.5s ease; 
+            position: relative;
         }
 
         /* --- ATMOSPHERE LAYERS --- */
@@ -169,28 +201,74 @@
         /* --- TOAST --- */
         #modeToast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: white; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(12px); pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-body); }
 
-        /* --- NAV --- */
-        /* COMPACT SIDEBAR: Reduced width from 90px to 74px, buttons from 60px to 50px */
-        nav { width: 74px; height: 94vh; margin: 3vh 0 3vh 3vh; background: var(--glass-nav); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 37px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-btn { width: 50px; height: 50px; border-radius: 18px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s var(--ease-out); position: relative; overflow: hidden; user-select: none; -webkit-user-select: none; }
-        .nav-btn.active { background: var(--gold); color: white; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* --- NAV (IPAD OPTIMIZED) --- */
+        /* Smaller, more elegant sidebar for iPad */
+        nav { 
+            width: 72px; /* Reduced from 90px */
+            height: 94vh; 
+            margin: 3vh 0 3vh 3vh; 
+            background: var(--glass-nav); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border-radius: 36px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            border: 1px solid var(--glass-border); 
+            box-shadow: var(--shadow-soft); 
+            z-index: 100; 
+            padding-bottom: env(safe-area-inset-bottom); 
+        }
+        .nav-btn { 
+            width: 50px; /* Reduced from 60px */
+            height: 50px; 
+            border-radius: 18px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            background: transparent; 
+            border: none; 
+            color: var(--text-muted); 
+            cursor: pointer; 
+            transition: all 0.4s var(--ease-out); 
+            position: relative; 
+            overflow: hidden; 
+        }
+        .nav-btn.active { 
+            background: var(--gold); 
+            color: white; 
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); 
+            animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
         @keyframes spring { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
         .nav-btn svg { width: 24px; height: 24px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
         .nav-btn.active svg { transform: scale(1.1); fill: white; }
 
         /* --- MAIN --- */
-        /* Increased header logo height to 110px */
-        main { flex: 1; height: 100vh; overflow-y: auto; overflow-x: hidden; padding: 50px 70px; scroll-behavior: smooth; z-index: 10; -webkit-overflow-scrolling: touch; }
+        main { 
+            flex: 1; 
+            height: 100vh; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            padding: 50px 70px; /* Comfortable padding for iPad */
+            scroll-behavior: smooth; 
+            z-index: 10; 
+            -webkit-overflow-scrolling: touch; 
+        }
         main::-webkit-scrollbar { display: none; }
 
         /* --- HEADER --- */
         header { margin-bottom: 40px; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        /* HEADER LOGO: Bigger size for iPad */
-        .header-logo { height: 110px; width: auto; cursor: pointer; mix-blend-mode: normal; transition: filter 0.5s; object-fit: contain; }
+        
+        /* HEADER LOGO: Optimized size */
+        .header-logo { height: 100px; width: auto; cursor: pointer; mix-blend-mode: normal; transition: filter 0.5s; object-fit: contain; }
         .logo-white { filter: brightness(0) invert(1); }
         
-        .greeting-wrap { text-align: right; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.2s; }
+        .greeting-wrap { text-align: right; cursor: pointer; transition: transform 0.2s; }
         .greeting-wrap:active { transform: scale(0.95); }
         .greeting { font-family: var(--font-body); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 800; }
         .date-display { font-family: var(--font-body); font-size: 1rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; transition: color 1s; }
@@ -215,7 +293,16 @@
         /* --- GRID & TRANSITION --- */
         .fade-wrapper { animation: fadeInSection 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
         @keyframes fadeInSection { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 35px; padding-bottom: 120px; perspective: 1000px; }
+        
+        /* IPAD OPTIMIZED GRID */
+        .grid { 
+            display: grid; 
+            /* Larger cards for tablet touch targets */
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 35px; 
+            padding-bottom: 120px; 
+            perspective: 1000px; 
+        }
 
         /* --- PARALLAX CARD --- */
         .card { background: var(--glass-card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 30px; overflow: hidden; position: relative; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.1s ease, box-shadow 0.4s var(--ease-out); box-shadow: var(--shadow-soft); transform-style: preserve-3d; border-top: 1px solid var(--glass-shine); border-left: 1px solid var(--glass-shine); }
@@ -241,8 +328,8 @@
 
         /* --- SPLASH --- */
         #splash { position: fixed; inset: 0; z-index: 9999; background: #fff; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
-        /* LOADING LOGO BIGGER: Increased width to 600px */
-        .splash-logo { width: 600px; max-width: 90%; opacity: 0; animation: logoEntrance 2s var(--ease-out) forwards; will-change: transform, opacity; -webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(0); }
+        /* LOADING LOGO: LARGE & PREMIUM */
+        .splash-logo { width: 600px; max-width: 85%; opacity: 0; animation: logoEntrance 2s var(--ease-out) forwards; will-change: transform, opacity; -webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(0); }
         .splash-logo { animation: logoEntrance 2s cubic-bezier(0.22, 1, 0.36, 1) forwards, logoPulse 2s ease-in-out infinite alternate 1.5s; }
         @keyframes logoEntrance { 0% { opacity: 0; transform: scale(0.9) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
         @keyframes logoPulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
@@ -251,11 +338,11 @@
         .modal-wrap { position: fixed; inset: 0; z-index: 1000; background: rgba(15, 45, 74, 0.01); backdrop-filter: blur(0px); pointer-events: none; transition: all 0.5s var(--ease-out); display: flex; align-items: center; justify-content: center; }
         .modal-wrap.active { background: rgba(15, 45, 74, 0.4); backdrop-filter: blur(20px); pointer-events: all; }
 
-        .modal { width: 85vw; height: 90vh; background: #fff; border-radius: 40px; box-shadow: 0 50px 100px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; transform: translateY(100vh) scale(0.95); transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
+        .modal { width: 90vw; height: 92vh; background: #fff; border-radius: 40px; box-shadow: 0 50px 100px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; transform: translateY(100vh) scale(0.95); transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
         body.dark-theme .modal { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1); }
         .modal-wrap.active .modal { transform: translateY(0) scale(1); }
 
-        .modal-close-btn { position: absolute; top: 25px; right: 25px; width: 44px; height: 44px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 50%; border: none; color: #0F2D4A; font-size: 20px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .modal-close-btn { position: absolute; top: 30px; right: 30px; width: 50px; height: 50px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 50%; border: none; color: #0F2D4A; font-size: 24px; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .modal-close-btn:active { transform: scale(0.9); background: var(--gold); color: white; }
 
         .modal-hero { height: 45vh; flex-shrink: 0; position: relative; cursor: pointer; }
@@ -324,7 +411,7 @@
         .fs-caption { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.9); font-family: var(--font-body); font-size: 15px; font-weight: 600; background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(5px); }
         @media (max-width: 768px) { 
             .fs-nav { width: 50px; height: 50px; font-size: 24px; } .fs-prev { left: 10px; } .fs-next { right: 10px; } 
-            nav { width: 92%; height: 70px; padding-bottom: env(safe-area-inset-bottom); bottom: 20px; }
+            nav { width: 92%; height: 70px; padding-bottom: env(safe-area-inset-bottom); bottom: 20px; margin: 0 0 20px 4%; }
             main { padding: 30px 20px 140px 20px; }
             h1 { font-size: 2.5rem; }
             .modal { width: 100%; height: 100%; border-radius: 0; top: 0; left: 0; transform: translateY(100vh); }
@@ -354,8 +441,8 @@
 
     <!-- SPLASH SCREEN -->
     <div id="splash">
-        <!-- FIXED: Removed the double extension .png.png -->
-        <img id="splashLogo" src="Logos/logo_club.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
+        <!-- FIXED: REVERTED TO DOUBLE EXTENSION .PNG.PNG -->
+        <img id="splashLogo" src="Logos/logo_club.png.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
     </div>
 
     <!-- FLOATING DOCK -->
@@ -371,8 +458,8 @@
     <main id="mainContainer">
         <header>
             <div class="header-top">
-                <!-- FIXED: Removed the double extension .png.png -->
-                <img id="headerLogo" src="Logos/logo_club.png" alt="Iberostar Logo" class="header-logo" onerror="handleImgError(this)">
+                <!-- FIXED: REVERTED TO DOUBLE EXTENSION .PNG.PNG -->
+                <img id="headerLogo" src="Logos/logo_club.png.png" alt="Iberostar Logo" class="header-logo" onerror="handleImgError(this)">
                 <div class="greeting-wrap" onclick="toggleTimeMode()">
                     <div class="greeting" id="greeting">Bon Bini</div>
                     <div class="date-display" id="dateDisplay">...</div>
