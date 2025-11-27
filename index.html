@@ -582,7 +582,7 @@
     <!-- SPLASH SCREEN -->
     <div id="splash">
         <!-- UPDATED SPLASH LOGO (ORIGINAL PNG) -->
-        <img id="splashLogo" src="Logos/logo_club.png.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
+        <img id="splashLogo" src="Logos/logo_club.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
     </div>
 
     <!-- FLOATING DOCK -->
@@ -609,7 +609,7 @@
         <header>
             <div class="header-top">
                 <!-- UPDATED HEADER LOGO (ORIGINAL PNG) -->
-                <img id="headerLogo" src="Logos/logo_club.png.png" alt="Iberostar Logo" class="header-logo" onerror="handleImgError(this)">
+                <img id="headerLogo" src="Logos/logo_club.png" alt="Iberostar Logo" class="header-logo" onerror="handleImgError(this)">
                 <div class="greeting-wrap" onclick="toggleTimeMode()">
                     <div class="greeting" id="greeting">Bon Bini</div>
                     <div class="date-display" id="dateDisplay">...</div>
@@ -924,26 +924,24 @@
             spinner.classList.add('active');
             mainImg.onload = () => spinner.classList.remove('active');
             
-            // --- FIXED: AUTO-GALLERY LOGIC ---
-            // 1. PRIORITIZE EXPLICIT GALLERY ARRAY (Fixes "Jumping")
+            // --- AUTO-GALLERY LOGIC ---
+            // If gallery is explicit list, use it. If imageCount > 0, generate it.
             let galleryData = [];
-            
-            if (item.gallery && item.gallery.length > 0) {
-                 galleryData = item.gallery;
-            } else if (item.imageCount && item.imageCount > 0) {
-                // Only generate if no explicit array exists
+            if (item.imageCount && item.imageCount > 0) {
                 // Generate sequence based on main image path
+                // assumes rest_azia_1.jpg -> prefix "rest_azia_"
                 const mainSrc = item.img || (item.gallery ? item.gallery[0] : '');
                 if (mainSrc) {
                     const lastUnderscore = mainSrc.lastIndexOf('_');
                     const lastDot = mainSrc.lastIndexOf('.');
                     if (lastUnderscore > -1 && lastDot > -1) {
-                        const prefix = mainSrc.substring(0, lastUnderscore + 1); 
-                        const ext = mainSrc.substring(lastDot); 
+                        const prefix = mainSrc.substring(0, lastUnderscore + 1); // "path/rest_azia_"
+                        const ext = mainSrc.substring(lastDot); // ".jpg"
                         for (let i = 1; i <= item.imageCount; i++) {
                             galleryData.push(prefix + i + ext);
                         }
                     } else {
+                        // Fallback if pattern not found
                         galleryData = item.gallery || [item.img];
                     }
                 }
@@ -953,11 +951,7 @@
 
             // Clicking hero opens gallery at 0
             modal.querySelector('.modal-hero').onclick = () => viewFull(null, galleryData, 0);
-            
-            // FIXED: Ensure main image loads the first valid item
-            if(galleryData.length > 0) {
-                 mainImg.src = galleryData[0];
-            }
+            mainImg.src = galleryData[0];
 
             document.getElementById('dTitle').innerText = item.title;
             document.getElementById('dSub').innerText = item.sub;
@@ -1010,9 +1004,6 @@
         }
 
         function closeModal() { document.getElementById('detailModal').classList.remove('active'); }
-        function expandMainImage() {
-             // Handled by onclick in HTML now via openDetails logic
-        }
 
         // --- LIGHTBOX LOGIC ---
         function viewFull(url, galleryList, index) {
@@ -1222,35 +1213,11 @@
             'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Tierra del Sol, Aruba\'s premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole.', gallery: ['Golf/Course/golf_1.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm', essentials: ['Golf Shoes', 'Collared Shirt', 'Sunscreen'], imageCount: 10 },
             'BirdLife': { type:'golf', title: 'Audubon Sanctuary', sub: 'Nature & Wildlife', desc: 'Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).', gallery: ['Golf/Birds/birds_1.jpg'], pdf: '' },
 
-            'UTV': { 
-                type:'fun', title: 'Aruba UTV & ATV Tour', sub: 'Rocka Beach Tours', 
-                desc: 'Take the wheel of a rugged UTV and conquer Aruba’s wild side! This guided off-road safari takes you through the desert terrain of Arikok National Park, past the Natural Bridge ruins, and down to the refreshing waters of the Natural Pool (Conchi).',
-                gallery: ['Activites/Rockabeach/act_utv_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
-                duration: '4 Hours', time: '9:00 AM & 2:30 PM',
-                itinerary: ['Philips Animal Garden', 'Alto Vista Chapel', 'Baby Bridge', 'Bushiribana Gold Ruins', 'Wariruri Beach'],
-                essentials: ['Valid Drivers License', 'Sunblock', 'Sunglasses', 'Bandana', 'Old clothes'],
-                imageCount: 10
-            },
-            'Jeep': { 
-                type:'fun', title: 'Jeep Excursions', sub: 'Rocka Beach Tours', 
-                desc: 'Explore the island comfortably in our open-air Land Rovers. Visit the California Lighthouse, Alto Vista Chapel, and the rugged North Coast. A perfect mix of sightseeing and off-road adventure suitable for the whole family.', 
-                gallery: ['Activites/Rockabeach/act_jeep_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
-                duration: '4.5 Hours', time: '8:30 AM',
-                itinerary: ['California Lighthouse', 'Alto Vista Chapel', 'Natural Pool', 'Baby Beach'],
-                essentials: ['Swimwear', 'Towel', 'Sunscreen', 'Camera'],
-                imageCount: 10
-            },
-            'Sail': { 
-                type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', 
-                desc: 'Set sail on a luxury catamaran for a relaxing day on the turquoise Caribbean Sea. Includes stops at the Antilla Shipwreck for snorkeling, an open bar with tropical cocktails, and a delicious light lunch.', 
-                gallery: ['Activites/Rockabeach/act_sail_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
-                duration: '3.5 Hours', time: '9:30 AM & 2:00 PM',
-                itinerary: ['Antilla Shipwreck', 'Boca Catalina', 'Malmok Reef'],
-                essentials: ['Swimwear', 'Towel', 'Sunscreen'],
-                imageCount: 10
-            },
-            'GoKart': { type:'fun', title: 'Go Kart Racing', sub: 'Rocka Beach Tours', desc: 'Adrenaline-pumping fun for speed enthusiasts. Race around a professionally designed track.', gallery: ['Activites/Rockabeach/act_gokart_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
-            'Rentals': { type:'fun', title: 'UTV & ATV Rentals', sub: 'Rocka Beach Tours', desc: 'Freedom to explore at your own pace. Rent a UTV or ATV and create your own itinerary.', gallery: ['Activites/Rockabeach/act_rentals_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
+            'UTV': { type:'fun', title: 'Aruba UTV & ATV Tour', sub: 'Rocka Beach Tours', desc: 'Take the wheel of a rugged UTV and conquer Aruba’s wild side!', gallery: ['Activites/Rockabeach/act_utv_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', duration: '4 Hours', time: '9:00 AM & 2:30 PM', itinerary: ['Philips Animal Garden', 'Alto Vista Chapel', 'Baby Bridge', 'Bushiribana Gold Ruins', 'Wariruri Beach'], essentials: ['Valid Drivers License', 'Sunblock', 'Sunglasses', 'Bandana'], imageCount: 10 },
+            'Jeep': { type:'fun', title: 'Jeep Excursions', sub: 'Rocka Beach Tours', desc: 'Explore the island comfortably in our open-air Land Rovers.', gallery: ['Activites/Rockabeach/act_jeep_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', duration: '4.5 Hours', time: '8:30 AM', itinerary: ['California Lighthouse', 'Natural Pool'], essentials: ['Swimwear', 'Towel', 'Sunscreen', 'Camera'], imageCount: 10 },
+            'Sail': { type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', desc: 'Set sail on a luxury catamaran for a relaxing day.', gallery: ['Activites/Rockabeach/act_sail_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', duration: '3.5 Hours', time: '9:30 AM & 2:00 PM', itinerary: ['Antilla Shipwreck', 'Boca Catalina'], essentials: ['Swimwear', 'Towel'], imageCount: 10 },
+            'GoKart': { type:'fun', title: 'Go Kart Racing', sub: 'Rocka Beach Tours', desc: 'Adrenaline-pumping fun for speed enthusiasts.', gallery: ['Activites/Rockabeach/act_gokart_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
+            'Rentals': { type:'fun', title: 'UTV & ATV Rentals', sub: 'Rocka Beach Tours', desc: 'Freedom to explore at your own pace.', gallery: ['Activites/Rockabeach/act_rentals_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
             'HalfIsland': { type:'fun', title: 'Half Island Tour', sub: 'Rocka Beach Tours', desc: 'A perfect overview of Aruba in comfort.', gallery: ['Activites/Rockabeach/act_half_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
 
             'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
