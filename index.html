@@ -11,8 +11,8 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     
     <!-- APP ICON -->
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=3"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=3" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=4"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=4" type="image/png">
     
     <!-- TYPOGRAPHY -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,26 +24,38 @@
     <!-- IMAGE ERROR HANDLER -->
     <script>
         function handleImgError(img) {
+            // Prevent infinite loops
             if (img.getAttribute('data-tried-fix') === 'true') {
-                // If main modal hero image fails, show a placeholder instead of hiding
+                // If main modal hero image fails, show a placeholder
                 if (img.id === 'dImg') {
-                    img.src = 'https://placehold.co/800x600/E6C890/0F2D4A?text=Image+Unavailable';
+                    // Try to find a backup from the gallery if available in the DOM
+                    const firstGal = document.querySelector('.gallery-item img');
+                    if(firstGal && firstGal.src && firstGal.src !== img.src) {
+                        img.src = firstGal.src;
+                    } else {
+                        // Fallback placeholder to prevent ugly broken icon
+                        img.style.display = 'none';
+                        img.parentElement.style.backgroundColor = '#eee';
+                    }
                     return;
                 }
                 
-                // For gallery items or cards, hide them if they fail
-                img.style.display = 'none'; 
-                if (img.parentElement.classList.contains('gallery-item')) {
-                    img.parentElement.style.display = 'none';
+                // For gallery items or cards, HIDE the container completely
+                if (img.closest('.gallery-item')) {
+                    img.closest('.gallery-item').style.display = 'none';
+                } else {
+                    img.style.display = 'none'; 
                 }
                 return;
             }
+            
             img.setAttribute('data-tried-fix', 'true');
             
-            // Try switching extension
+            // Try switching extension logic
             const src = img.src;
             if (src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
             else if (src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
+            else if (src.endsWith('.webp')) img.src = src.replace('.webp', '.jpg');
         }
     </script>
 
@@ -73,7 +85,6 @@
         }
 
         /* PRELOAD FIX: Prevents animation glitches on load */
-        /* EXCEPTION: Don't disable splash animations */
         body.preload *:not(#splash):not(.splash-logo) {
             transition: none !important;
             animation: none !important;
@@ -87,6 +98,7 @@
             background-color: #FDFBF7;
             color: var(--text-main);
             height: 100vh;
+            /* SAFE AREA PADDING */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
             padding-left: env(safe-area-inset-left);
@@ -97,14 +109,15 @@
             transition: background 2.5s ease;
         }
 
-        /* --- LOADING SPLASH --- */
+        /* --- LOADING SPLASH (BIGGER LOGO) --- */
         #splash {
             position: fixed; inset: 0; z-index: 999999; 
             background: #fff; display: flex; align-items: center; justify-content: center;
             transition: opacity 0.8s ease; opacity: 1;
         }
         .splash-logo {
-            width: 400px; max-width: 80%;
+            width: 500px; /* Increased Size */
+            max-width: 80%;
             animation: pulseLogo 2s infinite ease-in-out;
         }
         @keyframes pulseLogo { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
@@ -116,21 +129,24 @@
         .night-glow { position: absolute; bottom: 0; left: 0; width: 100%; height: 60vh; background: linear-gradient(to top, rgba(212, 175, 55, 0.15), transparent); opacity: 0; z-index: 0; transition: opacity 3s; }
         .glow-active { opacity: 1; }
 
-        /* --- SIDEBAR (PREMIUM IPAD STYLE) --- */
+        /* --- SIDEBAR (PREMIUM IPAD STYLE FIXED) --- */
         nav {
-            width: 200px; /* EXTRA CHUNKY PREMIUM WIDTH */
-            height: 94vh; margin: 3vh 0 3vh 3vh;
+            width: 180px; 
+            /* Fix for "looking under screen": Subtract margin from 100vh explicitly */
+            height: calc(100vh - 40px); 
+            margin: 20px; /* Even margin top/bottom/left */
             background: var(--glass-nav); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border-radius: 50px; /* Extra rounded */
+            border-radius: 50px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid var(--glass-border); 
             box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
             z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom);
+            /* Important: Ensure bottom padding for home bar */
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
         
         .nav-btn {
-            width: 140px; /* BIG BUTTONS */
+            width: 120px; /* Big buttons */
             height: 100px; 
             border-radius: 35px; 
             margin-bottom: 25px;
@@ -140,8 +156,8 @@
         }
         
         .nav-btn svg { 
-            width: 60px; /* HUGE ICONS */
-            height: 60px; 
+            width: 50px; /* Large icons */
+            height: 50px; 
             fill: currentColor; transition: transform 0.3s; 
         }
         
@@ -162,7 +178,9 @@
 
         header { margin-bottom: 50px; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .header-logo { height: 100px; width: auto; object-fit: contain; transition: filter 0.5s; }
+        
+        /* HEADER LOGO BIGGER */
+        .header-logo { height: 120px; width: auto; object-fit: contain; transition: filter 0.5s; }
         .logo-white { filter: brightness(0) invert(1); }
 
         .greeting { font-family: var(--font-body); font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 800; text-align: right; }
@@ -212,6 +230,21 @@
         .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
         
         .tag-pill { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: #0F2D4A; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .cash-badge { position: absolute; bottom: 20px; left: 20px; background: rgba(15, 45, 74, 0.9); color: var(--gold); padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; z-index: 2; }
+        
+        .media-badge {
+            position: absolute; top: 20px; right: 20px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; z-index: 5; /* High Z-Index to be clickable */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .media-badge:active { transform: scale(0.9); }
+        .media-badge svg { width: 20px; height: 20px; fill: #0F2D4A; }
+        
+        .partner-badge { position: absolute; bottom: 15px; right: 15px; width: 40px; height: 40px; background: white; border-radius: 50%; padding: 5px; z-index: 2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit: contain; }
+
         .card-content { padding: 30px; }
         .card-title { font-family: var(--font-head); font-size: 1.8rem; margin: 0 0 10px 0; color: var(--text-main); }
         .card-desc { font-family: var(--font-body); font-size: 1rem; color: var(--text-muted); line-height: 1.6; margin: 0; }
@@ -281,7 +314,7 @@
     <div class="palm-shadows" id="palmShadows"></div>
     <div class="night-glow" id="nightGlow"></div>
 
-    <!-- LOADING SCREEN (FIXED) -->
+    <!-- LOADING SCREEN (FIXED BIGGER) -->
     <div id="splash">
         <img src="Logos/logo_club.png" class="splash-logo" alt="Loading...">
     </div>
@@ -348,25 +381,46 @@
     <div class="fs-viewer" id="fsViewer" onclick="this.classList.remove('active')">
         <button class="fs-close">✕</button>
         <img class="fs-img" id="fsImg" src="">
+        <div id="fsVideoContainer" style="width:100%; height:100%; display:none; align-items:center; justify-content:center;"></div>
     </div>
 
     <script>
-        // DATA
+        // --- RESTORED RICH DATA ---
+        // This includes videos, pdfs, and logos that were missing in previous simplified versions
         const appData = {
-            'Joia': { type:'club', title: 'Iberostar Joia', sub: 'Eagle Beach', desc: 'Experience the crown jewel of Aruba. Located on the pristine shores of Eagle Beach, Joia is an adults-only haven offering butler service, swim-up suites, and a level of exclusivity that redefines Caribbean luxury.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg'], img: 'Hotels/Joia/hotel_joia_1.jpg' },
-            'Tierra': { type:'club', title: 'Tierra del Sol', sub: 'Golf & Estates', desc: 'Escape to the island\'s most prestigious gated community.', gallery: ['Hotels/Tierra/golf_tierra_1.jpg', 'Hotels/Tierra/golf_tierra_2.jpg'], img: 'Hotels/Tierra/golf_tierra_1.jpg' },
-            'Selection': { type:'club', title: 'Iberostar Selection', sub: 'Coming Soon', desc: 'Bringing the premium Selection family experience to the Caribbean.', gallery: ['Hotels/Selection/hotel_selection_1.png'], img: 'Hotels/Selection/hotel_selection_1.png' },
+            'Joia': { type:'club', title: 'Iberostar Joia', sub: 'Eagle Beach', desc: 'Experience the crown jewel of Aruba. Located on the pristine shores of Eagle Beach, Joia is an adults-only haven offering butler service, swim-up suites, and a level of exclusivity that redefines Caribbean luxury.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg', 'Hotels/Joia/hotel_joia_3.jpg'], img: 'Hotels/Joia/hotel_joia_1.jpg', video: 'Hotels/Joia/hotel_joia.mp4' },
+            'Tierra': { type:'club', title: 'Tierra del Sol', sub: 'Golf & Estates', desc: 'Escape to the island\'s most prestigious gated community. Featuring luxury villas, a championship golf course, and panoramic views of the California Lighthouse and rugged North Coast.', gallery: ['Hotels/Tierra/golf_tierra_1.jpg', 'Hotels/Tierra/golf_tierra_2.jpg', 'Hotels/Tierra/golf_tierra_3.jpg', 'Hotels/Tierra/golf_tierra_4.jpg'], img: 'Hotels/Tierra/golf_tierra_1.jpg', video: 'Hotels/Tierra/golf_tierra.mp4' },
+            'Selection': { type:'club', title: 'Iberostar Selection', sub: 'Coming Soon', desc: 'Bringing the premium Selection family experience to the Caribbean. Designed for families who refuse to compromise on luxury.', gallery: ['Hotels/Selection/hotel_selection_1.png'], img: 'Hotels/Selection/hotel_selection_1.png' },
+            'Joia2': { type:'club', title: 'Iberostar Joia (Lighthouse)', sub: 'In Development', desc: 'The next chapter of the Joia collection.', gallery: ['Hotels/Joia2/hotel_joia2_1.jpg'], img: 'Hotels/Joia2/hotel_joia2_1.jpg' },
+
+            'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Tierra del Sol, Aruba\'s premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole.', gallery: ['Golf/Course/golf_1.jpg'], img: 'Golf/Course/golf_1.jpg', video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm' },
+            'BirdLife': { type:'golf', title: 'Audubon Sanctuary', sub: 'Nature & Wildlife', desc: 'Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).', gallery: ['Golf/Birds/birds_1.jpg'], img: 'Golf/Birds/birds_1.jpg' },
+
+            'UTV': { type:'fun', title: 'Aruba UTV & ATV Tour', sub: 'Rocka Beach Tours', desc: 'Take the wheel of a rugged UTV and conquer Aruba’s wild side!', gallery: ['Activites/Rockabeach/act_utv_1.jpg'], img: 'Activites/Rockabeach/act_utv_1.jpg', partnerLogo: 'Logos/logo_rocka.png', duration: '4 Hours' },
+            'Jeep': { type:'fun', title: 'Jeep Excursions', sub: 'Rocka Beach Tours', desc: 'Explore the island comfortably in our open-air Land Rovers.', gallery: ['Activites/Rockabeach/act_jeep_1.jpg'], img: 'Activites/Rockabeach/act_jeep_1.jpg', partnerLogo: 'Logos/logo_rocka.png', duration: '4.5 Hours' },
+            'Sail': { type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', desc: 'Set sail on a luxury catamaran for a relaxing day.', gallery: ['Activites/Rockabeach/act_sail_1.jpg'], img: 'Activites/Rockabeach/act_sail_1.jpg', partnerLogo: 'Logos/logo_rocka.png', duration: '3.5 Hours' },
+            'GoKart': { type:'fun', title: 'Go Kart Racing', sub: 'Rocka Beach Tours', desc: 'Adrenaline-pumping fun for speed enthusiasts.', gallery: ['Activites/Rockabeach/act_gokart_1.jpg'], img: 'Activites/Rockabeach/act_gokart_1.jpg', partnerLogo: 'Logos/logo_rocka.png' },
+            'Rentals': { type:'fun', title: 'UTV & ATV Rentals', sub: 'Rocka Beach Tours', desc: 'Freedom to explore at your own pace.', gallery: ['Activites/Rockabeach/act_rentals_1.jpg'], img: 'Activites/Rockabeach/act_rentals_1.jpg', partnerLogo: 'Logos/logo_rocka.png' },
+            'HalfIsland': { type:'fun', title: 'Half Island Tour', sub: 'Rocka Beach Tours', desc: 'A perfect overview of Aruba in comfort.', gallery: ['Activites/Rockabeach/act_half_1.jpg'], img: 'Activites/Rockabeach/act_half_1.jpg', partnerLogo: 'Logos/logo_rocka.png' },
+
+            'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage.', gallery: ['Spa/Promo/massage_1.jpg'], img: 'Spa/Promo/massage_1.jpg', duration: '50 Minutes' },
+            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit.', gallery: ['Spa/General/spa_1.jpg'], img: 'Spa/General/spa_1.jpg', pdf: 'Spa/General/menu_spa.pdf' },
+
+            'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'Joia Aruba • Rooftop', desc: 'Perched atop the Joia hotel, Zima Bar offers the best sunset views.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], img: 'Restaurants/Zima/rest_zima_1.jpg', pdf: 'Restaurants/Zima/menu_zima.pdf' },
+            'Bucatini': { type:'food', title: 'Bucatini', sub: 'Joia Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], img: 'Restaurants/Bucatini/rest_bucatini_1.jpg', pdf: 'Restaurants/Bucatini/menu_bucatini.pdf' },
+            'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], img: 'Restaurants/Marea/menu_marea.pdf', pdf: 'Restaurants/Marea/menu_marea.pdf' },
+            'Birdie': { type:'food', title: 'The Birdie', sub: 'Tierra del Sol', desc: 'Experience the "Tapas Affair" with breathtaking views.', gallery: ['Restaurants/Birdie/rest_birdie_1.jpg'], img: 'Restaurants/Birdie/rest_birdie_1.jpg', pdf: 'Restaurants/Birdie/menu_birdie.pdf' },
             
-            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, dinner in bed experience.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], img: 'Restaurants/Screaming%20Eagle/rest_screaming_1.jpg' },
-            'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], img: 'Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg' },
-            'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], img: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg' },
-            'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], img: 'Restaurants/Azia%20Restaurant/rest_azia_1.jpg' },
-            
-            'UTV': { type:'fun', title: 'UTV Adventure', sub: 'Rocka Beach Tours', desc: 'Take the wheel of a rugged UTV.', gallery: ['Activites/Rockabeach/act_utv_1.jpg'], img: 'Activites/Rockabeach/act_utv_1.jpg' },
-            'Sail': { type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', desc: 'Set sail on a luxury catamaran.', gallery: ['Activites/Rockabeach/act_sail_1.jpg'], img: 'Activites/Rockabeach/act_sail_1.jpg' },
-            
-            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba', desc: 'A sanctuary of relaxation.', gallery: ['Spa/General/spa_1.jpg'], img: 'Spa/General/spa_1.jpg' },
-            'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Aruba\'s premier 18-hole course.', gallery: ['Golf/Course/golf_1.jpg'], img: 'Golf/Course/golf_1.jpg' }
+            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, dinner in bed experience.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], img: 'Restaurants/Screaming%20Eagle/rest_screaming_1.jpg', pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf' },
+            'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], img: 'Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg', pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf' },
+            'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], img: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg', pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf' },
+            'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas and modern atmosphere.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], img: 'Restaurants/Azia%20Restaurant/rest_azia_1.jpg', pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf' },
+            'Azzurro': { type:'food', title: 'Azzurro Ristorante', sub: 'Seafood', desc: 'Located right on the beach, serving authentic Italian seafood.', gallery: ['Restaurants/Azzurro%20Ristorante/rest_azzurro_1.jpg'], img: 'Restaurants/Azzurro%20Ristorante/rest_azzurro_1.jpg', pdf: 'Restaurants/Azzurro%20Ristorante/menu_azzurro.pdf' },
+            'AmoreMio': { type:'food', title: 'Amore Mio', sub: 'Pizzeria', desc: 'Authentic Neapolitan pizza with a crispy, airy crust.', gallery: ['Restaurants/Amore%20Mio/rest_amoremio_1.jpg'], img: 'Restaurants/Amore%20Mio/rest_amoremio_1.jpg', pdf: 'Restaurants/Amore%20Mio/menu_amoremio.pdf' },
+            'Dushi': { type:'food', title: 'Dushi Bagels', sub: 'Casual', desc: 'The go-to spot for New York style bagels and hearty burgers.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg'], img: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf', pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf' },
+            'BeachBar': { type:'food', title: 'The Beach Bar', sub: 'Beachside', desc: 'The longest happy hour on the island.', gallery: ['Restaurants/The%20Beach%20Bar/rest_beachbar_1.jpg'], img: 'Restaurants/The%20Beach%20Bar/rest_beachbar_1.jpg', pdf: 'Restaurants/The%20Beach%20Bar/menu_beachbar.pdf' },
+            'Gelatissimo': { type:'food', title: 'Gelatissimo', sub: 'Bistro', desc: 'Authentic Italian gelato and bistro favorites.', gallery: ['Restaurants/Gelatissimo/rest_gelatissimo_1.jpg'], img: 'Restaurants/Gelatissimo/rest_gelatissimo_1.jpg', pdf: 'Restaurants/Gelatissimo/menu_gelatissimo.pdf' },
+            'Garden': { type: 'food', title: 'Garden Fresh', sub: 'Healthy', desc: 'The best spot for fresh smoothies, salads, and wraps.', gallery: ['Restaurants/Garden%20Fresh/rest_garden_1.jpg'], img: 'Restaurants/Garden%20Fresh/rest_garden_1.jpg', pdf: 'Restaurants/Garden%20Fresh/menu_garden.pdf' },
         };
 
         // INIT
@@ -450,10 +504,25 @@
                 const item = appData[key];
                 if(item.type !== type) return;
                 
+                let logoHtml = ''; if(item.partnerLogo) logoHtml = `<img src="${item.partnerLogo}" class="partner-badge" onerror="handleImgError(this)">`;
+                
+                // --- FIXED MEDIA ICON LOGIC ---
+                let mediaBadge = '';
+                if(item.video) {
+                    // Video icon plays video directly
+                    mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); playVideo('${item.video}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`;
+                }
+                else if(item.pdf) {
+                    // PDF icon opens PDF
+                    mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>`;
+                }
+
                 html += `
-                <div class="card" onclick="openDetails('${key}')">
+                <div class="card" onclick="openDetails('${key}')" onmousemove="cardTilt(event, this)" onmouseleave="cardReset(this)">
                     <div class="card-media">
+                        ${logoHtml} ${mediaBadge}
                         <div class="tag-pill">${item.sub}</div>
+                        <div class="cash-badge">IBEROCASH</div>
                         <img class="card-img" src="${item.img}" onerror="handleImgError(this)">
                     </div>
                     <div class="card-content">
@@ -475,6 +544,17 @@
             document.getElementById('dSub').innerText = item.sub;
             document.getElementById('dDesc').innerText = item.desc;
             
+            // Info Grid (Duration etc)
+            const grid = document.getElementById('dDetails');
+            grid.innerHTML = ''; // Reset
+            if(item.duration || item.time) {
+                let infoHtml = '<div class="info-grid">';
+                if(item.duration) infoHtml += `<div class="info-item"><h5>Duration</h5><p>${item.duration}</p></div>`;
+                if(item.time) infoHtml += `<div class="info-item"><h5>Time</h5><p>${item.time}</p></div>`;
+                infoHtml += '</div>';
+                grid.innerHTML = infoHtml;
+            }
+
             // Set Main Image (Try first gallery image, fallback to main img)
             const mainImg = document.getElementById('dImg');
             // Reset to prevent showing old image
@@ -503,8 +583,44 @@
         }
 
         function openFS(src) {
+            document.getElementById('fsImg').style.display = 'block';
+            document.getElementById('fsVideoContainer').style.display = 'none';
             document.getElementById('fsImg').src = src;
             document.getElementById('fsViewer').classList.add('active');
+        }
+
+        function playVideo(url) {
+            const vidContainer = document.getElementById('fsVideoContainer');
+            document.getElementById('fsImg').style.display = 'none';
+            vidContainer.style.display = 'flex';
+            vidContainer.innerHTML = `<video controls autoplay style="width:100%;height:100%"><source src="${url}" type="video/mp4"></video>`;
+            document.getElementById('fsViewer').classList.add('active');
+        }
+
+        function viewPdf(url) {
+            // PDF Viewing Logic (Simplest: New Tab or FS Object)
+            // For iPad, new tab is often safer for PDFs
+            window.open(url, '_blank');
+        }
+
+        // TILT LOGIC (OPTIMIZED)
+        function cardTilt(e, card) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -3; 
+            const rotateY = ((x - centerX) / centerX) * 3;
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            const img = card.querySelector('.card-img');
+            if(img) img.style.transform = `scale(1.1) translateX(${rotateY * -1.5}px) translateY(${rotateX * -1.5}px)`;
+        }
+
+        function cardReset(card) {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            const img = card.querySelector('.card-img');
+            if(img) img.style.transform = 'scale(1.08)'; 
         }
 
         function nav(sec) { renderApp(sec); }
