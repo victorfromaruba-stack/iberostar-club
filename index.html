@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     
-    <!-- APP ICON: Updated version tag to v=3 to force iPad refresh -->
+    <!-- APP ICON -->
     <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=3"> 
     <link rel="shortcut icon" href="Logos/app_logo_club.png?v=3" type="image/png">
     
@@ -43,14 +43,11 @@
             const src = img.src;
             
             // 3. Smart Extension Fixer
-            // Detects if we need to double up (.png.png) or swap (.jpg <-> .png)
             if (src.endsWith('.jpg')) {
                  img.src = src.replace('.jpg', '.png');
             } else if (src.endsWith('.png')) {
-                 // Try appending .png again for the "Windows Double Extension" issue
                  img.src = src + '.png';
             } else {
-                // If no logic fits, remove the box immediately
                 const galleryItem = img.closest('.gallery-item');
                 if (galleryItem) galleryItem.remove();
                 else img.style.display = 'none';
@@ -609,6 +606,8 @@
             
             itemsToShow.forEach(item => {
                 let logoHtml = ''; if(item.partnerLogo) logoHtml = `<img src="${item.partnerLogo}" class="partner-badge" onerror="this.style.display='none'">`;
+                
+                // Prefer explicit gallery first item, fallback to item.img
                 const mainImg = (item.gallery && item.gallery.length > 0) ? item.gallery[0] : item.img;
                 
                 let mediaBadge = '';
@@ -665,34 +664,40 @@
             spinner.classList.add('active');
             mainImg.onload = () => spinner.classList.remove('active');
             
-            // --- AUTO-GALLERY LOGIC ---
-            // If gallery is explicit list, use it. If imageCount > 0, generate it.
+            // --- FIXED: AUTO-GALLERY LOGIC ---
+            // 1. PRIORITIZE EXPLICIT GALLERY ARRAY (Fixes "Jumping")
             let galleryData = [];
-            if (item.imageCount && item.imageCount > 0) {
+            
+            if (item.gallery && item.gallery.length > 0) {
+                 galleryData = item.gallery;
+            } else if (item.imageCount && item.imageCount > 0) {
+                // Only generate if no explicit array exists
                 // Generate sequence based on main image path
-                // assumes rest_azia_1.jpg -> prefix "rest_azia_"
-                const mainSrc = item.img || (item.gallery ? item.gallery[0] : '');
+                const mainSrc = item.img || '';
                 if (mainSrc) {
                     const lastUnderscore = mainSrc.lastIndexOf('_');
                     const lastDot = mainSrc.lastIndexOf('.');
                     if (lastUnderscore > -1 && lastDot > -1) {
-                        const prefix = mainSrc.substring(0, lastUnderscore + 1); // "path/rest_azia_"
-                        const ext = mainSrc.substring(lastDot); // ".jpg"
+                        const prefix = mainSrc.substring(0, lastUnderscore + 1); 
+                        const ext = mainSrc.substring(lastDot); 
                         for (let i = 1; i <= item.imageCount; i++) {
                             galleryData.push(prefix + i + ext);
                         }
                     } else {
-                        // Fallback if pattern not found
-                        galleryData = item.gallery || [item.img];
+                        galleryData = [item.img];
                     }
                 }
             } else {
-                galleryData = (item.gallery && item.gallery.length > 0) ? item.gallery : [item.img];
+                galleryData = [item.img];
             }
 
             // Clicking hero opens gallery at 0
             modal.querySelector('.modal-hero').onclick = () => viewFull(null, galleryData, 0);
-            mainImg.src = galleryData[0];
+            
+            // FIXED: Ensure main image loads the first valid item
+            if(galleryData.length > 0) {
+                 mainImg.src = galleryData[0];
+            }
 
             document.getElementById('dTitle').innerText = item.title;
             document.getElementById('dSub').innerText = item.sub;
@@ -745,6 +750,9 @@
         }
 
         function closeModal() { document.getElementById('detailModal').classList.remove('active'); }
+        function expandMainImage() {
+             // Handled by onclick in HTML now
+        }
 
         // --- LIGHTBOX LOGIC ---
         function viewFull(url, galleryList, index) {
