@@ -200,19 +200,19 @@
         /* --- NAV (BALANCED FLOATING) --- */
         nav { 
             position: fixed; /* Fixes it to screen */
-            left: 30px; /* Comfortable left margin */
+            left: 40px; /* Comfortable left margin */
             top: 50%;
             transform: translateY(-50%);
-            width: 85px; /* Slightly wider for premium feel */
+            width: 96px; /* Slightly wider for premium feel */
             height: auto; 
             min-height: auto; /* Allow it to fit content vertically */
-            padding: 45px 0; /* More breathing room top/bottom */
+            padding: 40px 0; /* More breathing room top/bottom */
             margin: 0; 
             
             background: var(--glass-nav); 
             backdrop-filter: blur(25px); 
             -webkit-backdrop-filter: blur(25px); 
-            border-radius: 42px; /* Softer roundness */
+            border-radius: 48px; /* Softer roundness */
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -222,10 +222,10 @@
             z-index: 100; 
         }
         .nav-btn { 
-            width: 55px; /* Bigger touch targets */
-            height: 55px; 
-            border-radius: 20px; 
-            margin-bottom: 20px; /* Better spacing */
+            width: 64px; /* Bigger touch targets */
+            height: 64px; 
+            border-radius: 24px; 
+            margin-bottom: 24px; /* Better spacing */
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -246,7 +246,7 @@
             animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
         @keyframes spring { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
-        .nav-btn svg { width: 26px; height: 26px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
+        .nav-btn svg { width: 32px; height: 32px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
         .nav-btn.active svg { transform: scale(1.1); fill: white; }
 
         /* --- MAIN --- */
@@ -257,7 +257,7 @@
             overflow-x: hidden; 
             padding: 50px 70px; 
             /* Push content right to avoid sidebar */
-            padding-left: 150px; 
+            padding-left: 170px; 
             scroll-behavior: smooth; 
             z-index: 10; 
             -webkit-overflow-scrolling: touch; 
@@ -278,13 +278,13 @@
         /* GREETING: POP OUT MORE */
         .greeting { 
             font-family: var(--font-body); 
-            font-size: 2.5rem; /* SIGNIFICANTLY BIGGER */
+            font-size: 3rem; /* SIGNIFICANTLY BIGGER */
             text-transform: uppercase; 
             letter-spacing: 2px; 
             color: var(--gold); 
             font-weight: 900; /* Extra Bold */
             /* Intense glow shadow for pop */
-            text-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 0 30px rgba(255,255,255,0.8);
+            text-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 40px rgba(255,255,255,0.5);
         }
         .date-display { font-family: var(--font-body); font-size: 1.2rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; transition: color 1s; }
         body.dark-theme .date-display { color: rgba(255,255,255,0.9); }
@@ -603,7 +603,7 @@
                 const splash = document.getElementById('splash');
                 splash.style.opacity = '0'; 
                 setTimeout(() => splash.style.display = 'none', 800); 
-            }, 1500); // Slightly longer delay to let assets settle
+            }, 2000); // Slightly longer delay to let assets settle
             renderApp('portfolio');
             
             let ticking = false;
