@@ -17,7 +17,7 @@
     <!-- PREMIUM TYPOGRAPHY -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 
     <title>Iberostar Aruba</title>
 
@@ -134,7 +134,7 @@
             position: relative;
         }
 
-        /* --- ATMOSPHERE LAYERS (BOOSTED VISIBILITY) --- */
+        /* --- ATMOSPHERE LAYERS --- */
         .ocean-waves { 
             position: absolute; inset: 0; pointer-events: none; z-index: 0; 
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.3' fill-rule='evenodd'/%3E%3C/svg%3E"); 
@@ -164,14 +164,19 @@
         .fireflies-active { opacity: 0.9 !important; }
         @keyframes fireflyMove { 0% { transform: translate(0,0); opacity: 0.3; } 50% { opacity: 1; } 100% { transform: translate(80px, -40px); opacity: 0.3; } }
 
-        /* REALISTIC TURTLE SVG */
-        .living-turtle { 
-            position: absolute; bottom: 15%; right: -150px; width: 140px; height: 100px; 
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%230F2D4A' opacity='0.4'%3E%3Cpath d='M85.2,45.5c-3.6-1.5-7.4-2.6-11.2-3.3c-0.6-2.5-2-4.8-4-6.5c-3-2.5-6.9-3.2-10.7-2.3c-2.3,0.5-4.4,1.7-6.2,3.3 c-5-1.5-10.3-2.2-15.6-2.2c-12.6,0-24.5,4-34.1,10.9c-1.3-0.8-2.8-1.3-4.4-1.3c-4.4,0-8,3.6-8,8c0,1.9,0.7,3.6,1.8,5 c-2.3,2-3.8,5-3.8,8.3c0,6.1,4.9,11,11,11c1.3,0,2.5-0.2,3.6-0.6c3.9,6.7,10.2,12,17.7,14.9c0.2,2.3,1.2,4.4,3,6 c3,2.5,7.3,2.8,10.6,0.8c3.3-2,4.5-6.2,2.8-9.7c7.1-1.3,13.8-4.4,19.3-8.8c2.1,1.5,4.7,2.2,7.3,1.8c3.8-0.6,6.9-3.4,7.8-7.2 c0.9-3.8-0.9-7.7-4.2-9.7C81.1,51.8,83.9,49,85.2,45.5z M32,68c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4S34.2,68,32,68z M55,68 c-2.2,0-4-1.8-4-4s1.8-4,4-4s4,1.8,4,4S57.2,68,55,68z'/%3E%3C/svg%3E");
+        /* REALISTIC FISH SVG */
+        .living-fish { 
+            position: absolute; bottom: 20%; right: -150px; width: 120px; height: 80px; 
+            /* Simple elegant fish silhouette */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60' fill='%230F2D4A' opacity='0.4'%3E%3Cpath d='M95,30c-3-3-8-5-12-5c-5,0-10,2-14,4c-6,3-12,5-19,5c-8,0-15-3-21-7c-4-3-8-6-13-6c-6,0-11,4-14,9c-1,2-2,3-2,5 c0,2,1,3,2,5c3,5,8,9,14,9c5,0,9-3,13-6c6-4,13-7,21-7c7,0,13,2,19,5c4,2,9,4,14,4c4,0,9-2,12-5C98,35,98,33,95,30z M10,30 c-3,0-5-2-5-5s2-5,5-5s5,2,5,5S13,30,10,30z'/%3E%3C/svg%3E");
             background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; 
         }
-        .turtle-active { opacity: 1 !important; animation: turtleSwim 120s linear infinite; }
-        @keyframes turtleSwim { 0% { transform: translateX(0) rotate(5deg); } 50% { transform: translateX(-60vw) rotate(-5deg); } 100% { transform: translateX(-140vw) rotate(5deg); } }
+        .fish-active { opacity: 1 !important; animation: fishSwim 60s linear infinite; }
+        @keyframes fishSwim { 
+            0% { transform: translateX(0) rotate(2deg); } 
+            50% { transform: translateX(-60vw) rotate(-2deg); } 
+            100% { transform: translateX(-140vw) rotate(2deg); } 
+        }
 
         .living-birds { position: absolute; top: 15%; left: -100px; width: 100px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' fill='%230F2D4A' opacity='0.25'%3E%3Cpath d='M10 25 Q25 10 40 25 Q25 30 10 25 M60 15 Q75 0 90 15 Q75 20 60 15' stroke='%230F2D4A' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
         .birds-active { opacity: 1 !important; animation: birdsFly 60s linear infinite; }
@@ -199,20 +204,20 @@
 
         /* --- NAV (BALANCED FLOATING) --- */
         nav { 
-            position: fixed; /* Fixes it to screen */
-            left: 40px; /* Comfortable left margin */
+            position: fixed; 
+            left: 40px; 
             top: 50%;
             transform: translateY(-50%);
-            width: 96px; /* Slightly wider for premium feel */
+            width: 96px; /* Wider */
             height: auto; 
-            min-height: auto; /* Allow it to fit content vertically */
-            padding: 80px 0; /* Significantly increased from 40px for a longer, elegant capsule */
+            min-height: auto; 
+            padding: 80px 0; /* INCREASED PADDING FOR LONGER LOOK */
             margin: 0; 
             
             background: var(--glass-nav); 
             backdrop-filter: blur(25px); 
             -webkit-backdrop-filter: blur(25px); 
-            border-radius: 48px; /* Softer roundness */
+            border-radius: 48px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -222,10 +227,10 @@
             z-index: 100; 
         }
         .nav-btn { 
-            width: 64px; /* Bigger touch targets */
+            width: 64px; 
             height: 64px; 
             border-radius: 24px; 
-            margin-bottom: 30px; /* Increased spacing from 24px */
+            margin-bottom: 35px; /* INCREASED SPACING */
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -256,7 +261,6 @@
             overflow-y: auto; 
             overflow-x: hidden; 
             padding: 50px 70px; 
-            /* Push content right to avoid sidebar */
             padding-left: 170px; 
             scroll-behavior: smooth; 
             z-index: 10; 
@@ -266,27 +270,27 @@
 
         /* --- HEADER --- */
         header { margin-bottom: 40px; }
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        /* ALIGNMENT FIX: Center items better */
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
         
-        /* HEADER LOGO: BIGGER */
-        .header-logo { height: 140px; width: auto; cursor: pointer; mix-blend-mode: normal; transition: filter 0.5s; object-fit: contain; }
+        /* HEADER LOGO */
+        .header-logo { height: 140px; width: auto; cursor: pointer; mix-blend-mode: normal; transition: filter 0.5s; object-fit: contain; margin-top: -10px; }
         .logo-white { filter: brightness(0) invert(1); }
         
-        .greeting-wrap { text-align: right; cursor: pointer; transition: transform 0.2s; }
+        .greeting-wrap { text-align: right; cursor: pointer; transition: transform 0.2s; padding-top: 10px; }
         .greeting-wrap:active { transform: scale(0.95); }
         
-        /* GREETING: POP OUT MORE */
+        /* GREETING: BALANCED SIZE */
         .greeting { 
             font-family: var(--font-body); 
-            font-size: 3rem; /* SIGNIFICANTLY BIGGER */
+            font-size: 1.8rem; /* SCALED DOWN FOR ELEGANCE */
             text-transform: uppercase; 
             letter-spacing: 2px; 
             color: var(--gold); 
-            font-weight: 900; /* Extra Bold */
-            /* Intense glow shadow for pop */
-            text-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 40px rgba(255,255,255,0.5);
+            font-weight: 800; 
+            text-shadow: 0 2px 10px rgba(255,255,255,0.5);
         }
-        .date-display { font-family: var(--font-body); font-size: 1.2rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; transition: color 1s; }
+        .date-display { font-family: var(--font-body); font-size: 1.1rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; transition: color 1s; }
         body.dark-theme .date-display { color: rgba(255,255,255,0.9); }
 
         h1 { font-family: var(--font-head); font-size: 4rem; font-weight: 700; color: var(--text-main); margin: 0; letter-spacing: -1px; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; position: relative; display: inline-block; transition: color 1s; }
@@ -340,7 +344,7 @@
         body.dark-theme .card-desc { color: rgba(255,255,255,0.7); }
 
         /* --- SPLASH --- */
-        #splash { position: fixed; inset: 0; z-index: 9999; background: #fff; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
+        #splash { position: fixed; inset: 0; z-index: 9999; background: #fff; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease; will-change: opacity; }
         /* LOADING LOGO: HUGE */
         .splash-logo { width: 700px; max-width: 90%; opacity: 0; animation: logoEntrance 2s var(--ease-out) forwards; will-change: transform, opacity; -webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(0); }
         .splash-logo { animation: logoEntrance 2s cubic-bezier(0.22, 1, 0.36, 1) forwards, logoPulse 2s ease-in-out infinite alternate 1.5s; }
@@ -424,7 +428,7 @@
         .fs-caption { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.9); font-family: var(--font-body); font-size: 15px; font-weight: 600; background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(5px); }
         @media (max-width: 768px) { 
             .fs-nav { width: 50px; height: 50px; font-size: 24px; } .fs-prev { left: 10px; } .fs-next { right: 10px; } 
-            nav { width: 92%; height: 70px; padding-bottom: env(safe-area-inset-bottom); bottom: 20px; margin: 0 0 20px 4%; left: 0; top: auto; transform: none; min-height: auto; }
+            nav { width: 92%; height: 70px; padding-bottom: env(safe-area-inset-bottom); bottom: 20px; margin: 0 0 20px 4%; left: 0; top: auto; transform: none; min-height: auto; padding: 0; }
             main { padding: 30px 20px 140px 20px; }
             h1 { font-size: 2.5rem; }
             .modal { width: 100%; height: 100%; border-radius: 0; top: 0; left: 0; transform: translateY(100vh); }
@@ -443,7 +447,10 @@
     <div class="palm-shadows" id="palmShadows"></div>
     <div class="night-glow" id="nightGlow"></div>
     <div class="clouds" id="clouds"></div>
-    <div class="living-turtle" id="turtle"></div>
+    
+    <!-- NEW: Fish instead of turtle -->
+    <div class="living-fish" id="fish"></div>
+    
     <div class="living-dolphin" id="dolphin"></div>
     <div class="living-birds" id="birds"></div>
     <div class="fireflies" id="fireflies"></div>
@@ -598,12 +605,12 @@
             if(saved) { try { appData = JSON.parse(saved); } catch(e) { appData = defaultData; } } else { appData = defaultData; }
             
             updateTimeVibe();
-            // SMOOTHER LOADING TRANSITION
+            // SMOOTHER LOADING TRANSITION: Wait for everything to load
             setTimeout(() => { 
                 const splash = document.getElementById('splash');
                 splash.style.opacity = '0'; 
                 setTimeout(() => splash.style.display = 'none', 800); 
-            }, 2000); // Slightly longer delay to let assets settle
+            }, 2500); // Increased slightly to ensure "glitch" is gone and assets are ready
             renderApp('portfolio');
             
             let ticking = false;
@@ -633,7 +640,8 @@
             const hour = new Date().getHours();
             const root = document.documentElement;
             const body = document.body;
-            const els = ['boat', 'turtle', 'birds', 'dolphin', 'stars', 'nightGlow', 'clouds', 'fireflies', 'palmShadows'];
+            // Updated list to include fish
+            const els = ['boat', 'fish', 'birds', 'dolphin', 'stars', 'nightGlow', 'clouds', 'fireflies', 'palmShadows'];
             els.forEach(id => document.getElementById(id).className = document.getElementById(id).className.split(' ')[0]); 
             
             // Logo Element
@@ -657,14 +665,14 @@
                 document.getElementById('greeting').innerText = "Bon Dia";
                 root.style.setProperty('--bg-gradient-1', '#A0E6FF'); root.style.setProperty('--bg-gradient-2', '#F9F7E8');
                 document.getElementById('birds').classList.add('birds-active');
-                document.getElementById('turtle').classList.add('turtle-active');
+                document.getElementById('fish').classList.add('fish-active');
                 document.getElementById('clouds').classList.add('clouds-active');
                 document.getElementById('palmShadows').classList.add('shadows-active');
             } else if(phase === 'day') {
                 document.getElementById('greeting').innerText = "Bon Tardi";
                 root.style.setProperty('--bg-gradient-1', '#00c6ff'); root.style.setProperty('--bg-gradient-2', '#0072ff');
                 document.getElementById('birds').classList.add('birds-active');
-                document.getElementById('turtle').classList.add('turtle-active');
+                document.getElementById('fish').classList.add('fish-active');
                 document.getElementById('dolphin').classList.add('dolphin-active');
                 document.getElementById('clouds').classList.add('clouds-active');
                 document.getElementById('palmShadows').classList.add('shadows-active');
@@ -1149,22 +1157,22 @@
             'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
             'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit.', gallery: ['Spa/General/spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 5 },
 
-            'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'Joia Aruba • Rooftop', desc: 'Perched atop the Joia hotel, Zima Bar offers the best sunset views.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], pdf: 'Restaurants/Zima/menu_zima.pdf', imageCount: 20 },
-            'Bucatini': { type:'food', title: 'Bucatini', sub: 'Joia Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], pdf: 'Restaurants/Bucatini/menu_bucatini.pdf', imageCount: 20 },
-            'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
-            'Birdie': { type:'food', title: 'The Birdie', sub: 'Tierra del Sol', desc: 'Experience the "Tapas Affair" with breathtaking views.', gallery: ['Restaurants/Birdie/rest_birdie_1.jpg'], pdf: 'Restaurants/Birdie/menu_birdie.pdf', imageCount: 20 },
+            'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'Joia Aruba • Rooftop', desc: 'Perched atop the Joia hotel, Zima Bar offers the best sunset views. Enjoy handcrafted cocktails and a sophisticated atmosphere while watching the sun dip below the horizon.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], pdf: 'Restaurants/Zima/menu_zima.pdf', imageCount: 20 },
+            'Bucatini': { type:'food', title: 'Bucatini', sub: 'Joia Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station. Indulge in fresh pasta, artisanal pizzas, and a wide selection of fine wines in an elegant setting.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], pdf: 'Restaurants/Bucatini/menu_bucatini.pdf', imageCount: 20 },
+            'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
+            'Birdie': { type:'food', title: 'The Birdie', sub: 'Tierra del Sol', desc: 'Experience the "Tapas Affair" with breathtaking views. Located at Tierra del Sol, this spot offers a unique blend of small plates and scenic golf course vistas.', gallery: ['Restaurants/Birdie/rest_birdie_1.jpg'], pdf: 'Restaurants/Birdie/menu_birdie.pdf', imageCount: 20 },
             
             // --- EXTERNAL RESTAURANTS ---
-            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, dinner in bed experience.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
-            'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf', imageCount: 20 },
-            'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf', imageCount: 20 },
-            'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas and modern atmosphere.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf', imageCount: 20 },
-            'Azzurro': { type:'food', title: 'Azzurro Ristorante', sub: 'Seafood', desc: 'Located right on the beach, serving authentic Italian seafood.', gallery: ['Restaurants/Azzurro%20Ristorante/rest_azzurro_1.jpg'], pdf: 'Restaurants/Azzurro%20Ristorante/menu_azzurro.pdf', imageCount: 20 },
-            'AmoreMio': { type:'food', title: 'Amore Mio', sub: 'Pizzeria', desc: 'Authentic Neapolitan pizza with a crispy, airy crust.', gallery: ['Restaurants/Amore%20Mio/rest_amoremio_1.jpg'], pdf: 'Restaurants/Amore%20Mio/menu_amoremio.pdf', imageCount: 20 },
-            'Dushi': { type:'food', title: 'Dushi Bagels', sub: 'Casual', desc: 'The go-to spot for New York style bagels and hearty burgers.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg'], pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf', imageCount: 20 },
-            'BeachBar': { type:'food', title: 'The Beach Bar', sub: 'Beachside', desc: 'The longest happy hour on the island.', gallery: ['Restaurants/The%20Beach%20Bar/rest_beachbar_1.jpg'], pdf: 'Restaurants/The%20Beach%20Bar/menu_beachbar.pdf', imageCount: 20 },
-            'Gelatissimo': { type:'food', title: 'Gelatissimo', sub: 'Bistro', desc: 'Authentic Italian gelato and bistro favorites.', gallery: ['Restaurants/Gelatissimo/rest_gelatissimo_1.jpg'], pdf: 'Restaurants/Gelatissimo/menu_gelatissimo.pdf', imageCount: 20 },
-            'Garden': { type: 'food', title: 'Garden Fresh', sub: 'Healthy', desc: 'The best spot for fresh smoothies, salads, and wraps.', gallery: ['Restaurants/Garden%20Fresh/rest_garden_1.jpg'], pdf: 'Restaurants/Garden%20Fresh/menu_garden.pdf', imageCount: 20 },
+            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, known for its "Dinner in Bed" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
+            'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf', imageCount: 20 },
+            'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops. A classic steakhouse experience with a rustic touch, perfect for meat lovers seeking quality cuts.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf', imageCount: 20 },
+            'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas and modern atmosphere. Exquisite sushi, dim sum, and Asian-fusion dishes in a stylish, Zen-inspired environment.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf', imageCount: 20 },
+            'Azzurro': { type:'food', title: 'Azzurro Ristorante', sub: 'Seafood', desc: 'Located right on the beach, serving authentic Italian seafood. Enjoy panoramic ocean views and fresh catches prepared with traditional Italian flair.', gallery: ['Restaurants/Azzurro%20Ristorante/rest_azzurro_1.jpg'], pdf: 'Restaurants/Azzurro%20Ristorante/menu_azzurro.pdf', imageCount: 20 },
+            'AmoreMio': { type:'food', title: 'Amore Mio', sub: 'Pizzeria', desc: 'Authentic Neapolitan pizza with a crispy, airy crust. A cozy pizzeria offering a variety of traditional toppings and Italian comfort food.', gallery: ['Restaurants/Amore%20Mio/rest_amoremio_1.jpg'], pdf: 'Restaurants/Amore%20Mio/menu_amoremio.pdf', imageCount: 20 },
+            'Dushi': { type:'food', title: 'Dushi Bagels', sub: 'Casual', desc: 'The go-to spot for New York style bagels and hearty burgers. A casual, friendly eatery perfect for breakfast or a quick, delicious lunch.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg'], pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf', imageCount: 20 },
+            'BeachBar': { type:'food', title: 'The Beach Bar', sub: 'Beachside', desc: 'The longest happy hour on the island. Relax with a cold drink in hand, toes in the sand, and enjoy the vibrant beach atmosphere.', gallery: ['Restaurants/The%20Beach%20Bar/rest_beachbar_1.jpg'], pdf: 'Restaurants/The%20Beach%20Bar/menu_beachbar.pdf', imageCount: 20 },
+            'Gelatissimo': { type:'food', title: 'Gelatissimo', sub: 'Bistro', desc: 'Authentic Italian gelato and bistro favorites. Treat yourself to creamy, homemade gelato or a light meal in a charming, lively setting.', gallery: ['Restaurants/Gelatissimo/rest_gelatissimo_1.jpg'], pdf: 'Restaurants/Gelatissimo/menu_gelatissimo.pdf', imageCount: 20 },
+            'Garden': { type: 'food', title: 'Garden Fresh', sub: 'Healthy', desc: 'The best spot for fresh smoothies, salads, and wraps. A healthy oasis offering organic, locally sourced ingredients for a guilt-free meal.', gallery: ['Restaurants/Garden%20Fresh/rest_garden_1.jpg'], pdf: 'Restaurants/Garden%20Fresh/menu_garden.pdf', imageCount: 20 },
         };
     </script>
 </body>
