@@ -199,15 +199,14 @@
 
         /* --- NAV (FIXED LEFT FLOATING) --- */
         nav { 
-            position: fixed; /* Fixes it to screen */
-            left: 30px;
+            position: fixed; /* Fixes it to screen so it never flows under */
+            left: 25px; /* Comfortable left margin */
             top: 50%;
             transform: translateY(-50%);
             width: 72px; 
-            height: auto;
-            min-height: 400px;
-            max-height: 80vh; /* Prevent going off screen */
-            padding: 30px 0;
+            height: auto; /* Shrink to fit content */
+            min-height: auto; /* Remove min height */
+            padding: 20px 0; /* Tighter padding */
             margin: 0; 
             
             background: var(--glass-nav); 
@@ -226,7 +225,7 @@
             width: 50px; 
             height: 50px; 
             border-radius: 18px; 
-            margin-bottom: 15px; 
+            margin-bottom: 12px; /* Tighter button spacing */
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -279,15 +278,16 @@
         /* GREETING: POP OUT MORE */
         .greeting { 
             font-family: var(--font-body); 
-            font-size: 1.2rem; 
+            font-size: 1.8rem; /* Much Bigger */
             text-transform: uppercase; 
             letter-spacing: 2px; 
             color: var(--gold); 
-            font-weight: 900; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-weight: 900; /* Extra Bold */
+            /* White glow shadow for pop */
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1), 0 0 20px rgba(255,255,255,0.6);
         }
-        .date-display { font-family: var(--font-body); font-size: 1rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; transition: color 1s; }
-        body.dark-theme .date-display { color: rgba(255,255,255,0.7); }
+        .date-display { font-family: var(--font-body); font-size: 1.2rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; transition: color 1s; }
+        body.dark-theme .date-display { color: rgba(255,255,255,0.9); }
 
         h1 { font-family: var(--font-head); font-size: 4rem; font-weight: 700; color: var(--text-main); margin: 0; letter-spacing: -1px; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; position: relative; display: inline-block; transition: color 1s; }
         h1::after { content: attr(data-text); position: absolute; left: 0; top: 0; color: transparent; background-size: 200% 100%; background-clip: text; -webkit-background-clip: text; animation: shimmer 5s infinite linear; pointer-events: none; mix-blend-mode: overlay; }
