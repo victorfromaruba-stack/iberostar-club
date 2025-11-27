@@ -11,7 +11,6 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     
     <!-- APP ICON (Home Screen) - Uses the Gold Star Icon -->
-    <!-- Added ?v=2 to force iPad to refresh the icon from cache -->
     <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=2"> 
     <link rel="shortcut icon" href="Logos/app_logo_club.png?v=2" type="image/png">
     
@@ -90,7 +89,8 @@
         }
 
         /* PRELOAD FIX: Prevents animation glitches on load */
-        body.preload, body.preload * {
+        /* EXCEPTION: Don't disable splash animations */
+        body.preload *:not(#splash):not(.splash-logo) {
             transition: none !important;
             animation: none !important;
         }
@@ -236,9 +236,10 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-body);
         }
 
-        /* --- NAV --- */
+        /* --- NAV (IPAD PREMIUM UPDATE) --- */
         nav {
-            width: 90px; height: 94vh; margin: 3vh 0 3vh 3vh;
+            width: 160px; /* Significantly increased width for chunky premium feel */
+            height: 94vh; margin: 3vh 0 3vh 3vh;
             background: var(--glass-nav); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-radius: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100;
@@ -246,14 +247,21 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
         .nav-btn {
-            width: 60px; height: 60px; border-radius: 20px; margin-bottom: 20px;
+            width: 100px; /* Bigger buttons to fill the bar */
+            height: 100px; 
+            border-radius: 30px; /* Softer, premium rounding */
+            margin-bottom: 25px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: transparent; border: none; color: var(--text-muted); cursor: pointer;
             transition: all 0.4s var(--ease-out); position: relative; overflow: hidden; user-select: none; -webkit-user-select: none;
         }
         .nav-btn.active { background: var(--gold); color: white; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes spring { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
-        .nav-btn svg { width: 28px; height: 28px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
+        .nav-btn svg { 
+            width: 44px; /* Much larger icons to reduce white space */
+            height: 44px; 
+            fill: currentColor; transition: transform 0.4s; pointer-events: none; 
+        }
         .nav-btn.active svg { transform: scale(1.1); fill: white; }
 
         /* --- MAIN --- */
@@ -372,7 +380,7 @@
         .card-desc { font-family: var(--font-body); font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
         body.dark-theme .card-desc { color: rgba(255,255,255,0.7); }
 
-        /* --- SPLASH --- */
+        /* --- SPLASH (FORCED VISIBILITY FIX) --- */
         #splash { position: fixed; inset: 0; z-index: 9999; background: #fff; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
         .splash-logo { 
             width: 450px; max-width: 85%; opacity: 0; animation: logoEntrance 2s var(--ease-out) forwards; 
@@ -743,11 +751,14 @@
             
             // REMOVED: Old setTimeout nesting that caused glitch
             // ADDED: Immediate clean up of preload class to prevent transition flashes
+            // UPDATED: Forced specific delay for splash screen visibility
             setTimeout(() => {
                 document.body.classList.remove('preload');
-                document.getElementById('splash').style.opacity = '0'; 
-                setTimeout(() => document.getElementById('splash').style.display = 'none', 800);
-            }, 500); // Small delay to ensure styles are computed
+                
+                const splash = document.getElementById('splash');
+                splash.style.opacity = '0'; 
+                setTimeout(() => splash.style.display = 'none', 800);
+            }, 2500); // Forced 2.5s wait so loading screen is seen
 
             renderApp('portfolio');
             
