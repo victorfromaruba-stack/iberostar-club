@@ -22,29 +22,31 @@
 
     <title>Iberostar Aruba</title>
 
-    <!-- CRITICAL: Image Error Handler -->
+    <!-- CRITICAL: Image Error Handler (FIXED) -->
     <script>
         function handleImgError(img) {
             if (window.handleImgError && window.handleImgError !== handleImgError) return;
             if (!img.src) return;
             if (img.getAttribute('data-tried-fix')) return;
+            
             img.setAttribute('data-tried-fix', 'true'); 
             const src = img.src;
             
             // Attempt extension fix
             if (src.endsWith('.jpg') || src.endsWith('.png') || src.endsWith('.webp')) {
-                if(src.endsWith('.jpg')) img.src = src + '.jpg';
-                else if(src.endsWith('.png')) img.src = src + '.png';
-            } else if (src.endsWith('.jpg')) {
-                img.src = src.replace('.jpg', '.png');
+                if(src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
+                else if(src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
             } else {
-                // If we can't fix it, hide the container to prevent empty white boxes
+                // FIX APPLIED HERE:
+                // Instead of just hiding (display:none), we REMOVE the element entirely.
+                // This prevents the empty white boxes in the scroll view.
                 const galleryItem = img.closest('.gallery-item');
                 if (galleryItem) {
-                    galleryItem.style.display = 'none';
-                    galleryItem.classList.add('invalid-image'); // Mark as invalid for lightbox
+                    galleryItem.remove(); 
                 }
-                else img.style.display = 'none';
+                else {
+                    img.style.display = 'none';
+                }
             }
         }
     </script>
@@ -1030,7 +1032,10 @@
             const content = document.getElementById('fsContent');
             const caption = document.getElementById('fsCaption');
             const backdrop = document.getElementById('fsBackdrop');
-            content.innerHTML = `<img class="fs-image" src="${src}" onerror="handleImgError(this)">`;
+            
+            // FIX: Use handleLightboxError instead of handleImgError
+            content.innerHTML = `<img class="fs-image" src="${src}" onerror="handleLightboxError(this)">`;
+            
             backdrop.style.backgroundImage = `url('${src}')`;
             if(currentGallery.length > 1) caption.innerText = `${currentImgIndex + 1} / ${currentGallery.length}`;
         }
