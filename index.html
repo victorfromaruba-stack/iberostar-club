@@ -11,8 +11,8 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     
     <!-- APP ICON -->
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=4"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=4" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=5"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=5" type="image/png">
     
     <!-- TYPOGRAPHY -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,37 +21,31 @@
 
     <title>Iberostar Aruba</title>
 
-    <!-- IMAGE ERROR HANDLER -->
+    <!-- IMAGE ERROR HANDLER (AGGRESSIVE FIX) -->
     <script>
         function handleImgError(img) {
             // Prevent infinite loops
             if (img.getAttribute('data-tried-fix') === 'true') {
-                // If main modal hero image fails, show a placeholder
+                // If this is the main modal image, show a pretty placeholder
                 if (img.id === 'dImg') {
-                    // Try to find a backup from the gallery if available in the DOM
-                    const firstGal = document.querySelector('.gallery-item img');
-                    if(firstGal && firstGal.src && firstGal.src !== img.src) {
-                        img.src = firstGal.src;
-                    } else {
-                        // Fallback placeholder to prevent ugly broken icon
-                        img.style.display = 'none';
-                        img.parentElement.style.backgroundColor = '#eee';
-                    }
+                    img.src = 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1000&q=80'; // Generic Resort Placeholder
                     return;
                 }
                 
-                // For gallery items or cards, HIDE the container completely
-                if (img.closest('.gallery-item')) {
-                    img.closest('.gallery-item').style.display = 'none';
+                // CRITICAL FIX: Completely remove the parent container if it's a gallery item or card
+                // This stops "empty boxes" from appearing
+                const galleryItem = img.closest('.gallery-item');
+                if (galleryItem) {
+                    galleryItem.remove(); // DELETE THE ELEMENT FROM DOM
                 } else {
-                    img.style.display = 'none'; 
+                    img.style.display = 'none'; // Just hide the img tag if not in gallery
                 }
                 return;
             }
             
             img.setAttribute('data-tried-fix', 'true');
             
-            // Try switching extension logic
+            // Try standard extension swaps first
             const src = img.src;
             if (src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
             else if (src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
@@ -84,7 +78,7 @@
             --ocean-deep: #FFFFFF;
         }
 
-        /* PRELOAD FIX: Prevents animation glitches on load */
+        /* PRELOAD FIX */
         body.preload *:not(#splash):not(.splash-logo) {
             transition: none !important;
             animation: none !important;
@@ -109,15 +103,15 @@
             transition: background 2.5s ease;
         }
 
-        /* --- LOADING SPLASH (BIGGER LOGO) --- */
+        /* --- LOADING SPLASH (HUGE LOGO) --- */
         #splash {
             position: fixed; inset: 0; z-index: 999999; 
             background: #fff; display: flex; align-items: center; justify-content: center;
             transition: opacity 0.8s ease; opacity: 1;
         }
         .splash-logo {
-            width: 500px; /* Increased Size */
-            max-width: 80%;
+            width: 600px; /* INCREASED SIZE */
+            max-width: 90%;
             animation: pulseLogo 2s infinite ease-in-out;
         }
         @keyframes pulseLogo { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
@@ -129,25 +123,33 @@
         .night-glow { position: absolute; bottom: 0; left: 0; width: 100%; height: 60vh; background: linear-gradient(to top, rgba(212, 175, 55, 0.15), transparent); opacity: 0; z-index: 0; transition: opacity 3s; }
         .glow-active { opacity: 1; }
 
-        /* --- SIDEBAR (PREMIUM IPAD STYLE FIXED) --- */
+        /* --- SIDEBAR (FIXED POSITIONING FOR IPAD) --- */
         nav {
-            width: 180px; 
-            /* Fix for "looking under screen": Subtract margin from 100vh explicitly */
-            height: calc(100vh - 40px); 
-            margin: 20px; /* Even margin top/bottom/left */
+            /* FIXED POSITION: This forces it to stay on screen and NOT go under */
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            bottom: 20px;
+            
+            width: 180px; /* CHUNKY PREMIUM WIDTH */
+            height: auto; /* Let top/bottom control height */
+            
+            margin: 0; /* Margin handled by position */
+            
             background: var(--glass-nav); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-radius: 50px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             border: 1px solid var(--glass-border); 
             box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
             z-index: 100;
-            /* Important: Ensure bottom padding for home bar */
+            
+            /* SAFE AREA: Ensure home bar doesn't cover content */
             padding-bottom: max(20px, env(safe-area-inset-bottom));
         }
         
         .nav-btn {
             width: 120px; /* Big buttons */
-            height: 100px; 
+            height: 120px; 
             border-radius: 35px; 
             margin-bottom: 25px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -171,7 +173,9 @@
 
         /* --- MAIN LAYOUT --- */
         main { 
-            flex: 1; height: 100vh; overflow-y: auto; overflow-x: hidden; padding: 60px 80px; 
+            flex: 1; height: 100vh; overflow-y: auto; overflow-x: hidden; 
+            /* PADDING LEFT: Compensate for fixed sidebar (180px + 20px left + 40px gap) */
+            padding: 60px 80px 60px 240px; 
             scroll-behavior: smooth; z-index: 10; -webkit-overflow-scrolling: touch;
         }
         main::-webkit-scrollbar { display: none; }
@@ -180,7 +184,7 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         
         /* HEADER LOGO BIGGER */
-        .header-logo { height: 120px; width: auto; object-fit: contain; transition: filter 0.5s; }
+        .header-logo { height: 140px; width: auto; object-fit: contain; transition: filter 0.5s; }
         .logo-white { filter: brightness(0) invert(1); }
 
         .greeting { font-family: var(--font-body); font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 800; text-align: right; }
@@ -297,7 +301,7 @@
 
         /* MEDIA QUERY FOR PHONES (Keep mobile functional) */
         @media (max-width: 768px) {
-            nav { width: 100%; height: 80px; bottom: 0; margin: 0; border-radius: 0; flex-direction: row; position: fixed; top: auto; background: rgba(255,255,255,0.95); }
+            nav { width: 100%; height: 80px; bottom: 0; margin: 0; border-radius: 0; flex-direction: row; position: fixed; top: auto; left: 0; right: 0; background: rgba(255,255,255,0.95); }
             .nav-btn { width: auto; height: 100%; margin: 0; flex: 1; background: none !important; box-shadow: none !important; }
             .nav-btn svg { width: 28px; height: 28px; fill: #aaa; }
             .nav-btn.active svg { fill: var(--gold); transform: scale(1.2); }
