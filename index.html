@@ -24,15 +24,19 @@
             // 1. If inside Lightbox, just hide it (logic handled in lightbox functions)
             if (img.classList.contains('fs-image')) return;
 
+            // Stop spinner immediately if main image fails
+            if (img.id === 'dImg') {
+                const spinner = img.parentElement.querySelector('.image-spinner');
+                if(spinner) spinner.classList.remove('active');
+                
+                // Instead of hiding, show a subtle placeholder or just keep transparent
+                img.style.display = 'none'; 
+            }
+
             // 2. Prevent Infinite Loops
             if (img.getAttribute('data-tried-fix')) {
                 // If it failed twice...
-                if (img.id === 'dImg') {
-                    // Main Hero: hide it so background shows
-                    img.style.display = 'none';
-                    const spinner = img.parentElement.querySelector('.image-spinner');
-                    if(spinner) spinner.classList.remove('active');
-                } else {
+                if (img.id !== 'dImg') {
                     // Thumbnail: DESTROY the container immediately
                     const galleryItem = img.closest('.gallery-item');
                     if (galleryItem) {
@@ -166,22 +170,24 @@
         #modeToast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: white; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(12px); pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-body); }
 
         /* --- NAV --- */
-        nav { width: 90px; height: 94vh; margin: 3vh 0 3vh 3vh; background: var(--glass-nav); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-btn { width: 60px; height: 60px; border-radius: 20px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s var(--ease-out); position: relative; overflow: hidden; user-select: none; -webkit-user-select: none; }
+        /* COMPACT SIDEBAR: Reduced width from 90px to 74px, buttons from 60px to 50px */
+        nav { width: 74px; height: 94vh; margin: 3vh 0 3vh 3vh; background: var(--glass-nav); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 37px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-btn { width: 50px; height: 50px; border-radius: 18px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s var(--ease-out); position: relative; overflow: hidden; user-select: none; -webkit-user-select: none; }
         .nav-btn.active { background: var(--gold); color: white; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes spring { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
-        .nav-btn svg { width: 28px; height: 28px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
+        .nav-btn svg { width: 24px; height: 24px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
         .nav-btn.active svg { transform: scale(1.1); fill: white; }
 
         /* --- MAIN --- */
+        /* Increased header logo height to 110px */
         main { flex: 1; height: 100vh; overflow-y: auto; overflow-x: hidden; padding: 50px 70px; scroll-behavior: smooth; z-index: 10; -webkit-overflow-scrolling: touch; }
         main::-webkit-scrollbar { display: none; }
 
         /* --- HEADER --- */
         header { margin-bottom: 40px; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        /* HEADER LOGO */
-        .header-logo { height: 80px; width: auto; cursor: pointer; mix-blend-mode: normal; transition: filter 0.5s; object-fit: contain; }
+        /* HEADER LOGO: Bigger size for iPad */
+        .header-logo { height: 110px; width: auto; cursor: pointer; mix-blend-mode: normal; transition: filter 0.5s; object-fit: contain; }
         .logo-white { filter: brightness(0) invert(1); }
         
         .greeting-wrap { text-align: right; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.2s; }
@@ -235,7 +241,8 @@
 
         /* --- SPLASH --- */
         #splash { position: fixed; inset: 0; z-index: 9999; background: #fff; display: flex; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
-        .splash-logo { width: 450px; max-width: 85%; opacity: 0; animation: logoEntrance 2s var(--ease-out) forwards; will-change: transform, opacity; -webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(0); }
+        /* LOADING LOGO BIGGER: Increased width to 600px */
+        .splash-logo { width: 600px; max-width: 90%; opacity: 0; animation: logoEntrance 2s var(--ease-out) forwards; will-change: transform, opacity; -webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(0); }
         .splash-logo { animation: logoEntrance 2s cubic-bezier(0.22, 1, 0.36, 1) forwards, logoPulse 2s ease-in-out infinite alternate 1.5s; }
         @keyframes logoEntrance { 0% { opacity: 0; transform: scale(0.9) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
         @keyframes logoPulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
@@ -715,6 +722,8 @@
             // FIXED: Ensure main image loads the first valid item
             if(galleryData.length > 0) {
                  mainImg.src = galleryData[0];
+                 // If image is already cached, spinner might stick. Force check.
+                 if(mainImg.complete) handleImgLoad(mainImg);
             }
 
             document.getElementById('dTitle').innerText = item.title;
