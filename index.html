@@ -197,22 +197,22 @@
         /* --- TOAST --- */
         #modeToast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: white; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(12px); pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-body); }
 
-        /* --- NAV (FIXED LEFT FLOATING) --- */
+        /* --- NAV (BALANCED FLOATING) --- */
         nav { 
-            position: fixed; /* Fixes it to screen so it never flows under */
-            left: 25px; /* Comfortable left margin */
+            position: fixed; /* Fixes it to screen */
+            left: 30px; /* Comfortable left margin */
             top: 50%;
             transform: translateY(-50%);
-            width: 72px; 
-            height: auto; /* Shrink to fit content */
-            min-height: auto; /* Remove min height */
-            padding: 20px 0; /* Tighter padding */
+            width: 85px; /* Slightly wider for premium feel */
+            height: auto; 
+            min-height: auto; /* Allow it to fit content vertically */
+            padding: 45px 0; /* More breathing room top/bottom */
             margin: 0; 
             
             background: var(--glass-nav); 
             backdrop-filter: blur(25px); 
             -webkit-backdrop-filter: blur(25px); 
-            border-radius: 36px; 
+            border-radius: 42px; /* Softer roundness */
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -222,10 +222,10 @@
             z-index: 100; 
         }
         .nav-btn { 
-            width: 50px; 
-            height: 50px; 
-            border-radius: 18px; 
-            margin-bottom: 12px; /* Tighter button spacing */
+            width: 55px; /* Bigger touch targets */
+            height: 55px; 
+            border-radius: 20px; 
+            margin-bottom: 20px; /* Better spacing */
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -242,11 +242,11 @@
         .nav-btn.active { 
             background: var(--gold); 
             color: white; 
-            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); 
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3); 
             animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
         @keyframes spring { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
-        .nav-btn svg { width: 24px; height: 24px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
+        .nav-btn svg { width: 26px; height: 26px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
         .nav-btn.active svg { transform: scale(1.1); fill: white; }
 
         /* --- MAIN --- */
@@ -257,7 +257,7 @@
             overflow-x: hidden; 
             padding: 50px 70px; 
             /* Push content right to avoid sidebar */
-            padding-left: 130px;
+            padding-left: 150px; 
             scroll-behavior: smooth; 
             z-index: 10; 
             -webkit-overflow-scrolling: touch; 
@@ -278,13 +278,13 @@
         /* GREETING: POP OUT MORE */
         .greeting { 
             font-family: var(--font-body); 
-            font-size: 1.8rem; /* Much Bigger */
+            font-size: 2.5rem; /* SIGNIFICANTLY BIGGER */
             text-transform: uppercase; 
             letter-spacing: 2px; 
             color: var(--gold); 
             font-weight: 900; /* Extra Bold */
-            /* White glow shadow for pop */
-            text-shadow: 0 2px 10px rgba(0,0,0,0.1), 0 0 20px rgba(255,255,255,0.6);
+            /* Intense glow shadow for pop */
+            text-shadow: 0 4px 12px rgba(0,0,0,0.15), 0 0 30px rgba(255,255,255,0.8);
         }
         .date-display { font-family: var(--font-body); font-size: 1.2rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; transition: color 1s; }
         body.dark-theme .date-display { color: rgba(255,255,255,0.9); }
@@ -598,7 +598,12 @@
             if(saved) { try { appData = JSON.parse(saved); } catch(e) { appData = defaultData; } } else { appData = defaultData; }
             
             updateTimeVibe();
-            setTimeout(() => { document.getElementById('splash').style.opacity = '0'; setTimeout(() => document.getElementById('splash').style.display = 'none', 800); }, 1000);
+            // SMOOTHER LOADING TRANSITION
+            setTimeout(() => { 
+                const splash = document.getElementById('splash');
+                splash.style.opacity = '0'; 
+                setTimeout(() => splash.style.display = 'none', 800); 
+            }, 1500); // Slightly longer delay to let assets settle
             renderApp('portfolio');
             
             let ticking = false;
