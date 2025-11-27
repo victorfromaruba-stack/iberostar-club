@@ -21,54 +21,55 @@
     <!-- CRITICAL: Image Error Handler -->
     <script>
         function handleImgError(img) {
-            if (window.handleImgError && window.handleImgError !== handleImgError) return;
-            if (!img.src) return;
-
-            // 1. Lightbox check
+            // 1. If inside Lightbox, handle skipping
             if (img.classList.contains('fs-image')) {
-                handleLightboxError(img);
+                // If lightbox image fails, try fixing extension or just ignore
+                // (Logic handled in lightbox functions)
                 return;
             }
 
-            // 2. If we already tried to fix it, REMOVE IT.
+            // 2. Prevent Infinite Loops
             if (img.getAttribute('data-tried-fix')) {
+                // If it failed twice...
                 if (img.id === 'dImg') {
-                    // If main image fails twice, hide it
+                    // Main Hero: hide it
                     img.style.display = 'none';
                     const spinner = img.parentElement.querySelector('.image-spinner');
                     if(spinner) spinner.classList.remove('active');
                 } else {
-                    // GALLERY: Remove the container completely so no blank space/broken icon
+                    // Thumbnail: Remove container completely to prevent white box
                     const galleryItem = img.closest('.gallery-item');
                     if (galleryItem) galleryItem.remove();
                     else img.style.display = 'none';
                 }
                 return;
             }
-
+            
             img.setAttribute('data-tried-fix', 'true'); 
             const src = img.src;
             
-            // 3. Try Extension Swap (jpg <-> png)
+            // 3. Extension Fixer
             if (src.endsWith('.jpg')) {
                  img.src = src.replace('.jpg', '.png');
             } else if (src.endsWith('.png')) {
-                 // Some files might need double extension or jpg swap
-                 img.src = src + '.png'; 
+                 // Try appending .png for the double extension issue you have
+                 img.src = src + '.png';
             } else {
-                // If unknown ext, just remove immediately
+                // Fallback removal
                 const galleryItem = img.closest('.gallery-item');
                 if (galleryItem) galleryItem.remove();
                 else img.style.display = 'none';
             }
         }
-
-        // NEW: Handle Main Image Load to ensure it appears
-        function handleHeroLoad(img) {
-            const spinner = img.parentElement.querySelector('.image-spinner');
-            if(spinner) spinner.classList.remove('active');
+        
+        // Helper to show image once loaded
+        function handleImgLoad(img) {
             img.style.display = 'block';
             img.classList.add('loaded');
+            if(img.id === 'dImg') {
+                const spinner = img.parentElement.querySelector('.image-spinner');
+                if(spinner) spinner.classList.remove('active');
+            }
         }
     </script>
 
@@ -92,6 +93,7 @@
             --font-head: 'Playfair Display', serif;
             --font-body: 'Inter', sans-serif;
         }
+
         body.dark-theme {
             --text-main: #FFFFFF;
             --text-muted: rgba(255, 255, 255, 0.8);
@@ -101,49 +103,53 @@
             --glass-shine: rgba(255, 255, 255, 0.2);
             --ocean-deep: #FFFFFF;
         }
+
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-font-smoothing: antialiased; }
+        
         body {
             margin: 0; font-family: var(--font-body); background-color: #FDFBF7; color: var(--text-main); height: 100vh;
-            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);
-            display: flex; overflow: hidden; background: linear-gradient(180deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+            padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right);
+            display: flex; overflow: hidden;
+            background: linear-gradient(180deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
             transition: background 2.5s ease, color 1.5s ease; position: relative;
         }
 
-        /* ATMOSPHERE */
-        .ocean-waves { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E"); opacity: 0.2; animation: waveDrift 60s linear infinite; will-change: transform; }
+        /* --- ATMOSPHERE LAYERS --- */
+        .ocean-waves { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E"); opacity: 0.2; animation: waveDrift 60s linear infinite; }
         @keyframes waveDrift { 0% { background-position: 0 0; } 100% { background-position: 1000px 20px; } }
         
-        .palm-shadows { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(circle at 100% 0%, rgba(0,0,0,0.05) 0%, transparent 40%), radial-gradient(circle at 90% 10%, rgba(0,0,0,0.03) 0%, transparent 30%); opacity: 0; transition: opacity 3s ease; filter: blur(25px); will-change: transform, opacity; }
+        .palm-shadows { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(circle at 100% 0%, rgba(0,0,0,0.05) 0%, transparent 40%), radial-gradient(circle at 90% 10%, rgba(0,0,0,0.03) 0%, transparent 30%); opacity: 0; transition: opacity 3s ease; filter: blur(40px); }
         .shadows-active { opacity: 1 !important; animation: palmSway 10s ease-in-out infinite alternate; }
         @keyframes palmSway { 0% { transform: translateX(0); } 100% { transform: translateX(-20px); } }
 
         .night-glow { position: absolute; bottom: 0; left: 0; width: 100%; height: 60vh; background: linear-gradient(to top, rgba(212, 175, 55, 0.15), transparent); opacity: 0; transition: opacity 3s ease; z-index: 0; pointer-events: none; }
         .glow-active { opacity: 1 !important; }
 
-        .horizon-boat { position: absolute; bottom: 18%; left: -100px; width: 60px; height: 60px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.4'%3E%3Cpath d='M14 6l5 11h-5v-11zm-2 0v11h-5l5-11zm-9 13l2 3h16l2-3h-20z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; will-change: transform; }
+        .horizon-boat { position: absolute; bottom: 18%; left: -100px; width: 60px; height: 60px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.4'%3E%3Cpath d='M14 6l5 11h-5v-11zm-2 0v11h-5l5-11zm-9 13l2 3h16l2-3h-20z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
         body.dark-theme .horizon-boat { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF' opacity='0.3'%3E%3Cpath d='M14 6l5 11h-5v-11zm-2 0v11h-5l5-11zm-9 13l2 3h16l2-3h-20z'/%3E%3C/svg%3E"); }
         .boat-active { opacity: 1 !important; animation: sailAcross 140s linear infinite; }
         @keyframes sailAcross { 0% { transform: translateX(-20vw) rotate(1deg); } 100% { transform: translateX(120vw) rotate(1deg); } }
 
-        .clouds { position: absolute; top: 0; left: 0; width: 100%; height: 300px; background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 60px 60px; filter: blur(25px); opacity: 0; transition: opacity 3s ease; z-index: 0; will-change: transform; animation: cloudDrift 90s linear infinite; }
+        .clouds { position: absolute; top: 0; left: 0; width: 100%; height: 300px; background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 60px 60px; filter: blur(40px); opacity: 0; transition: opacity 3s ease; z-index: 0; animation: cloudDrift 90s linear infinite; }
         .clouds-active { opacity: 0.7 !important; }
         @keyframes cloudDrift { 0% { transform: translateX(-30px); } 50% { transform: translateX(30px); } 100% { transform: translateX(-30px); } }
 
         .fireflies { position: absolute; inset: 0; opacity: 0; transition: opacity 3s ease; pointer-events: none; z-index: 0; }
-        .fireflies::before, .fireflies::after { content: ''; position: absolute; width: 3px; height: 3px; background: #FFD700; border-radius: 50%; box-shadow: 0 0 8px #FFD700; animation: fireflyMove 20s infinite alternate; will-change: transform; }
+        .fireflies::before, .fireflies::after { content: ''; position: absolute; width: 3px; height: 3px; background: #FFD700; border-radius: 50%; box-shadow: 0 0 8px #FFD700; animation: fireflyMove 20s infinite alternate; }
         .fireflies::after { left: 60%; top: 40%; animation-duration: 25s; animation-direction: alternate-reverse; width: 2px; height: 2px; }
         .fireflies-active { opacity: 0.6 !important; }
         @keyframes fireflyMove { 0% { transform: translate(0,0); opacity: 0.2; } 50% { opacity: 1; } 100% { transform: translate(80px, -40px); opacity: 0.2; } }
 
-        .living-turtle { position: absolute; bottom: 8%; right: -120px; width: 100px; height: 80px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='%230F2D4A' opacity='0.2'%3E%3Cpath d='M32,12 c-6,0-10,4-10,10 c0,1.5,0.3,3,0.8,4.3 C18,27.5,15,31,15,35 c0,2.8,1.5,5.2,3.7,6.6 c-0.5,1.5-0.7,3.1-0.7,4.8 c0,6,4,11,9.5,12.4 c-0.3,0.5-0.5,1-0.5,1.6 c0,2.2,1.8,4,4,4 c2.2,0,4-1.8,4-4 c0-0.4-0.1-0.8-0.2-1.2 c2.2,0.5,4.5,0.8,7,0.8 s4.8-0.3,7-0.8 c-0.1,0.4-0.2,0.8-0.2,1.2 c0,2.2,1.8,4,4,4 c2.2,0,4-1.8,4-4 c0-0.6-0.2-1.1-0.5-1.6 c5.5-1.4,9.5-6.4,9.5-12.4 c0-1.7-0.2-3.3-0.7-4.8 c2.2-1.4,3.7-3.8,3.7-6.6 c0-4-3-7.5-7.8-8.7 c0.5-1.3,0.8-2.8,0.8-4.3 C52,16,48,12,32,12 z M32,16 c4,0,8,3,8,8 c0,4-3,8-8,8 s-8-4-8-8 C24,19,28,16,32,16 z M19,35 c0-2,2-4,5-4 c0.5,0,1,0.1,1.5,0.2 c-0.3,1.5-0.5,3-0.5,4.8 c0,5,2,10,5,13 c-2,0-4-1-6-3 C21,43,19,39,19,35 z M45,35 c3,0,5,2,5,4 c0,4-2,8-5,10 c-2,2-4,3-6,3 c3-3,5-8,5-13 C44,37.2,44.5,35.5,45,35 z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; will-change: transform; }
+        .living-turtle { position: absolute; bottom: 8%; right: -120px; width: 100px; height: 80px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='%230F2D4A' opacity='0.2'%3E%3Cpath d='M32,12 c-6,0-10,4-10,10 c0,1.5,0.3,3,0.8,4.3 C18,27.5,15,31,15,35 c0,2.8,1.5,5.2,3.7,6.6 c-0.5,1.5-0.7,3.1-0.7,4.8 c0,6,4,11,9.5,12.4 c-0.3,0.5-0.5,1-0.5,1.6 c0,2.2,1.8,4,4,4 c2.2,0,4-1.8,4-4 c0-0.4-0.1-0.8-0.2-1.2 c2.2,0.5,4.5,0.8,7,0.8 s4.8-0.3,7-0.8 c-0.1,0.4-0.2,0.8-0.2,1.2 c0,2.2,1.8,4,4,4 c2.2,0,4-1.8,4-4 c0-0.6-0.2-1.1-0.5-1.6 c5.5-1.4,9.5-6.4,9.5-12.4 c0-1.7-0.2-3.3-0.7-4.8 c2.2-1.4,3.7-3.8,3.7-6.6 c0-4-3-7.5-7.8-8.7 c0.5-1.3,0.8-2.8,0.8-4.3 C52,16,48,12,32,12 z M32,16 c4,0,8,3,8,8 c0,4-3,8-8,8 s-8-4-8-8 C24,19,28,16,32,16 z M19,35 c0-2,2-4,5-4 c0.5,0,1,0.1,1.5,0.2 c-0.3,1.5-0.5,3-0.5,4.8 c0,5,2,10,5,13 c-2,0-4-1-6-3 C21,43,19,39,19,35 z M45,35 c3,0,5,2,5,4 c0,4-2,8-5,10 c-2,2-4,3-6,3 c3-3,5-8,5-13 C44,37.2,44.5,35.5,45,35 z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
         .turtle-active { opacity: 1 !important; animation: turtleSwim 90s linear infinite; }
         @keyframes turtleSwim { 0% { transform: translateX(0) rotate(5deg); } 50% { transform: translateX(-60vw) rotate(-5deg); } 100% { transform: translateX(-120vw) rotate(5deg); } }
 
-        .living-birds { position: absolute; top: 15%; left: -100px; width: 100px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' fill='%230F2D4A' opacity='0.15'%3E%3Cpath d='M10 25 Q25 10 40 25 Q25 30 10 25 M60 15 Q75 0 90 15 Q75 20 60 15' stroke='%230F2D4A' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; will-change: transform; }
+        .living-birds { position: absolute; top: 15%; left: -100px; width: 100px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' fill='%230F2D4A' opacity='0.15'%3E%3Cpath d='M10 25 Q25 10 40 25 Q25 30 10 25 M60 15 Q75 0 90 15 Q75 20 60 15' stroke='%230F2D4A' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
         .birds-active { opacity: 1 !important; animation: birdsFly 60s linear infinite; }
         @keyframes birdsFly { 0% { transform: translateX(0) translateY(0); } 100% { transform: translateX(120vw) translateY(-20px); } }
 
-        .living-dolphin { position: absolute; bottom: 25%; left: 20%; width: 50px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.15'%3E%3Cpath d='M2 12s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; will-change: transform; }
+        .living-dolphin { position: absolute; bottom: 25%; left: 20%; width: 50px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.15'%3E%3Cpath d='M2 12s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
         .dolphin-active { opacity: 1 !important; animation: dolphinJump 20s ease-in-out infinite; }
         @keyframes dolphinJump { 0%, 80% { transform: translateY(20px) rotate(0); opacity: 0; } 90% { transform: translateY(-20px) rotate(-10deg); opacity: 0.4; } 100% { transform: translateY(20px) rotate(10deg); opacity: 0; } }
 
@@ -154,13 +160,16 @@
         .stars-overlay { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 3s ease; background-image: radial-gradient(white, rgba(255,255,255,.3) 1px, transparent 2px); background-size: 300px 300px; }
         .stars-active { opacity: 0.7 !important; }
 
+        /* --- RIPPLES --- */
         .ripple-btn { position: absolute; border-radius: 50%; transform: scale(0); animation: rippleBtnAnim 0.6s linear; background: rgba(255, 255, 255, 0.4); pointer-events: none; z-index: 9999; }
         @keyframes rippleBtnAnim { to { transform: scale(4); opacity: 0; } }
         .ripple-water { position: absolute; border-radius: 50%; transform: scale(0); animation: rippleWaterAnim 1.2s ease-out; border: 2px solid rgba(255, 255, 255, 0.3); background: transparent; pointer-events: none; z-index: 5; }
         @keyframes rippleWaterAnim { 0% { transform: scale(0); opacity: 0.6; border-width: 4px; } 100% { transform: scale(2.5); opacity: 0; border-width: 0px; } }
 
+        /* --- TOAST --- */
         #modeToast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: white; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; backdrop-filter: blur(12px); pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.1); font-family: var(--font-body); }
 
+        /* --- NAV --- */
         nav { width: 90px; height: 94vh; margin: 3vh 0 3vh 3vh; background: var(--glass-nav); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
         .nav-btn { width: 60px; height: 60px; border-radius: 20px; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s var(--ease-out); position: relative; overflow: hidden; user-select: none; -webkit-user-select: none; }
         .nav-btn.active { background: var(--gold); color: white; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -168,13 +177,18 @@
         .nav-btn svg { width: 28px; height: 28px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
         .nav-btn.active svg { transform: scale(1.1); fill: white; }
 
+        /* --- MAIN --- */
         main { flex: 1; height: 100vh; overflow-y: auto; overflow-x: hidden; padding: 50px 70px; scroll-behavior: smooth; z-index: 10; -webkit-overflow-scrolling: touch; }
         main::-webkit-scrollbar { display: none; }
 
+        /* --- HEADER --- */
         header { margin-bottom: 40px; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        /* HEADER LOGO CSS UPDATED: Height constrained to 80px, auto width */
         .header-logo { height: 80px; width: auto; cursor: pointer; mix-blend-mode: normal; transition: filter 0.5s; object-fit: contain; }
+        /* LOGO FILTER CLASS: To be toggled by JS */
         .logo-white { filter: brightness(0) invert(1); }
+        
         .greeting-wrap { text-align: right; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.2s; }
         .greeting-wrap:active { transform: scale(0.95); }
         .greeting { font-family: var(--font-body); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 800; }
@@ -197,10 +211,12 @@
         .search-icon { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; fill: var(--gold); pointer-events: none; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- GRID & TRANSITION --- */
         .fade-wrapper { animation: fadeInSection 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
         @keyframes fadeInSection { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 35px; padding-bottom: 120px; perspective: 1000px; }
 
+        /* --- PARALLAX CARD --- */
         .card { background: var(--glass-card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 30px; overflow: hidden; position: relative; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.1s ease, box-shadow 0.4s var(--ease-out); box-shadow: var(--shadow-soft); transform-style: preserve-3d; border-top: 1px solid var(--glass-shine); border-left: 1px solid var(--glass-shine); }
         .card:hover { box-shadow: var(--shadow-hover); border-color: var(--gold); z-index: 10; }
         .card::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent); transform: skewX(-25deg); transition: 0.5s; pointer-events: none; z-index: 5; }
@@ -336,7 +352,7 @@
 
     <!-- SPLASH SCREEN -->
     <div id="splash">
-        <!-- Updated to point to the correct double extension logo logic -->
+        <!-- Restored original Double Extension filename per user request -->
         <img id="splashLogo" src="Logos/logo_club.png.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
     </div>
 
@@ -353,7 +369,7 @@
     <main id="mainContainer">
         <header>
             <div class="header-top">
-                <!-- Updated to point to the correct double extension logo logic -->
+                <!-- Restored original Double Extension filename per user request -->
                 <img id="headerLogo" src="Logos/logo_club.png.png" alt="Iberostar Logo" class="header-logo" onerror="handleImgError(this)">
                 <div class="greeting-wrap" onclick="toggleTimeMode()">
                     <div class="greeting" id="greeting">Bon Bini</div>
@@ -378,6 +394,7 @@
         <div class="modal">
             <button class="modal-close-btn" onclick="closeModal()">✕</button>
             <div class="modal-hero" onclick="expandMainImage()">
+                <!-- handleHeroLoad ensures spinner is removed only on success -->
                 <img id="dImg" src="" onerror="handleImgError(this)" onload="handleHeroLoad(this)">
                 <div class="image-spinner active"></div>
                 <div style="position:absolute; bottom:20px; right:20px; background:rgba(255,255,255,0.8); padding:6px 12px; border-radius:20px; color:var(--text-main); font-size:11px; font-weight:700; backdrop-filter:blur(5px);">TAP TO EXPAND</div>
@@ -613,8 +630,6 @@
             
             itemsToShow.forEach(item => {
                 let logoHtml = ''; if(item.partnerLogo) logoHtml = `<img src="${item.partnerLogo}" class="partner-badge" onerror="this.style.display='none'">`;
-                
-                // Prefer explicit gallery first item, fallback to item.img
                 const mainImg = (item.gallery && item.gallery.length > 0) ? item.gallery[0] : item.img;
                 
                 let mediaBadge = '';
@@ -672,10 +687,11 @@
             mainImg.style.display = 'none'; // Hide old image
             mainImg.classList.remove('loaded'); // Reset load state
             
-            // --- AUTO-GALLERY GENERATION LOGIC (UPDATED) ---
+            // --- FIXED: AUTO-GALLERY GENERATION LOGIC ---
             let galleryData = [];
             
-            // 1. Try generating sequence based on imageCount (Best for finding ALL files)
+            // Priority 1: Generate sequence from folder (Best for "finding" files)
+            // If imageCount > 0, we assume the user wants us to look for that many files
             if (item.imageCount && item.imageCount > 0) {
                 const mainSrc = item.img || (item.gallery ? item.gallery[0] : '');
                 if (mainSrc) {
@@ -692,7 +708,7 @@
                     }
                 }
             } 
-            // 2. Fallback to explicit gallery list
+            // Priority 2: Use explicit gallery list
             else if (item.gallery && item.gallery.length > 0) {
                  galleryData = item.gallery;
             } else {
@@ -702,6 +718,7 @@
             // Clicking hero opens gallery at 0
             modal.querySelector('.modal-hero').onclick = () => viewFull(null, galleryData, 0);
             
+            // FIXED: Ensure main image loads the first valid item
             if(galleryData.length > 0) {
                  mainImg.src = galleryData[0];
                  // Note: Error handler will hide mainImg if it fails, Load handler shows it
@@ -991,11 +1008,35 @@
             'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Tierra del Sol, Aruba\'s premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole.', gallery: ['Golf/Course/golf_1.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm', essentials: ['Golf Shoes', 'Collared Shirt', 'Sunscreen'], imageCount: 10 },
             'BirdLife': { type:'golf', title: 'Audubon Sanctuary', sub: 'Nature & Wildlife', desc: 'Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).', gallery: ['Golf/Birds/birds_1.jpg'], pdf: '' },
 
-            'UTV': { type:'fun', title: 'Aruba UTV & ATV Tour', sub: 'Rocka Beach Tours', desc: 'Take the wheel of a rugged UTV and conquer Aruba’s wild side!', gallery: ['Activites/Rockabeach/act_utv_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', duration: '4 Hours', time: '9:00 AM & 2:30 PM', itinerary: ['Philips Animal Garden', 'Alto Vista Chapel', 'Baby Bridge', 'Bushiribana Gold Ruins', 'Wariruri Beach'], essentials: ['Valid Drivers License', 'Sunblock', 'Sunglasses', 'Bandana', 'Old clothes'], imageCount: 10 },
-            'Jeep': { type:'fun', title: 'Jeep Excursions', sub: 'Rocka Beach Tours', desc: 'Explore the island comfortably in our open-air Land Rovers.', gallery: ['Activites/Rockabeach/act_jeep_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', duration: '4.5 Hours', time: '8:30 AM', itinerary: ['California Lighthouse', 'Natural Pool', 'Baby Beach'], essentials: ['Swimwear', 'Towel', 'Sunscreen', 'Camera'], imageCount: 10 },
-            'Sail': { type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', desc: 'Set sail on a luxury catamaran for a relaxing day.', gallery: ['Activites/Rockabeach/act_sail_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', duration: '3.5 Hours', time: '9:30 AM & 2:00 PM', itinerary: ['Antilla Shipwreck', 'Boca Catalina', 'Malmok Reef'], essentials: ['Swimwear', 'Towel', 'Sunscreen'], imageCount: 10 },
-            'GoKart': { type:'fun', title: 'Go Kart Racing', sub: 'Rocka Beach Tours', desc: 'Adrenaline-pumping fun for speed enthusiasts.', gallery: ['Activites/Rockabeach/act_gokart_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
-            'Rentals': { type:'fun', title: 'UTV & ATV Rentals', sub: 'Rocka Beach Tours', desc: 'Freedom to explore at your own pace.', gallery: ['Activites/Rockabeach/act_rentals_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
+            'UTV': { 
+                type:'fun', title: 'Aruba UTV & ATV Tour', sub: 'Rocka Beach Tours', 
+                desc: 'Take the wheel of a rugged UTV and conquer Aruba’s wild side! This guided off-road safari takes you through the desert terrain of Arikok National Park, past the Natural Bridge ruins, and down to the refreshing waters of the Natural Pool (Conchi).',
+                gallery: ['Activites/Rockabeach/act_utv_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
+                duration: '4 Hours', time: '9:00 AM & 2:30 PM',
+                itinerary: ['Philips Animal Garden', 'Alto Vista Chapel', 'Baby Bridge', 'Bushiribana Gold Ruins', 'Wariruri Beach'],
+                essentials: ['Valid Drivers License', 'Sunblock', 'Sunglasses', 'Bandana', 'Old clothes'],
+                imageCount: 10
+            },
+            'Jeep': { 
+                type:'fun', title: 'Jeep Excursions', sub: 'Rocka Beach Tours', 
+                desc: 'Explore the island comfortably in our open-air Land Rovers. Visit the California Lighthouse, Alto Vista Chapel, and the rugged North Coast. A perfect mix of sightseeing and off-road adventure suitable for the whole family.', 
+                gallery: ['Activites/Rockabeach/act_jeep_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
+                duration: '4.5 Hours', time: '8:30 AM',
+                itinerary: ['California Lighthouse', 'Alto Vista Chapel', 'Natural Pool', 'Baby Beach'],
+                essentials: ['Swimwear', 'Towel', 'Sunscreen', 'Camera'],
+                imageCount: 10
+            },
+            'Sail': { 
+                type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', 
+                desc: 'Set sail on a luxury catamaran for a relaxing day on the turquoise Caribbean Sea. Includes stops at the Antilla Shipwreck for snorkeling, an open bar with tropical cocktails, and a delicious light lunch.', 
+                gallery: ['Activites/Rockabeach/act_sail_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
+                duration: '3.5 Hours', time: '9:30 AM & 2:00 PM',
+                itinerary: ['Antilla Shipwreck', 'Boca Catalina', 'Malmok Reef'],
+                essentials: ['Swimwear', 'Towel', 'Sunscreen'],
+                imageCount: 10
+            },
+            'GoKart': { type:'fun', title: 'Go Kart Racing', sub: 'Rocka Beach Tours', desc: 'Adrenaline-pumping fun for speed enthusiasts. Race around a professionally designed track.', gallery: ['Activites/Rockabeach/act_gokart_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
+            'Rentals': { type:'fun', title: 'UTV & ATV Rentals', sub: 'Rocka Beach Tours', desc: 'Freedom to explore at your own pace. Rent a UTV or ATV and create your own itinerary.', gallery: ['Activites/Rockabeach/act_rentals_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
             'HalfIsland': { type:'fun', title: 'Half Island Tour', sub: 'Rocka Beach Tours', desc: 'A perfect overview of Aruba in comfort.', gallery: ['Activites/Rockabeach/act_half_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', imageCount: 5 },
 
             'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
