@@ -21,26 +21,25 @@
     <!-- CRITICAL: Image Error Handler -->
     <script>
         function handleImgError(img) {
-            // 1. If inside Lightbox, handle skipping
-            if (img.classList.contains('fs-image')) {
-                // If lightbox image fails, try fixing extension or just ignore
-                // (Logic handled in lightbox functions)
-                return;
-            }
+            // 1. If inside Lightbox, just hide it (logic handled in lightbox functions)
+            if (img.classList.contains('fs-image')) return;
 
             // 2. Prevent Infinite Loops
             if (img.getAttribute('data-tried-fix')) {
                 // If it failed twice...
                 if (img.id === 'dImg') {
-                    // Main Hero: hide it
+                    // Main Hero: hide it so background shows
                     img.style.display = 'none';
                     const spinner = img.parentElement.querySelector('.image-spinner');
                     if(spinner) spinner.classList.remove('active');
                 } else {
-                    // Thumbnail: Remove container completely to prevent white box
+                    // Thumbnail: DESTROY the container immediately
                     const galleryItem = img.closest('.gallery-item');
-                    if (galleryItem) galleryItem.remove();
-                    else img.style.display = 'none';
+                    if (galleryItem) {
+                        galleryItem.remove();
+                    } else {
+                        img.style.display = 'none';
+                    }
                 }
                 return;
             }
@@ -48,14 +47,12 @@
             img.setAttribute('data-tried-fix', 'true'); 
             const src = img.src;
             
-            // 3. Extension Fixer
-            if (src.endsWith('.jpg')) {
-                 img.src = src.replace('.jpg', '.png');
-            } else if (src.endsWith('.png')) {
-                 // Try appending .png for the double extension issue you have
-                 img.src = src + '.png';
+            // 3. Extension Fixer (Only try to fix Main Image, don't waste time on thumbnails)
+            if (img.id === 'dImg') {
+                if (src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
+                else if (src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
             } else {
-                // Fallback removal
+                // For gallery thumbnails, if it fails, kill it immediately to keep UI clean
                 const galleryItem = img.closest('.gallery-item');
                 if (galleryItem) galleryItem.remove();
                 else img.style.display = 'none';
@@ -66,10 +63,9 @@
         function handleImgLoad(img) {
             img.style.display = 'block';
             img.classList.add('loaded');
-            if(img.id === 'dImg') {
-                const spinner = img.parentElement.querySelector('.image-spinner');
-                if(spinner) spinner.classList.remove('active');
-            }
+            // Remove spinner if it exists sibling
+            const spinner = img.parentElement.querySelector('.image-spinner');
+            if(spinner) spinner.classList.remove('active');
         }
     </script>
 
@@ -184,9 +180,8 @@
         /* --- HEADER --- */
         header { margin-bottom: 40px; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        /* HEADER LOGO CSS UPDATED: Height constrained to 80px, auto width */
+        /* HEADER LOGO */
         .header-logo { height: 80px; width: auto; cursor: pointer; mix-blend-mode: normal; transition: filter 0.5s; object-fit: contain; }
-        /* LOGO FILTER CLASS: To be toggled by JS */
         .logo-white { filter: brightness(0) invert(1); }
         
         .greeting-wrap { text-align: right; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.2s; }
@@ -352,8 +347,8 @@
 
     <!-- SPLASH SCREEN -->
     <div id="splash">
-        <!-- Restored original Double Extension filename per user request -->
-        <img id="splashLogo" src="Logos/logo_club.png.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
+        <!-- FIXED: Removed the double extension .png.png -->
+        <img id="splashLogo" src="Logos/logo_club.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
     </div>
 
     <!-- FLOATING DOCK -->
@@ -369,8 +364,8 @@
     <main id="mainContainer">
         <header>
             <div class="header-top">
-                <!-- Restored original Double Extension filename per user request -->
-                <img id="headerLogo" src="Logos/logo_club.png.png" alt="Iberostar Logo" class="header-logo" onerror="handleImgError(this)">
+                <!-- FIXED: Removed the double extension .png.png -->
+                <img id="headerLogo" src="Logos/logo_club.png" alt="Iberostar Logo" class="header-logo" onerror="handleImgError(this)">
                 <div class="greeting-wrap" onclick="toggleTimeMode()">
                     <div class="greeting" id="greeting">Bon Bini</div>
                     <div class="date-display" id="dateDisplay">...</div>
@@ -394,8 +389,8 @@
         <div class="modal">
             <button class="modal-close-btn" onclick="closeModal()">✕</button>
             <div class="modal-hero" onclick="expandMainImage()">
-                <!-- handleHeroLoad ensures spinner is removed only on success -->
-                <img id="dImg" src="" onerror="handleImgError(this)" onload="handleHeroLoad(this)">
+                <!-- Use standard handleImgLoad -->
+                <img id="dImg" src="" onerror="handleImgError(this)" onload="handleImgLoad(this)">
                 <div class="image-spinner active"></div>
                 <div style="position:absolute; bottom:20px; right:20px; background:rgba(255,255,255,0.8); padding:6px 12px; border-radius:20px; color:var(--text-main); font-size:11px; font-weight:700; backdrop-filter:blur(5px);">TAP TO EXPAND</div>
             </div>
@@ -690,8 +685,7 @@
             // --- FIXED: AUTO-GALLERY GENERATION LOGIC ---
             let galleryData = [];
             
-            // Priority 1: Generate sequence from folder (Best for "finding" files)
-            // If imageCount > 0, we assume the user wants us to look for that many files
+            // Priority 1: Generate sequence from folder
             if (item.imageCount && item.imageCount > 0) {
                 const mainSrc = item.img || (item.gallery ? item.gallery[0] : '');
                 if (mainSrc) {
@@ -721,7 +715,6 @@
             // FIXED: Ensure main image loads the first valid item
             if(galleryData.length > 0) {
                  mainImg.src = galleryData[0];
-                 // Note: Error handler will hide mainImg if it fails, Load handler shows it
             }
 
             document.getElementById('dTitle').innerText = item.title;
