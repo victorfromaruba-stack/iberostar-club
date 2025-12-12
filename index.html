@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- VIEWPORT: Optimized for all iOS devices -->
+    <!-- VIEWPORT: Optimized for all iOS devices to prevent zooming/scrolling issues -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=4"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=4" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=5"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=5" type="image/png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,15 +75,23 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
         p, .modal-desc { user-select: text; -webkit-user-select: text; }
 
-        body {
-            margin: 0; font-family: var(--font-body); background-color: #FDFBF7; color: var(--text-main); 
-            /* Fix for iOS Scroll Locking */
-            position: absolute; inset: 0; overflow: hidden; overscroll-behavior: none;
-            display: flex; background: linear-gradient(180deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
-            transition: background 2.5s ease;
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; /* Lock scroll to main container only */
         }
 
-        /* LAYERS */
+        body {
+            font-family: var(--font-body); 
+            background-color: #FDFBF7; 
+            color: var(--text-main); 
+            display: flex; 
+            /* Gradient applied to body for smooth transitions */
+            background: linear-gradient(180deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+            transition: background 2.5s ease;
+            position: relative;
+            overscroll-behavior: none;
+        }
+
+        /* LAYERS - Z-Index Management for Backgrounds */
         .ocean-waves { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.3' fill-rule='evenodd'/%3E%3C/svg%3E"); opacity: 0.4; animation: waveDrift 60s linear infinite; }
         @keyframes waveDrift { 0% { background-position: 0 0; } 100% { background-position: 1000px 20px; } }
         .palm-shadows { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(circle at 100% 0%, rgba(0,0,0,0.05) 0%, transparent 40%), radial-gradient(circle at 90% 10%, rgba(0,0,0,0.03) 0%, transparent 30%); opacity: 0; transition: opacity 3s ease; filter: blur(40px); }
@@ -134,7 +142,7 @@
         .nav-btn svg { width: 32px; height: 32px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
         .nav-btn.active svg { transform: scale(1.1); fill: white; }
 
-        /* MAIN SCROLL AREA */
+        /* MAIN SCROLL AREA - Z-INDEX 10 to be above background */
         main { flex: 1; height: 100%; overflow-y: auto; overflow-x: hidden; padding: 50px 70px; padding-left: 170px; scroll-behavior: smooth; z-index: 10; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }
         main::-webkit-scrollbar { display: none; }
 
@@ -437,7 +445,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
         // --- VERSION CONTROL ---
-        const DATA_VERSION = 5; 
+        const DATA_VERSION = 6; 
 
         // --- INIT ---
         window.onload = function() {
@@ -476,26 +484,26 @@
                     if(e.key === 'Escape') closeFs();
                 }
             });
-        };
 
-        // --- SECRET MODE TOGGLE ---
-        let titleTaps = 0;
-        document.getElementById('pageTitle').addEventListener('click', function() {
-            titleTaps++;
-            if(titleTaps === 3) {
-                inHouseMode = !inHouseMode;
-                localStorage.setItem('ib_in_house', inHouseMode);
-                updateModeUI();
-                showToast(inHouseMode ? "Switched to In-House Mode" : "Switched to Off-Site Mode");
-                
-                // If user is currently on 'fun' tab and we switch to in-house, move them to home
-                if(inHouseMode && currentSection === 'activities') {
-                    nav('portfolio');
+            // --- SECRET MODE TOGGLE (TRIPLE TAP TITLE) ---
+            let titleTaps = 0;
+            document.getElementById('pageTitle').addEventListener('click', function() {
+                titleTaps++;
+                if(titleTaps === 3) {
+                    inHouseMode = !inHouseMode;
+                    localStorage.setItem('ib_in_house', inHouseMode);
+                    updateModeUI();
+                    showToast(inHouseMode ? "Switched to In-House Mode" : "Switched to Off-Site Mode");
+                    
+                    // If user is currently on 'fun' tab and we switch to in-house, move them to home
+                    if(inHouseMode && currentSection === 'activities') {
+                        nav('portfolio');
+                    }
+                    titleTaps = 0;
                 }
-                titleTaps = 0;
-            }
-            setTimeout(() => titleTaps = 0, 1500);
-        });
+                setTimeout(() => titleTaps = 0, 1500);
+            });
+        };
 
         function updateModeUI() {
             const funBtn = document.getElementById('nav-fun');
@@ -510,8 +518,8 @@
         function preloadImages() {
             if(!appData) return;
             Object.values(appData).forEach(item => {
-                const img = new Image();
-                if(item.img) img.src = item.img;
+                if(item.img) { const i = new Image(); i.src = item.img; }
+                if(item.gallery) item.gallery.forEach(g => { const i = new Image(); i.src = g; });
             });
         }
 
@@ -528,7 +536,10 @@
             const root = document.documentElement;
             const body = document.body;
             const els = ['boat', 'fish', 'birds', 'dolphin', 'stars', 'nightGlow', 'clouds', 'fireflies', 'palmShadows'];
-            els.forEach(id => document.getElementById(id).className = document.getElementById(id).className.split(' ')[0]); 
+            els.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.className = el.className.split(' ')[0];
+            }); 
             
             const logo = document.getElementById('headerLogo');
             body.classList.remove('night-mode', 'dark-theme');
