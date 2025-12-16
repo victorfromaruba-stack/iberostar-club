@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     <meta name="format-detection" content="telephone=no">
     
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=6"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=6" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=7"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=7" type="image/png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,42 +18,36 @@
     <title>Iberostar Aruba</title>
 
     <script>
-        // --- SMART IMAGE HANDLER ---
+        // --- ROBUST IMAGE HANDLER ---
         function handleImgError(img) {
+            // Prevent infinite loops
             if (img.dataset.hasError === 'true') return; 
             img.dataset.hasError = 'true'; 
             
-            // 1. If it's a gallery thumb, DELETE the box so there is no white space
-            const galleryItem = img.closest('.gallery-item');
-            if (galleryItem) {
-                galleryItem.remove();
-                return;
-            } 
-            
-            // 2. If it's the main modal image, hide it and show text
+            // 1. If it's the Main Modal Image -> Hide it, show spinner/background
             if (img.id === 'dImg') {
                 img.style.display = 'none';
-                const spinner = img.parentElement.querySelector('.image-spinner');
-                if(spinner) spinner.classList.remove('active');
                 return;
             }
 
-            // 3. If it's a card image, try one extension swap, otherwise hide
+            // 2. Try extension swap (jpg <-> png)
             const src = img.src;
-            if (src.endsWith('.jpg')) {
+            if (src.includes('.jpg')) {
                 img.src = src.replace('.jpg', '.png');
-            } else if (src.endsWith('.png')) {
+            } else if (src.includes('.png')) {
                 img.src = src.replace('.png', '.jpg');
             } else {
-                // If it fails completely, we hide the image.
-                // CSS background color on the container will show instead.
-                img.style.opacity = '0';
+                // 3. FINAL FALLBACK: If swap fails, do NOT hide.
+                // Apply a class that shows a nice placeholder gradient pattern.
+                img.parentElement.classList.add('img-fallback');
+                img.style.opacity = '0'; // Hide the broken icon, show the div background
             }
         }
         
         function handleImgLoad(img) {
             img.style.opacity = '1';
             img.classList.add('loaded');
+            // Remove spinner if it exists
             const spinner = img.parentElement.querySelector('.image-spinner');
             if(spinner) spinner.classList.remove('active');
         }
@@ -65,8 +59,8 @@
             --bg-gradient-2: #00f2fe;
             --ocean-deep: #0F2D4A; 
             --gold: #C5A065;
-            --glass-card: rgba(255, 255, 255, 0.85); /* Increased opacity for better contrast */
-            --glass-nav: rgba(255, 255, 255, 0.9);
+            --glass-card: rgba(255, 255, 255, 0.9);
+            --glass-nav: rgba(255, 255, 255, 0.95);
             --glass-border: rgba(255, 255, 255, 0.6);
             --text-main: #0F2D4A;
             --text-muted: #425b76;
@@ -79,8 +73,8 @@
         body.dark-theme {
             --text-main: #FFFFFF;
             --text-muted: rgba(255, 255, 255, 0.85);
-            --glass-card: rgba(15, 23, 42, 0.75);
-            --glass-nav: rgba(15, 23, 42, 0.9);
+            --glass-card: rgba(15, 23, 42, 0.8);
+            --glass-nav: rgba(15, 23, 42, 0.95);
             --glass-border: rgba(255, 255, 255, 0.15);
             --ocean-deep: #FFFFFF;
         }
@@ -101,7 +95,7 @@
             overscroll-behavior: none;
         }
 
-        /* ANIMATED BACKGROUNDS */
+        /* LAYERS */
         .ocean-waves { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.3' fill-rule='evenodd'/%3E%3C/svg%3E"); opacity: 0.4; animation: waveDrift 60s linear infinite; }
         @keyframes waveDrift { 0% { background-position: 0 0; } 100% { background-position: 1000px 20px; } }
         
@@ -131,10 +125,6 @@
         .fish-active { opacity: 1 !important; animation: fishSwim 60s linear infinite; }
         @keyframes fishSwim { 0% { transform: translateX(0) rotate(2deg); } 50% { transform: translateX(-60vw) rotate(-2deg); } 100% { transform: translateX(-140vw) rotate(2deg); } }
         
-        .living-birds { position: absolute; top: 15%; left: -100px; width: 100px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' fill='%230F2D4A' opacity='0.25'%3E%3Cpath d='M10 25 Q25 10 40 25 Q25 30 10 25 M60 15 Q75 0 90 15 Q75 20 60 15' stroke='%230F2D4A' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
-        .birds-active { opacity: 1 !important; animation: birdsFly 60s linear infinite; }
-        @keyframes birdsFly { 0% { transform: translateX(0) translateY(0); } 100% { transform: translateX(120vw) translateY(-20px); } }
-        
         .living-dolphin { position: absolute; bottom: 25%; left: 20%; width: 50px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.25'%3E%3Cpath d='M2 12s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; z-index: 0; opacity: 0; transition: opacity 2s ease; }
         .dolphin-active { opacity: 1 !important; animation: dolphinJump 20s ease-in-out infinite; }
         @keyframes dolphinJump { 0%, 80% { transform: translateY(20px) rotate(0); opacity: 0; } 90% { transform: translateY(-20px) rotate(-10deg); opacity: 0.6; } 100% { transform: translateY(20px) rotate(10deg); opacity: 0; } }
@@ -142,7 +132,6 @@
         .living-star { position: absolute; top: 15%; right: 10%; width: 120px; height: 3px; background: linear-gradient(to right, white, transparent); z-index: 0; opacity: 0; transform: rotate(-35deg); border-radius: 50%; filter: drop-shadow(0 0 8px white); }
         body.dark-theme .living-star { animation: shootStar 8s ease-in-out infinite 5s; }
         @keyframes shootStar { 0% { opacity: 0; transform: translateX(0) translateY(0) rotate(-35deg); } 10% { opacity: 1; } 20% { opacity: 0; transform: translateX(-300px) translateY(200px) rotate(-35deg); } 100% { opacity: 0; transform: translateX(-300px) translateY(200px) rotate(-35deg); } }
-        
         .stars-overlay { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 3s ease; background-image: radial-gradient(white, rgba(255,255,255,.4) 1px, transparent 2px); background-size: 300px 300px; }
         .stars-active { opacity: 0.9 !important; }
 
@@ -201,7 +190,10 @@
         .card { background: var(--glass-card); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 30px; overflow: hidden; position: relative; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1); transform-style: preserve-3d; border-top: 1px solid rgba(255,255,255,0.4); }
         .card:hover { box-shadow: 0 20px 40px -10px rgba(0,0,0,0.2); border-color: var(--gold); z-index: 10; }
         .card:active { transform: scale(0.97) !important; }
-        .card-media { height: 220px; position: relative; overflow: hidden; pointer-events: none; background: #eee; }
+        .card-media { height: 220px; position: relative; overflow: hidden; pointer-events: none; background: #f0f0f0; transition: background 0.3s; }
+        .card-media.img-fallback { background: linear-gradient(135deg, #0F2D4A 0%, #1a4064 100%); display: flex; align-items: center; justify-content: center; }
+        .card-media.img-fallback::after { content: 'IBEROSTAR'; color: rgba(255,255,255,0.1); font-weight: 900; font-size: 24px; letter-spacing: 2px; }
+        
         .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease-out; opacity: 0; transition: opacity 0.5s; }
         .tag-pill { position: absolute; top: 18px; left: 18px; background: rgba(255,255,255,0.95); padding: 6px 14px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-body); color: #0F2D4A; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 2; }
         .tag-pill.highlight { background: var(--gold); color: white; }
@@ -473,7 +465,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
         // --- VERSION CONTROL ---
-        const DATA_VERSION = 8; 
+        const DATA_VERSION = 9; 
 
         // --- INIT ---
         window.onload = function() {
@@ -1127,8 +1119,7 @@
             'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
             'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 20 },
 
-            // FOOD - REORDERED: Main Iberostar spots moved to bottom as requested
-            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, known for its "Dinner in Bed" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
+            // FOOD - REORDERED: Screaming Eagle moved to bottom with Joia Restaurants
             'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf', imageCount: 20 },
             'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops. A classic steakhouse experience with a rustic touch, perfect for meat lovers seeking quality cuts.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf', imageCount: 20 },
             'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas and modern atmosphere. Exquisite sushi, dim sum, and Asian-fusion dishes in a stylish, Zen-inspired environment.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf', imageCount: 20 },
@@ -1137,6 +1128,7 @@
             'Dushi': { type:'food', title: 'Dushi Bagels', sub: 'Casual', desc: 'The go-to spot for New York style bagels and hearty burgers. A casual, friendly eatery perfect for breakfast or a quick, delicious lunch.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg'], pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf', imageCount: 20 },
             
             // MOVED TO BOTTOM
+            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, known for its "Dinner in Bed" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
             'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'Joia Aruba • Rooftop', desc: 'Perched atop the Joia hotel, Zima Bar offers the best sunset views. Enjoy handcrafted cocktails and a sophisticated atmosphere while watching the sun dip below the horizon.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], pdf: 'Restaurants/Zima/menu_zima.pdf', imageCount: 20 },
             'Bucatini': { type:'food', title: 'Bucatini', sub: 'Joia Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station. Indulge in fresh pasta, artisanal pizzas, and a wide selection of fine wines in an elegant setting.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], pdf: 'Restaurants/Bucatini/menu_bucatini.pdf', imageCount: 20 },
             'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
