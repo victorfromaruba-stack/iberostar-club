@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- VIEWPORT: Optimized for iPad (Prevents zoom, handles notch) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
+    <!-- PWA SETTINGS: Makes it look like a native app -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
@@ -20,27 +22,31 @@
 
     <script>
         // --- IMPROVED IMAGE ERROR HANDLING ---
-        // Prevents infinite loops and ugly broken image icons
+        // Removes broken images entirely to prevent "White Spaces"
         function handleImgError(img) {
             if (img.dataset.hasError === 'true') return; 
-            img.dataset.hasError = 'true'; // Mark as failed so we don't loop
+            img.dataset.hasError = 'true'; // Mark as failed
             
-            if (img.classList.contains('fs-image') || img.id === 'dImg') {
-                img.style.display = 'none'; 
+            // Check if it's a gallery item or main image
+            const galleryItem = img.closest('.gallery-item');
+            const cardMedia = img.closest('.card-media');
+            
+            if (galleryItem) {
+                // Remove the box entirely so no whitespace remains
+                galleryItem.remove();
+            } else if (img.id === 'dImg') {
+                // If modal main image fails, hide it
+                img.style.display = 'none';
                 const spinner = img.parentElement.querySelector('.image-spinner');
                 if(spinner) spinner.classList.remove('active');
+            } else if (cardMedia) {
+                // Try extension swap for cards, if that fails, hide
+                const src = img.src;
+                if (src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
+                else if (src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
+                else img.style.opacity = '0'; 
             } else {
-                // If main card image fails, hide it or try generic fallback
-                const cardMedia = img.closest('.card-media');
-                if(cardMedia) {
-                     // Try to swap extension ONCE
-                    const src = img.src;
-                    if (src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
-                    else if (src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
-                    else img.style.opacity = '0'; // Hide if swapping fails
-                } else {
-                    img.style.display = 'none';
-                }
+                img.style.display = 'none';
             }
         }
         
@@ -100,11 +106,10 @@
             overscroll-behavior: none;
         }
 
-        /* LAYERS - Z-Index Management for Backgrounds */
+        /* LAYERS - Z-Index Management */
         .ocean-waves { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.3' fill-rule='evenodd'/%3E%3C/svg%3E"); opacity: 0.4; animation: waveDrift 60s linear infinite; }
         @keyframes waveDrift { 0% { background-position: 0 0; } 100% { background-position: 1000px 20px; } }
         
-        /* Your Original Background Elements Restored */
         .palm-shadows { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(circle at 100% 0%, rgba(0,0,0,0.05) 0%, transparent 40%), radial-gradient(circle at 90% 10%, rgba(0,0,0,0.03) 0%, transparent 30%); opacity: 0; transition: opacity 3s ease; filter: blur(40px); }
         .shadows-active { opacity: 1 !important; animation: palmSway 10s ease-in-out infinite alternate; }
         @keyframes palmSway { 0% { transform: translateX(0); } 100% { transform: translateX(-20px); } }
@@ -155,7 +160,7 @@
             background: var(--glass-nav); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 48px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100; 
         }
-        .nav-btn { width: 64px; height: 64px; border-radius: 24px; margin-bottom: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s var(--ease-out); position: relative; overflow: hidden; }
+        .nav-btn { width: 64px; height: 64px; border-radius: 24px; margin-bottom: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s ease-out; position: relative; overflow: hidden; }
         .nav-btn:last-child { margin-bottom: 0; }
         .nav-btn.active { background: var(--gold); color: white; box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3); animation: spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes spring { 0% { transform: scale(0.9); } 100% { transform: scale(1); } }
@@ -324,6 +329,7 @@
 </head>
 <body>
 
+    <!-- BACKGROUND LAYERS -->
     <div class="ocean-waves"></div>
     <div class="palm-shadows" id="palmShadows"></div>
     <div class="night-glow" id="nightGlow"></div>
@@ -337,10 +343,12 @@
     <div class="horizon-boat" id="boat"></div>
     <div id="modeToast">Mode: Auto</div>
 
+    <!-- SPLASH SCREEN -->
     <div id="splash">
         <img id="splashLogo" src="Logos/logo_club.png.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
     </div>
 
+    <!-- FLOATING DOCK -->
     <nav id="mainNav">
         <button class="nav-btn active" id="nav-club" onclick="nav('portfolio')" title="Club"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
         <button class="nav-btn" id="nav-dining" onclick="nav('dining')" title="Dining"><svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg></button>
@@ -349,6 +357,7 @@
         <button class="nav-btn" id="nav-golf" onclick="nav('golf')" title="Golf"><svg viewBox="0 0 24 24"><path d="M19.5 19.5c-1 0-1.7-.6-2.1-1.5l-2.9-6.2c-.2-.4-.3-.8-.3-1.3 0-.2 0-.4.1-.6l.5-1.9c.2-.8-.2-1.7-1-2L12 5.5c-.1 0-.2-.1-.3-.1-1 0-1.8.7-2 1.7l-.3 1.7c-.2.9-.9 1.6-1.8 1.9l-2.1.6C4.7 11.6 4 12.4 4 13.3v.2c0 1 .6 1.9 1.5 2.3l2.2.9c.8.3 1.3 1.1 1.3 1.9v1.1c0 1.5 1.2 2.8 2.8 2.8h5.9c1 0 1.8-.8 1.8-1.8v-1.2zm-10-17c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg></button>
     </nav>
 
+    <!-- CONTENT -->
     <main id="mainContainer">
         <header>
             <div class="header-top">
@@ -371,6 +380,7 @@
         <div id="appContent"></div>
     </main>
 
+    <!-- MODAL -->
     <div class="modal-wrap" id="detailModal">
         <div class="modal">
             <button class="modal-close-btn" onclick="closeModal()">✕</button>
@@ -391,13 +401,15 @@
         </div>
     </div>
 
+    <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel">
         <div class="admin-header"><h3>Admin Editor</h3><div><button class="btn-admin" onclick="exportData()">Copy Code</button> <button class="btn-admin" style="background:#ff3b30;" onclick="closeAdmin()">Close</button></div></div>
         <div class="admin-body">
+            <!-- IMPROVED: CACHES EVERY SINGLE GENERATED IMAGE -->
             <div class="admin-card" style="border: 2px solid #C5A065;">
-                <h4 style="margin-top:0; color:#0F2D4A; font-family:var(--font-head);">🚀 Offline Mode Prep</h4>
-                <p style="font-size:0.9rem; color:#666;">Tap this before leaving Wi-Fi. It will download all images to the device cache.</p>
-                <button class="btn-big" id="preloadBtn" onclick="forceOfflineCache()" style="background:var(--gold); color:white;">⬇️ Cache All Media Now</button>
+                <h4 style="margin-top:0; color:#0F2D4A; font-family:var(--font-head);">🚀 Super Cache (Offline Prep)</h4>
+                <p style="font-size:0.9rem; color:#666;">Downloads ALL content (including generated gallery photos) to ensuring nothing is missing when offline.</p>
+                <button class="btn-big" id="preloadBtn" onclick="forceOfflineCache()" style="background:var(--gold); color:white;">⬇️ Cache Everything</button>
                 <div id="cacheStatus" style="margin-top:10px; font-weight:bold; color:#0F2D4A; text-align:center;"></div>
             </div>
 
@@ -420,12 +432,13 @@
                 <div class="form-group"><label>Itinerary</label><textarea id="newItinerary" rows="3"></textarea></div>
                 <div class="form-group"><label>Essentials</label><textarea id="newEssentials" rows="3"></textarea></div>
                 <div class="form-group"><label>Gallery</label><textarea id="newGallery" rows="3"></textarea></div>
-                <div class="form-group"><label>PDF/Video Path</label><input type="text" id="newFile"></div>
+                <div class="form-group"><label>PDF/Video Path</label><input type="text" id="newFile" placeholder="e.g. Activity/brochure.pdf"></div>
                 <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-admin" onclick="saveItem()">Save</button><button class="btn-admin" style="background:#d32f2f;" onclick="deleteItem()">Delete</button><button class="btn-admin" style="background:#8e8e93;" onclick="clearForm()">Clear</button></div>
             </div>
         </div>
     </div>
 
+    <!-- LIGHTBOX VIEWER -->
     <div class="fs-viewer" id="fsViewer">
         <button class="fs-close" onclick="closeFs()">✕</button>
         <button class="fs-nav fs-prev" id="fsPrev" onclick="prevFs()">‹</button>
@@ -466,7 +479,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
         // --- VERSION CONTROL ---
-        const DATA_VERSION = 6; 
+        const DATA_VERSION = 7; 
 
         // --- INIT ---
         window.onload = function() {
@@ -482,7 +495,7 @@
             }
             
             updateTimeVibe();
-            updateModeUI(); // Set correct tabs on load
+            updateModeUI();
             
             setTimeout(() => { 
                 const splash = document.getElementById('splash');
@@ -492,7 +505,6 @@
             }, 2000);
             renderApp('portfolio');
             
-            // Landscape/Tilt Effect
             let ticking = false;
             document.addEventListener('mousemove', (e) => {
                 if (!ticking) { window.requestAnimationFrame(() => { handleTilt(e); ticking = false; }); ticking = true; }
@@ -506,7 +518,7 @@
                 }
             });
 
-            // --- SECRET MODE TOGGLE (TRIPLE TAP TITLE) ---
+            // --- SECRET MODE TOGGLE ---
             let titleTaps = 0;
             document.getElementById('pageTitle').addEventListener('click', function() {
                 titleTaps++;
@@ -534,59 +546,89 @@
             }
         }
 
-        // --- SMART PRELOADER ---
         function preloadImages() {
             if(!appData) return;
             Object.values(appData).forEach(item => {
                 if(item.img) { const i = new Image(); i.src = item.img; }
-                if(item.gallery) item.gallery.forEach(g => { const i = new Image(); i.src = g; });
             });
         }
         
-        // --- OFFLINE CACHE (SUPERMIND IMPROVEMENT) ---
+        // --- SUPER CACHE ---
+        // This calculates ALL implied images (e.g. hotel_joia_1.jpg ... hotel_joia_10.jpg) and downloads them
         function forceOfflineCache() {
             const btn = document.getElementById('preloadBtn');
             const status = document.getElementById('cacheStatus');
             btn.disabled = true;
-            status.innerText = "Scanning database...";
+            status.innerText = "Scanning full database...";
             
             let allUrls = [];
-            // Gather all images from database
-            Object.values(appData).forEach(item => {
-                if(item.img) allUrls.push(item.img);
-                if(item.gallery) item.gallery.forEach(g => allUrls.push(g));
-                if(item.partnerLogo) allUrls.push(item.partnerLogo);
-            });
-            // Gather interface images
-            allUrls.push('Logos/logo_club.png.png');
             
-            // Unique
-            allUrls = [...new Set(allUrls)];
+            // Gather all images from database, including generated ones
+            Object.values(appData).forEach(item => {
+                // 1. Explicit main image
+                if(item.img) allUrls.push(item.img);
+                
+                // 2. Explicit gallery
+                if(item.gallery) item.gallery.forEach(g => allUrls.push(g));
+                
+                // 3. Partner Logo
+                if(item.partnerLogo) allUrls.push(item.partnerLogo);
+                
+                // 4. GENERATED GALLERY (The missing piece!)
+                // If item has imageCount, we must generate and fetch those URLs
+                if (item.imageCount && item.imageCount > 0) {
+                    const mainSrc = item.img || (item.gallery ? item.gallery[0] : '');
+                    if (mainSrc) {
+                        const lastUnderscore = mainSrc.lastIndexOf('_');
+                        const lastDot = mainSrc.lastIndexOf('.');
+                        if (lastUnderscore > -1 && lastDot > -1) {
+                            const prefix = mainSrc.substring(0, lastUnderscore + 1); 
+                            const ext = mainSrc.substring(lastDot); 
+                            for (let i = 1; i <= item.imageCount; i++) {
+                                allUrls.push(prefix + i + ext);
+                            }
+                        }
+                    }
+                }
+            });
+            
+            allUrls.push('Logos/logo_club.png.png');
+            allUrls = [...new Set(allUrls)]; // Remove duplicates
             
             let loaded = 0;
             const total = allUrls.length;
             status.innerText = `Downloading 0 / ${total}...`;
             
-            allUrls.forEach(url => {
-                const img = new Image();
-                img.onload = () => {
-                    loaded++;
-                    status.innerText = `Cached ${loaded} / ${total}`;
-                    if(loaded === total) {
-                        status.innerText = "✅ All files cached! Ready for offline.";
-                        btn.disabled = false;
-                    }
-                };
-                img.onerror = () => {
-                     // Still count errors so we don't hang
-                    loaded++;
-                    status.innerText = `Cached ${loaded} / ${total}`;
-                };
-                img.src = url;
-            });
+            // Use FETCH instead of Image() to force network request and cache warming
+            const fetchNext = (index) => {
+                if(index >= total) {
+                    status.innerText = `✅ Success! ${total} files cached.`;
+                    btn.disabled = false;
+                    return;
+                }
+                
+                const url = allUrls[index];
+                
+                // We use 'no-cors' to allow fetching from CDNs/External without erroring,
+                // though usually images are local. 
+                fetch(url, {mode: 'no-cors'})
+                    .then(() => {
+                        loaded++;
+                        status.innerText = `Cached ${loaded} / ${total}`;
+                        fetchNext(index + 1);
+                    })
+                    .catch(() => {
+                        loaded++; // Count errors too
+                        status.innerText = `Cached ${loaded} / ${total}`;
+                        fetchNext(index + 1);
+                    });
+            };
+            
+            // Start the chain
+            fetchNext(0);
         }
 
-        // --- TIME MODE SWITCHER (RESTORED) ---
+        // --- TIME MODE SWITCHER ---
         function toggleTimeMode() {
             timeState++;
             if(timeState > 4) timeState = 0;
@@ -601,7 +643,6 @@
             const body = document.body;
             const els = ['boat', 'fish', 'birds', 'dolphin', 'stars', 'nightGlow', 'clouds', 'fireflies', 'palmShadows'];
             
-            // Reset all animations
             els.forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.className = el.className.split(' ')[0];
@@ -612,7 +653,7 @@
             if(logo) logo.classList.remove('logo-white');
 
             let phase = 'day';
-            if (timeState === 0) { // Auto
+            if (timeState === 0) { 
                 if(hour >= 5 && hour < 11) phase = 'morning';
                 else if(hour >= 11 && hour < 17) phase = 'day';
                 else if(hour >= 17 && hour < 19) phase = 'sunset';
@@ -646,7 +687,7 @@
                 document.getElementById('dolphin').classList.add('dolphin-active');
                 document.getElementById('nightGlow').classList.add('glow-active');
                 if(logo) logo.classList.add('logo-white'); 
-            } else { // Night
+            } else { 
                 document.getElementById('greeting').innerText = "Bon Nochi";
                 body.classList.add('night-mode', 'dark-theme');
                 root.style.setProperty('--bg-gradient-1', '#0f172a'); root.style.setProperty('--bg-gradient-2', '#1e293b');
@@ -669,12 +710,8 @@
                     const centerX = rect.width / 2; const centerY = rect.height / 2;
                     const rotateX = ((y - centerY) / centerY) * -3; const rotateY = ((x - centerX) / centerX) * 3;
                     card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-                    const img = card.querySelector('.card-img');
-                    if(img) img.style.transform = `scale(1.1) translateX(${rotateY * -1.5}px) translateY(${rotateX * -1.5}px)`;
                 } else {
                     card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-                    const img = card.querySelector('.card-img');
-                    if(img) img.style.transform = 'scale(1.08)'; 
                 }
             });
         }
@@ -730,8 +767,6 @@
             container.querySelector('.grid').appendChild(noResults);
 
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            // Map section ID to Nav Button IDs for highlighting
             const navMap = { 'portfolio': 'nav-club', 'dining': 'nav-dining', 'activities': 'nav-fun', 'spa': 'nav-spa', 'golf': 'nav-golf' };
             const activeId = navMap[sectionId];
             if(activeId) document.getElementById(activeId).classList.add('active');
@@ -819,12 +854,12 @@
             const actBar = document.getElementById('dAction');
             let actionButtons = '';
 
-            if(item.type === 'food' && item.pdf) {
-                actionButtons += `<button class="btn-big" onclick="viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Digital Menu</button>`;
-            } else if ((item.type === 'club' || item.type === 'golf') && item.video) {
+            // LOGIC FOR SHOWING PDF BUTTONS
+            if(item.pdf) {
+                actionButtons += `<button class="btn-big" onclick="viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> View Brochure / Menu</button>`;
+            } 
+            if(item.video) {
                 actionButtons += `<button class="btn-big" onclick="viewVideo('${item.video}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Video Tour</button>`;
-            } else if (item.type === 'spa' && item.pdf) {
-                actionButtons += `<button class="btn-big" onclick="viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H8v-2h8v2zm0-4h-4V8h4v2z"/></svg> Spa Menu</button>`;
             }
             actBar.innerHTML = actionButtons;
 
@@ -968,11 +1003,7 @@
                 document.getElementById('newImg').value = item.img || '';
             }
             document.getElementById('newPartnerLogo').value = item.partnerLogo || '';
-            let fileVal = '';
-            if(item.type === 'food') fileVal = item.pdf || '';
-            else if(item.type === 'club') fileVal = item.video || '';
-            else if(item.type === 'spa') fileVal = item.pdf || '';
-            document.getElementById('newFile').value = fileVal;
+            document.getElementById('newFile').value = item.pdf || item.video || '';
         }
 
         function clearForm() {
@@ -1005,10 +1036,13 @@
             const imageCount = parseInt(document.getElementById('newImageCount').value) || 0;
             if(!key || !title) { alert('ID/Title required'); return; }
             
+            // Auto detect if path is video
+            const isVideo = file.toLowerCase().endsWith('.mp4');
+            
             appData[key] = { 
                 type: type, title: title, sub: sub, desc: desc, img: img, gallery: gallery, 
-                pdf: (type === 'food' || type === 'spa' ? file : ''), 
-                video: (type === 'club' || type === 'golf' ? file : ''),
+                pdf: (!isVideo ? file : ''), 
+                video: (isVideo ? file : ''),
                 partnerLogo: (type === 'fun' ? partnerLogo : ''),
                 duration: duration, time: time, itinerary: itinerary, essentials: essentials,
                 imageCount: imageCount
@@ -1055,7 +1089,8 @@
                 duration: '4 Hours', time: '9:00 AM & 2:30 PM',
                 itinerary: ['Philips Animal Garden', 'Alto Vista Chapel', 'Baby Bridge', 'Bushiribana Gold Ruins', 'Wariruri Beach'],
                 essentials: ['Valid Drivers License', 'Sunblock', 'Sunglasses', 'Bandana', 'Old clothes'],
-                imageCount: 10
+                imageCount: 10,
+                pdf: 'Activites/Rockabeach/brochure_utv.pdf' 
             },
             'Jeep': { 
                 type:'fun', title: 'Jeep Excursions', sub: 'Rocka Beach Tours', 
@@ -1064,7 +1099,8 @@
                 duration: '4.5 Hours', time: '8:30 AM',
                 itinerary: ['California Lighthouse', 'Alto Vista Chapel', 'Natural Pool', 'Baby Beach'],
                 essentials: ['Swimwear', 'Towel', 'Sunscreen', 'Camera'],
-                imageCount: 10
+                imageCount: 10,
+                pdf: 'Activites/Rockabeach/brochure_jeep.pdf'
             },
             'Sail': { 
                 type:'fun', title: 'Snorkeling & Sailing', sub: 'Rocka Beach Tours', 
@@ -1095,9 +1131,6 @@
             'Azzurro': { type:'food', title: 'Azzurro Ristorante', sub: 'Seafood', desc: 'Located right on the beach, serving authentic Italian seafood. Enjoy panoramic ocean views and fresh catches prepared with traditional Italian flair.', gallery: ['Restaurants/Azzurro%20Ristorante/rest_azzurro_1.jpg'], pdf: 'Restaurants/Azzurro%20Ristorante/menu_azzurro.pdf', imageCount: 20 },
             'AmoreMio': { type:'food', title: 'Amore Mio', sub: 'Pizzeria', desc: 'Authentic Neapolitan pizza with a crispy, airy crust. A cozy pizzeria offering a variety of traditional toppings and Italian comfort food.', gallery: ['Restaurants/Amore%20Mio/rest_amoremio_1.jpg'], pdf: 'Restaurants/Amore%20Mio/menu_amoremio.pdf', imageCount: 20 },
             'Dushi': { type:'food', title: 'Dushi Bagels', sub: 'Casual', desc: 'The go-to spot for New York style bagels and hearty burgers. A casual, friendly eatery perfect for breakfast or a quick, delicious lunch.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg'], pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf', imageCount: 20 },
-            'BeachBar': { type:'food', title: 'The Beach Bar', sub: 'Beachside', desc: 'The longest happy hour on the island. Relax with a cold drink in hand, toes in the sand, and enjoy the vibrant beach atmosphere.', gallery: ['Restaurants/The%20Beach%20Bar/rest_beachbar_1.jpg'], pdf: 'Restaurants/The%20Beach%20Bar/menu_beachbar.pdf', imageCount: 20 },
-            'Gelatissimo': { type:'food', title: 'Gelatissimo', sub: 'Bistro', desc: 'Authentic Italian gelato and bistro favorites. Treat yourself to creamy, homemade gelato or a light meal in a charming, lively setting.', gallery: ['Restaurants/Gelatissimo/rest_gelatissimo_1.jpg'], pdf: 'Restaurants/Gelatissimo/menu_gelatissimo.pdf', imageCount: 20 },
-            'Garden': { type: 'food', title: 'Garden Fresh', sub: 'Healthy', desc: 'The best spot for fresh smoothies, salads, and wraps. A healthy oasis offering organic, locally sourced ingredients for a guilt-free meal.', gallery: ['Restaurants/Garden%20Fresh/rest_garden_1.jpg'], pdf: 'Restaurants/Garden%20Fresh/menu_garden.pdf', imageCount: 20 },
         };
     </script>
 </body>
