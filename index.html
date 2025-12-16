@@ -8,8 +8,9 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     <meta name="format-detection" content="telephone=no">
     
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=7"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=7" type="image/png">
+    <!-- Try both standard and the "double extension" version found on your live site -->
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png" type="image/png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,17 +31,30 @@
                 return;
             }
 
-            // 2. Try extension swap (jpg <-> png)
+            // 2. If it's the Logo, try the "double png" typo fix observed on live site
+            if (img.classList.contains('header-logo') || img.classList.contains('splash-logo')) {
+                if (img.src.endsWith('.png') && !img.src.endsWith('.png.png')) {
+                    img.src = img.src + '.png';
+                    return;
+                }
+            }
+
+            // 3. Try extension swap (jpg <-> png)
             const src = img.src;
             if (src.includes('.jpg')) {
                 img.src = src.replace('.jpg', '.png');
-            } else if (src.includes('.png')) {
+            } else if (src.includes('.png') && !src.endsWith('.png.png')) {
                 img.src = src.replace('.png', '.jpg');
             } else {
-                // 3. FINAL FALLBACK: If swap fails, do NOT hide.
-                // Apply a class that shows a nice placeholder gradient pattern.
-                img.parentElement.classList.add('img-fallback');
-                img.style.opacity = '0'; // Hide the broken icon, show the div background
+                // 4. FINAL FALLBACK: If swap fails, show the "Placeholder Gradient"
+                // This ensures no "White Spaces" appear.
+                const mediaDiv = img.closest('.card-media') || img.closest('.gallery-item');
+                if(mediaDiv) {
+                    mediaDiv.classList.add('img-fallback');
+                    img.style.opacity = '0'; // Hide broken icon
+                } else {
+                    img.style.display = 'none'; // Just hide if no container
+                }
             }
         }
         
@@ -331,6 +345,7 @@
 
     <!-- SPLASH SCREEN -->
     <div id="splash">
+        <!-- Try loading logo, will auto-fix to .png if .png.png fails or vice versa -->
         <img id="splashLogo" src="Logos/logo_club.png.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
     </div>
 
@@ -465,7 +480,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
         // --- VERSION CONTROL ---
-        const DATA_VERSION = 9; 
+        const DATA_VERSION = 10; 
 
         // --- INIT ---
         window.onload = function() {
@@ -577,7 +592,10 @@
                 // Note: Caching large videos for offline via fetch is risky on iOS memory, skipping video files
             });
             
+            // Critical assets (Logo + its double extension variant)
+            allUrls.push('Logos/logo_club.png');
             allUrls.push('Logos/logo_club.png.png');
+            
             allUrls = [...new Set(allUrls)]; 
 
             let loaded = 0;
@@ -1081,7 +1099,7 @@
             'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Tierra del Sol, Aruba\'s premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole.', gallery: ['Golf/Course/golf_1.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm', essentials: ['Golf Shoes', 'Collared Shirt', 'Sunscreen'], imageCount: 10 },
             'BirdLife': { type:'golf', title: 'Audubon Sanctuary', sub: 'Nature & Wildlife', desc: 'Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).', gallery: ['Golf/Birds/birds_1.jpg'], pdf: '' },
 
-            // FUN - Updated with PDF capability
+            // FUN
             'UTV': { 
                 type:'fun', title: 'Aruba UTV & ATV Tour', sub: 'Rocka Beach Tours', 
                 desc: 'Take the wheel of a rugged UTV and conquer Aruba’s wild side! This guided off-road safari takes you through the desert terrain of Arikok National Park, past the Natural Bridge ruins, and down to the refreshing waters of the Natural Pool (Conchi).',
@@ -1119,7 +1137,7 @@
             'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
             'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 20 },
 
-            // FOOD - REORDERED: Screaming Eagle moved to bottom with Joia Restaurants
+            // FOOD
             'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf', imageCount: 20 },
             'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops. A classic steakhouse experience with a rustic touch, perfect for meat lovers seeking quality cuts.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf', imageCount: 20 },
             'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas and modern atmosphere. Exquisite sushi, dim sum, and Asian-fusion dishes in a stylish, Zen-inspired environment.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf', imageCount: 20 },
@@ -1127,13 +1145,15 @@
             'AmoreMio': { type:'food', title: 'Amore Mio', sub: 'Pizzeria', desc: 'Authentic Neapolitan pizza with a crispy, airy crust. A cozy pizzeria offering a variety of traditional toppings and Italian comfort food.', gallery: ['Restaurants/Amore%20Mio/rest_amoremio_1.jpg'], pdf: 'Restaurants/Amore%20Mio/menu_amoremio.pdf', imageCount: 20 },
             'Dushi': { type:'food', title: 'Dushi Bagels', sub: 'Casual', desc: 'The go-to spot for New York style bagels and hearty burgers. A casual, friendly eatery perfect for breakfast or a quick, delicious lunch.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg'], pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf', imageCount: 20 },
             
-            // MOVED TO BOTTOM
-            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, known for its "Dinner in Bed" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
+            // MOVED TO BOTTOM (All 5 + Screaming Eagle)
             'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'Joia Aruba • Rooftop', desc: 'Perched atop the Joia hotel, Zima Bar offers the best sunset views. Enjoy handcrafted cocktails and a sophisticated atmosphere while watching the sun dip below the horizon.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], pdf: 'Restaurants/Zima/menu_zima.pdf', imageCount: 20 },
             'Bucatini': { type:'food', title: 'Bucatini', sub: 'Joia Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station. Indulge in fresh pasta, artisanal pizzas, and a wide selection of fine wines in an elegant setting.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], pdf: 'Restaurants/Bucatini/menu_bucatini.pdf', imageCount: 20 },
             'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
             'Birdie': { type:'food', title: 'The Birdie', sub: 'Tierra del Sol', desc: 'Experience the "Tapas Affair" with breathtaking views. Located at Tierra del Sol, this spot offers a unique blend of small plates and scenic golf course vistas.', gallery: ['Restaurants/Birdie/rest_birdie_1.jpg'], pdf: 'Restaurants/Birdie/menu_birdie.pdf', imageCount: 20 },
+            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, known for its "Dinner in Bed" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
         };
     </script>
 </body>
 </html>
+
+
