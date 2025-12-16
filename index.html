@@ -477,7 +477,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
         // --- VERSION CONTROL ---
-        const DATA_VERSION = 14; 
+        const DATA_VERSION = 16; 
 
         // --- INIT ---
         window.onload = function() {
@@ -743,6 +743,9 @@
                     mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>`;
                 }
 
+                // FIXED: Strip HTML from description for card preview to avoid showing <b> or <br> codes
+                const cleanDesc = item.desc.replace(/<[^>]*>?/gm, '');
+
                 html += `<div class="card" onclick="openDetails('${item.key}')">
                     <div class="card-media">
                         ${logoHtml} ${mediaBadge}
@@ -750,7 +753,7 @@
                         <div class="cash-badge">IBEROCASH</div>
                         <div class="card-img"><img src="${mainImg}" onerror="handleImgError(this)" style="width:100%;height:100%;object-fit:cover;"></div>
                     </div>
-                    <div class="card-content"><h3 class="card-title">${item.title}</h3><p class="card-desc">${item.desc.substring(0, 100)}...</p></div>
+                    <div class="card-content"><h3 class="card-title">${item.title}</h3><p class="card-desc">${cleanDesc.substring(0, 100)}...</p></div>
                 </div>`;
             });
             html += `</div>`;
@@ -817,7 +820,9 @@
 
             document.getElementById('dTitle').innerText = item.title;
             document.getElementById('dSub').innerText = item.sub;
-            document.getElementById('dDesc').innerText = item.desc;
+            
+            // FIXED: Use innerHTML to render bold tags and line breaks correctly
+            document.getElementById('dDesc').innerHTML = item.desc;
 
             const grid = document.getElementById('dInfoGrid');
             grid.innerHTML = '';
