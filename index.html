@@ -702,7 +702,7 @@
         let currentImgIndex = 0;
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
-        const DATA_VERSION = 29; 
+        const DATA_VERSION = 31; // Incremented for new content
 
         // --- INIT ---
         window.onload = function() {
@@ -1374,22 +1374,22 @@
 
         const defaultData = {
             // CLUBS
-            'Joia': { type:'club', title: 'Iberostar Joia', sub: 'Eagle Beach', desc: 'Experience the crown jewel of Aruba. Located on the pristine shores of Eagle Beach, Joia is an adults-only haven offering butler service, swim-up suites, and a level of exclusivity that redefines Caribbean luxury.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg', 'Hotels/Joia/hotel_joia_3.jpg'], video: 'Hotels/Joia/hotel_joia.mp4', imageCount: 10 },
-            'Tierra': { type:'club', title: 'Tierra del Sol', sub: 'Golf & Estates', desc: 'Escape to the island\'s most prestigious gated community. Featuring luxury villas, a championship golf course, and panoramic views of the California Lighthouse and rugged North Coast.', gallery: ['Hotels/Tierra/golf_tierra_1.jpg', 'Hotels/Tierra/golf_tierra_2.jpg', 'Hotels/Tierra/golf_tierra_3.jpg', 'Hotels/Tierra/golf_tierra_4.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', imageCount: 10 },
-            'Selection': { type:'club', title: 'Iberostar Selection', sub: 'Coming Soon', desc: 'Bringing the premium Selection family experience to the Caribbean. Designed for families who refuse to compromise on luxury.', gallery: ['Hotels/Selection/hotel_selection_1.png'], video: '' },
-            'Joia2': { type:'club', title: 'Iberostar Joia (Lighthouse)', sub: 'In Development', desc: 'The next chapter of the Joia collection is currently in development. This exclusive property will feature unparalleled luxury and direct access to the island\'s most secluded beaches.', gallery: ['Hotels/Joia2/hotel_joia2_1.jpg'], video: '' },
+            'Joia': { type:'club', title: 'JOIA Aruba by Iberostar', sub: 'Eagle Beach', desc: 'Welcome to a world of luxury on the shores of Eagle Beach. JOIA Aruba by Iberostar offers an exclusive 5-star experience for everyone. From personalized butler service and swim-up suites to curated gastronomy, every detail is designed for relaxation. Enjoy our rooftop bar Zima, indulge in SPA Sensations, or let the kids have fun at Star Camp.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg', 'Hotels/Joia/hotel_joia_3.jpg'], video: 'Hotels/Joia/hotel_joia.mp4', imageCount: 10 },
+            'Tierra': { type:'club', title: 'Tierra del Sol', sub: 'Golf & Estates', desc: 'Immerse yourself in the island\'s most prestigious community. Located on the rugged North Coast, Tierra del Sol offers private luxury villas and condos surrounded by nature. Home to Aruba\'s only 18-hole championship golf course, a panoramic clubhouse pool, and fine dining at The Birdie.', gallery: ['Hotels/Tierra/golf_tierra_1.jpg', 'Hotels/Tierra/golf_tierra_2.jpg', 'Hotels/Tierra/golf_tierra_3.jpg', 'Hotels/Tierra/golf_tierra_4.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', imageCount: 10 },
+            'Selection': { type:'club', title: 'Iberostar Selection', sub: 'The Family Experience', desc: 'The future of family luxury in Aruba. Opening soon on Eagle Beach, Iberostar Selection will feature spacious suites, the signature Star Camp for kids, and splashing pools. A perfect blend of relaxation for adults and endless fun for the little ones.', gallery: ['Hotels/Selection/hotel_selection_1.png'], video: '' },
+            'Joia2': { type:'club', title: 'JOIA Aruba (Lighthouse)', sub: 'Future Phase', desc: 'A vision of future exclusivity. The next phase of Iberostar in Aruba is in development, promising secluded luxury near the iconic California Lighthouse. Stay tuned for a new level of sophistication.', gallery: ['Hotels/Joia2/hotel_joia2_1.jpg'], video: '' },
 
             // GOLF - Updated to have Brochure paths so the button appears
-            'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Tierra del Sol, Aruba\'s premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole.', gallery: ['Golf/Course/golf_1.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm', essentials: ['Golf Shoes', 'Collared Shirt', 'Sunscreen'], imageCount: 10, pdf: 'Golf/Course/brochure_golf.pdf' },
+            'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Tierra del Sol, Aruba\'s premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole and the rugged North Coast.', gallery: ['Golf/Course/golf_1.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm', essentials: ['Golf Shoes', 'Collared Shirt', 'Sunscreen'], imageCount: 10, pdf: 'Golf/Course/brochure_golf.pdf' },
             'BirdLife': { type:'golf', title: 'Audubon Sanctuary', sub: 'Nature & Wildlife', desc: 'Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).', gallery: ['Golf/Birds/birds_1.jpg'], pdf: 'Golf/Birds/brochure_birds.pdf' },
 
             // FUN - Updated with 2025 Info from Binder
             'UTV': { 
                 type:'fun', title: 'UTV & ATV Adventure Tours', sub: 'Rocka Beach Tours', 
-                desc: 'Guided off-road safari. Explore the wild side of Aruba. <br><strong>ATV Single: $160 | ATV Double: $200<br>UTV 2-Seater: $230 | UTV 3-Seater: $305 | UTV 4-Seater: $380</strong><br>Lunch included for an additional $20.',
+                desc: 'Experience the wild side of Aruba! <br><strong>Tour A (North Coast):</strong> Stops at Black Stone Beach, 3 Bridges, Baby Bridge, Bushiribana Gold Ruins, Wariruri Beach, California Lighthouse, and Secret Beach with Cliff Jumping.<br><strong>Tour B (Natural Pool):</strong> Explore the Natural Pool (Conchi), Natural Bridge, and Boca Catalina.<br><br><strong>Prices (2025):</strong><br>ATV Single: $160 | ATV Double: $200<br>UTV 2-Seater: $230 | 3-Seater: $305 | 4-Seater: $380',
                 gallery: ['Activites/Rockabeach/act_utv_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
                 duration: '4 Hours', time: 'Morning: 9:30 AM | Afternoon: 2:30 PM',
-                itinerary: ['Black Stone Beach', '3 Bridges', 'Baby Bridge', 'Bushiribana Gold Ruins', 'Wariruri Beach', 'California Lighthouse', 'Secret Beach'],
+                itinerary: ['Black Stone Beach', '3 Bridges', 'Baby Bridge', 'Bushiribana Gold Ruins', 'Wariruri Beach', 'California Lighthouse', 'Secret Beach (Cliff Jumping)'],
                 essentials: ['Valid Drivers License', 'Sunblock', 'Sunglasses', 'Bandana', 'Old clothes'],
                 imageCount: 10,
                 pdf: 'Activites/Rockabeach/brochure_utv.pdf',
@@ -1397,7 +1397,7 @@
             },
             'Jeep': { 
                 type:'fun', title: 'Jeep Safari Adventure', sub: 'Rocka Beach Tours', 
-                desc: 'Explore Arikok National Park in open-air Land Rovers.<br><strong>Tour A (Natural Pool/Caves): Adult $97 / Child $75<br>Tour B (Cave Pool/Secret Beach): Adult $115 / Child $85</strong>', 
+                desc: 'Explore the rugged Arikok National Park in open-air Land Rovers.<br><strong>Tour A (Morning):</strong> Visit the Natural Pool, Fontein Cave, Boca Prins, and Baby Beach.<br><strong>Tour B (Afternoon):</strong> Discover the Cave Pool, Secret Beach, and San Nicolas Art City.<br><br><strong>Prices:</strong> Adult $97 / Child $75 (Tour A) | Adult $115 / Child $85 (Tour B).', 
                 gallery: ['Activites/Rockabeach/act_jeep_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
                 duration: '4-6 Hours', time: 'Pickups start 8:15 AM',
                 itinerary: ['Natural Pool', 'Fontein Cave', 'Boca Prins', '3 Bridges', 'Natural Bridge', 'Baby Beach (Tour A)'],
@@ -1408,9 +1408,9 @@
             },
             'Sail': { 
                 type:'fun', title: 'Tropical Sailing Adventures', sub: 'Tropical Sailing', 
-                desc: 'Luxury catamaran sailing. Snorkeling, sunset dinners, and private charters.<br><strong>Non-Private: Adult $135 | Child $75<br>Private Charters start at $200/hour.</strong>', 
+                desc: 'Set sail on a luxury catamaran for a 4-hour "Tropical Experience". Includes snorkeling stops at the Antilla Shipwreck and Boca Catalina.<br><strong>Included:</strong> Fruit bowl, BBQ lunch (or sunset dinner), and a Premium Open Bar.<br><strong>Price:</strong> Adult $135 | Child $75.', 
                 gallery: ['Activites/Rockabeach/act_sail_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
-                duration: '3-4 Hours', time: '9:00 AM & 3:00 PM',
+                duration: '4 Hours', time: '9:00 AM & 3:00 PM',
                 itinerary: ['Antilla Shipwreck', 'Boca Catalina', 'Spanish Lagoon (Dinner Sail)'],
                 essentials: ['Swimwear', 'Towel', 'Sunscreen'],
                 imageCount: 10,
@@ -1419,7 +1419,7 @@
             },
             'GoKart': { 
                 type:'fun', title: 'Bushiri Karting Speedway', sub: 'Rocka Beach Tours', 
-                desc: 'Outdoor karting experience including 3 races (Practice, Lap Position, Final Race).<br><strong>Race Experience: Adult $85 | Child $60<br>Arrive & Drive: $25</strong>', 
+                desc: 'Feel the adrenaline at Aruba\'s only outdoor karting track!<br><strong>Race Experience ($85):</strong> Includes Pickup/Dropoff, Briefing, Practice Race, Qualifier Lap, and Final Race. Includes medals & champagne for winners!<br><strong>Arrive & Drive:</strong> $25 (Track only).', 
                 gallery: ['Activites/Rockabeach/act_gokart_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', 
                 duration: '2 Hours', time: '3:30 PM - 5:30 PM',
                 essentials: ['Closed Toe Shoes Required'],
@@ -1429,7 +1429,7 @@
             },
             'Rentals': { 
                 type:'fun', title: 'UTV & ATV Rentals', sub: 'Rocka Beach Tours', 
-                desc: 'Freedom to explore at your own pace. Security Deposit: $500.<br><strong>UTV 2-Seater: 4hr $230 / 8hr $275<br>UTV 4-Seater: 4hr $380 / 8hr $395</strong>', 
+                desc: 'Freedom to explore Aruba at your own pace. Rentals available for 4 or 8 hours.<br><strong>UTV 2-Seater:</strong> $230 (4hr) / $275 (8hr)<br><strong>UTV 4-Seater:</strong> $380 (4hr) / $395 (8hr).<br>Note: $500 Security Deposit required.', 
                 gallery: ['Activites/Rockabeach/act_rentals_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', 
                 duration: '4 or 8 Hours',
                 essentials: ['Valid Drivers License (18+)'],
@@ -1439,7 +1439,7 @@
             },
             'HalfIsland': { 
                 type:'fun', title: 'Beach Bus Adventure', sub: 'Rocka Beach Tours', 
-                desc: 'Fun 4-hour tour visiting key landmarks and beaches.<br><strong>Adult: $65.00 | Child (4-12): $42.00</strong>', 
+                desc: 'A fun, colorful bus tour hitting the island\'s top landmarks.<br><strong>Stops:</strong> California Lighthouse, Alto Vista Chapel, Casibari Rock Formation, Natural Bridge, and a swim stop at Arashi Beach.<br><strong>Price:</strong> Adult $65 | Child $42.', 
                 gallery: ['Activites/Rockabeach/act_half_1.jpg'], partnerLogo: 'Logos/logo_rocka.png', 
                 duration: '4 Hours', time: '10:00 AM - 2:00 PM',
                 itinerary: ['California Lighthouse', 'Alto Vista Chapel', 'Casibari Rock Formation', 'Natural Bridge', 'Arashi Beach'],
@@ -1449,24 +1449,24 @@
             },
 
             // SPA
-            'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.', gallery: ['spa/Promo/massage_1.jpg'], pdf: 'Spa/Promo/brochure_spa_promo.pdf', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
-            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/Spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 5 },
+            'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation at JOIA Aruba.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: 'Spa/Promo/brochure_spa_promo.pdf', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
+            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'JOIA Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/Spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 5 },
 
             // FOOD
-            'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf', imageCount: 20 },
-            'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops. A classic steakhouse experience with a rustic touch, perfect for meat lovers seeking quality cuts.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf', imageCount: 20 },
-            'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Asian Fusion', desc: 'A journey through Asia with Tapas and modern atmosphere. Exquisite sushi, dim sum, and Asian-fusion dishes in a stylish, Zen-inspired environment.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf', imageCount: 20 },
-            'Azzurro': { type:'food', title: 'Azzurro Ristorante', sub: 'Seafood', desc: 'Located right on the beach, serving authentic Italian seafood. Enjoy panoramic ocean views and fresh catches prepared with traditional Italian flair.', gallery: ['Restaurants/Azzurro%20Ristorante/rest_azzurro_1.jpg'], pdf: 'Restaurants/Azzurro%20Ristorante/menu_azzurro.pdf', imageCount: 20 },
-            'AmoreMio': { type:'food', title: 'Amore Mio', sub: 'Pizzeria', desc: 'Authentic Neapolitan pizza with a crispy, airy crust. A cozy pizzeria offering a variety of traditional toppings and Italian comfort food.', gallery: ['Restaurants/Amore%20Mio/rest_amoremio_1.jpg'], pdf: 'Restaurants/Amore%20Mio/menu_amoremio.pdf', imageCount: 20 },
-            'Dushi': { type:'food', title: 'Dushi Bagels', sub: 'Casual', desc: 'The go-to spot for New York style bagels and hearty burgers. A casual, friendly eatery perfect for breakfast or a quick, delicious lunch.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg'], pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf', imageCount: 20 },
+            'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Palm Beach • Italian', desc: 'An Aruban classic located on the Palm Beach strip. Famous for their "Spaghetti al Formaggio Parmigiano," prepared tableside in a giant wheel of cheese. Reservations highly recommended.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf', imageCount: 20 },
+            'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Palm Beach • Steakhouse', desc: 'Located next to Gianni\'s, Daniel\'s offers a premium steakhouse experience with Certified Angus Beef and wood-fired chops. A perfect spot for meat lovers seeking quality cuts in a rustic setting.', gallery: ['Restaurants/Daniel%27s%20Steak%20%26%20Chop/rest_daniels_1.jpg'], pdf: 'Restaurants/Daniel%27s%20Steak%20%26%20Chop/menu_daniels.pdf', imageCount: 20 },
+            'Azia': { type:'food', title: 'Azia Restaurant', sub: 'Palm Beach • Asian Fusion', desc: 'A stylish and modern journey through Asia. Known for its vibrant blue decor and Zen-inspired atmosphere, Azia serves exquisite sushi, dim sum, and Asian-fusion tapas perfect for sharing.', gallery: ['Restaurants/Azia%20Restaurant/rest_azia_1.jpg'], pdf: 'Restaurants/Azia%20Restaurant/menu_azia.pdf', imageCount: 20 },
+            'Azzurro': { type:'food', title: 'Azzurro Ristorante', sub: 'Palm Beach • Seafood', desc: 'Dining right on the beach inside the Playa Linda resort. Azzurro specializes in authentic Italian seafood, offering panoramic ocean views and fresh catches prepared with traditional flair.', gallery: ['Restaurants/Azzurro%20Ristorante/rest_azzurro_1.jpg'], pdf: 'Restaurants/Azzurro%20Ristorante/menu_azzurro.pdf', imageCount: 20 },
+            'AmoreMio': { type:'food', title: 'Amore Mio', sub: 'Palm Beach • Pizzeria', desc: 'Authentic Neapolitan pizza with a crispy, airy crust. A fun and cozy pizzeria on the strip offering a variety of traditional toppings and Italian comfort food.', gallery: ['Restaurants/Amore%20Mio/rest_amoremio_1.jpg'], pdf: 'Restaurants/Amore%20Mio/menu_amoremio.pdf', imageCount: 20 },
+            'Dushi': { type:'food', title: 'Dushi Bagels', sub: 'Palm Beach • Casual', desc: 'The go-to spot for breakfast and lunch. Famous for New York-style bagels, hearty burgers, and a friendly, casual atmosphere right in front of the Playa Linda resort.', gallery: ['Restaurants/Dushi%20Bagels%20%26%20Burgers/rest_dushi_1.jpg'], pdf: 'Restaurants/Dushi%20Bagels%20%26%20Burgers/menu_dushi.pdf', imageCount: 20 },
             
             // MOVED TO BOTTOM (All 5 + Screaming Eagle)
-            'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'Joia Aruba • Rooftop', desc: 'Perched atop the Joia hotel, Zima Bar offers the best sunset views. Enjoy handcrafted cocktails and a sophisticated atmosphere while watching the sun dip below the horizon.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], pdf: 'Restaurants/Zima/menu_zima.pdf', imageCount: 20 },
-            'Bucatini': { type:'food', title: 'Bucatini', sub: 'Joia Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station. Indulge in fresh pasta, artisanal pizzas, and a wide selection of fine wines in an elegant setting.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], pdf: 'Restaurants/Bucatini/menu_bucatini.pdf', imageCount: 20 },
+            'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'JOIA Aruba • Rooftop', desc: 'Perched atop the JOIA Aruba hotel, Zima Bar offers the best sunset views on Eagle Beach. Enjoy handcrafted cocktails and a sophisticated atmosphere while watching the sun dip below the horizon.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], pdf: 'Restaurants/Zima/menu_zima.pdf', imageCount: 20 },
+            'Bucatini': { type:'food', title: 'Bucatini', sub: 'JOIA Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station. Indulge in fresh pasta, artisanal pizzas, and a wide selection of fine wines in an elegant setting within the JOIA Aruba resort.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], pdf: 'Restaurants/Bucatini/menu_bucatini.pdf', imageCount: 20 },
             // UPDATED: Marea image path fixed + Recovery Logic added
-            'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
-            'Birdie': { type:'food', title: 'The Birdie', sub: 'Tierra del Sol', desc: 'Experience the "Tapas Affair" with breathtaking views. Located at Tierra del Sol, this spot offers a unique blend of small plates and scenic golf course vistas.', gallery: ['Restaurants/Birdie/rest_birdie_1.jpg'], pdf: 'Restaurants/Birdie/menu_birdie.pdf', imageCount: 20 },
-            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, known for its "Dinner in Bed" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
+            'Marea': { type:'food', title: 'Marea', sub: 'JOIA Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront at JOIA Aruba. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
+            'Birdie': { type:'food', title: 'The Birdie', sub: 'Tierra del Sol', desc: 'Experience the "Tapas Affair" with breathtaking views at Tierra del Sol. This spot offers a unique blend of small plates and scenic vistas overlooking the golf course and the rugged North Coast.', gallery: ['Restaurants/Birdie/rest_birdie_1.jpg'], pdf: 'Restaurants/Birdie/menu_birdie.pdf', imageCount: 20 },
+            'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'Eagle Beach • French Fusion', desc: 'Inspired by French-fusion cuisine and famous for its unique "Dinner in Bed" experience. A chic, trendy, and romantic spot just steps from Eagle Beach.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
         };
     </script>
 </body>
