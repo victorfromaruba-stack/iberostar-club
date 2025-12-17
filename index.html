@@ -64,6 +64,31 @@
                     }
                 }
             }
+            
+            // STRATEGY 0.5: Specific Fix for Spa Images (Targeted Recovery)
+            // Checks for 'massage' (promo) or 'Spa_1' (main)
+            if (src.includes('massage') || src.includes('Spa_1') || src.includes('spa_1')) {
+                const isPromo = src.toLowerCase().includes('massage');
+                const baseFile = isPromo ? 'massage_1.jpg' : 'Spa_1.jpg';
+                
+                // Try all common folder casing variations
+                const spaCandidates = [
+                    (isPromo ? 'Spa/Promo/' : 'Spa/General/') + baseFile,       // Standard
+                    (isPromo ? 'spa/Promo/' : 'spa/General/') + baseFile,       // Lowercase start
+                    (isPromo ? 'Spa/promo/' : 'Spa/general/') + baseFile,       // Lowercase folder
+                    (isPromo ? 'spa/promo/' : 'spa/general/') + baseFile,       // All lowercase path
+                    (isPromo ? 'Spa/Promo/' : 'Spa/General/') + baseFile.toLowerCase(), // Lowercase file
+                    (isPromo ? 'spa/promo/' : 'spa/general/') + baseFile.toLowerCase()  // All lowercase
+                ];
+
+                if (retries < spaCandidates.length) {
+                    const candidate = spaCandidates[retries];
+                    if (!src.endsWith(candidate)) {
+                        img.src = candidate;
+                        return;
+                    }
+                }
+            }
 
             // STRATEGY 1: Swap Extension
             if (retries === 0) {
