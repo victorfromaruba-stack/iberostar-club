@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     <meta name="format-detection" content="telephone=no">
     
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=8"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=8" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=9"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=9" type="image/png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,42 +18,30 @@
     <title>Iberostar Aruba</title>
 
     <script>
-        // --- RESTORED ROBUST IMAGE HANDLER (Based on your working version) ---
+        // --- RESTORED ROBUST IMAGE HANDLER ---
         function handleImgError(img) {
-            // If it's a specific UI element like fs-image, just hide it
             if (img.classList.contains('fs-image')) return;
             
-            // Check if we already tried to fix this image
             if (img.getAttribute('data-tried-fix')) {
-                // If fixing failed:
-                
-                // 1. If it's the Modal Hero Image, hide it (show spinner/bg)
+                // If fix failed:
                 if (img.id === 'dImg') {
                     img.style.display = 'none'; 
                     const spinner = img.parentElement.querySelector('.image-spinner');
                     if(spinner) spinner.classList.remove('active');
-                } 
-                // 2. If it's a Card or Gallery item, REMOVE it to prevent white space
-                else {
+                } else {
                     const galleryItem = img.closest('.gallery-item');
-                    if (galleryItem) {
-                        galleryItem.remove();
-                    } else {
-                        img.style.display = 'none';
-                    }
+                    if (galleryItem) galleryItem.remove();
+                    else img.style.display = 'none';
                 }
                 return;
             }
             
-            // Mark as tried
             img.setAttribute('data-tried-fix', 'true'); 
             const src = img.src;
             
-            // Try swapping extension
             if (src.endsWith('.jpg')) { img.src = src.replace('.jpg', '.png'); } 
             else if (src.endsWith('.png')) { img.src = src.replace('.png', '.jpg'); } 
             else { 
-                // If it's not jpg/png issue, remove it immediately
                 if (img.id !== 'dImg') { 
                     const galleryItem = img.closest('.gallery-item'); 
                     if (galleryItem) galleryItem.remove(); 
@@ -84,7 +72,6 @@
             --font-head: 'Playfair Display', -apple-system, serif;
             --font-body: 'Inter', -apple-system, sans-serif;
             --glass-shine: rgba(255,255,255,0.4);
-            
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
@@ -102,9 +89,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
         p, .modal-desc { user-select: text; -webkit-user-select: text; }
 
-        html, body {
-            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; 
-        }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
 
         body {
             font-family: var(--font-body); 
@@ -477,7 +462,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
         // --- VERSION CONTROL ---
-        const DATA_VERSION = 16; 
+        const DATA_VERSION = 17; 
 
         // --- INIT ---
         window.onload = function() {
@@ -562,13 +547,21 @@
             
             let allUrls = [];
             
+            // Helper to generate swaps
+            const getSwaps = (url) => {
+                const arr = [url];
+                if(url.endsWith('.jpg')) arr.push(url.replace('.jpg', '.png'));
+                if(url.endsWith('.png')) arr.push(url.replace('.png', '.jpg'));
+                return arr;
+            };
+
             Object.values(appData).forEach(item => {
-                // Images
-                if(item.img) allUrls.push(item.img);
-                if(item.gallery) item.gallery.forEach(g => allUrls.push(g));
-                if(item.partnerLogo) allUrls.push(item.partnerLogo);
+                // Images + Swaps
+                if(item.img) allUrls.push(...getSwaps(item.img));
+                if(item.gallery) item.gallery.forEach(g => allUrls.push(...getSwaps(g)));
+                if(item.partnerLogo) allUrls.push(...getSwaps(item.partnerLogo));
                 
-                // Generated Gallery
+                // Generated Gallery + Swaps
                 if (item.imageCount && item.imageCount > 0) {
                     const mainSrc = item.img || (item.gallery ? item.gallery[0] : '');
                     if (mainSrc) {
@@ -578,7 +571,8 @@
                             const prefix = mainSrc.substring(0, lastUnderscore + 1); 
                             const ext = mainSrc.substring(lastDot); 
                             for (let i = 1; i <= item.imageCount; i++) {
-                                allUrls.push(prefix + i + ext);
+                                const generatedUrl = prefix + i + ext;
+                                allUrls.push(...getSwaps(generatedUrl));
                             }
                         }
                     }
@@ -587,6 +581,7 @@
                 // PDFs & Videos
                 if(item.pdf) allUrls.push(item.pdf);
                 // Note: Caching large videos for offline via fetch is risky on iOS memory, skipping video files
+                if(item.video) allUrls.push(item.video);
             });
             
             // Critical assets (Logo + its double extension variant)
