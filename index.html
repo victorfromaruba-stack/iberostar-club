@@ -360,6 +360,7 @@
         .screensaver-logo {
             position: relative; z-index: 10; width: 400px;
             /* Changed to filter brightness 0 invert 1 to make it white */
+            -webkit-filter: brightness(0) invert(1) drop-shadow(0 10px 30px rgba(0,0,0,0.5));
             filter: brightness(0) invert(1) drop-shadow(0 10px 30px rgba(0,0,0,0.5));
             opacity: 0.9;
         }
@@ -825,6 +826,19 @@
                 if(item.img) allUrls.push(...getSwaps(item.img));
                 if(item.gallery) item.gallery.forEach(g => allUrls.push(...getSwaps(g)));
                 if(item.partnerLogo) allUrls.push(...getSwaps(item.partnerLogo));
+
+                // Marea specific cache boost
+                if (item.title === 'Marea') {
+                     const basePath = 'Restaurants/Marea/';
+                     const mareaCandidates = [
+                        basePath + 'rest_marea_1.jpg',
+                        basePath + 'marea.jpg',
+                        basePath + 'Marea.jpg',
+                        basePath + 'rest_marea.jpg',
+                        basePath + 'rest_marea_1.png'
+                    ];
+                    allUrls.push(...mareaCandidates);
+                }
                 
                 if (item.imageCount && item.imageCount > 0) {
                     const mainSrc = item.img || (item.gallery ? item.gallery[0] : '');
