@@ -25,7 +25,8 @@
             let retries = parseInt(img.getAttribute('data-retries') || '0');
             const src = img.src;
 
-            if (retries > 6) {
+            // Stop after 8 attempts
+            if (retries > 8) {
                 if (img.id === 'dImg') {
                     img.style.display = 'none'; 
                     img.parentElement.classList.add('hero-fallback');
@@ -43,6 +44,26 @@
             }
             
             img.setAttribute('data-retries', retries + 1);
+
+            // STRATEGY 0: Specific Fix for Marea (Targeted Recovery)
+            if (src.includes('Marea') || src.includes('marea')) {
+                const basePath = 'Restaurants/Marea/';
+                // Try sequence of known possible filenames for Marea
+                const mareaCandidates = [
+                    basePath + 'rest_marea_1.jpg',
+                    basePath + 'marea.jpg',
+                    basePath + 'Marea.jpg',
+                    basePath + 'rest_marea.jpg',
+                    basePath + 'rest_marea_1.png'
+                ];
+                if (retries < mareaCandidates.length) {
+                    const candidate = mareaCandidates[retries];
+                    if (!src.endsWith(candidate)) {
+                         img.src = candidate;
+                         return;
+                    }
+                }
+            }
 
             // STRATEGY 1: Swap Extension
             if (retries === 0) {
@@ -323,6 +344,26 @@
         @keyframes logoEntrance { 0% { opacity: 0; transform: scale(0.9) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
         @keyframes logoPulse { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
 
+        /* SCREENSAVER */
+        .screensaver {
+            position: fixed; inset: 0; z-index: 5000;
+            background: black;
+            opacity: 0; pointer-events: none; transition: opacity 1s ease;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .screensaver.active { opacity: 1; pointer-events: auto; }
+        .screensaver-img {
+            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+            opacity: 0; transition: opacity 2s ease-in-out; animation: zoomPan 20s linear infinite;
+        }
+        .screensaver-img.active { opacity: 0.7; }
+        .screensaver-logo {
+            position: relative; z-index: 10; width: 400px;
+            filter: brightness(0) invert(1) drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+            opacity: 0.9;
+        }
+        @keyframes zoomPan { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
         /* MODAL */
         .modal-wrap { position: fixed; inset: 0; z-index: 1000; background: rgba(15, 45, 74, 0.01); backdrop-filter: blur(0px); pointer-events: none; transition: all 0.5s var(--ease-out); display: flex; align-items: center; justify-content: center; }
         .modal-wrap.active { background: rgba(15, 45, 74, 0.4); backdrop-filter: blur(20px); pointer-events: all; }
@@ -445,11 +486,12 @@
             display: flex; align-items: center; justify-content: center; gap: 6px;
             transition: transform 0.2s, box-shadow 0.2s;
             /* Override generic button size */
-            padding: 10px 20px !important; 
-            font-size: 0.85rem !important;
+            padding: 10px 16px !important; 
+            font-size: 0.8rem !important;
             border-radius: 12px !important;
-            max-width: 100%;
+            min-width: auto !important;
             width: auto !important;
+            flex: 0 0 auto !important;
             margin-top: 5px;
         }
         .btn-whatsapp:active { transform: scale(0.97); box-shadow: 0 2px 5px rgba(37, 211, 102, 0.2); }
@@ -475,6 +517,13 @@
     <!-- SPLASH SCREEN -->
     <div id="splash">
         <img id="splashLogo" src="Logos/logo_club.png.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
+    </div>
+
+    <!-- SCREENSAVER (IDLE ATTRACT MODE) -->
+    <div id="screensaver" class="screensaver" onclick="stopScreensaver()">
+        <img id="ssImg1" class="screensaver-img" src="Hotels/Joia/hotel_joia_1.jpg">
+        <img id="ssImg2" class="screensaver-img" src="Hotels/Tierra/golf_tierra_1.jpg">
+        <img id="ssLogo" src="Logos/logo_club.png.png" class="screensaver-logo">
     </div>
 
     <!-- FLOATING DOCK -->
@@ -549,6 +598,7 @@
             <div class="admin-card">
                 <h4 style="margin-top:0; color:#0F2D4A; font-family:var(--font-head);">Edit Existing Items</h4>
                 <div id="itemListContainer"></div>
+                <button class="btn-admin" style="margin-top:20px; background: #555;" onclick="factoryReset()">Factory Reset Data</button>
             </div>
             <div class="admin-card">
                 <h4 style="margin-top:0; color:#0F2D4A; font-family:var(--font-head);">Add / Update Item</h4>
@@ -586,11 +636,51 @@
         window.addEventListener('online',  () => showToast("Online Mode"));
         window.addEventListener('offline', () => showToast("Offline Mode"));
 
+        // --- IDLE TIMER & SCREENSAVER ---
+        let idleTimer;
+        let ssInterval;
+        const idleTimeLimit = 60000; // 60 seconds
+        
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            stopScreensaver();
+            idleTimer = setTimeout(startScreensaver, idleTimeLimit);
+        }
+        
+        function startScreensaver() {
+            const ss = document.getElementById('screensaver');
+            if(ss.classList.contains('active')) return;
+            ss.classList.add('active');
+            
+            // Cycle images
+            const imgs = ss.querySelectorAll('.screensaver-img');
+            let activeIdx = 0;
+            imgs[0].classList.add('active');
+            
+            ssInterval = setInterval(() => {
+                imgs.forEach(img => img.classList.remove('active'));
+                activeIdx = (activeIdx + 1) % imgs.length;
+                imgs[activeIdx].classList.add('active');
+            }, 6000); 
+        }
+        
+        function stopScreensaver() {
+            const ss = document.getElementById('screensaver');
+            if(!ss.classList.contains('active')) return;
+            ss.classList.remove('active');
+            clearInterval(ssInterval);
+        }
+
         // --- RIPPLES & HAPTICS ---
         document.addEventListener('click', function(e) {
+            resetIdleTimer();
             if (navigator.vibrate) navigator.vibrate(5); 
             if (e.target.closest('.nav-btn')) createRipple(e, 'ripple-btn');
             else if (!e.target.closest('.card') && !e.target.closest('.modal') && !e.target.closest('nav') && !e.target.closest('.admin-panel') && !e.target.closest('.fs-nav') && !e.target.closest('.media-badge') && !e.target.closest('.fav-btn-card')) createRipple(e, 'ripple-water');
+        });
+        
+        ['mousemove', 'mousedown', 'touchstart', 'scroll', 'keydown'].forEach(evt => {
+            document.addEventListener(evt, resetIdleTimer, {passive: true});
         });
 
         function createRipple(e, type) {
@@ -628,7 +718,9 @@
             }
             
             updateTimeVibe();
+            setInterval(updateTimeVibe, 60000); // Live update every minute
             updateModeUI();
+            resetIdleTimer();
             
             setTimeout(() => { 
                 const splash = document.getElementById('splash');
@@ -836,8 +928,9 @@
                 if(logo) logo.classList.add('logo-white'); 
                 widget.innerHTML = `25°C <span style="font-size:1.2em">🌙</span>`;
             }
-            const options = { weekday: 'long', month: 'long', day: 'numeric' };
-            document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('en-US', options);
+            const options = { weekday: 'long', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            // Added live clock to the date string
+            document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) + ' • ' + new Date().toLocaleTimeString('en-US', {hour: 'numeric', minute:'2-digit'});
         }
 
         function handleTilt(e) {
@@ -1008,7 +1101,7 @@
             // NEW: QR Code Button Logic - ONLY FOR ACTIVITIES (type: 'fun')
             if(item.type === 'fun') {
                 const waUrl = item.contactUrl || 'https://wa.me/2975932202';
-                actionButtons += `<button class="btn-big btn-whatsapp" onclick="toggleQR('${waUrl}')" style="flex:1;">
+                actionButtons += `<button class="btn-big btn-whatsapp" onclick="toggleQR('${waUrl}')">
                     <svg viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01C17.18 3.03 14.69 2 12.04 2zM12.05 20.34c-1.48 0-2.93-.39-4.21-1.15l-.3-.18-3.11.82.83-3.04-.19-.31c-.82-1.33-1.26-2.87-1.26-4.46 0-4.63 3.77-8.4 8.4-8.4 2.24 0 4.35.87 5.94 2.46 1.58 1.58 2.46 3.69 2.46 5.94 0 4.63-3.77 8.39-8.4 8.39z"/></svg>
                     Guest Scan (QR)
                 </button>`;
@@ -1256,6 +1349,15 @@
                 showToast('Item Deleted'); closeAdmin(); location.reload();
             }
         }
+        
+        function factoryReset() {
+            if(confirm("⚠ WARNING: This will reset all data to the factory defaults. Any custom changes will be lost. Continue?")) {
+                appData = defaultData;
+                localStorage.setItem('ib_app_data', JSON.stringify(appData));
+                showToast("Factory Reset Complete");
+                setTimeout(() => location.reload(), 1000);
+            }
+        }
 
         function showToast(msg) {
             const toast = document.getElementById('modeToast');
@@ -1277,9 +1379,9 @@
             'Selection': { type:'club', title: 'Iberostar Selection', sub: 'Coming Soon', desc: 'Bringing the premium Selection family experience to the Caribbean. Designed for families who refuse to compromise on luxury.', gallery: ['Hotels/Selection/hotel_selection_1.png'], video: '' },
             'Joia2': { type:'club', title: 'Iberostar Joia (Lighthouse)', sub: 'In Development', desc: 'The next chapter of the Joia collection is currently in development. This exclusive property will feature unparalleled luxury and direct access to the island\'s most secluded beaches.', gallery: ['Hotels/Joia2/hotel_joia2_1.jpg'], video: '' },
 
-            // GOLF
-            'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Tierra del Sol, Aruba\'s premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole.', gallery: ['Golf/Course/golf_1.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm', essentials: ['Golf Shoes', 'Collared Shirt', 'Sunscreen'], imageCount: 10 },
-            'BirdLife': { type:'golf', title: 'Audubon Sanctuary', sub: 'Nature & Wildlife', desc: 'Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).', gallery: ['Golf/Birds/birds_1.jpg'], pdf: '' },
+            // GOLF - Updated to have Brochure paths so the button appears
+            'TierraGolf': { type:'golf', title: 'Tierra del Sol', sub: 'Championship Golf', desc: 'Play a round at Tierra del Sol, Aruba\'s premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole.', gallery: ['Golf/Course/golf_1.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', duration: '4 Hours', time: 'Tee Times: 7am - 2pm', essentials: ['Golf Shoes', 'Collared Shirt', 'Sunscreen'], imageCount: 10, pdf: 'Golf/Course/brochure_golf.pdf' },
+            'BirdLife': { type:'golf', title: 'Audubon Sanctuary', sub: 'Nature & Wildlife', desc: 'Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).', gallery: ['Golf/Birds/birds_1.jpg'], pdf: 'Golf/Birds/brochure_birds.pdf' },
 
             // FUN - Updated with 2025 Info from Binder
             'UTV': { 
@@ -1347,7 +1449,7 @@
             },
 
             // SPA
-            'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.', gallery: ['spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
+            'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.', gallery: ['spa/Promo/massage_1.jpg'], pdf: 'Spa/Promo/brochure_spa_promo.pdf', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
             'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/Spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 5 },
 
             // FOOD
@@ -1361,8 +1463,8 @@
             // MOVED TO BOTTOM (All 5 + Screaming Eagle)
             'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'Joia Aruba • Rooftop', desc: 'Perched atop the Joia hotel, Zima Bar offers the best sunset views. Enjoy handcrafted cocktails and a sophisticated atmosphere while watching the sun dip below the horizon.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], pdf: 'Restaurants/Zima/menu_zima.pdf', imageCount: 20 },
             'Bucatini': { type:'food', title: 'Bucatini', sub: 'Joia Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station. Indulge in fresh pasta, artisanal pizzas, and a wide selection of fine wines in an elegant setting.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], pdf: 'Restaurants/Bucatini/menu_bucatini.pdf', imageCount: 20 },
-            // UPDATED: Marea image path fixed
-            'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.', gallery: ['Restaurants/Marea/marea.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
+            // UPDATED: Marea image path fixed + Recovery Logic added
+            'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
             'Birdie': { type:'food', title: 'The Birdie', sub: 'Tierra del Sol', desc: 'Experience the "Tapas Affair" with breathtaking views. Located at Tierra del Sol, this spot offers a unique blend of small plates and scenic golf course vistas.', gallery: ['Restaurants/Birdie/rest_birdie_1.jpg'], pdf: 'Restaurants/Birdie/menu_birdie.pdf', imageCount: 20 },
             'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, known for its "Dinner in Bed" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
         };
