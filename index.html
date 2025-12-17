@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     <meta name="format-detection" content="telephone=no">
     
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=10"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=10" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=11"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=11" type="image/png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,64 +18,87 @@
     <title>Iberostar Aruba</title>
 
     <script>
-        // --- 10/10 SMART IMAGE RECOVERY ---
+        // --- 10/10 DEEP SEARCH IMAGE RECOVERY ---
         function handleImgError(img) {
             if (img.classList.contains('fs-image')) return;
             
-            // Track retries to prevent loops
+            // Track retries
             let retries = parseInt(img.getAttribute('data-retries') || '0');
-            
-            // If failed twice, show the "Premium Fallback" (Gradient)
-            if (retries >= 2) {
+            const src = img.src;
+
+            // Stop after 4 attempts to prevent infinite loops and show fallback
+            if (retries > 4) {
                 if (img.id === 'dImg') {
                     img.style.display = 'none'; 
                     img.parentElement.classList.add('hero-fallback');
-                    const spinner = img.parentElement.querySelector('.image-spinner');
-                    if(spinner) spinner.classList.remove('active');
                 } else if (img.closest('.card-media')) {
                     img.style.display = 'none';
                     img.closest('.card-media').classList.add('card-fallback');
                 } else {
-                    // For gallery thumbs, just remove them to keep layout clean
                     const galleryItem = img.closest('.gallery-item');
                     if (galleryItem) galleryItem.remove();
                     else img.style.display = 'none';
                 }
+                // Cleanup
+                const spinner = img.parentElement?.querySelector('.image-spinner');
+                if(spinner) spinner.classList.remove('active');
                 return;
             }
             
             img.setAttribute('data-retries', retries + 1);
-            const src = img.src;
-            
-            // RECOVERY STRATEGY 1: Swap Extension (.jpg <-> .png)
+
+            // STRATEGY 1: Swap Extension (.jpg <-> .png)
             if (retries === 0) {
                 if (src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
                 else if (src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
-                else img.src = src; // Force next retry
+                else img.src = src; // Trigger next retry immediately
+                return;
             }
-            // RECOVERY STRATEGY 2: Try Capitalizing Filename (spa_1.jpg -> Spa_1.jpg)
-            else if (retries === 1) {
+            
+            // STRATEGY 2: Fix Folder Case (Spa/ -> spa/)
+            if (retries === 1) {
+                if (src.includes('/Spa/')) img.src = src.replace('/Spa/', '/spa/');
+                else if (src.includes('/spa/')) img.src = src.replace('/spa/', '/Spa/');
+                else img.src = src;
+                return;
+            }
+
+            // STRATEGY 3: Fix Filename Case (spa_1.jpg -> Spa_1.jpg)
+            if (retries === 2) {
                 const parts = src.split('/');
                 const file = parts.pop();
-                // If starts lowercase, try uppercase
-                if (file && file.length > 0 && file[0] === file[0].toLowerCase()) {
-                    parts.push(file.charAt(0).toUpperCase() + file.slice(1));
+                if (file) {
+                    const firstChar = file.charAt(0);
+                    // Toggle case of first letter
+                    const newFile = (firstChar === firstChar.toLowerCase()) 
+                        ? firstChar.toUpperCase() + file.slice(1) 
+                        : firstChar.toLowerCase() + file.slice(1);
+                    parts.push(newFile);
                     img.src = parts.join('/');
-                } else {
-                    // Use a fallback timestamp to force reload if needed, or just fail to fallback UI
-                    img.src = src; 
-                }
+                } else { img.src = src; }
+                return;
+            }
+
+            // STRATEGY 4: Try All Lowercase Path
+            if (retries === 3) {
+                try {
+                    const url = new URL(src);
+                    // Preserve the base but lowercase the path
+                    url.pathname = url.pathname.toLowerCase();
+                    img.src = url.href;
+                } catch(e) { img.src = src; }
+                return;
             }
         }
         
         function handleImgLoad(img) {
             img.style.display = 'block';
             img.classList.add('loaded');
-            const spinner = img.parentElement.querySelector('.image-spinner');
+            const spinner = img.parentElement?.querySelector('.image-spinner');
             if(spinner) spinner.classList.remove('active');
             
-            // Remove fallback if it recovers
-            if (img.id === 'dImg') img.parentElement.classList.remove('hero-fallback');
+            // Remove fallback classes if it recovers
+            if (img.id === 'dImg') img.parentElement?.classList.remove('hero-fallback');
             if (img.closest('.card-media')) img.closest('.card-media').classList.remove('card-fallback');
         }
     </script>
@@ -166,7 +189,7 @@
         nav { 
             position: fixed; left: 40px; top: 50%; transform: translateY(-50%); width: 96px; height: auto; min-height: auto; padding: 80px 0; margin: 0; 
             background: var(--glass-nav); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 48px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 100; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100; 
         }
         .nav-btn { width: 64px; height: 64px; border-radius: 24px; margin-bottom: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s var(--ease-out); position: relative; overflow: hidden; }
         .nav-btn:last-child { margin-bottom: 0; }
@@ -213,7 +236,7 @@
         .card:active { transform: scale(0.98) !important; }
         .card-media { height: 220px; position: relative; overflow: hidden; pointer-events: none; }
         
-        /* 10/10 FALLBACK GRADIENT (Prevents White Space) */
+        /* 10/10 FALLBACK GRADIENT */
         .card-media.card-fallback, .hero-fallback {
             background: linear-gradient(135deg, #0F2D4A 0%, #1a4b78 100%) !important;
             display: flex; align-items: center; justify-content: center;
@@ -494,7 +517,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
         // --- VERSION CONTROL ---
-        const DATA_VERSION = 20; 
+        const DATA_VERSION = 21; 
 
         // --- INIT ---
         window.onload = function() {
@@ -590,9 +613,24 @@
                 const file = parts.pop();
                 if(file && file.length > 0) {
                      const capitalFile = file.charAt(0).toUpperCase() + file.slice(1);
-                     if(capitalFile !== file) parts.push(capitalFile);
-                     arr.push(parts.join('/'));
+                     if(capitalFile !== file) {
+                        parts.push(capitalFile);
+                        arr.push(parts.join('/'));
+                     }
+                     // Add lowercase variant
+                     const lowerFile = file.toLowerCase();
+                     if(lowerFile !== file) {
+                        parts.pop(); // Remove capitalized one if just added, actually just reset parts
+                        const lowerParts = url.split('/');
+                        lowerParts.pop();
+                        lowerParts.push(lowerFile);
+                        arr.push(lowerParts.join('/'));
+                     }
                 }
+                
+                // Add folder case variant (Spa -> spa)
+                if(url.includes('/Spa/')) arr.push(url.replace('/Spa/', '/spa/'));
+                
                 return arr;
             };
 
@@ -1214,7 +1252,7 @@
 
             // SPA
             'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
-            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/Spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 20 },
+            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['spa/General/spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 20 },
 
             // FOOD
             'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf', imageCount: 20 },
