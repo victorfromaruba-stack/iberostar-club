@@ -18,17 +18,29 @@
     <title>Iberostar Aruba</title>
 
     <script>
-        // --- RESTORED ROBUST IMAGE HANDLER ---
+        // --- 10/10 ENHANCED IMAGE HANDLER ---
         function handleImgError(img) {
             if (img.classList.contains('fs-image')) return;
             
+            // Check if we already tried to fix this image
             if (img.getAttribute('data-tried-fix')) {
-                // If fix failed:
+                // FAILURE STATE: If fixing failed, apply PREMIUM FALLBACK UI
+                
+                // 1. Modal Hero Image Fallback
                 if (img.id === 'dImg') {
                     img.style.display = 'none'; 
+                    // Add class to parent to show gradient background
+                    img.parentElement.classList.add('hero-fallback');
                     const spinner = img.parentElement.querySelector('.image-spinner');
                     if(spinner) spinner.classList.remove('active');
-                } else {
+                } 
+                // 2. Card Media Image Fallback
+                else if (img.closest('.card-media')) {
+                    img.style.display = 'none';
+                    img.closest('.card-media').classList.add('card-fallback');
+                }
+                // 3. Gallery Item -> Remove to keep layout clean (no fallback needed here)
+                else {
                     const galleryItem = img.closest('.gallery-item');
                     if (galleryItem) galleryItem.remove();
                     else img.style.display = 'none';
@@ -36,12 +48,14 @@
                 return;
             }
             
+            // ATTEMPT RECOVERY (Try swapping .jpg <-> .png)
             img.setAttribute('data-tried-fix', 'true'); 
             const src = img.src;
             
             if (src.endsWith('.jpg')) { img.src = src.replace('.jpg', '.png'); } 
             else if (src.endsWith('.png')) { img.src = src.replace('.png', '.jpg'); } 
             else { 
+                // If extension looks fine but still failed, trigger fallback immediately
                 if (img.id !== 'dImg') { 
                     const galleryItem = img.closest('.gallery-item'); 
                     if (galleryItem) galleryItem.remove(); 
@@ -55,6 +69,10 @@
             img.classList.add('loaded');
             const spinner = img.parentElement.querySelector('.image-spinner');
             if(spinner) spinner.classList.remove('active');
+            
+            // Remove fallback class if image suddenly loads (e.g. network restored)
+            if (img.id === 'dImg') img.parentElement.classList.remove('hero-fallback');
+            if (img.closest('.card-media')) img.closest('.card-media').classList.remove('card-fallback');
         }
     </script>
 
@@ -190,6 +208,16 @@
         .card:hover { box-shadow: var(--shadow-hover); border-color: var(--gold); z-index: 10; }
         .card:active { transform: scale(0.98) !important; }
         .card-media { height: 220px; position: relative; overflow: hidden; pointer-events: none; }
+        
+        /* 10/10 FALLBACK GRADIENT (Prevents White Space) */
+        .card-media.card-fallback, .hero-fallback {
+            background: linear-gradient(135deg, #0F2D4A 0%, #1a4b78 100%) !important;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .card-media.card-fallback::after, .hero-fallback::after {
+            content: 'IBEROSTAR'; color: rgba(255,255,255,0.15); font-family: var(--font-head); font-weight: 700; font-size: 1.5rem; letter-spacing: 4px;
+        }
+
         .card-img { width: 100%; height: 100%; background-color: #eee; background-size: cover; background-position: center; transition: transform 0.1s ease-out; will-change: transform; }
         .tag-pill { position: absolute; top: 18px; left: 18px; background: rgba(255,255,255,0.95); padding: 6px 14px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-body); color: #0F2D4A; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 2; }
         .tag-pill.highlight { background: var(--gold); color: white; }
@@ -462,7 +490,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
         // --- VERSION CONTROL ---
-        const DATA_VERSION = 17; 
+        const DATA_VERSION = 18; 
 
         // --- INIT ---
         window.onload = function() {
@@ -846,13 +874,17 @@
             const actBar = document.getElementById('dAction');
             let actionButtons = '';
 
-            // LOGIC FOR SHOWING PDF BUTTONS
+            // LOGIC FOR SHOWING PDF BUTTONS + SHARE BUTTON
             if(item.pdf) {
-                actionButtons += `<button class="btn-big" onclick="viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> View Brochure / Menu</button>`;
+                actionButtons += `<button class="btn-big" onclick="viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> View Brochure</button>`;
             } 
             if(item.video) {
                 actionButtons += `<button class="btn-big" onclick="viewVideo('${item.video}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Video Tour</button>`;
             }
+            
+            // Share Button
+            actionButtons += `<button class="btn-big" style="flex:0; background:var(--glass-card); color:var(--text-main);" onclick="sharePackage('${key}')" title="Share"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></button>`;
+
             actBar.innerHTML = actionButtons;
 
             const gal = document.getElementById('dGallery');
@@ -862,6 +894,22 @@
             });
             gal.innerHTML = gHtml;
             modal.classList.add('active');
+        }
+        
+        // --- NEW SHARE FUNCTION ---
+        async function sharePackage(key) {
+            const item = appData[key];
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: item.title,
+                        text: `Check out ${item.title} - ${item.sub}\n\n${item.desc.replace(/<[^>]*>?/gm, '').substring(0, 150)}...`,
+                        url: window.location.href // Or deep link if you had routing
+                    });
+                } catch (err) { console.log('Share canceled'); }
+            } else {
+                showToast("Sharing not supported on this device");
+            }
         }
 
         function closeModal() { document.getElementById('detailModal').classList.remove('active'); }
