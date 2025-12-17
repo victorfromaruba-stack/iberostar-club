@@ -8,8 +8,8 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     <meta name="format-detection" content="telephone=no">
     
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=9"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=9" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=10"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=10" type="image/png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,29 +18,25 @@
     <title>Iberostar Aruba</title>
 
     <script>
-        // --- 10/10 ENHANCED IMAGE HANDLER ---
+        // --- 10/10 SMART IMAGE RECOVERY ---
         function handleImgError(img) {
             if (img.classList.contains('fs-image')) return;
             
-            // Check if we already tried to fix this image
-            if (img.getAttribute('data-tried-fix')) {
-                // FAILURE STATE: If fixing failed, apply PREMIUM FALLBACK UI
-                
-                // 1. Modal Hero Image Fallback
+            // Track retries to prevent loops
+            let retries = parseInt(img.getAttribute('data-retries') || '0');
+            
+            // If failed twice, show the "Premium Fallback" (Gradient)
+            if (retries >= 2) {
                 if (img.id === 'dImg') {
                     img.style.display = 'none'; 
-                    // Add class to parent to show gradient background
                     img.parentElement.classList.add('hero-fallback');
                     const spinner = img.parentElement.querySelector('.image-spinner');
                     if(spinner) spinner.classList.remove('active');
-                } 
-                // 2. Card Media Image Fallback
-                else if (img.closest('.card-media')) {
+                } else if (img.closest('.card-media')) {
                     img.style.display = 'none';
                     img.closest('.card-media').classList.add('card-fallback');
-                }
-                // 3. Gallery Item -> Remove to keep layout clean (no fallback needed here)
-                else {
+                } else {
+                    // For gallery thumbs, just remove them to keep layout clean
                     const galleryItem = img.closest('.gallery-item');
                     if (galleryItem) galleryItem.remove();
                     else img.style.display = 'none';
@@ -48,19 +44,27 @@
                 return;
             }
             
-            // ATTEMPT RECOVERY (Try swapping .jpg <-> .png)
-            img.setAttribute('data-tried-fix', 'true'); 
+            img.setAttribute('data-retries', retries + 1);
             const src = img.src;
             
-            if (src.endsWith('.jpg')) { img.src = src.replace('.jpg', '.png'); } 
-            else if (src.endsWith('.png')) { img.src = src.replace('.png', '.jpg'); } 
-            else { 
-                // If extension looks fine but still failed, trigger fallback immediately
-                if (img.id !== 'dImg') { 
-                    const galleryItem = img.closest('.gallery-item'); 
-                    if (galleryItem) galleryItem.remove(); 
-                    else img.style.display = 'none';
-                } 
+            // RECOVERY STRATEGY 1: Swap Extension (.jpg <-> .png)
+            if (retries === 0) {
+                if (src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
+                else if (src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
+                else img.src = src; // Force next retry
+            }
+            // RECOVERY STRATEGY 2: Try Capitalizing Filename (spa_1.jpg -> Spa_1.jpg)
+            else if (retries === 1) {
+                const parts = src.split('/');
+                const file = parts.pop();
+                // If starts lowercase, try uppercase
+                if (file && file.length > 0 && file[0] === file[0].toLowerCase()) {
+                    parts.push(file.charAt(0).toUpperCase() + file.slice(1));
+                    img.src = parts.join('/');
+                } else {
+                    // Use a fallback timestamp to force reload if needed, or just fail to fallback UI
+                    img.src = src; 
+                }
             }
         }
         
@@ -70,7 +74,7 @@
             const spinner = img.parentElement.querySelector('.image-spinner');
             if(spinner) spinner.classList.remove('active');
             
-            // Remove fallback class if image suddenly loads (e.g. network restored)
+            // Remove fallback if it recovers
             if (img.id === 'dImg') img.parentElement.classList.remove('hero-fallback');
             if (img.closest('.card-media')) img.closest('.card-media').classList.remove('card-fallback');
         }
@@ -162,7 +166,7 @@
         nav { 
             position: fixed; left: 40px; top: 50%; transform: translateY(-50%); width: 96px; height: auto; min-height: auto; padding: 80px 0; margin: 0; 
             background: var(--glass-nav); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 48px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); z-index: 100; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 100; 
         }
         .nav-btn { width: 64px; height: 64px; border-radius: 24px; margin-bottom: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s var(--ease-out); position: relative; overflow: hidden; }
         .nav-btn:last-child { margin-bottom: 0; }
@@ -490,7 +494,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
         // --- VERSION CONTROL ---
-        const DATA_VERSION = 18; 
+        const DATA_VERSION = 20; 
 
         // --- INIT ---
         window.onload = function() {
@@ -580,6 +584,15 @@
                 const arr = [url];
                 if(url.endsWith('.jpg')) arr.push(url.replace('.jpg', '.png'));
                 if(url.endsWith('.png')) arr.push(url.replace('.png', '.jpg'));
+                
+                // Add capitalization variants for "Smart Recovery"
+                const parts = url.split('/');
+                const file = parts.pop();
+                if(file && file.length > 0) {
+                     const capitalFile = file.charAt(0).toUpperCase() + file.slice(1);
+                     if(capitalFile !== file) parts.push(capitalFile);
+                     arr.push(parts.join('/'));
+                }
                 return arr;
             };
 
@@ -1201,7 +1214,7 @@
 
             // SPA
             'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
-            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 20 },
+            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/Spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 20 },
 
             // FOOD
             'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.', gallery: ['Restaurants/Gianni%27s%20Ristorante/rest_giannis_1.jpg'], pdf: 'Restaurants/Gianni%27s%20Ristorante/menu_giannis.pdf', imageCount: 20 },
@@ -1214,7 +1227,7 @@
             // MOVED TO BOTTOM (All 5 + Screaming Eagle)
             'Zima': { type:'food', title: 'Zima Rooftop Bar', sub: 'Joia Aruba • Rooftop', desc: 'Perched atop the Joia hotel, Zima Bar offers the best sunset views. Enjoy handcrafted cocktails and a sophisticated atmosphere while watching the sun dip below the horizon.', gallery: ['Restaurants/Zima/rest_zima_1.jpg'], pdf: 'Restaurants/Zima/menu_zima.pdf', imageCount: 20 },
             'Bucatini': { type:'food', title: 'Bucatini', sub: 'Joia Aruba • Italian', desc: 'Modern Italian cuisine featuring a curated Antipasto station. Indulge in fresh pasta, artisanal pizzas, and a wide selection of fine wines in an elegant setting.', gallery: ['Restaurants/Bucatini/rest_bucatini_1.jpg'], pdf: 'Restaurants/Bucatini/menu_bucatini.pdf', imageCount: 20 },
-            'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.', gallery: ['Restaurants/Marea/rest_marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
+            'Marea': { type:'food', title: 'Marea', sub: 'Joia Aruba • Caribbean', desc: 'Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.', gallery: ['Restaurants/Marea/marea_1.jpg'], pdf: 'Restaurants/Marea/menu_marea.pdf', imageCount: 20 },
             'Birdie': { type:'food', title: 'The Birdie', sub: 'Tierra del Sol', desc: 'Experience the "Tapas Affair" with breathtaking views. Located at Tierra del Sol, this spot offers a unique blend of small plates and scenic golf course vistas.', gallery: ['Restaurants/Birdie/rest_birdie_1.jpg'], pdf: 'Restaurants/Birdie/menu_birdie.pdf', imageCount: 20 },
             'Screaming': { type:'food', title: 'Screaming Eagle', sub: 'French Fusion', desc: 'Inspired by French-fusion cuisine, known for its "Dinner in Bed" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.', gallery: ['Restaurants/Screaming%20Eagle/rest_screaming_1.jpg'], pdf: 'Restaurants/Screaming%20Eagle/menu_screaming.pdf', imageCount: 20 },
         };
