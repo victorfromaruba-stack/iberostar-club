@@ -586,8 +586,21 @@
 
     <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel">
-        <div class="admin-header"><h3>Admin Editor</h3><div><button class="btn-admin" onclick="exportData()">Copy Code</button> <button class="btn-admin" style="background:#ff3b30;" onclick="closeAdmin()">Close</button></div></div>
-        <div class="admin-body">
+        <div class="admin-header"><h3>Admin Editor</h3><div><button class="btn-admin" style="background:#ff3b30;" onclick="closeAdmin()">Close</button></div></div>
+        
+        <!-- PASSWORD PROMPT -->
+        <div id="adminLogin" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; padding:20px;">
+            <h4 style="margin-bottom:20px;">Enter Admin Password</h4>
+            <input type="password" id="adminPass" placeholder="Password" style="padding:15px; border-radius:10px; border:1px solid #ccc; width:100%; max-width:300px; margin-bottom:15px;">
+            <button class="btn-admin" onclick="unlockAdmin()">Unlock</button>
+        </div>
+
+        <div class="admin-body" id="adminContent" style="display:none;">
+             <div class="admin-header" style="padding-left:0; padding-right:0; margin-bottom:20px; display:flex; justify-content:space-between;">
+                <h3>Controls</h3>
+                <button class="btn-admin" onclick="exportData()">Copy Code</button>
+            </div>
+
             <div class="admin-card" style="border: 2px solid #C5A065;">
                 <h4 style="margin-top:0; color:#0F2D4A; font-family:var(--font-head);">🚀 Super Cache (Offline Prep)</h4>
                 <p style="font-size:0.9rem; color:#666;">Downloads ALL images AND PDFs to the iPad's internal storage.</p>
@@ -1251,11 +1264,30 @@
         let tapCount = 0;
         document.getElementById('headerLogo').addEventListener('click', function() {
             tapCount++;
-            if(tapCount >= 5) { document.getElementById('adminPanel').classList.add('active'); tapCount = 0; renderAdminList(); }
+            if(tapCount >= 5) { 
+                document.getElementById('adminPanel').classList.add('active'); 
+                tapCount = 0; 
+                // Always reset to login screen for security
+                document.getElementById('adminLogin').style.display = 'flex';
+                document.getElementById('adminContent').style.display = 'none';
+                document.getElementById('adminPass').value = '';
+            }
             setTimeout(() => tapCount = 0, 2000); 
         });
 
         function closeAdmin() { document.getElementById('adminPanel').classList.remove('active'); }
+
+        function unlockAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === 'Iberostartheclub#1team') {
+                document.getElementById('adminLogin').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                renderAdminList();
+            } else {
+                alert('Incorrect Password');
+                document.getElementById('adminPass').value = '';
+            }
+        }
         
         function renderAdminList() {
             let listContainer = document.getElementById('itemListContainer');
@@ -1374,7 +1406,7 @@
 
         const defaultData = {
             // CLUBS
-            'Joia': { type:'club', title: 'JOIA Aruba by Iberostar', sub: 'Eagle Beach', desc: 'Welcome to a world of luxury on the shores of Eagle Beach. JOIA Aruba by Iberostar offers an exclusive 5-star experience for everyone. From personalized butler service and swim-up suites to curated gastronomy, every detail is designed for relaxation. Enjoy our rooftop bar Zima, indulge in SPA Sensations, or let the kids have fun at Star Camp.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg', 'Hotels/Joia/hotel_joia_3.jpg'], video: 'Hotels/Joia/hotel_joia.mp4', imageCount: 10 },
+            'Joia': { type:'club', title: 'JOIA Aruba by Iberostar', sub: 'Eagle Beach', desc: 'Welcome to a world of luxury on the shores of Eagle Beach. JOIA Aruba by Iberostar offers an exclusive 5-star experience for everyone. From personalized butler service and swim-up suites, to curated gastronomy, every detail is designed for relaxation. Enjoy our rooftop bar Zima, indulge in SPA Sensations, or let the kids have fun at Star Camp.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg', 'Hotels/Joia/hotel_joia_3.jpg'], video: 'Hotels/Joia/hotel_joia.mp4', imageCount: 10 },
             'Tierra': { type:'club', title: 'Tierra del Sol', sub: 'Golf & Estates', desc: 'Immerse yourself in the island\'s most prestigious community. Located on the rugged North Coast, Tierra del Sol offers private luxury villas and condos surrounded by nature. Home to Aruba\'s only 18-hole championship golf course, a panoramic clubhouse pool, and fine dining at The Birdie.', gallery: ['Hotels/Tierra/golf_tierra_1.jpg', 'Hotels/Tierra/golf_tierra_2.jpg', 'Hotels/Tierra/golf_tierra_3.jpg', 'Hotels/Tierra/golf_tierra_4.jpg'], video: 'Hotels/Tierra/golf_tierra.mp4', imageCount: 10 },
             'Selection': { type:'club', title: 'Iberostar Selection', sub: 'The Family Experience', desc: 'The future of family luxury in Aruba. Opening soon on Eagle Beach, Iberostar Selection will feature spacious suites, the signature Star Camp for kids, and splashing pools. A perfect blend of relaxation for adults and endless fun for the little ones.', gallery: ['Hotels/Selection/hotel_selection_1.png'], video: '' },
             'Joia2': { type:'club', title: 'JOIA Aruba (Lighthouse)', sub: 'Future Phase', desc: 'A vision of future exclusivity. The next phase of Iberostar in Aruba is in development, promising secluded luxury near the iconic California Lighthouse. Stay tuned for a new level of sophistication.', gallery: ['Hotels/Joia2/hotel_joia2_1.jpg'], video: '' },
