@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,8 +9,8 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     <meta name="format-detection" content="telephone=no">
     
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=30"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=30" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=50"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=50" type="image/png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,7 +35,7 @@
             else docEl.classList.add('device-desktop');
         });
 
-        // --- BULLETPROOF IMAGE RECOVERY ---
+        // --- ULTRA-FAST BULLETPROOF IMAGE RECOVERY ---
         function handleImgError(img) {
             if (img.classList.contains('fs-image')) return;
             
@@ -43,11 +43,11 @@
             const src = img.src;
 
             const spinner = img.parentElement?.querySelector('.image-spinner');
-            if(spinner) spinner.classList.remove('active');
 
-            if (retries > 6) {
-                img.style.opacity = '0';
-                setTimeout(() => img.style.display = 'none', 300);
+            // Fast fallback: 3 strikes and it renders the beautiful luxury placeholder
+            if (retries > 3) {
+                if(spinner) spinner.classList.remove('active');
+                img.style.display = 'none';
                 
                 if (img.id === 'dImg') {
                     img.parentElement.classList.add('hero-fallback');
@@ -60,50 +60,29 @@
             
             img.setAttribute('data-retries', retries + 1);
 
+            // Attempt 1: Swap extensions
             if (retries === 0) {
                 if (src.endsWith('.jpg')) img.src = src.replace('.jpg', '.png');
                 else if (src.endsWith('.png')) img.src = src.replace('.png', '.jpg');
-                else handleImgError(img); 
+                else { img.setAttribute('data-retries', '4'); handleImgError(img); } 
                 return;
             }
+            // Attempt 2: Decode URL (Fixes %20 space errors)
             if (retries === 1) {
-                if (src.includes('Activites')) { img.src = src.replace('Activites', 'Activities'); return; }
-                handleImgError(img); return;
-            }
-            if (retries === 2) {
-                if (src.includes('/Spa/')) { img.src = src.replace('/Spa/', '/spa/'); return; }
-                if (src.includes('/spa/')) { img.src = src.replace('/spa/', '/Spa/'); return; }
-                handleImgError(img); return;
-            }
-            if (retries === 3) {
-                const parts = src.split('/'); const file = parts.pop();
-                if (file && file.length > 0) {
-                    const firstChar = file.charAt(0);
-                    if (firstChar === firstChar.toLowerCase()) {
-                        parts.push(firstChar.toUpperCase() + file.slice(1));
-                        img.src = parts.join('/'); return;
-                    }
-                }
-                handleImgError(img); return;
-            }
-            if (retries === 4) {
-                 const parts = src.split('/'); const file = parts.pop();
-                if (file && file.length > 0) {
-                    const firstChar = file.charAt(0);
-                    if (firstChar === firstChar.toUpperCase()) {
-                        parts.push(firstChar.toLowerCase() + file.slice(1));
-                        img.src = parts.join('/'); return;
-                    }
-                }
-                handleImgError(img); return;
-            }
-            if (retries === 5) {
                 try {
                     const decoded = decodeURIComponent(src);
                     if (decoded !== src) { img.src = decoded; return; }
                 } catch(e) {}
-                handleImgError(img); return;
+                img.setAttribute('data-retries', '4'); handleImgError(img); return;
             }
+            // Attempt 3: Fix common folder casing
+            if (retries === 2) {
+                if (src.includes('Activites')) { img.src = src.replace('Activites', 'Activities'); return; }
+                if (src.includes('/Spa/')) { img.src = src.replace('/Spa/', '/spa/'); return; }
+                img.setAttribute('data-retries', '4'); handleImgError(img); return;
+            }
+            
+            img.setAttribute('data-retries', '4'); handleImgError(img);
         }
         
         function handleImgLoad(img) {
@@ -111,7 +90,6 @@
             if(spinner) spinner.classList.remove('active');
             
             img.style.display = 'block';
-            img.classList.add('loaded');
             
             if (img.id === 'dImg') img.parentElement?.classList.remove('hero-fallback');
             const mediaContainer = img.closest('.card-media') || img.closest('.gallery-item');
@@ -121,7 +99,7 @@
 
     <style>
         :root {
-            /* V30 Luxury Palette */
+            /* V50 Luxury Palette */
             --bg-gradient-1: #A6C9E2;
             --bg-gradient-2: #246B9E;
             --ocean-deep: #081424; 
@@ -160,6 +138,9 @@
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
         p, .modal-desc, .form-group input, .form-group textarea, .price-row { user-select: text; -webkit-user-select: text; touch-action: auto; }
+        
+        /* Hides the broken image icon on Safari during fallback processing */
+        img { color: transparent; text-indent: 10000px; }
 
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #FDFBF7; }
 
@@ -222,22 +203,22 @@
         .nav-btn.active svg { transform: scale(1.1); fill: white; }
 
         /* MAIN SCROLL AREA */
-        main { flex: 1; height: 100%; overflow-y: auto; overflow-x: hidden; padding: 60px 80px 100px 150px; scroll-behavior: smooth; z-index: 10; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-top: calc(60px + var(--safe-top)); }
+        main { flex: 1; height: 100%; overflow-y: auto; overflow-x: hidden; padding: 60px 80px 100px 150px; scroll-behavior: smooth; z-index: 10; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; padding-top: calc(60px + var(--safe-top)); box-sizing: border-box; }
         main::-webkit-scrollbar { display: none; }
 
         /* HEADER */
         header { margin-bottom: 50px; }
-        .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; }
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; }
         
-        /* RESTORED LOGO CLARITY - Retains original colors in day, white glow at night */
-        .header-logo { height: 130px; width: auto; cursor: pointer; transition: transform 0.2s, filter 0.5s; object-fit: contain; margin-top: -10px; filter: drop-shadow(0 4px 15px rgba(255,255,255,0.4)); }
+        /* THE LOGO FIX: Forced pure white everywhere, perfectly constrained to never cut off the right side */
+        .header-logo { height: 90px; max-width: 50%; cursor: pointer; transition: transform 0.2s; object-fit: contain; object-position: left; margin-top: -5px; filter: brightness(0) invert(1) drop-shadow(0 4px 10px rgba(0,0,0,0.25)) !important; }
         .header-logo:active { transform: scale(0.95); }
-        .logo-white { filter: brightness(0) invert(1) drop-shadow(0 4px 15px rgba(0,0,0,0.5)) !important; }
         
-        .greeting-wrap { text-align: right; cursor: pointer; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); padding-top: 5px; }
+        /* GREETING FIX: Fluid fonts and flex containment so it naturally scales on small screens */
+        .greeting-wrap { max-width: 48%; text-align: right; cursor: pointer; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); padding-top: 5px; }
         .greeting-wrap:active { transform: scale(0.92); }
-        .greeting { font-family: var(--font-body); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 3px; color: var(--gold); font-weight: 800; text-shadow: 0 2px 12px rgba(255,255,255,0.4); }
-        .date-display { font-family: var(--font-body); font-size: 1.05rem; color: var(--text-muted); margin-top: 6px; font-weight: 600; transition: color 1s; }
+        .greeting { font-family: var(--font-body); font-size: clamp(1.1rem, 3.5vw, 1.35rem); text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 800; text-shadow: 0 2px 12px rgba(255,255,255,0.4); line-height: 1.2; margin-bottom: 2px; }
+        .date-display { font-family: var(--font-body); font-size: clamp(0.85rem, 2.5vw, 1.05rem); color: var(--text-muted); font-weight: 600; transition: color 1s; line-height: 1.2; }
         body.dark-theme .date-display { color: rgba(255,255,255,0.9); }
         
         h1 { font-family: var(--font-head); font-size: 4.5rem; font-weight: 700; color: var(--text-main); margin: 0; letter-spacing: -1.5px; opacity: 0; animation: fadeUp 0.8s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; position: relative; display: inline-block; transition: color 1s; line-height: 1.1; }
@@ -261,7 +242,7 @@
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* GRID & CARDS - Margins added to prevent top overlap */
+        /* GRID & CARDS */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 35px; padding-bottom: 140px; margin-top: 30px; perspective: 1200px; }
         
         .card { background: var(--glass-card-light); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 32px; overflow: hidden; position: relative; cursor: pointer; user-select: none; -webkit-user-select: none; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; box-shadow: var(--shadow-soft); opacity: 0; animation: cardEnter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; transform-origin: center bottom; }
@@ -270,17 +251,13 @@
         .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-8px); border-color: rgba(212, 175, 55, 0.5); }
         .card:active { transform: scale(0.95) !important; transition: transform 0.1s; }
         
-        /* SECURE IMAGE RENDERING ENGINE */
+        /* SPEED RENDER ENGINE (Instantly displays images) */
         .card-media { height: 230px; position: relative; overflow: hidden; pointer-events: none; background: #E2E8F0; }
         body.dark-theme .card-media { background: #1E293B; }
         .card-media::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); z-index: 1; }
         
         .card-img-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .card:hover .card-img-wrapper { transform: scale(1.08); }
-        
-        /* Smooth Fade In For Images */
-        .card-media img, .modal-hero img, .gallery-item img { opacity: 0; transition: opacity 0.5s ease; }
-        .card-media img.loaded, .modal-hero img.loaded, .gallery-item img.loaded { opacity: 1; }
         
         /* LUXURY FALLBACK STATE FOR MISSING IMAGES */
         .card-media.card-fallback, .hero-fallback {
@@ -323,16 +300,17 @@
         body.dark-theme .modal { background: #081424; border: 1px solid rgba(255,255,255,0.1); }
         .modal-wrap.active .modal { transform: translateY(0) scale(1); }
         
-        .modal-drag-handle { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 5px; z-index: 25; backdrop-filter: blur(5px); }
+        .modal-drag-handle { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 5px; z-index: 35; backdrop-filter: blur(5px); }
         
-        /* GHOST CLICK FIX: The close button strictly stops propagation */
-        .modal-close-btn { position: absolute; top: 25px; right: 25px; width: 44px; height: 44px; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border-radius: 50%; border: none; color: #081424; font-size: 20px; font-weight: bold; cursor: pointer; z-index: 30; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
-        .modal-close-btn:active { transform: scale(0.8); background: var(--gold); color: white; }
+        /* GHOST CLICK FIX */
+        .modal-close-btn { position: absolute; top: 20px; right: 20px; width: 50px; height: 50px; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border-radius: 50%; border: none; color: #081424; font-size: 22px; font-weight: bold; cursor: pointer; z-index: 50; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
+        .modal-close-btn:active { transform: scale(0.85); background: var(--gold); color: white; }
         
-        .modal-hero { height: 40vh; flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; background: #E2E8F0; }
-        body.dark-theme .modal-hero { background: #1E293B; }
-        .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
-        .modal-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.6)); pointer-events: none; }
+        /* ZOOM FIX (Images are completely CONTAINED inside the frame) */
+        .modal-hero { height: 40vh; flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; background: #162b44; display: flex; justify-content: center; align-items: center; }
+        body.dark-theme .modal-hero { background: #000000; }
+        .modal-hero img { width: 100%; height: 100%; object-fit: contain; }
+        .modal-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4)); pointer-events: none; }
         
         .image-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; opacity: 0; transition: opacity 0.3s; z-index: -1; }
         .image-spinner.active { opacity: 1; z-index: 1; }
@@ -392,7 +370,7 @@
         .btn-admin:active { transform: scale(0.95); }
         
         /* LIGHTBOX VIEWER */
-        .fs-viewer { position: fixed; inset: 0; z-index: 1100; background: #000; display: none; align-items: center; justify-content: center; }
+        .fs-viewer { position: fixed; inset: 0; z-index: 2500; background: #000; display: none; align-items: center; justify-content: center; }
         .fs-viewer.active { display: flex; animation: fadeIn 0.4s; }
         .fs-backdrop { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(40px) brightness(0.3); transform: scale(1.1); z-index: -1; opacity: 0.8; }
         .fs-image { max-width: 95%; max-height: 95%; object-fit: contain; box-shadow: 0 30px 60px rgba(0,0,0,0.6); opacity: 0; animation: scaleInFs 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; border-radius: 12px; }
@@ -411,22 +389,29 @@
         @keyframes rippleWaterAnim { 0% { transform: scale(0); opacity: 0.8; border-width: 4px; } 100% { transform: scale(2.5); opacity: 0; border-width: 0px; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* 📱 DEVICE SPECIFIC RESPONSIVE OPTIMIZATIONS (Solves Cut-off issue) */
-        .no-results { grid-column: 1/-1; text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 1.2rem; font-family: var(--font-body); font-weight: 600; }
+        /* 📱 DEVICE SPECIFIC RESPONSIVE OPTIMIZATIONS */
+        .no-results { grid-column: 1/-1; text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 1.2rem; font-family: var(--font-body); font-weight: 600; display: none; }
 
-        /* Mobile Portrait & Small Screens */
+        /* Mobile Portrait & Small Screens (Solves Overlap Bug Completely) */
         @media (max-width: 768px) { 
-            .grid { grid-template-columns: 1fr; gap: 20px; padding-bottom: 100px; margin-top: 25px; } 
+            .header-top { align-items: center; } /* Keeps them perfectly parallel */
+            .header-logo { height: 60px; max-width: 45%; margin-top: 0; }
+            .greeting-wrap { max-width: 50%; }
+            .greeting { font-size: 1.15rem; letter-spacing: 1px; }
+            .date-display { font-size: 0.85rem; }
+            
+            .grid { grid-template-columns: 1fr; gap: 20px; padding-bottom: 110px; margin-top: 20px; } 
             .fs-nav { width: 44px; height: 44px; font-size: 24px; } .fs-prev { left: 10px; } .fs-next { right: 10px; } .fs-close { top: 20px; right: 20px; width: 44px; height: 44px; }
             nav { width: calc(100% - 40px); height: 75px; padding: 0 10px; bottom: 25px; left: 20px; top: auto; transform: none; flex-direction: row; justify-content: space-around; border-radius: 24px; gap: 0; }
             .nav-btn { width: 50px; height: 50px; border-radius: 16px; margin-bottom: 0; margin-right: 0; flex: 1; height: 100%; }
-            main { padding: 30px 20px 140px 20px; overflow-x: hidden; width: 100vw; max-width: 100vw; }
+            main { padding: 25px 20px 140px 20px; overflow-x: hidden; width: 100vw; max-width: 100vw; box-sizing: border-box; }
             h1 { font-size: 2.8rem; }
-            .search-container { max-width: 100%; width: 100%; margin-top: 30px; }
+            .search-container { max-width: 100%; width: 100%; margin-top: 25px; }
             .modal { width: 100%; height: 100%; max-width: none; border-radius: 0; top: 0; left: 0; transform: translateY(100vh); }
             .modal-wrap.active .modal { transform: translateY(0); }
             .modal-hero { height: 35vh; }
             .modal-content { padding: 30px 20px; }
+            .modal-close-btn { top: 15px; right: 15px; }
         }
 
         body.keyboard-open .device-mobile nav { display: none; }
@@ -437,20 +422,22 @@
 
         /* Landscape Orientation */
         @media (orientation: landscape) and (max-height: 600px) {
+            .header-logo { height: 60px; max-width: 40%; }
+            h1 { font-size: 2.5rem; }
             nav { width: 70px; height: 85vh; left: 15px; top: 50%; bottom: auto; padding: 15px 0; margin: 0; transform: translateY(-50%); flex-direction: column; gap: 12px; border-radius: 35px; }
             .nav-btn { width: 48px; height: 48px; margin-bottom: 0; margin-right: 0; }
             .nav-btn svg { width: 22px; height: 22px; }
-            main { padding: 25px 25px 25px 110px; }
-            .modal { flex-direction: row; height: 90vh; width: 95vw; }
+            main { padding: 20px 25px 25px 110px; }
+            .modal { flex-direction: row; height: 95vh; width: 95vw; }
             .modal-hero { width: 45%; height: 100%; }
-            .modal-content { width: 55%; height: 100%; padding: 40px; }
-            .modal-close-btn { top: 20px; right: 20px; width: 40px; height: 40px; font-size: 18px; }
+            .modal-content { width: 55%; height: 100%; padding: 30px; }
+            .modal-close-btn { top: 15px; right: 15px; width: 44px; height: 44px; font-size: 18px; }
+            .grid { padding-bottom: 50px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- BACKGROUND LAYERS -->
     <div class="ocean-waves"></div>
     <div class="palm-shadows" id="palmShadows"></div>
     <div class="night-glow" id="nightGlow"></div>
@@ -464,12 +451,10 @@
     <div class="horizon-boat" id="boat"></div>
     <div id="modeToast">Mode: Auto</div>
 
-    <!-- SPLASH SCREEN -->
     <div id="splash">
         <img id="splashLogo" src="Logos/logo_club.png.png" alt="Iberostar Aruba" class="splash-logo" onerror="handleImgError(this)">
     </div>
 
-    <!-- FLOATING DOCK -->
     <nav id="mainNav">
         <button class="nav-btn active" id="nav-club" onclick="nav('portfolio')" title="Club"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
         <button class="nav-btn" id="nav-dining" onclick="nav('dining')" title="Dining"><svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg></button>
@@ -491,7 +476,7 @@
             </div>
             
             <h1 id="pageTitle" data-text="Iberostar Aruba">Iberostar Aruba</h1>
-            <p class="subtitle" id="pageSub">The official guide to redeeming Iberocash on Aruba.</p>
+            <p class="subtitle" id="pageSub">Experience the ultimate Iberostar hotels on Aruba.</p>
             
             <div class="search-container" id="searchBox">
                 <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
@@ -507,8 +492,8 @@
     <div class="modal-wrap" id="detailModal">
         <div class="modal">
             <div class="modal-drag-handle"></div>
-            <!-- GHOST CLICK FIX: Passed 'event' explicitly to prevent click-through -->
-            <button class="modal-close-btn" onclick="closeModal(event)">✕</button>
+            <!-- GHOST CLICK FIX: Explicitly pass event and stop propagation immediately -->
+            <button class="modal-close-btn" onclick="event.stopPropagation(); closeModal(event);">✕</button>
             <div class="modal-hero" onclick="launchLightbox(currentGallery, 0)">
                 <img id="dImg" src="" onerror="handleImgError(this)" onload="handleImgLoad(this)">
                 <div class="image-spinner active"></div>
@@ -590,7 +575,6 @@
             input.focus();
         }
 
-        // --- NATIVE SWIPE-DOWN GESTURE ---
         let dragStartY = 0;
         let dragCurrentY = 0;
         const modalEl = document.querySelector('.modal');
@@ -621,7 +605,6 @@
         }, {passive: true});
 
 
-        // --- GLOBAL VARS ---
         let appData = {};
         let currentSection = 'portfolio';
         let timeState = 0; 
@@ -629,8 +612,9 @@
         let currentImgIndex = 0;
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
-        // --- VERSION CONTROL BUMP ---
-        const DATA_VERSION = 30; 
+        // --- VERSION CONTROL BUMP: 50 --- 
+        // GUARANTEES WIPE OF OLD PRICES AND LOADING NEW STORES
+        const DATA_VERSION = 50; 
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -649,9 +633,9 @@
             setTimeout(() => { 
                 const splash = document.getElementById('splash');
                 splash.style.opacity = '0'; 
-                setTimeout(() => splash.style.display = 'none', 800); 
+                setTimeout(() => splash.style.display = 'none', 500); 
                 preloadImages(); 
-            }, 1500);
+            }, 1000);
             renderApp('portfolio');
             
             let ticking = false;
@@ -819,9 +803,7 @@
                 if(el) el.className = el.className.split(' ')[0];
             }); 
             
-            const logo = document.getElementById('headerLogo');
             body.classList.remove('night-mode', 'dark-theme');
-            if(logo) logo.classList.remove('logo-white');
 
             let phase = 'day';
             if (timeState === 0) { 
@@ -856,7 +838,6 @@
                 document.getElementById('boat').classList.add('boat-active'); 
                 document.getElementById('dolphin').classList.add('dolphin-active');
                 document.getElementById('nightGlow').classList.add('glow-active');
-                if(logo) logo.classList.add('logo-white'); 
             } else { 
                 document.getElementById('greeting').innerText = "Bon Nochi";
                 body.classList.add('night-mode', 'dark-theme');
@@ -865,7 +846,6 @@
                 document.getElementById('stars').classList.add('stars-active');
                 document.getElementById('nightGlow').classList.add('glow-active');
                 document.getElementById('fireflies').classList.add('fireflies-active');
-                if(logo) logo.classList.add('logo-white'); 
             }
             const options = { weekday: 'long', month: 'long', day: 'numeric' };
             document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('en-US', options);
@@ -896,8 +876,9 @@
             
             document.getElementById('mainContainer').scrollTop = 0;
             
-            const noResults = document.createElement('div'); noResults.className = 'no-results'; noResults.innerText = "No experiences found.";
-            noResults.style.display = 'none'; // HIDDEN ON LOAD
+            const noResults = document.createElement('div'); 
+            noResults.className = 'no-results'; 
+            noResults.innerText = "No experiences found.";
             
             if (sectionId === 'dining' || sectionId === 'activities' || sectionId === 'store') searchBox.style.display = 'block'; else searchBox.style.display = 'none';
             searchInput.value = '';
@@ -936,13 +917,14 @@
                 const cleanDesc = item.desc.replace(/<[^>]*>?/gm, '');
                 const delay = index * 0.05; 
 
+                // Images now render instantly. No opacity fade.
                 html += `<div class="card" onclick="openDetails('${item.key}')" style="animation-delay: ${delay}s">
                     <div class="card-media">
                         ${logoHtml} ${mediaBadge}
                         <div class="tag-pill ${item.sub.includes('Joia') || item.sub.includes('Exclusive') ? 'highlight' : ''}">${item.sub}</div>
                         <div class="cash-badge">IBEROCASH</div>
                         <div class="card-img-wrapper">
-                            <img src="${mainImg}" onerror="handleImgError(this)" onload="handleImgLoad(this)" style="width:100%;height:100%;object-fit:cover;">
+                            <img src="${mainImg}" onerror="handleImgError(this)" fetchpriority="high">
                         </div>
                     </div>
                     <div class="card-content">
@@ -984,7 +966,6 @@
                 if(title.includes(query) || sub.includes(query) || hiddenDesc.includes(query)) { 
                     card.style.display = 'block'; 
                     card.style.animation = 'none'; 
-                    card.style.opacity = '1';
                     card.style.transform = 'translateY(0) scale(1)';
                     visibleCount++; 
                 } else { 
@@ -1002,7 +983,6 @@
             
             // MODAL IMAGE FIX: Reset counter explicitly so images always try to load properly
             mainImg.setAttribute('data-retries', '0');
-            mainImg.style.opacity = '0';
             mainImg.parentElement.classList.remove('hero-fallback');
             
             const spinner = modal.querySelector('.image-spinner');
@@ -1080,8 +1060,7 @@
             const gal = document.getElementById('dGallery');
             let gHtml = '';
             galleryData.forEach((img, idx) => {
-                // Opacity is set to 0 in CSS. It fades in via .loaded class on load.
-                gHtml += `<div class="gallery-item" onclick="openLightboxFromThumb(this)"><img src="${img}" onerror="handleImgError(this)" onload="handleImgLoad(this)"></div>`;
+                gHtml += `<div class="gallery-item" onclick="openLightboxFromThumb(this)"><img src="${img}" onerror="handleImgError(this)" loading="lazy"></div>`;
             });
             gal.innerHTML = gHtml;
             modal.classList.add('active');
@@ -1112,9 +1091,12 @@
             }
         }
 
-        // GHOST CLICK FIX: e.stopPropagation() totally kills the tap event from hitting the grid
+        // GHOST CLICK FIX
         function closeModal(e) { 
-            if(e) { e.preventDefault(); e.stopPropagation(); }
+            if(e) {
+                e.preventDefault(); 
+                e.stopPropagation(); 
+            }
             document.getElementById('detailModal').classList.remove('active'); 
         }
 
@@ -1157,7 +1139,7 @@
             const content = document.getElementById('fsContent');
             const caption = document.getElementById('fsCaption');
             const backdrop = document.getElementById('fsBackdrop');
-            content.innerHTML = `<img class="fs-image" src="${src}" onerror="handleImgError(this)">`;
+            content.innerHTML = `<img class="fs-image" src="${src}" onerror="handleImgError(this)" decoding="async">`;
             backdrop.style.backgroundImage = `url('${src}')`;
             caption.innerText = `${currentImgIndex + 1} / ${currentGallery.length}`;
         }
@@ -1436,3 +1418,6 @@
     </script>
 </body>
 </html>
+
+
+```
