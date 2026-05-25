@@ -40,6 +40,7 @@
         function handleImgError(img) {
             if (img.classList.contains('fs-image')) return;
             
+            // Short-circuit immediately using a memory-level flag
             if (img._isFailed === true) return; 
             if (img.dataset.failed === 'true') return;
             
@@ -53,6 +54,7 @@
 
             let retries = parseInt(img.dataset.retries || '0', 10);
 
+            // Aggressive fallback checks
             const fallbacks = [
                 origSrc.replace('.jpg', '.png'),
                 origSrc.replace('.png', '.jpg'),
@@ -550,7 +552,7 @@
             <div class="modal-hero" onclick="launchLightbox(currentGallery, 0)">
                 <img id="dImg" src="" onerror="handleImgError(this)" onload="handleImgLoad(this)">
                 <div class="image-spinner active"></div>
-                <div style="position:absolute; bottom:20px; right:20px; background:rgba(255,255,255,0.95); padding:6px 14px; border-radius:20px; color:var(--text-main); font-size:11px; font-weight:800; backdrop-filter:blur(10px); box-shadow:0 4px 16px rgba(0,0,0,0.25); letter-spacing:1px; pointer-events:none; z-index:20;">TAP TO EXPAND</div>
+                <div style="position:absolute; bottom:20px; right:20px; background:rgba(255,255,255,0.95); padding:6px 14px; border-radius:20px; color:#06121E; font-size:11px; font-weight:800; backdrop-filter:blur(10px); box-shadow:0 4px 16px rgba(0,0,0,0.25); letter-spacing:1px; pointer-events:none; z-index:20;">TAP TO EXPAND</div>
             </div>
             
             <div class="modal-content" id="modalContentScroll">
@@ -679,7 +681,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
         let fsVideoTimeoutId = null;
         
-        const DATA_VERSION = 205; 
+        const DATA_VERSION = 206; // Version bump for strict path string escaping
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -978,19 +980,23 @@
                 const mainImg = (item.gallery && item.gallery.length > 0) ? item.gallery[0] : item.img;
                 
                 let mediaBadge = '';
+                // STRICT BUG FIX: ESCAPE APOSTROPHES IN STRING TEMPLATES SO MENUS ACTUALLY OPEN
                 if(item.video) {
-                    mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); viewVideo('${item.video}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`;
+                    const safeVid = item.video.replace(/'/g, "\\'");
+                    mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); viewVideo('${safeVid}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>`;
                 }
                 else if(item.pdf) {
-                    mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>`;
+                    const safePdf = item.pdf.replace(/'/g, "\\'");
+                    mediaBadge = `<div class="media-badge" onclick="event.stopPropagation(); viewPdf('${safePdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>`;
                 }
 
                 const cleanDesc = item.desc.replace(/<[^>]*>?/gm, '');
                 const delay = index * 0.05; 
                 
                 const imgLoadingParams = index < 6 ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"';
+                const safeKey = item.key.replace(/'/g, "\\'");
 
-                html += `<div class="card" onclick="openDetails('${item.key}')" style="animation-delay: ${delay}s">
+                html += `<div class="card" onclick="openDetails('${safeKey}')" style="animation-delay: ${delay}s">
                     <div class="card-media">
                         <div class="card-img-blur" style="background-image: url('${mainImg}')"></div>
                         ${logoHtml} ${mediaBadge}
@@ -1123,16 +1129,20 @@
             let actionButtons = '';
             let hasPrimary = false;
 
+            // STRICT BUG FIX: ESCAPE APOSTROPHES FOR BUTTON CLICKS INSIDE THE MODAL
             if(item.pdf) {
-                actionButtons += `<button class="btn-big ${!hasPrimary ? 'btn-primary' : ''}" onclick="viewPdf('${item.pdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> View Brochure</button>`;
+                const safePdf = item.pdf.replace(/'/g, "\\'");
+                actionButtons += `<button class="btn-big ${!hasPrimary ? 'btn-primary' : ''}" onclick="viewPdf('${safePdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> View Brochure</button>`;
                 hasPrimary = true;
             } 
             if(item.video) {
-                actionButtons += `<button class="btn-big ${!hasPrimary ? 'btn-primary' : ''}" onclick="viewVideo('${item.video}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Video Tour</button>`;
+                const safeVid = item.video.replace(/'/g, "\\'");
+                actionButtons += `<button class="btn-big ${!hasPrimary ? 'btn-primary' : ''}" onclick="viewVideo('${safeVid}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Video Tour</button>`;
                 hasPrimary = true;
             }
             
-            actionButtons += `<button class="btn-big" style="flex:0; min-width:80px;" onclick="sharePackage('${key}')" title="Share"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></button>`;
+            const safeKey = key.replace(/'/g, "\\'");
+            actionButtons += `<button class="btn-big" style="flex:0; min-width:80px;" onclick="sharePackage('${safeKey}')" title="Share"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></button>`;
 
             actBar.innerHTML = actionButtons;
 
@@ -1318,12 +1328,14 @@
             vid.addEventListener('error', () => {
                 if(spin) spin.style.display = 'none';
                 const altUrl = url.replace('.mp4', '.MOV');
+                const safeAltUrl = altUrl.replace(/'/g, "\\'"); // Escaped for fallback player
+                
                 container.innerHTML = `
                     <div style="text-align:center; color:white; font-family:var(--font-body);">
                         <svg viewBox="0 0 24 24" style="width:50px;height:50px;fill:#ff3b30;margin-bottom:15px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                         <h2 style="margin-bottom:10px;">Video Format Issue</h2>
                         <p style="color:#8898AA; margin-bottom:30px; max-width: 400px; margin-left: auto; margin-right: auto;">The iPad could not process this video file format, or the file is missing from the server.</p>
-                        <button onclick="document.getElementById('fsVideo').src='${altUrl}'; this.innerText='Trying .MOV...'" style="padding:15px 30px; background:var(--gold); border-radius:15px; border:none; color:#06121E; font-weight:bold; cursor:pointer; margin-bottom:15px; width: 100%;">Try Alternate Format</button>
+                        <button onclick="document.getElementById('fsVideo').src='${safeAltUrl}'; this.innerText='Trying .MOV...'" style="padding:15px 30px; background:var(--gold); border-radius:15px; border:none; color:#06121E; font-weight:bold; cursor:pointer; margin-bottom:15px; width: 100%;">Try Alternate Format</button>
                         <br>
                         <button onclick="closeFs()" style="padding:15px 30px; background:rgba(255,255,255,0.1); border-radius:15px; border:none; color:white; font-weight:bold; cursor:pointer; width: 100%;">Close Player</button>
                     </div>`;
