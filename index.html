@@ -86,8 +86,16 @@
             if (img.id === 'dImg') {
                 img.parentElement.classList.add('hero-fallback');
             } else {
-                const mediaContainer = img.closest('.card-media') || img.closest('.gallery-item');
-                if (mediaContainer) mediaContainer.classList.add('card-fallback');
+                const mediaContainer = img.closest('.card-media');
+                if (mediaContainer) {
+                    mediaContainer.classList.add('card-fallback');
+                } else {
+                    // 🚨 GHOST BOX FIX: Completely hide missing gallery items
+                    const galleryItem = img.closest('.gallery-item');
+                    if (galleryItem) {
+                        galleryItem.style.display = 'none';
+                    }
+                }
             }
         }
         
@@ -108,6 +116,7 @@
             } else if (img.closest('.gallery-item')) {
                 const mediaContainer = img.closest('.gallery-item');
                 mediaContainer.classList.remove('card-fallback');
+                mediaContainer.style.display = 'flex'; // Ensure visible
             }
         }
     </script>
@@ -552,7 +561,7 @@
             <div class="modal-hero" onclick="launchLightbox(currentGallery, 0)">
                 <img id="dImg" src="" onerror="handleImgError(this)" onload="handleImgLoad(this)">
                 <div class="image-spinner active"></div>
-                <div style="position:absolute; bottom:20px; right:20px; background:rgba(255,255,255,0.95); padding:6px 14px; border-radius:20px; color:#06121E; font-size:11px; font-weight:800; backdrop-filter:blur(10px); box-shadow:0 4px 16px rgba(0,0,0,0.25); letter-spacing:1px; pointer-events:none; z-index:20;">TAP TO EXPAND</div>
+                <div style="position:absolute; bottom:20px; right:20px; background:rgba(0,0,0,0.65); padding:8px 16px; border-radius:20px; color:#FFFFFF; font-size:11px; font-weight:800; backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px); border: 1px solid rgba(255,255,255,0.2); box-shadow:0 4px 16px rgba(0,0,0,0.3); letter-spacing:1px; pointer-events:none; z-index:20;">TAP TO EXPAND</div>
             </div>
             
             <div class="modal-content" id="modalContentScroll">
@@ -681,7 +690,7 @@
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
         let fsVideoTimeoutId = null;
         
-        const DATA_VERSION = 206; // Version bump for strict path string escaping
+        const DATA_VERSION = 207; // Version bump for ghost box and contrast fixes
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -1149,6 +1158,7 @@
             modal.style.transform = ''; 
             modal.classList.add('active');
             
+            // 🚨 GHOST BOX & SAFARI LAZY-LOAD BUG FIX 🚨
             setTimeout(() => {
                 const gal = document.getElementById('dGallery');
                 const fragment = document.createDocumentFragment();
@@ -1160,9 +1170,10 @@
                     
                     const image = document.createElement('img');
                     image.src = img;
-                    image.loading = 'lazy';
+                    // REMOVED 'loading="lazy"' because iOS Safari bugs out inside off-screen animated modals
                     image.decoding = 'async';
                     image.onerror = function() { handleImgError(this); };
+                    image.onload = function() { handleImgLoad(this); };
                     
                     div.appendChild(image);
                     fragment.appendChild(div);
@@ -1219,6 +1230,7 @@
             const validImgs = [];
             const thumbs = document.querySelectorAll('#dGallery .gallery-item img');
             thumbs.forEach(img => {
+                // Ensure only visible thumbnails are injected into the lightbox gallery
                 if (img.style.display !== 'none' && img.parentElement.style.display !== 'none') {
                     validImgs.push(img.src);
                 }
