@@ -171,36 +171,45 @@
         /* TEXTURE OVERLAY */
         body::before { content: ""; position: absolute; inset: 0; background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.04"/%3E%3C/svg%3E'); pointer-events: none; z-index: 1; mix-blend-mode: multiply; }
 
-        /* DYNAMIC ENVIRONMENT LAYERS */
-        .ocean-waves { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E"); opacity: 0.6; animation: waveDrift 90s linear infinite; }
-        @keyframes waveDrift { 0% { background-position: 0 0; } 100% { background-position: 1000px 20px; } }
-        .palm-shadows { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(circle at 100% 0%, rgba(0,0,0,0.06) 0%, transparent 50%), radial-gradient(circle at 90% 10%, rgba(0,0,0,0.04) 0%, transparent 40%); opacity: 0; transition: opacity 3s ease; filter: blur(40px); }
+        /* DYNAMIC ENVIRONMENT LAYERS - GPU ACCELERATED */
+        .ocean-waves { position: absolute; top: -20vh; left: -20vw; width: 140vw; height: 140vh; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23ffffff' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E"); opacity: 0.6; animation: waveDrift 90s linear infinite; will-change: transform; }
+        @keyframes waveDrift { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(1000px, 20px, 0); } }
+        
+        .palm-shadows { position: absolute; inset: 0; pointer-events: none; z-index: 1; background: radial-gradient(circle at 100% 0%, rgba(0,0,0,0.06) 0%, transparent 50%), radial-gradient(circle at 90% 10%, rgba(0,0,0,0.04) 0%, transparent 40%); opacity: 0; transition: opacity 3s ease; filter: blur(40px); will-change: transform; }
         .shadows-active { opacity: 1 !important; animation: palmSway 12s ease-in-out infinite alternate; }
-        @keyframes palmSway { 0% { transform: translateX(0); } 100% { transform: translateX(-15px); } }
+        @keyframes palmSway { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-15px, 0, 0); } }
+        
         .night-glow { position: absolute; bottom: 0; left: 0; width: 100%; height: 60vh; background: linear-gradient(to top, rgba(212, 175, 55, 0.25), transparent); opacity: 0; transition: opacity 3s ease; z-index: 0; pointer-events: none; }
         .glow-active { opacity: 1 !important; }
-        .horizon-boat, .living-fish, .living-birds, .living-dolphin { position: absolute; z-index: 0; opacity: 0; transition: opacity 2s ease; background-repeat: no-repeat; }
+        
+        .horizon-boat, .living-fish, .living-birds, .living-dolphin { position: absolute; z-index: 0; opacity: 0; transition: opacity 2s ease; background-repeat: no-repeat; will-change: transform; }
         .horizon-boat { bottom: 18%; left: -100px; width: 60px; height: 60px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.4'%3E%3Cpath d='M14 6l5 11h-5v-11zm-2 0v11h-5l5-11zm-9 13l2 3h16l2-3h-20z'/%3E%3C/svg%3E"); }
         body.dark-theme .horizon-boat { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF' opacity='0.4'%3E%3Cpath d='M14 6l5 11h-5v-11zm-2 0v11h-5l5-11zm-9 13l2 3h16l2-3h-20z'/%3E%3C/svg%3E"); }
         .boat-active { opacity: 1 !important; animation: sailAcross 160s linear infinite; }
-        @keyframes sailAcross { 0% { transform: translateX(-20vw) rotate(1deg); } 100% { transform: translateX(120vw) rotate(1deg); } }
-        .clouds { position: absolute; top: 0; left: 0; width: 100%; height: 350px; background-image: radial-gradient(rgba(255,255,255,0.7) 1px, transparent 1px); background-size: 80px 80px; filter: blur(45px); opacity: 0; transition: opacity 3s ease; z-index: 0; animation: cloudDrift 100s linear infinite; }
+        @keyframes sailAcross { 0% { transform: translate3d(-20vw, 0, 0) rotate(1deg); } 100% { transform: translate3d(120vw, 0, 0) rotate(1deg); } }
+        
+        .clouds { position: absolute; top: 0; left: 0; width: 100%; height: 350px; background-image: radial-gradient(rgba(255,255,255,0.7) 1px, transparent 1px); background-size: 80px 80px; filter: blur(45px); opacity: 0; transition: opacity 3s ease; z-index: 0; animation: cloudDrift 100s linear infinite; will-change: transform; }
         .clouds-active { opacity: 0.8 !important; }
-        @keyframes cloudDrift { 0% { transform: translateX(-40px); } 50% { transform: translateX(40px); } 100% { transform: translateX(-40px); } }
-        .fireflies { position: absolute; inset: 0; opacity: 0; transition: opacity 3s ease; pointer-events: none; z-index: 0; }
+        @keyframes cloudDrift { 0% { transform: translate3d(-40px, 0, 0); } 50% { transform: translate3d(40px, 0, 0); } 100% { transform: translate3d(-40px, 0, 0); } }
+        
+        .fireflies { position: absolute; inset: 0; opacity: 0; transition: opacity 3s ease; pointer-events: none; z-index: 0; will-change: transform; }
         .fireflies::before, .fireflies::after { content: ''; position: absolute; width: 4px; height: 4px; background: #D4AF37; border-radius: 50%; box-shadow: 0 0 12px #D4AF37; animation: fireflyMove 20s infinite alternate; }
         .fireflies::after { left: 60%; top: 40%; animation-duration: 25s; animation-direction: alternate-reverse; width: 3px; height: 3px; }
         .fireflies-active { opacity: 0.9 !important; }
-        @keyframes fireflyMove { 0% { transform: translate(0,0); opacity: 0.3; } 50% { opacity: 1; } 100% { transform: translate(100px, -50px); opacity: 0.3; } }
+        @keyframes fireflyMove { 0% { transform: translate3d(0, 0, 0); opacity: 0.3; } 50% { opacity: 1; } 100% { transform: translate3d(100px, -50px, 0); opacity: 0.3; } }
+        
         .living-fish { bottom: 20%; right: -150px; width: 120px; height: 80px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60' fill='%230F2D4A' opacity='0.3'%3E%3Cpath d='M95,30c-3-3-8-5-12-5c-5,0-10,2-14,4c-6,3-12,5-19,5c-8,0-15-3-21-7c-4-3-8-6-13-6c-6,0-11,4-14,9c-1,2-2,3-2,5 c0,2,1,3,2,5c3,5,8,9,14,9c5,0,9-3,13-6c6-4,13-7,21-7c7,0,13,2,19,5c4,2,9,4,14,4c4,0,9-2,12-5C98,35,98,33,95,30z M10,30 c-3,0-5-2-5-5s2-5,5-5s5,2,5,5S13,30,10,30z'/%3E%3C/svg%3E"); }
         .fish-active { opacity: 1 !important; animation: fishSwim 70s linear infinite; }
-        @keyframes fishSwim { 0% { transform: translateX(0) rotate(2deg); } 50% { transform: translateX(-60vw) rotate(-2deg); } 100% { transform: translateX(-140vw) rotate(2deg); } }
+        @keyframes fishSwim { 0% { transform: translate3d(0, 0, 0) rotate(2deg); } 50% { transform: translate3d(-60vw, 0, 0) rotate(-2deg); } 100% { transform: translate3d(-140vw, 0, 0) rotate(2deg); } }
+        
         .living-birds { top: 15%; left: -100px; width: 100px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50' fill='%230F2D4A' opacity='0.2'%3E%3Cpath d='M10 25 Q25 10 40 25 Q25 30 10 25 M60 15 Q75 0 90 15 Q75 20 60 15' stroke='%230F2D4A' stroke-width='2' fill='none'/%3E%3C/svg%3E"); }
         .birds-active { opacity: 1 !important; animation: birdsFly 80s linear infinite; }
-        @keyframes birdsFly { 0% { transform: translateX(0) translateY(0); } 100% { transform: translateX(120vw) translateY(-30px); } }
+        @keyframes birdsFly { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(120vw, -30px, 0); } }
+        
         .living-dolphin { bottom: 25%; left: 20%; width: 50px; height: 50px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230F2D4A' opacity='0.2'%3E%3Cpath d='M2 12s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5z'/%3E%3C/svg%3E"); }
         .dolphin-active { opacity: 1 !important; animation: dolphinJump 25s ease-in-out infinite; }
-        @keyframes dolphinJump { 0%, 80% { transform: translateY(20px) rotate(0); opacity: 0; } 90% { transform: translateY(-20px) rotate(-10deg); opacity: 0.5; } 100% { transform: translateY(20px) rotate(10deg); opacity: 0; } }
+        @keyframes dolphinJump { 0%, 80% { transform: translate3d(0, 20px, 0) rotate(0); opacity: 0; } 90% { transform: translate3d(0, -20px, 0) rotate(-10deg); opacity: 0.5; } 100% { transform: translate3d(0, 20px, 0) rotate(10deg); opacity: 0; } }
+        
         .stars-overlay { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 3s ease; background-image: radial-gradient(white, rgba(255,255,255,.5) 1px, transparent 2px); background-size: 250px 250px; }
         .stars-active { opacity: 0.8 !important; }
 
@@ -490,7 +499,7 @@
         <button class="nav-btn" id="nav-fun" onclick="nav('activities')" title="Fun"><svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg></button>
         <button class="nav-btn" id="nav-spa" onclick="nav('spa')" title="Wellness"><svg viewBox="0 0 24 24"><path d="M12 2C9 7 4 9 4 14c0 3 3 5 8 5s8-2 8-5c0-5-5-7-8-12zm0 18c-4.4 0-8-1.8-8-5 0-2.4 2.3-4.5 5-5.8 1.5 1.7 3 3.4 3 5.8 0-2.4 1.5-4.1 3-5.8 2.7 1.3 5 3.4 5 5.8 0 3.2-3.6 5-8 5z"/></svg></button>
         <button class="nav-btn" id="nav-golf" onclick="nav('golf')" title="Golf"><svg viewBox="0 0 24 24"><path d="M19.5 19.5c-1 0-1.7-.6-2.1-1.5l-2.9-6.2c-.2-.4-.3-.8-.3-1.3 0-.2 0-.4.1-.6l.5-1.9c.2-.8-.2-1.7-1-2L12 5.5c-.1 0-.2-.1-.3-.1-1 0-1.8.7-2 1.7l-.3 1.7c-.2.9-.9 1.6-1.8 1.9l-2.1.6C4.7 11.6 4 12.4 4 13.3v.2c0 1 .6 1.9 1.5 2.3l2.2.9c.8.3 1.3 1.1 1.3 1.9v1.1c0 1.5 1.2 2.8 2.8 2.8h5.9c1 0 1.8-.8 1.8-1.8v-1.2zm-10-17c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg></button>
-        <button class="nav-btn" id="nav-store" onclick="nav('store')" title="Shopping"><svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg></button>
+        <button class="nav-btn" id="nav-store" onclick="nav('store')" title="Shopping"><svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg></button>
     </nav>
 
     <main id="mainContainer">
@@ -615,7 +624,6 @@
         };
 
         modalEl.addEventListener('touchstart', e => {
-            // Ignore swipes on buttons or horizontal scroll areas
             if(e.target.closest('.modal-close-btn') || e.target.closest('.gallery-scroller') || e.target.closest('button')) return;
             dragStartY = e.touches[0].clientY;
             modalEl.style.transition = 'none'; 
@@ -626,9 +634,7 @@
             dragCurrentY = e.touches[0].clientY;
             const diff = dragCurrentY - dragStartY;
             
-            // Only drag down if the user is at the absolute top of the scroll container
             if(diff > 0 && modalScrollEl.scrollTop <= 0) {
-                // Apply Apple-style friction to the pull
                 const frictionDiff = diff * 0.85; 
                 modalEl.style.transform = `translateY(${frictionDiff}px) scale(1)`;
             }
@@ -640,15 +646,13 @@
             
             if(diff > 120 && modalScrollEl.scrollTop <= 0) {
                 closeModal();
-                setTimeout(resetModalTouch, 600); // Clean up after the CSS animation completes
+                setTimeout(resetModalTouch, 600); 
             } else {
-                resetModalTouch(); // Snap back into place
+                resetModalTouch(); 
             }
         }, {passive: true});
 
-        // 🚨 CRITICAL FIX: Handle iOS system interruptions (notifications, control center swipe)
         modalEl.addEventListener('touchcancel', resetModalTouch, {passive: true});
-
 
         let appData = {};
         let currentSection = 'portfolio';
@@ -656,11 +660,8 @@
         let currentGallery = [];
         let currentImgIndex = 0;
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
-
-        // Add a global tracker for the video timeout
         let fsVideoTimeoutId = null;
-
-        // --- DATA BUMP 205: Forces updated image paths ---
+        
         const DATA_VERSION = 205; 
 
         window.onload = function() {
@@ -702,7 +703,6 @@
                 }
             });
 
-            // STRICT LOGIC: 3 Taps to Toggle In-House / Off-Site modes
             let titleTaps = 0;
             document.getElementById('pageTitle').addEventListener('click', function() {
                 titleTaps++;
@@ -720,6 +720,7 @@
             });
         };
         
+        // 🚨 CHUNKED PARALLEL CACHING 🚨
         async function forceOfflineCache() {
             const btn = document.getElementById('preloadBtn');
             const status = document.getElementById('cacheStatus');
@@ -792,20 +793,24 @@
 
             let loaded = 0;
             const total = allUrls.length;
-            
             const cache = await caches.open('ib-aruba-v1');
             
             status.innerText = `Downloading 0 / ${total}...`;
             
-            for (const url of allUrls) {
-                try {
-                    await cache.add(url);
-                    loaded++;
-                    status.innerText = `Cached ${loaded} / ${total}`;
-                } catch (e) {
-                    loaded++; 
-                    status.innerText = `Cached ${loaded} / ${total} (Skip)`;
-                }
+            // Batched parallel downloading to respect connection limits but vastly improve speed
+            const chunkSize = 15;
+            for (let i = 0; i < allUrls.length; i += chunkSize) {
+                const chunk = allUrls.slice(i, i + chunkSize);
+                await Promise.all(chunk.map(async (url) => {
+                    try {
+                        await cache.add(url);
+                    } catch (e) {
+                        // Silently catch missing individual fallbacks
+                    } finally {
+                        loaded++;
+                    }
+                }));
+                status.innerText = `Cached ${loaded} / ${total}`;
             }
             
             status.innerText = "✅ All content (incl. PDFs & Videos) cached!";
@@ -944,7 +949,6 @@
             
             let itemsToShow = Object.keys(appData).map(key => ({ key, ...appData[key] })).filter(i => i.type === type);
             
-            // 🚨 STRICT BUSINESS LOGIC: Offsite = Rockabeach, In-House = Red Sail 🚨
             if (type === 'fun') {
                 if (inHouseMode) {
                     itemsToShow = itemsToShow.filter(i => i.sub && i.sub.toLowerCase().includes('red sail'));
@@ -1029,19 +1033,17 @@
             if(visibleCount === 0) noRes.style.display = 'block'; else noRes.style.display = 'none';
         }
 
-        // 🚨 ZERO-LAG MODAL ENGINE: Fast UI update, delayed heavy asset loading
         function openDetails(key) {
             const item = appData[key];
             const modal = document.getElementById('detailModal');
             const mainImg = document.getElementById('dImg');
             
-            // Instantly clear heavy items to free up main thread
             document.getElementById('dGallery').innerHTML = '';
             document.getElementById('modalContentScroll').scrollTop = 0;
             
             mainImg.setAttribute('data-retries', '0');
             mainImg.dataset.failed = 'false';
-            mainImg._isFailed = false; // Reset the memory flag
+            mainImg._isFailed = false; 
             mainImg.parentElement.classList.remove('hero-fallback');
             
             const spinner = modal.querySelector('.image-spinner');
@@ -1115,22 +1117,35 @@
 
             actBar.innerHTML = actionButtons;
 
-            // Trigger Animation First
             modal.style.transform = ''; 
             modal.classList.add('active');
             
-            // Wait for 60fps animation to end, then load heavy gallery
+            // 🚨 DOCUMENT FRAGMENT GALLERY RENDERING 🚨
             setTimeout(() => {
                 const gal = document.getElementById('dGallery');
-                let gHtml = '';
-                galleryData.forEach((img, idx) => {
-                    gHtml += `<div class="gallery-item" onclick="openLightboxFromThumb(this)">
-                        <img src="${img}" onerror="handleImgError(this)" loading="lazy" decoding="async">
-                    </div>`;
+                const fragment = document.createDocumentFragment();
+                
+                galleryData.forEach((img) => {
+                    const div = document.createElement('div');
+                    div.className = 'gallery-item';
+                    div.onclick = function() { openLightboxFromThumb(this); };
+                    
+                    const image = document.createElement('img');
+                    image.src = img;
+                    image.loading = 'lazy';
+                    image.decoding = 'async';
+                    image.onerror = function() { handleImgError(this); };
+                    
+                    div.appendChild(image);
+                    fragment.appendChild(div);
                 });
-                gal.innerHTML = gHtml;
-                gal.style.opacity = '0';
-                setTimeout(() => gal.style.opacity = '1', 50); 
+                
+                requestAnimationFrame(() => {
+                    gal.innerHTML = '';
+                    gal.appendChild(fragment);
+                    gal.style.opacity = '0';
+                    requestAnimationFrame(() => gal.style.opacity = '1');
+                });
             }, 450); 
         }
         
@@ -1254,7 +1269,6 @@
             fs.classList.add('active');
         }
 
-        // 🚨 BULLETPROOF VIDEO PLAYER FIX (iOS Specific Tags Added) 🚨
         function viewVideo(url) {
             const fs = document.getElementById('fsViewer');
             const content = document.getElementById('fsContent');
@@ -1263,7 +1277,6 @@
             document.getElementById('fsCaption').style.display = 'none';
             document.getElementById('fsBackdrop').style.backgroundImage = 'none';
             
-            // iPad/iOS completely ignores videos without webkit-playsinline and muted
             content.innerHTML = `
                 <div style="width:100%; height:100%; padding: 40px; display:flex; align-items:center; justify-content:center; background:#000; position: relative;" id="vidContainer">
                     <div class="image-spinner active" id="vidSpinner" style="z-index: 10;"></div>
@@ -1286,8 +1299,6 @@
             
             vid.addEventListener('error', () => {
                 if(spin) spin.style.display = 'none';
-                
-                // Extremely robust error UI to give the user an alternative option if .mp4 fails
                 const altUrl = url.replace('.mp4', '.MOV');
                 container.innerHTML = `
                     <div style="text-align:center; color:white; font-family:var(--font-body);">
@@ -1300,10 +1311,8 @@
                     </div>`;
             });
             
-            // Clear any existing timeout from a previous session
             if (fsVideoTimeoutId) clearTimeout(fsVideoTimeoutId);
         
-            // Timeout escape hatch so spinner never gets stuck
             fsVideoTimeoutId = setTimeout(() => { 
                 if(spin) spin.style.display = 'none'; 
             }, 8000);
@@ -1313,7 +1322,6 @@
             const fs = document.getElementById('fsViewer');
             fs.classList.remove('active');
             
-            // 🚨 CRITICAL FIX: Destroy the timer to prevent ghost DOM manipulation
             if (fsVideoTimeoutId) {
                 clearTimeout(fsVideoTimeoutId);
                 fsVideoTimeoutId = null;
