@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,6 +39,9 @@
 
         function handleImgError(img) {
             if (img.classList.contains('fs-image')) return;
+            
+            // Short-circuit immediately using a memory-level flag
+            if (img._isFailed === true) return; 
             if (img.dataset.failed === 'true') return;
             
             const origSrc = img.dataset.origSrc || img.src;
@@ -50,7 +52,7 @@
                 return;
             }
 
-            let retries = parseInt(img.dataset.retries || '0');
+            let retries = parseInt(img.dataset.retries || '0', 10);
 
             // Aggressive fallback checks to catch Marea, Spa, and case-sensitivity issues
             const fallbacks = [
@@ -65,7 +67,7 @@
             ];
 
             if (retries < fallbacks.length) {
-                img.dataset.retries = retries + 1;
+                img.dataset.retries = (retries + 1).toString();
                 img.src = fallbacks[retries];
             } else {
                 failedImageCache.add(origSrc); // Mark globally failed
@@ -75,6 +77,8 @@
 
         function triggerFallback(img) {
             img.dataset.failed = 'true';
+            img._isFailed = true; // Attach directly to the node to survive layout shifts
+            
             const spinner = img.parentElement?.querySelector('.image-spinner');
             if(spinner) spinner.classList.remove('active');
             img.style.display = 'none';
@@ -489,7 +493,6 @@
         <button class="nav-btn" id="nav-store" onclick="nav('store')" title="Shopping"><svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg></button>
     </nav>
 
-    <!-- CONTENT -->
     <main id="mainContainer">
         <header>
             <div class="header-top">
@@ -513,7 +516,6 @@
         <div id="appContent"></div>
     </main>
 
-    <!-- MODAL -->
     <div class="modal-wrap" id="detailModal">
         <div class="modal">
             <div class="modal-drag-handle"></div>
@@ -537,7 +539,6 @@
         </div>
     </div>
 
-    <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel">
         <div class="admin-header"><h3>Admin Editor</h3><div><button class="btn-admin" onclick="exportData()">Copy Code</button> <button class="btn-admin" style="background:#ff3b30; margin-left:10px;" onclick="closeAdmin()">Close</button></div></div>
         <div class="admin-body">
@@ -576,7 +577,6 @@
         </div>
     </div>
 
-    <!-- LIGHTBOX VIEWER -->
     <div class="fs-viewer" id="fsViewer">
         <button class="fs-close" onclick="closeFs()">✕</button>
         <button class="fs-nav fs-prev" id="fsPrev" onclick="prevFs()">‹</button>
@@ -601,13 +601,21 @@
             input.focus();
         }
 
-        // --- GESTURE SWIPE DOWN ENGINE (Polished for stability) ---
+        // --- GESTURE SWIPE DOWN ENGINE (Polished for absolute stability) ---
         let dragStartY = 0;
         let dragCurrentY = 0;
         const modalEl = document.querySelector('.modal');
         const modalScrollEl = document.getElementById('modalContentScroll');
 
+        const resetModalTouch = () => {
+            dragStartY = 0; 
+            dragCurrentY = 0;
+            modalEl.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1)';
+            modalEl.style.transform = '';
+        };
+
         modalEl.addEventListener('touchstart', e => {
+            // Ignore swipes on buttons or horizontal scroll areas
             if(e.target.closest('.modal-close-btn') || e.target.closest('.gallery-scroller') || e.target.closest('button')) return;
             dragStartY = e.touches[0].clientY;
             modalEl.style.transition = 'none'; 
@@ -617,22 +625,29 @@
             if(dragStartY === 0) return;
             dragCurrentY = e.touches[0].clientY;
             const diff = dragCurrentY - dragStartY;
+            
+            // Only drag down if the user is at the absolute top of the scroll container
             if(diff > 0 && modalScrollEl.scrollTop <= 0) {
-                modalEl.style.transform = `translateY(${diff}px) scale(1)`;
+                // Apply Apple-style friction to the pull
+                const frictionDiff = diff * 0.85; 
+                modalEl.style.transform = `translateY(${frictionDiff}px) scale(1)`;
             }
         }, {passive: true});
 
         modalEl.addEventListener('touchend', e => {
             if(dragStartY === 0) return;
-            modalEl.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1)'; 
             const diff = dragCurrentY - dragStartY;
+            
             if(diff > 120 && modalScrollEl.scrollTop <= 0) {
                 closeModal();
+                setTimeout(resetModalTouch, 600); // Clean up after the CSS animation completes
             } else {
-                modalEl.style.transform = ''; 
+                resetModalTouch(); // Snap back into place
             }
-            dragStartY = 0; dragCurrentY = 0;
         }, {passive: true});
+
+        // 🚨 CRITICAL FIX: Handle iOS system interruptions (notifications, control center swipe)
+        modalEl.addEventListener('touchcancel', resetModalTouch, {passive: true});
 
 
         let appData = {};
@@ -641,6 +656,9 @@
         let currentGallery = [];
         let currentImgIndex = 0;
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
+
+        // Add a global tracker for the video timeout
+        let fsVideoTimeoutId = null;
 
         // --- DATA BUMP 205: Forces updated image paths ---
         const DATA_VERSION = 205; 
@@ -1023,6 +1041,7 @@
             
             mainImg.setAttribute('data-retries', '0');
             mainImg.dataset.failed = 'false';
+            mainImg._isFailed = false; // Reset the memory flag
             mainImg.parentElement.classList.remove('hero-fallback');
             
             const spinner = modal.querySelector('.image-spinner');
@@ -1281,13 +1300,24 @@
                     </div>`;
             });
             
-            // Timeout escape hatch so spinner never gets stuck forever
-            setTimeout(() => { if(spin) spin.style.display = 'none'; }, 8000);
+            // Clear any existing timeout from a previous session
+            if (fsVideoTimeoutId) clearTimeout(fsVideoTimeoutId);
+        
+            // Timeout escape hatch so spinner never gets stuck
+            fsVideoTimeoutId = setTimeout(() => { 
+                if(spin) spin.style.display = 'none'; 
+            }, 8000);
         }
         
         function closeFs() {
             const fs = document.getElementById('fsViewer');
             fs.classList.remove('active');
+            
+            // 🚨 CRITICAL FIX: Destroy the timer to prevent ghost DOM manipulation
+            if (fsVideoTimeoutId) {
+                clearTimeout(fsVideoTimeoutId);
+                fsVideoTimeoutId = null;
+            }
             
             const video = fs.querySelector('video');
             if (video) video.pause(); 
