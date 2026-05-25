@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +9,8 @@
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
     <meta name="format-detection" content="telephone=no">
     
-    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=100"> 
-    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=100" type="image/png">
+    <link rel="apple-touch-icon" href="Logos/app_logo_club.png?v=200"> 
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=200" type="image/png">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,18 +89,25 @@
             
             if (img.id === 'dImg') {
                 img.parentElement?.classList.remove('hero-fallback');
-                // Set the beautiful blurred backdrop
                 const blurBg = document.getElementById('dImgBlur');
                 if(blurBg) blurBg.style.backgroundImage = `url('${img.src}')`;
+            } else if (img.closest('.card-media')) {
+                const mediaContainer = img.closest('.card-media');
+                mediaContainer.classList.remove('card-fallback');
+                const blurBg = mediaContainer.querySelector('.card-img-blur');
+                if(blurBg) blurBg.style.backgroundImage = `url('${img.src}')`;
+            } else if (img.closest('.gallery-item')) {
+                const mediaContainer = img.closest('.gallery-item');
+                mediaContainer.classList.remove('card-fallback');
+                const blurBg = mediaContainer.querySelector('.gallery-blur');
+                if(blurBg) blurBg.style.backgroundImage = `url('${img.src}')`;
             }
-            const mediaContainer = img.closest('.card-media') || img.closest('.gallery-item');
-            if (mediaContainer) mediaContainer.classList.remove('card-fallback');
         }
     </script>
 
     <style>
         :root {
-            /* V100 Ultimate Luxury Palette */
+            /* V200 Ultimate Luxury Palette */
             --bg-gradient-1: #95BFE0;
             --bg-gradient-2: #1D5C8A;
             --ocean-deep: #06121E; 
@@ -139,7 +147,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
         p, .modal-desc, .form-group input, .form-group textarea, .price-row { user-select: text; -webkit-user-select: text; touch-action: auto; }
         
-        img { color: transparent; text-indent: 10000px; } /* Hide broken image icons */
+        img { color: transparent; text-indent: 10000px; } 
 
         html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #FDFBF7; }
 
@@ -153,7 +161,7 @@
             overscroll-behavior: none;
         }
 
-        /* TEXTURE OVERLAY - Adds physical premium feel */
+        /* TEXTURE OVERLAY */
         body::before { content: ""; position: absolute; inset: 0; background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opacity="0.04"/%3E%3C/svg%3E'); pointer-events: none; z-index: 1; mix-blend-mode: multiply; }
 
         /* DYNAMIC ENVIRONMENT LAYERS */
@@ -212,8 +220,10 @@
         header { margin-bottom: 50px; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; gap: 15px; }
         
-        .header-logo { height: 90px; max-width: 50%; cursor: pointer; transition: transform 0.2s; object-fit: contain; object-position: left; margin-top: -5px; filter: brightness(0) invert(1) drop-shadow(0 4px 10px rgba(0,0,0,0.25)) !important; }
+        /* 🚨 LOGO FIX: Stripped out hardcoded filters. Uses true natural color during day, white at night. */
+        .header-logo { height: 90px; max-width: 50%; cursor: pointer; transition: transform 0.2s, filter 0.5s; object-fit: contain; object-position: left; margin-top: -5px; }
         .header-logo:active { transform: scale(0.95); }
+        .logo-white { filter: brightness(0) invert(1) drop-shadow(0 4px 10px rgba(0,0,0,0.5)) !important; }
         
         .greeting-wrap { text-align: right; cursor: pointer; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); flex-shrink: 0; }
         .greeting-wrap:active { transform: scale(0.92); }
@@ -251,12 +261,17 @@
         .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-8px); border-color: rgba(212, 175, 55, 0.6); }
         .card:active { transform: scale(0.96) !important; transition: transform 0.1s; }
         
+        /* 🚨 THE ZOOM FIX: "Museum Display" Double-Layer Image Engine 🚨 */
         .card-media { height: 240px; position: relative; overflow: hidden; pointer-events: none; background: #E2E8F0; }
-        body.dark-theme .card-media { background: #1E293B; }
-        .card-media::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); z-index: 1; }
+        body.dark-theme .card-media { background: #06121E; }
+        .card-media::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); z-index: 2; }
         
-        .card-img-wrapper { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .card-img-blur { position: absolute; inset: -20%; background-size: cover; background-position: center; filter: blur(25px) brightness(0.6); z-index: 0; }
+        .card-img-wrapper { position: absolute; inset: 0; z-index: 1; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .card:hover .card-img-wrapper { transform: scale(1.08); }
+        
+        /* Forces 100% of the image to show, never cropped, with blur behind it */
+        .card-img-wrapper img { width: 100%; height: 100%; object-fit: contain !important; display: block; }
         
         /* LUXURY FALLBACK STATE FOR MISSING IMAGES */
         .card-media.card-fallback, .hero-fallback {
@@ -271,16 +286,16 @@
             content: 'IBEROSTAR'; color: rgba(255,255,255,0.3); font-family: var(--font-head); font-weight: 700; font-size: 1.8rem; letter-spacing: 8px; z-index: 2; position: relative; background: none; text-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .tag-pill { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-body); color: #06121E; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 2; }
+        .tag-pill { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-body); color: #06121E; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 3; }
         .tag-pill.highlight { background: var(--gold); color: white; border: 1px solid rgba(255,255,255,0.4); }
         
         /* Premium Gold Foil Iberocash Badge */
-        .cash-badge { position: absolute; bottom: 20px; left: 20px; background: linear-gradient(135deg, #EED284 0%, #D4AF37 100%); color: #06121E; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; z-index: 2; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); border: 1px solid rgba(255,255,255,0.3); text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
+        .cash-badge { position: absolute; bottom: 20px; left: 20px; background: linear-gradient(135deg, #EED284 0%, #D4AF37 100%); color: #06121E; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; z-index: 3; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); border: 1px solid rgba(255,255,255,0.3); text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
         
-        .media-badge { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 3; box-shadow: 0 6px 16px rgba(0,0,0,0.2); pointer-events: auto; cursor: pointer; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .media-badge { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 4; box-shadow: 0 6px 16px rgba(0,0,0,0.2); pointer-events: auto; cursor: pointer; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .media-badge:active { transform: scale(0.85); }
         .media-badge svg { width: 18px; height: 18px; fill: #06121E; }
-        .partner-badge { position: absolute; bottom: 16px; right: 16px; width: 50px; height: 50px; background: white; border-radius: 50%; padding: 4px; z-index: 2; box-shadow: 0 6px 16px rgba(0,0,0,0.2); object-fit: contain; }
+        .partner-badge { position: absolute; bottom: 16px; right: 16px; width: 50px; height: 50px; background: white; border-radius: 50%; padding: 4px; z-index: 3; box-shadow: 0 6px 16px rgba(0,0,0,0.2); object-fit: contain; }
         
         .card-content { padding: 30px; pointer-events: none; }
         .card-title { font-family: var(--font-head); font-size: 1.7rem; font-weight: 700; color: var(--text-main); margin: 0 0 8px 0; letter-spacing: -0.5px; line-height: 1.1; }
@@ -295,7 +310,7 @@
 
         /* MODAL / iPAD OS SHEET */
         .modal-wrap { position: fixed; inset: 0; z-index: 1000; background: rgba(6, 18, 30, 0); backdrop-filter: blur(0px); pointer-events: none; transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; }
-        .modal-wrap.active { background: rgba(6, 18, 30, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); pointer-events: all; }
+        .modal-wrap.active { background: rgba(6, 18, 30, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); pointer-events: all; }
         
         .modal { width: 88vw; max-width: 1000px; height: 90vh; background: #ffffff; border-radius: 40px; box-shadow: 0 50px 100px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; transform: translateY(100vh) scale(0.95); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1); position: relative; will-change: transform; }
         body.dark-theme .modal { background: #06121E; border: 1px solid rgba(255,255,255,0.1); }
@@ -303,14 +318,15 @@
         
         .modal-drag-handle { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 5px; z-index: 35; backdrop-filter: blur(5px); }
         
-        /* GHOST CLICK FIX: Enlarged target, strict event killing */
+        /* 🚨 GHOST CLICK FIX: The Close Button absolutely intercepts touch events to prevent background clicks */
         .modal-close-btn { position: absolute; top: 20px; right: 20px; width: 50px; height: 50px; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border-radius: 50%; border: none; color: #06121E; font-size: 24px; font-weight: bold; cursor: pointer; z-index: 50; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
         .modal-close-btn:active { transform: scale(0.85); background: var(--gold); color: white; }
         
-        /* LUXURY MODAL HERO: The "Apple TV" Backdrop blur effect */
+        /* LUXURY MODAL HERO: The "Apple TV" Backdrop blur effect with ZERO crop */
         .modal-hero { height: 42vh; flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; background: #000000; display: flex; justify-content: center; align-items: center; }
-        .modal-hero-blur { position: absolute; inset: -10%; background-size: cover; background-position: center; filter: blur(40px) brightness(0.4); z-index: 0; }
-        .modal-hero img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; }
+        .modal-hero-blur { position: absolute; inset: -20%; background-size: cover; background-position: center; filter: blur(30px) brightness(0.5); z-index: 0; }
+        .modal-hero img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain !important; display: block; animation: smoothPop 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes smoothPop { 0% { transform: scale(1.05); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         
         .image-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; opacity: 0; transition: opacity 0.3s; z-index: -1; }
         .image-spinner.active { opacity: 1; z-index: 2; }
@@ -349,11 +365,15 @@
         .btn-big:active { transform: scale(0.95); }
         .btn-big svg { width: 22px; height: 22px; fill: currentColor; }
         
+        /* 🚨 GALLERY ZOOM FIX: Double-layer blur so it fits perfectly 🚨 */
         .gallery-scroller { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 25px; margin-top: 30px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
         .gallery-scroller::-webkit-scrollbar { display: none; }
         .gallery-item { scroll-snap-align: start; width: 280px; height: 200px; flex-shrink: 0; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-soft); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; background: #E2E8F0; }
-        body.dark-theme .gallery-item { background: #1E293B; }
+        body.dark-theme .gallery-item { background: #06121E; }
         .gallery-item:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+        
+        .gallery-blur { position: absolute; inset: -20%; background-size: cover; background-position: center; filter: blur(20px) brightness(0.6); z-index: 0; }
+        .gallery-item img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain !important; display: block; }
 
         /* ADMIN PANEL */
         .admin-panel { position: fixed; inset: 0; z-index: 2000; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); display: none; flex-direction: column; height: 100%; width: 100%; padding-top: var(--safe-top); }
@@ -391,7 +411,7 @@
         /* 📱 DEVICE SPECIFIC RESPONSIVE OPTIMIZATIONS */
         .no-results { grid-column: 1/-1; text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 1.2rem; font-family: var(--font-body); font-weight: 600; display: none; }
 
-        /* Mobile Portrait & Small Screens */
+        /* Mobile Portrait & Small Screens (Solves Overlap Bug Completely) */
         @media (max-width: 768px) { 
             .header-top { align-items: center; } 
             .header-logo { height: 50px; max-width: 45%; margin-top: 0; }
@@ -494,13 +514,12 @@
     <div class="modal-wrap" id="detailModal">
         <div class="modal">
             <div class="modal-drag-handle"></div>
-            <!-- GHOST CLICK FIX: Explicitly pass event and stop propagation immediately -->
-            <button class="modal-close-btn" onclick="event.stopPropagation(); closeModal(event);">✕</button>
+            <!-- 🚨 GHOST CLICK FIX: Explicitly pass event and stop propagation immediately -->
+            <button class="modal-close-btn" id="modalCloseBtn" ontouchstart="closeModal(event)" onclick="closeModal(event)">✕</button>
             
             <div class="modal-hero" onclick="launchLightbox(currentGallery, 0)">
                 <!-- LUXURY APPLE TV BLUR EFFECT -->
                 <div class="modal-hero-blur" id="dImgBlur"></div>
-                
                 <img id="dImg" src="" onerror="handleImgError(this)" onload="handleImgLoad(this)">
                 <div class="image-spinner active"></div>
                 <div style="position:absolute; bottom:20px; right:20px; background:rgba(255,255,255,0.95); padding:6px 14px; border-radius:20px; color:var(--text-main); font-size:11px; font-weight:800; backdrop-filter:blur(10px); box-shadow:0 4px 16px rgba(0,0,0,0.25); letter-spacing:1px; pointer-events:none; z-index:2;">TAP TO EXPAND</div>
@@ -582,17 +601,21 @@
             input.focus();
         }
 
+        // --- GESTURE SWIPE DOWN ENGINE ---
         let dragStartY = 0;
         let dragCurrentY = 0;
         const modalEl = document.querySelector('.modal');
         const modalScrollEl = document.getElementById('modalContentScroll');
 
         modalEl.addEventListener('touchstart', e => {
+            // Ignore if touching the close button
+            if(e.target.closest('.modal-close-btn')) return;
             dragStartY = e.touches[0].clientY;
             modalEl.style.transition = 'none'; 
-        }, {passive: true});
+        }, {passive: false});
 
         modalEl.addEventListener('touchmove', e => {
+            if(dragStartY === 0) return;
             dragCurrentY = e.touches[0].clientY;
             const diff = dragCurrentY - dragStartY;
             if(diff > 0 && modalScrollEl.scrollTop <= 0) {
@@ -601,12 +624,13 @@
         }, {passive: true});
 
         modalEl.addEventListener('touchend', e => {
+            if(dragStartY === 0) return;
             modalEl.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1)'; 
             const diff = dragCurrentY - dragStartY;
-            if(diff > 150 && modalScrollEl.scrollTop <= 0) {
+            if(diff > 120 && modalScrollEl.scrollTop <= 0) {
                 closeModal();
             } else {
-                modalEl.style.transform = 'translateY(0) scale(1)';
+                modalEl.style.transform = ''; 
             }
             dragStartY = 0; dragCurrentY = 0;
         }, {passive: true});
@@ -619,9 +643,9 @@
         let currentImgIndex = 0;
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
-        // --- VERSION CONTROL BUMP: 100 --- 
+        // --- VERSION CONTROL BUMP: 200 --- 
         // GUARANTEES WIPE OF OLD PRICES AND LOADING NEW STORES
-        const DATA_VERSION = 100; 
+        const DATA_VERSION = 200; 
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -811,6 +835,9 @@
             }); 
             
             body.classList.remove('night-mode', 'dark-theme');
+            
+            const logo = document.getElementById('headerLogo');
+            if(logo) logo.classList.remove('logo-white');
 
             let phase = 'day';
             if (timeState === 0) { 
@@ -845,6 +872,7 @@
                 document.getElementById('boat').classList.add('boat-active'); 
                 document.getElementById('dolphin').classList.add('dolphin-active');
                 document.getElementById('nightGlow').classList.add('glow-active');
+                if(logo) logo.classList.add('logo-white'); 
             } else { 
                 document.getElementById('greeting').innerText = "Bon Nochi";
                 body.classList.add('night-mode', 'dark-theme');
@@ -853,6 +881,7 @@
                 document.getElementById('stars').classList.add('stars-active');
                 document.getElementById('nightGlow').classList.add('glow-active');
                 document.getElementById('fireflies').classList.add('fireflies-active');
+                if(logo) logo.classList.add('logo-white'); 
             }
             const options = { weekday: 'long', month: 'long', day: 'numeric' };
             document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('en-US', options);
@@ -925,9 +954,10 @@
                 const cleanDesc = item.desc.replace(/<[^>]*>?/gm, '');
                 const delay = index * 0.05; 
 
-                // Images now render instantly. No opacity fade.
+                // 🚨 MUSEUM DISPLAY ENGINE (100% visible images, blurred background)
                 html += `<div class="card" onclick="openDetails('${item.key}')" style="animation-delay: ${delay}s">
                     <div class="card-media">
+                        <div class="card-img-blur" style="background-image: url('${mainImg}')"></div>
                         ${logoHtml} ${mediaBadge}
                         <div class="tag-pill ${item.sub.includes('Joia') || item.sub.includes('Exclusive') ? 'highlight' : ''}">${item.sub}</div>
                         <div class="cash-badge">IBEROCASH</div>
@@ -989,14 +1019,12 @@
             const modal = document.getElementById('detailModal');
             const mainImg = document.getElementById('dImg');
             
-            // MODAL IMAGE FIX: Reset counter explicitly so images always try to load properly
             mainImg.setAttribute('data-retries', '0');
             mainImg.parentElement.classList.remove('hero-fallback');
             
             const spinner = modal.querySelector('.image-spinner');
             spinner.classList.add('active');
             
-            // Clear previous blurred background
             document.getElementById('dImgBlur').style.backgroundImage = 'none';
             
             let galleryData = [];
@@ -1070,13 +1098,16 @@
             const gal = document.getElementById('dGallery');
             let gHtml = '';
             galleryData.forEach((img, idx) => {
-                gHtml += `<div class="gallery-item" onclick="openLightboxFromThumb(this)"><img src="${img}" onerror="handleImgError(this)" loading="lazy"></div>`;
+                gHtml += `<div class="gallery-item" onclick="openLightboxFromThumb(this)">
+                    <div class="gallery-blur" style="background-image: url('${img}')"></div>
+                    <img src="${img}" onerror="handleImgError(this)" loading="lazy">
+                </div>`;
             });
             gal.innerHTML = gHtml;
             modal.classList.add('active');
             
             document.getElementById('modalContentScroll').scrollTop = 0;
-            modal.style.transform = 'translateY(0) scale(1)'; 
+            modal.style.transform = ''; 
         }
         
         async function sharePackage(key) {
@@ -1101,13 +1132,21 @@
             }
         }
 
-        // GHOST CLICK FIX
+        // 🚨 ULTIMATE GHOST CLICK FIX: Strict lockdown on event propagation and multiple taps
+        let isClosingModal = false;
         function closeModal(e) { 
-            if(e) {
-                e.preventDefault(); 
-                e.stopPropagation(); 
-            }
+            if(e) { e.preventDefault(); e.stopPropagation(); }
+            if (isClosingModal) return;
+            isClosingModal = true;
+            
+            const modal = document.querySelector('.modal');
+            modal.style.transform = 'translateY(100vh) scale(0.95)'; 
             document.getElementById('detailModal').classList.remove('active'); 
+            
+            setTimeout(() => {
+                modal.style.transform = ''; 
+                isClosingModal = false;
+            }, 500);
         }
 
         function getValidImages() {
@@ -1157,6 +1196,7 @@
         function nextFs() { currentImgIndex++; if(currentImgIndex >= currentGallery.length) currentImgIndex = 0; updateFsImage(); }
         function prevFs() { currentImgIndex--; if(currentImgIndex < 0) currentImgIndex = currentGallery.length - 1; updateFsImage(); }
 
+        // 🚨 PDF FIX: Stunning explicit gateway to open the PDF properly in iOS 🚨
         async function viewPdf(url) {
             const fs = document.getElementById('fsViewer');
             const content = document.getElementById('fsContent');
@@ -1180,11 +1220,13 @@
             }
 
             content.innerHTML = `
-                <div style="width:100%; height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch; background:#111; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                    <iframe src="${finalUrl}" style="width:100%; height:100%; border:none;"></iframe>
-                    <div style="position:fixed; bottom:40px; display:flex; gap:15px;">
-                        <a href="${finalUrl}" target="_blank" style="background:white; padding:18px 35px; border-radius:30px; color:black; text-decoration:none; font-weight:800; box-shadow:0 12px 40px rgba(0,0,0,0.5); z-index:1600; font-family:var(--font-body); letter-spacing:0.5px;">Fullscreen</a>
-                        <button onclick="closeFs()" style="background:#ff3b30; border:none; padding:18px 35px; border-radius:30px; color:white; font-weight:800; box-shadow:0 12px 40px rgba(0,0,0,0.5); z-index:1600; font-family:var(--font-body); letter-spacing:0.5px; cursor:pointer;">Close</button>
+                <div style="width:100%; height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch; background:#06121E; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 30px;">
+                    <svg viewBox="0 0 24 24" style="width:70px;height:70px;fill:var(--gold);margin-bottom:20px;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    <h2 style="color:white; font-family:var(--font-head); font-size:2.4rem; margin:0 0 10px 0; font-weight:700;">Brochure Ready</h2>
+                    <p style="color:#8898AA; font-family:var(--font-body); font-size:1.1rem; max-width:400px; margin:0 0 40px 0; font-weight:500;">For the highest quality reading experience, tap below to open the official document fullscreen.</p>
+                    <div style="display:flex; gap:15px; flex-direction:column; width:100%; max-width:300px;">
+                        <a href="${finalUrl}" target="_blank" style="background:var(--gold); padding:20px; border-radius:20px; color:#06121E; text-decoration:none; font-weight:800; box-shadow:0 12px 30px rgba(212,175,55,0.3); font-family:var(--font-body); font-size:1.1rem; letter-spacing:1px;">OPEN BROCHURE</a>
+                        <button onclick="closeFs()" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:20px; border-radius:20px; color:white; font-weight:800; box-shadow:0 12px 30px rgba(0,0,0,0.3); font-family:var(--font-body); font-size:1.1rem; letter-spacing:1px; cursor:pointer;">GO BACK</button>
                     </div>
                 </div>`;
             fs.classList.add('active');
