@@ -35,65 +35,55 @@
             else docEl.classList.add('device-desktop');
         });
 
-        // --- ULTRA-FAST BULLETPROOF IMAGE RECOVERY ---
-        // Completely rewritten for instant, synchronous swapping and strict case-sensitivity matching
+        // --- ULTRA-FAST BULLETPROOF IMAGE RECOVERY (WITH GLOBAL CACHE) ---
+        const failedImageCache = new Set(); 
+
         function handleImgError(img) {
             if (img.classList.contains('fs-image')) return;
             if (img.dataset.failed === 'true') return;
             
-            let altIndex = parseInt(img.dataset.altIndex || '0');
-            
-            // Build the recovery array only once per image
-            if (!img.dataset.alts) {
-                const origSrc = img.getAttribute('src');
-                let alts = [];
-                
-                try {
-                    const decoded = decodeURIComponent(origSrc);
-                    if (origSrc !== decoded) alts.push(decoded);
-                } catch(e) {}
-                
-                // Extension Permutations (Very common server issue)
-                if (origSrc.endsWith('.jpg')) { alts.push(origSrc.replace('.jpg', '.png')); alts.push(origSrc.replace('.jpg', '.JPG')); }
-                if (origSrc.endsWith('.png')) { alts.push(origSrc.replace('.png', '.jpg')); alts.push(origSrc.replace('.png', '.PNG')); }
-                
-                // Folder Permutations (Fixes the missing Activity images)
-                if (origSrc.includes('Activities')) alts.push(origSrc.replace('Activities', 'Activites'));
-                if (origSrc.includes('Activites')) alts.push(origSrc.replace('Activites', 'Activities'));
-                if (origSrc.includes('Rockabeach')) alts.push(origSrc.replace('Rockabeach', 'RockaBeach'));
-                if (origSrc.includes('RockaBeach')) alts.push(origSrc.replace('RockaBeach', 'Rockabeach'));
-                if (origSrc.includes('/Spa/')) alts.push(origSrc.replace('/Spa/', '/spa/'));
+            const origSrc = img.dataset.origSrc || img.src;
+            if (!img.dataset.origSrc) img.dataset.origSrc = origSrc;
 
-                // Auto-Capitalize Filename
-                const parts = origSrc.split('/');
-                if(parts.length > 1) {
-                    const filename = parts.pop();
-                    parts.push(filename.charAt(0).toUpperCase() + filename.slice(1));
-                    alts.push(parts.join('/'));
-                }
-                
-                img.dataset.alts = JSON.stringify([...new Set(alts)]);
+            if (failedImageCache.has(origSrc)) {
+                triggerFallback(img);
+                return;
             }
-            
-            const alts = JSON.parse(img.dataset.alts);
-            
-            // Instantly try the next alternative
-            if (altIndex < alts.length) {
-                img.src = alts[altIndex];
-                img.dataset.altIndex = altIndex + 1;
+
+            let retries = parseInt(img.dataset.retries || '0');
+
+            // Aggressive fallback checks to catch Marea, Spa, and case-sensitivity issues
+            const fallbacks = [
+                origSrc.replace('.jpg', '.png'),
+                origSrc.replace('.png', '.jpg'),
+                origSrc.replace('.jpg', '.JPG'),
+                origSrc.replace('Activities/', 'Activites/'), 
+                origSrc.replace('Rockabeach', 'RockaBeach'),  
+                origSrc.replace('marea_1.jpg', 'rest_marea_1.jpg'), 
+                origSrc.replace('Spa_1', 'spa_1'), 
+                decodeURIComponent(origSrc)
+            ];
+
+            if (retries < fallbacks.length) {
+                img.dataset.retries = retries + 1;
+                img.src = fallbacks[retries];
             } else {
-                // If all fail, trigger the luxury gradient fallback instantly
-                img.dataset.failed = 'true';
-                img.style.display = 'none';
-                const spinner = img.parentElement?.querySelector('.image-spinner');
-                if(spinner) spinner.classList.remove('active');
-                
-                if (img.id === 'dImg') {
-                    img.parentElement.classList.add('hero-fallback');
-                } else {
-                    const mediaContainer = img.closest('.card-media') || img.closest('.gallery-item');
-                    if (mediaContainer) mediaContainer.classList.add('card-fallback');
-                }
+                failedImageCache.add(origSrc); // Mark globally failed
+                triggerFallback(img);
+            }
+        }
+
+        function triggerFallback(img) {
+            img.dataset.failed = 'true';
+            const spinner = img.parentElement?.querySelector('.image-spinner');
+            if(spinner) spinner.classList.remove('active');
+            img.style.display = 'none';
+            
+            if (img.id === 'dImg') {
+                img.parentElement.classList.add('hero-fallback');
+            } else {
+                const mediaContainer = img.closest('.card-media') || img.closest('.gallery-item');
+                if (mediaContainer) mediaContainer.classList.add('card-fallback');
             }
         }
         
@@ -102,12 +92,10 @@
             if(spinner) spinner.classList.remove('active');
             
             img.style.display = 'block';
-            img.dataset.failed = 'false'; // Reset failure flag if an alt works
+            img.dataset.failed = 'false';
             
             if (img.id === 'dImg') {
                 img.parentElement?.classList.remove('hero-fallback');
-                const blurBg = document.getElementById('dImgBlur');
-                if(blurBg) blurBg.style.backgroundImage = `url('${img.src}')`;
             } else if (img.closest('.card-media')) {
                 const mediaContainer = img.closest('.card-media');
                 mediaContainer.classList.remove('card-fallback');
@@ -116,8 +104,6 @@
             } else if (img.closest('.gallery-item')) {
                 const mediaContainer = img.closest('.gallery-item');
                 mediaContainer.classList.remove('card-fallback');
-                const blurBg = mediaContainer.querySelector('.gallery-blur');
-                if(blurBg) blurBg.style.backgroundImage = `url('${img.src}')`;
             }
         }
     </script>
@@ -268,59 +254,47 @@
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 🚨 GRID & CARDS (THE ULTIMATE IOS "OUT OF BOX" FIX) 🚨 */
+        /* MAIN GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 35px; padding-bottom: 140px; margin-top: 30px; perspective: 1200px; }
         
         .card { 
             background: var(--glass-card-light); backdrop-filter: blur(25px) saturate(200%); -webkit-backdrop-filter: blur(25px) saturate(200%); 
-            border: 1px solid var(--glass-border); border-radius: 36px; overflow: hidden; position: relative; cursor: pointer; 
+            border: 1px solid var(--glass-border); border-radius: 36px; position: relative; cursor: pointer; 
             user-select: none; -webkit-user-select: none; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; 
             box-shadow: var(--shadow-soft); opacity: 0; animation: cardEnter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; transform-origin: center bottom;
             
-            /* Forces Safari to strictly obey the border-radius */
-            isolation: isolate; transform: translateZ(0); -webkit-mask-image: -webkit-radial-gradient(white, black);
+            overflow: hidden; isolation: isolate; transform: translateZ(0); 
+            -webkit-mask-image: -webkit-radial-gradient(white, black); mask-image: radial-gradient(white, black);
         }
         @keyframes cardEnter { from { opacity: 0; transform: translateY(40px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         
         .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-8px); border-color: rgba(212, 175, 55, 0.6); }
         .card:active { transform: scale(0.96) !important; transition: transform 0.1s; }
         
+        /* CARD MEDIA */
         .card-media { 
             height: 240px; position: relative; overflow: hidden; pointer-events: none; background: #E2E8F0; 
-            /* Double-enforcing radius for the child element guarantees no bleeding */
-            border-top-left-radius: 36px; border-top-right-radius: 36px;
+            border-top-left-radius: 36px; border-top-right-radius: 36px; isolation: isolate;
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
         }
         body.dark-theme .card-media { background: #06121E; }
         .card-media::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); z-index: 2; pointer-events: none; }
         
         .card-img-blur { position: absolute; inset: -20%; background-size: cover; background-position: center; filter: blur(25px) brightness(0.6); z-index: 0; }
         
-        .card-img-wrapper { position: absolute; inset: 0; z-index: 1; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .card-img-wrapper { position: absolute; inset: 0; z-index: 1; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; }
         .card:hover .card-img-wrapper { transform: scale(1.08); }
+        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover !important; display: block; }
         
-        /* 🚨 RESTORED TO 'COVER': The main grid images perfectly fill the box edge-to-edge 🚨 */
-        .card-img-wrapper img { 
-            width: 100%; height: 100%; object-fit: cover !important; display: block; 
-            border-top-left-radius: 36px; border-top-right-radius: 36px; /* Guaranteed Safari Corner Hack */
-        }
-        
-        /* LUXURY FALLBACK STATE FOR MISSING IMAGES */
-        .card-media.card-fallback, .hero-fallback {
-            background: linear-gradient(135deg, #06121E 0%, #1a4b78 100%) !important;
-            display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
-        }
-        .card-media.card-fallback::before, .hero-fallback::before {
-            content: ''; position: absolute; inset: -50%; background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 60%); animation: pulseGlow 6s infinite alternate;
-        }
+        /* LUXURY FALLBACK */
+        .card-media.card-fallback, .hero-fallback { background: linear-gradient(135deg, #06121E 0%, #1a4b78 100%) !important; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        .card-media.card-fallback::before, .hero-fallback::before { content: ''; position: absolute; inset: -50%; background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 60%); animation: pulseGlow 6s infinite alternate; }
         @keyframes pulseGlow { 0% { transform: scale(0.8); } 100% { transform: scale(1.2); } }
-        .card-media.card-fallback::after, .hero-fallback::after {
-            content: 'IBEROSTAR'; color: rgba(255,255,255,0.3); font-family: var(--font-head); font-weight: 700; font-size: 1.8rem; letter-spacing: 8px; z-index: 2; position: relative; background: none; text-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
+        .card-media.card-fallback::after, .hero-fallback::after { content: 'IBEROSTAR'; color: rgba(255,255,255,0.3); font-family: var(--font-head); font-weight: 700; font-size: 1.8rem; letter-spacing: 8px; z-index: 2; position: relative; background: none; text-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
         .tag-pill { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-body); color: #06121E; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 3; }
         .tag-pill.highlight { background: var(--gold); color: white; border: 1px solid rgba(255,255,255,0.4); }
         
-        /* Premium Gold Foil Iberocash Badge */
         .cash-badge { position: absolute; bottom: 20px; left: 20px; background: linear-gradient(135deg, #EED284 0%, #D4AF37 100%); color: #06121E; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; z-index: 3; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); border: 1px solid rgba(255,255,255,0.3); text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
         
         .media-badge { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 4; box-shadow: 0 6px 16px rgba(0,0,0,0.2); pointer-events: auto; cursor: pointer; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -343,23 +317,26 @@
         .modal-wrap { position: fixed; inset: 0; z-index: 1000; background: rgba(6, 18, 30, 0); backdrop-filter: blur(0px); pointer-events: none; transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; align-items: center; justify-content: center; }
         .modal-wrap.active { background: rgba(6, 18, 30, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); pointer-events: all; }
         
-        .modal { width: 88vw; max-width: 1000px; height: 90vh; background: #ffffff; border-radius: 40px; box-shadow: 0 50px 100px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; transform: translateY(100vh) scale(0.95); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1); position: relative; will-change: transform; }
+        .modal { width: 88vw; max-width: 1000px; height: 90vh; background: #ffffff; border-radius: 40px; box-shadow: 0 50px 100px rgba(0,0,0,0.4); display: flex; flex-direction: column; overflow: hidden; transform: translateY(100vh) scale(0.95); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1); position: relative; will-change: transform; isolation: isolate; -webkit-mask-image: -webkit-radial-gradient(white, black); }
         body.dark-theme .modal { background: #06121E; border: 1px solid rgba(255,255,255,0.1); }
         .modal-wrap.active .modal { transform: translateY(0) scale(1); }
         
-        .modal-drag-handle { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 5px; z-index: 35; backdrop-filter: blur(5px); }
+        /* 🚨 FULL-FRAME MODAL HERO FIX 🚨 */
+        .modal-hero { height: 45vh; flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; background: #06121E; padding: 0; margin: 0; display: block; isolation: isolate; }
+        
+        /* Bottom gradient ensures text/buttons are visible against any image */
+        .modal-hero::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); z-index: 10; pointer-events: none; }
+        
+        .modal-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover !important; display: block; z-index: 0; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .modal-hero:hover img { transform: scale(1.03); }
+        
+        .modal-drag-handle { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 40px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 5px; z-index: 35; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         
         .modal-close-btn { position: absolute; top: 20px; right: 20px; width: 50px; height: 50px; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border-radius: 50%; border: none; color: #06121E; font-size: 24px; font-weight: bold; cursor: pointer; z-index: 50; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 6px 16px rgba(0,0,0,0.2); }
         .modal-close-btn:active { transform: scale(0.85); background: var(--gold); color: white; }
         
-        /* LUXURY MODAL HERO: The "Museum Display" with contain (uncropped) */
-        .modal-hero { height: 42vh; flex-shrink: 0; position: relative; cursor: pointer; overflow: hidden; background: #000000; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        .modal-hero-blur { position: absolute; inset: -20%; background-size: cover; background-position: center; filter: blur(30px) brightness(0.5); z-index: 0; }
-        .modal-hero img { position: relative; z-index: 1; max-width: 100%; max-height: 100%; object-fit: contain !important; display: block; animation: smoothPop 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5)); border-radius: 8px; }
-        @keyframes smoothPop { 0% { transform: scale(1.05); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        
         .image-spinner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.2); border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; opacity: 0; transition: opacity 0.3s; z-index: -1; }
-        .image-spinner.active { opacity: 1; z-index: 2; }
+        .image-spinner.active { opacity: 1; z-index: 20; }
         
         .modal-content { flex: 1; padding: 40px 60px; overflow-y: auto; background: #ffffff; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; position: relative; }
         body.dark-theme .modal-content { background: #06121E; }
@@ -395,15 +372,12 @@
         .btn-big:active { transform: scale(0.95); }
         .btn-big svg { width: 22px; height: 22px; fill: currentColor; }
         
-        /* 🚨 GALLERY ZOOM FIX: Double-layer blur so it fits perfectly 🚨 */
-        .gallery-scroller { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 25px; margin-top: 30px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .gallery-scroller { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 25px; margin-top: 30px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; transition: opacity 0.4s; }
         .gallery-scroller::-webkit-scrollbar { display: none; }
-        .gallery-item { scroll-snap-align: start; width: 280px; height: 200px; flex-shrink: 0; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-soft); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; background: #E2E8F0; display: flex; align-items: center; justify-content: center; padding: 15px; }
+        .gallery-item { scroll-snap-align: start; width: 280px; height: 200px; flex-shrink: 0; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-soft); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; background: #E2E8F0; isolation: isolate; -webkit-mask-image: -webkit-radial-gradient(white, black); display: flex; align-items: center; justify-content: center; }
         body.dark-theme .gallery-item { background: #06121E; }
         .gallery-item:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
-        
-        .gallery-blur { position: absolute; inset: -20%; background-size: cover; background-position: center; filter: blur(20px) brightness(0.6); z-index: 0; }
-        .gallery-item img { position: relative; z-index: 1; max-width: 100%; max-height: 100%; object-fit: contain !important; display: block; border-radius: 8px; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3)); }
+        .gallery-item img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover !important; display: block; }
 
         /* ADMIN PANEL */
         .admin-panel { position: fixed; inset: 0; z-index: 2000; background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); display: none; flex-direction: column; height: 100%; width: 100%; padding-top: var(--safe-top); }
@@ -452,7 +426,6 @@
             .grid { grid-template-columns: 1fr; gap: 20px; padding-bottom: 120px; margin-top: 20px; } 
             .fs-nav { width: 44px; height: 44px; font-size: 24px; } .fs-prev { left: 10px; } .fs-next { right: 10px; } .fs-close { top: 20px; right: 20px; width: 44px; height: 44px; }
             
-            /* Native Apple Floating Pill Navigation */
             nav { width: calc(100% - 32px); height: 70px; padding: 0 8px; bottom: calc(16px + env(safe-area-inset-bottom)); left: 16px; top: auto; transform: none; flex-direction: row; justify-content: space-around; border-radius: 35px; gap: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.4); }
             .nav-btn { width: 50px; height: 50px; border-radius: 25px; margin-bottom: 0; margin-right: 0; flex: 1; }
             
@@ -544,14 +517,12 @@
     <div class="modal-wrap" id="detailModal">
         <div class="modal">
             <div class="modal-drag-handle"></div>
-            <!-- 🚨 GHOST CLICK FIX: Explicitly pass event and stop propagation immediately -->
             <button class="modal-close-btn" id="modalCloseBtn" ontouchstart="closeModal(event)" onclick="closeModal(event)">✕</button>
             
             <div class="modal-hero" onclick="launchLightbox(currentGallery, 0)">
-                <div class="modal-hero-blur" id="dImgBlur"></div>
                 <img id="dImg" src="" onerror="handleImgError(this)" onload="handleImgLoad(this)">
                 <div class="image-spinner active"></div>
-                <div style="position:absolute; bottom:20px; right:20px; background:rgba(255,255,255,0.95); padding:6px 14px; border-radius:20px; color:var(--text-main); font-size:11px; font-weight:800; backdrop-filter:blur(10px); box-shadow:0 4px 16px rgba(0,0,0,0.25); letter-spacing:1px; pointer-events:none; z-index:2;">TAP TO EXPAND</div>
+                <div style="position:absolute; bottom:20px; right:20px; background:rgba(255,255,255,0.95); padding:6px 14px; border-radius:20px; color:var(--text-main); font-size:11px; font-weight:800; backdrop-filter:blur(10px); box-shadow:0 4px 16px rgba(0,0,0,0.25); letter-spacing:1px; pointer-events:none; z-index:20;">TAP TO EXPAND</div>
             </div>
             
             <div class="modal-content" id="modalContentScroll">
@@ -630,7 +601,7 @@
             input.focus();
         }
 
-        // --- GESTURE SWIPE DOWN ENGINE ---
+        // --- GESTURE SWIPE DOWN ENGINE (Polished for stability) ---
         let dragStartY = 0;
         let dragCurrentY = 0;
         const modalEl = document.querySelector('.modal');
@@ -671,7 +642,8 @@
         let currentImgIndex = 0;
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
 
-        const DATA_VERSION = 200; 
+        // --- DATA BUMP 205: Forces updated image paths ---
+        const DATA_VERSION = 205; 
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -712,6 +684,7 @@
                 }
             });
 
+            // STRICT LOGIC: 3 Taps to Toggle In-House / Off-Site modes
             let titleTaps = 0;
             document.getElementById('pageTitle').addEventListener('click', function() {
                 titleTaps++;
@@ -729,6 +702,110 @@
             });
         };
         
+        async function forceOfflineCache() {
+            const btn = document.getElementById('preloadBtn');
+            const status = document.getElementById('cacheStatus');
+            btn.disabled = true;
+            status.innerText = "Scanning full database...";
+            
+            let allUrls = [];
+            
+            const getSwaps = (url) => {
+                const decodedUrl = decodeURIComponent(url);
+                const arr = [url];
+                if(decodedUrl !== url) arr.push(decodedUrl); 
+                
+                if(url.endsWith('.jpg')) arr.push(url.replace('.jpg', '.png'));
+                if(url.endsWith('.png')) arr.push(url.replace('.png', '.jpg'));
+                
+                const parts = url.split('/');
+                const file = parts.pop();
+                if(file && file.length > 0) {
+                     const capitalFile = file.charAt(0).toUpperCase() + file.slice(1);
+                     if(capitalFile !== file) {
+                        parts.push(capitalFile);
+                        arr.push(parts.join('/'));
+                     }
+                     const lowerFile = file.toLowerCase();
+                     if(lowerFile !== file) {
+                        parts.pop(); 
+                        const lowerParts = url.split('/');
+                        lowerParts.pop();
+                        lowerParts.push(lowerFile);
+                        arr.push(lowerParts.join('/'));
+                     }
+                }
+                
+                if(url.includes('/Spa/')) arr.push(url.replace('/Spa/', '/spa/'));
+                if(url.includes('Activites')) arr.push(url.replace('Activites', 'Activities'));
+                
+                return arr;
+            };
+
+            Object.values(appData).forEach(item => {
+                if(item.img) allUrls.push(...getSwaps(item.img));
+                if(item.gallery) item.gallery.forEach(g => allUrls.push(...getSwaps(g)));
+                if(item.partnerLogo) allUrls.push(...getSwaps(item.partnerLogo));
+                
+                if (item.imageCount && item.imageCount > 0) {
+                    const mainSrc = item.img || (item.gallery ? item.gallery[0] : '');
+                    if (mainSrc) {
+                        const lastUnderscore = mainSrc.lastIndexOf('_');
+                        const lastDot = mainSrc.lastIndexOf('.');
+                        if (lastUnderscore > -1 && lastDot > -1) {
+                            const prefix = mainSrc.substring(0, lastUnderscore + 1); 
+                            const ext = mainSrc.substring(lastDot); 
+                            for (let i = 1; i <= item.imageCount; i++) {
+                                const generatedUrl = prefix + i + ext;
+                                allUrls.push(...getSwaps(generatedUrl));
+                            }
+                        }
+                    }
+                }
+                
+                if(item.pdf) allUrls.push(item.pdf);
+                if(item.video) allUrls.push(item.video); 
+            });
+            
+            allUrls.push('Logos/logo_club.png');
+            allUrls.push('Logos/logo_club.png.png');
+            
+            allUrls = [...new Set(allUrls)]; 
+
+            let loaded = 0;
+            const total = allUrls.length;
+            
+            const cache = await caches.open('ib-aruba-v1');
+            
+            status.innerText = `Downloading 0 / ${total}...`;
+            
+            for (const url of allUrls) {
+                try {
+                    await cache.add(url);
+                    loaded++;
+                    status.innerText = `Cached ${loaded} / ${total}`;
+                } catch (e) {
+                    loaded++; 
+                    status.innerText = `Cached ${loaded} / ${total} (Skip)`;
+                }
+            }
+            
+            status.innerText = "✅ All content (incl. PDFs & Videos) cached!";
+            btn.disabled = false;
+        }
+
+        async function clearOfflineCache() {
+            if ('caches' in window) {
+                try {
+                    await caches.delete('ib-aruba-v1');
+                    document.getElementById('cacheStatus').innerText = "🗑️ Cache cleared successfully!";
+                    showToast("Cache Cleared");
+                } catch(e) {
+                    document.getElementById('cacheStatus').innerText = "Error clearing cache.";
+                }
+            }
+        }
+
         function toggleTimeMode() {
             timeState++;
             if(timeState > 4) timeState = 0;
@@ -849,8 +926,13 @@
             
             let itemsToShow = Object.keys(appData).map(key => ({ key, ...appData[key] })).filter(i => i.type === type);
             
-            if (type === 'fun' && inHouseMode) {
-                itemsToShow = itemsToShow.filter(i => i.sub && i.sub.toLowerCase().includes('red sail'));
+            // 🚨 STRICT BUSINESS LOGIC: Offsite = Rockabeach, In-House = Red Sail 🚨
+            if (type === 'fun') {
+                if (inHouseMode) {
+                    itemsToShow = itemsToShow.filter(i => i.sub && i.sub.toLowerCase().includes('red sail'));
+                } else {
+                    itemsToShow = itemsToShow.filter(i => i.sub && i.sub.toLowerCase().includes('rocka'));
+                }
             }
             
             itemsToShow.forEach((item, index) => {
@@ -867,8 +949,9 @@
 
                 const cleanDesc = item.desc.replace(/<[^>]*>?/gm, '');
                 const delay = index * 0.05; 
+                
+                const imgLoadingParams = index < 6 ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"';
 
-                // 🚨 LAZY LOADING REMOVED: Instant load enabled for lightning speed rendering
                 html += `<div class="card" onclick="openDetails('${item.key}')" style="animation-delay: ${delay}s">
                     <div class="card-media">
                         <div class="card-img-blur" style="background-image: url('${mainImg}')"></div>
@@ -876,7 +959,7 @@
                         <div class="tag-pill ${item.sub.includes('Joia') || item.sub.includes('Exclusive') ? 'highlight' : ''}">${item.sub}</div>
                         <div class="cash-badge">IBEROCASH</div>
                         <div class="card-img-wrapper">
-                            <img src="${mainImg}" onerror="handleImgError(this)" fetchpriority="high">
+                            <img src="${mainImg}" onerror="handleImgError(this)" ${imgLoadingParams}>
                         </div>
                     </div>
                     <div class="card-content">
@@ -928,10 +1011,15 @@
             if(visibleCount === 0) noRes.style.display = 'block'; else noRes.style.display = 'none';
         }
 
+        // 🚨 ZERO-LAG MODAL ENGINE: Fast UI update, delayed heavy asset loading
         function openDetails(key) {
             const item = appData[key];
             const modal = document.getElementById('detailModal');
             const mainImg = document.getElementById('dImg');
+            
+            // Instantly clear heavy items to free up main thread
+            document.getElementById('dGallery').innerHTML = '';
+            document.getElementById('modalContentScroll').scrollTop = 0;
             
             mainImg.setAttribute('data-retries', '0');
             mainImg.dataset.failed = 'false';
@@ -939,8 +1027,6 @@
             
             const spinner = modal.querySelector('.image-spinner');
             spinner.classList.add('active');
-            
-            document.getElementById('dImgBlur').style.backgroundImage = 'none';
             
             let galleryData = [];
             if (item.imageCount && item.imageCount > 0) {
@@ -1010,19 +1096,23 @@
 
             actBar.innerHTML = actionButtons;
 
-            const gal = document.getElementById('dGallery');
-            let gHtml = '';
-            galleryData.forEach((img, idx) => {
-                gHtml += `<div class="gallery-item" onclick="openLightboxFromThumb(this)">
-                    <div class="gallery-blur" style="background-image: url('${img}')"></div>
-                    <img src="${img}" onerror="handleImgError(this)">
-                </div>`;
-            });
-            gal.innerHTML = gHtml;
+            // Trigger Animation First
+            modal.style.transform = ''; 
             modal.classList.add('active');
             
-            document.getElementById('modalContentScroll').scrollTop = 0;
-            modal.style.transform = ''; 
+            // Wait for 60fps animation to end, then load heavy gallery
+            setTimeout(() => {
+                const gal = document.getElementById('dGallery');
+                let gHtml = '';
+                galleryData.forEach((img, idx) => {
+                    gHtml += `<div class="gallery-item" onclick="openLightboxFromThumb(this)">
+                        <img src="${img}" onerror="handleImgError(this)" loading="lazy" decoding="async">
+                    </div>`;
+                });
+                gal.innerHTML = gHtml;
+                gal.style.opacity = '0';
+                setTimeout(() => gal.style.opacity = '1', 50); 
+            }, 450); 
         }
         
         async function sharePackage(key) {
@@ -1145,7 +1235,7 @@
             fs.classList.add('active');
         }
 
-        // 🚨 UPGRADED VIDEO PLAYER WITH LOADING SPINNER 🚨
+        // 🚨 BULLETPROOF VIDEO PLAYER FIX (iOS Specific Tags Added) 🚨
         function viewVideo(url) {
             const fs = document.getElementById('fsViewer');
             const content = document.getElementById('fsContent');
@@ -1154,24 +1244,47 @@
             document.getElementById('fsCaption').style.display = 'none';
             document.getElementById('fsBackdrop').style.backgroundImage = 'none';
             
+            // iPad/iOS completely ignores videos without webkit-playsinline and muted
             content.innerHTML = `
-                <div style="width:100%; height:100%; padding: 40px; display:flex; align-items:center; justify-content:center; background:#000; position:relative;">
+                <div style="width:100%; height:100%; padding: 40px; display:flex; align-items:center; justify-content:center; background:#000; position: relative;" id="vidContainer">
                     <div class="image-spinner active" id="vidSpinner" style="z-index: 10;"></div>
-                    <video id="fsVideo" controls playsinline autoplay style="width:100%; height:100%; max-height:85vh; border-radius:16px; box-shadow:0 30px 60px rgba(0,0,0,0.8); background: #06121E; opacity: 0; transition: opacity 0.5s;">
+                    <video id="fsVideo" controls playsinline webkit-playsinline autoplay muted preload="metadata" style="width:100%; height:100%; max-height:85vh; border-radius:16px; box-shadow:0 30px 60px rgba(0,0,0,0.8); background: #06121E; opacity: 0; transition: opacity 0.5s;">
                         <source src="${url}" type="video/mp4">
-                        Your browser does not support HTML5 video.
                     </video>
                 </div>`;
-            
+            fs.classList.add('active');
+
             const vid = document.getElementById('fsVideo');
-            vid.addEventListener('playing', () => {
-                document.getElementById('vidSpinner').style.display = 'none';
+            const spin = document.getElementById('vidSpinner');
+            const container = document.getElementById('vidContainer');
+            
+            vid.addEventListener('canplay', () => {
+                if(spin) spin.style.display = 'none';
                 vid.style.opacity = '1';
             });
-            fs.classList.add('active');
+            vid.addEventListener('waiting', () => { if(spin) spin.style.display = 'block'; });
+            vid.addEventListener('playing', () => { if(spin) spin.style.display = 'none'; });
+            
+            vid.addEventListener('error', () => {
+                if(spin) spin.style.display = 'none';
+                
+                // Extremely robust error UI to give the user an alternative option if .mp4 fails
+                const altUrl = url.replace('.mp4', '.MOV');
+                container.innerHTML = `
+                    <div style="text-align:center; color:white; font-family:var(--font-body);">
+                        <svg viewBox="0 0 24 24" style="width:50px;height:50px;fill:#ff3b30;margin-bottom:15px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <h2 style="margin-bottom:10px;">Video Format Issue</h2>
+                        <p style="color:#8898AA; margin-bottom:30px; max-width: 400px; margin-left: auto; margin-right: auto;">The iPad could not process this video file format, or the file is missing from the server.</p>
+                        <button onclick="document.getElementById('fsVideo').src='${altUrl}'; this.innerText='Trying .MOV...'" style="padding:15px 30px; background:var(--gold); border-radius:15px; border:none; color:#06121E; font-weight:bold; cursor:pointer; margin-bottom:15px; width: 100%;">Try Alternate Format</button>
+                        <br>
+                        <button onclick="closeFs()" style="padding:15px 30px; background:rgba(255,255,255,0.1); border-radius:15px; border:none; color:white; font-weight:bold; cursor:pointer; width: 100%;">Close Player</button>
+                    </div>`;
+            });
+            
+            // Timeout escape hatch so spinner never gets stuck forever
+            setTimeout(() => { if(spin) spin.style.display = 'none'; }, 8000);
         }
         
-        // 🚨 MEMORY LEAK FIX: Fully kills the video element instantly upon closing the Lightbox
         function closeFs() {
             const fs = document.getElementById('fsViewer');
             fs.classList.remove('active');
@@ -1182,7 +1295,6 @@
             setTimeout(() => document.getElementById('fsContent').innerHTML = '', 300);
         }
 
-        // Admin features
         let tapCount = 0;
         document.getElementById('headerLogo').addEventListener('click', function() {
             tapCount++;
@@ -1300,7 +1412,7 @@
             showToast('Data Copied!');
         }
 
-        // --- CORE DATABASE WITH CLEAN PRICING ---
+        // --- CORE DATABASE ---
         const defaultData = {
             // CLUBS
             'Joia': { type:'club', title: 'Iberostar Joia', sub: 'Eagle Beach', desc: 'Experience the crown jewel of Aruba. Located on the pristine shores of Eagle Beach, Joia is an adults-only haven offering butler service, swim-up suites, and a level of exclusivity that redefines Caribbean luxury.', gallery: ['Hotels/Joia/hotel_joia_1.jpg', 'Hotels/Joia/hotel_joia_2.jpg', 'Hotels/Joia/hotel_joia_3.jpg'], video: 'Hotels/Joia/hotel_joia.mp4', imageCount: 10 },
@@ -1315,7 +1427,7 @@
             // STORE
             'ArubaAloe': { type:'store', title: 'Aruba Aloe', sub: 'Local Skincare & Gifts', desc: 'Discover the healing power of Aruban Aloe. Founded in 1890, Aruba Aloe is one of the oldest aloe companies in the world, offering premium sun care, lotions, and locally made gifts perfect for bringing a piece of Aruba home.', gallery: ['Stores/Aloe/store_aloe_1.jpg'], pdf: '', imageCount: 5 },
 
-            // FUN - PRICING COMPLETELY RE-DESIGNED TO LOOK PROFESSIONAL
+            // FUN - STRICTLY ROCKA BEACH (OFFSITE) OR RED SAIL (IN-HOUSE)
             'RedSailSail': { 
                 type:'fun', title: 'Luxury Catamaran Sail', sub: 'Red Sail Sports Aruba', 
                 desc: 'Experience the beautiful Caribbean waters aboard a luxury catamaran. Includes premium snorkeling stops at the famous Antilla shipwreck and vibrant coral reefs, complete with an open bar and snacks. <div class="price-box"><div class="price-row"><span>Adult Ticket</span><strong>$107.00</strong></div><div class="price-row"><span>Child Ticket</span><strong>$65.00</strong></div></div>',
@@ -1350,15 +1462,6 @@
                 imageCount: 10,
                 pdf: 'Activities/Rockabeach/brochure_jeep.pdf'
             },
-            'Sail': { 
-                type:'fun', title: 'Tropical Sailing Adventures', sub: 'Tropical Sailing', 
-                desc: 'Luxury catamaran sailing. Snorkeling, sunset dinners, and private charters. <div class="price-box"><div class="price-row"><span>Adult (Non-Private)</span><strong>$135.00</strong></div><div class="price-row"><span>Child (Non-Private)</span><strong>$75.00</strong></div><div class="price-row"><span>Private Charters</span><strong>From $200/hr</strong></div></div>', 
-                gallery: ['Activities/Rockabeach/act_sail_1.jpg'], partnerLogo: 'Logos/logo_rocka.png',
-                duration: '3-4 Hours', time: '9:00 AM & 3:00 PM',
-                itinerary: ['Antilla Shipwreck', 'Boca Catalina', 'Spanish Lagoon (Dinner Sail)'],
-                essentials: ['Swimwear', 'Towel', 'Sunscreen'],
-                imageCount: 10
-            },
             'GoKart': { 
                 type:'fun', title: 'Bushiri Karting Speedway', sub: 'Rocka Beach Tours', 
                 desc: 'Outdoor karting experience including 3 races (Practice, Lap Position, Final Race). <div class="price-box"><div class="price-row"><span>Race Experience (Adult)</span><strong>$85.00</strong></div><div class="price-row"><span>Race Experience (Child)</span><strong>$60.00</strong></div><div class="price-row"><span>Arrive & Drive</span><strong>$25.00</strong></div></div>', 
@@ -1384,11 +1487,11 @@
                 imageCount: 5 
             },
 
-            // SPA
+            // SPA (PATHS FIXED)
             'SpaPromo': { type:'spa', title: 'Swedish Massage (50min)', sub: 'Complimentary Voucher', desc: 'Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.', gallery: ['Spa/Promo/massage_1.jpg'], pdf: '', duration: '50 Minutes', essentials: ['Arrive 15min early'], imageCount: 5 },
-            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/Spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 20 },
+            'SpaMain': { type:'spa', title: 'Spa Sensations', sub: 'Joia Aruba • Wellness', desc: 'A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.', gallery: ['Spa/General/spa_1.jpg'], pdf: 'Spa/General/menu_spa.pdf', imageCount: 20 },
 
-            // FOOD
+            // FOOD (MAREA PATH FIXED)
             'Giannis': { type:'food', title: 'Gianni\'s Ristorante', sub: 'Italian', desc: 'Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.', gallery: ["Restaurants/Gianni's Ristorante/rest_giannis_1.jpg"], pdf: "Restaurants/Gianni's Ristorante/menu_giannis.pdf", imageCount: 20 },
             'Daniels': { type:'food', title: 'Daniel\'s Steak & Chop', sub: 'Steakhouse', desc: 'Premium Certified Angus Beef and wood-fired chops. A classic steakhouse experience with a rustic touch, perfect for meat lovers seeking quality cuts.', gallery: ["Restaurants/Daniel's Steak & Chop/rest_daniels_1.jpg"], pdf: "Restaurants/Daniel's Steak & Chop/menu_daniels.pdf", imageCount: 20 },
             'Gaya': { type:'food', title: 'Gaya Restaurant', sub: 'Joia Aruba • Fine Dining', desc: 'An immersive culinary journey featuring world-class gastronomy. Gaya offers an elegant atmosphere paired with innovative flavors designed to delight the senses and elevate your dining experience.', gallery: ['Restaurants/Gaya/rest_gaya_1.jpg'], pdf: 'Restaurants/Gaya/menu_gaya.pdf', imageCount: 5 },
