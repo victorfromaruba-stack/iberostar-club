@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="shortcut icon" href="Logos/app_logo_club.png?v=200" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Iberostar Aruba — Admin</title>
+    <style>
+        body { overflow: auto; background: linear-gradient(150deg, #95BFE0 0%, #1D5C8A 100%); }
+        #gateScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        #gateCard { background: rgba(255,255,255,0.97); border-radius: 28px; padding: 40px; max-width: 380px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        #gateCard h1 { font-family: var(--font-head); font-size: 1.8rem; margin: 0 0 8px 0; color: #06121E; }
+        #gateCard p { color: #4A5D70; font-size: 0.95rem; margin: 0 0 24px 0; }
+        #gateError { display: none; color: #d32f2f; font-weight: 700; font-size: 0.9rem; margin-top: 12px; }
+        .admin-back { color: var(--gold); text-decoration: none; font-weight: 700; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+
+    <div id="modeToast" role="status" aria-live="polite">Mode: Auto</div>
+
+    <div id="gateScreen">
+        <div id="gateCard">
+            <h1>Staff Access</h1>
+            <p>This page edits live content for the Iberostar Aruba guest app. Enter the staff password to continue.</p>
+            <form id="gateForm">
+                <div class="form-group">
+                    <label for="gatePassword">Password</label>
+                    <input type="password" id="gatePassword" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn-admin" style="width:100%;">Unlock</button>
+                <div id="gateError" role="alert">Incorrect password.</div>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-panel" id="adminContent" style="position: static; height: auto; min-height: 100vh; backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255,255,255,0.7);">
+        <div class="admin-header">
+            <h3>Admin Editor</h3>
+            <div>
+                <button class="btn-admin" onclick="exportData()">Copy Code</button>
+                <a class="admin-back" href="index.html" style="margin-left:20px;">← Back to App</a>
+            </div>
+        </div>
+        <div class="admin-body">
+            <div class="admin-card" style="border: 2px solid #D4AF37;">
+                <h4 style="margin-top:0; color:#06121E; font-family:var(--font-head);">Super Cache (Offline Prep)</h4>
+                <p style="font-size:1.05rem; color:#4A5D70; margin-bottom:20px; font-weight:500;">Downloads all current images, PDFs, and videos into the browser's offline cache.</p>
+                <div style="display:flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn-big btn-primary" id="preloadBtn" onclick="forceOfflineCache()" style="flex: 1;">Cache Everything</button>
+                    <button class="btn-big" onclick="clearOfflineCache()" style="color:#ff3b30; flex: 1;">Clear Cache</button>
+                </div>
+                <div id="cacheStatus" style="margin-top:15px; font-weight:800; color:#06121E; text-align:center;" role="status" aria-live="polite"></div>
+            </div>
+
+            <div class="admin-card">
+                <h4 style="margin-top:0; color:#06121E; font-family:var(--font-head);">Edit Existing Items</h4>
+                <div id="itemListContainer"></div>
+            </div>
+            <div class="admin-card">
+                <h4 style="margin-top:0; color:#06121E; font-family:var(--font-head);">Add / Update Item</h4>
+                <p style="font-size:0.9rem; color:#4A5D70; margin-top:-10px;">Changes here save to this browser only. Use "Copy Code" and paste the result into <code>js/data.js</code> to make them permanent for every visitor.</p>
+                <div class="form-group"><label for="newType">Type</label><select id="newType"><option value="food">Restaurant</option><option value="fun">Activity</option><option value="club">Hotel/Club</option><option value="spa">Spa &amp; Wellness</option><option value="golf">Golf &amp; Nature</option><option value="store">Store / Retail</option></select></div>
+                <div class="form-group"><label for="newKey">ID</label><input type="text" id="newKey" placeholder="e.g. MyNewItem"></div>
+                <div class="form-group"><label for="newTitle">Title</label><input type="text" id="newTitle"></div>
+                <div class="form-group"><label for="newSub">Subtitle</label><input type="text" id="newSub"></div>
+                <div class="form-group"><label for="newPartnerLogo">Partner Logo</label><input type="text" id="newPartnerLogo"></div>
+                <div class="form-group"><label for="newDesc">Description</label><textarea id="newDesc" rows="5"></textarea></div>
+                <div class="form-group"><label for="newDuration">Duration</label><input type="text" id="newDuration"></div>
+                <div class="form-group"><label for="newTime">Departure</label><input type="text" id="newTime"></div>
+                <div class="form-group"><label for="newItinerary">Itinerary</label><textarea id="newItinerary" rows="3"></textarea></div>
+                <div class="form-group"><label for="newEssentials">Essentials</label><textarea id="newEssentials" rows="3"></textarea></div>
+                <div class="form-group"><label for="newGallery">Gallery (comma-separated real file paths)</label><textarea id="newGallery" rows="3"></textarea></div>
+                <div class="form-group"><label for="newFile">PDF/Video Path</label><input type="text" id="newFile" placeholder="e.g. Restaurants/Name/menu.pdf"></div>
+                <div style="display:flex; gap:15px; margin-top:30px;"><button class="btn-admin" onclick="saveItem()">Save</button><button class="btn-admin" style="background:#d32f2f;" onclick="deleteItem()">Delete</button><button class="btn-admin" style="background:#8e8e93;" onclick="clearForm()">Clear</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/data.js" defer></script>
+    <script src="js/admin.js" defer></script>
+</body>
+</html>
