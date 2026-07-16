@@ -90,8 +90,18 @@ const defaultData = {
         "title": "Aruba Aloe",
         "sub": "Local Skincare & Gifts",
         "desc": "Discover the healing power of Aruban Aloe. Founded in 1890, Aruba Aloe is one of the oldest aloe companies in the world, offering premium sun care, lotions, and locally made gifts perfect for bringing a piece of Aruba home.",
-        "gallery": [],
-        "pdf": ""
+        "gallery": [
+            "assets/Store/ArubaAloe/store_aloe_1.jpg",
+            "assets/Store/ArubaAloe/store_aloe_2.jpg",
+            "assets/Store/ArubaAloe/store_aloe_3.jpg",
+            "assets/Store/ArubaAloe/store_aloe_4.jpg",
+            "assets/Store/ArubaAloe/store_aloe_5.jpg",
+            "assets/Store/ArubaAloe/store_aloe_6.jpg",
+            "assets/Store/ArubaAloe/store_aloe_7.jpg",
+            "assets/Store/ArubaAloe/store_aloe_8.jpg",
+            "assets/Store/ArubaAloe/store_aloe_9.jpg",
+            "assets/Store/ArubaAloe/store_aloe_10.jpg"
+        ]
     },
     "MoreRetail": {
         "type": "store",
