@@ -115,61 +115,37 @@ const defaultData = {
         "type": "fun",
         "title": "UTV & ATV Adventure Tours",
         "sub": "Rocka Beach Tours",
-        "desc": "Guided off-road safari. Explore the wild side of Aruba. <div class=\"price-box\"><div class=\"price-row\"><span>ATV Single</span><strong>$160.00</strong></div><div class=\"price-row\"><span>ATV Double</span><strong>$200.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater</span><strong>$480.00</strong></div></div>",
+        "desc": "Guided off-road safari to Aruba's wild north coast. Includes water, snacks, and a professional tour guide. <div class=\"price-box\"><div class=\"price-row\"><span>ATV Single</span><strong>$160.00</strong></div><div class=\"price-row\"><span>ATV Double</span><strong>$200.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater</span><strong>$480.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_utv_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4 Hours",
-        "time": "Morning: 9:30 AM | Afternoon: 2:30 PM",
+        "time": "Morning: 9:30 AM–1:30 PM | Afternoon: 2:30–6:30 PM",
         "itinerary": [
             "Black Stone Beach",
             "3 Bridges",
+            "Andicuri Beach (pass by)",
             "Baby Bridge",
-            "Bushiribana Gold Ruins",
-            "Wariruri Beach",
+            "Bushiribana Goldmill Ruins",
+            "Wariruri Bridge (pass by)",
             "California Lighthouse",
-            "Secret Beach"
+            "Secret Beach (cliff jumping)"
         ],
         "essentials": [
-            "Valid Drivers License",
+            "Valid Driver's License",
             "Sunblock",
             "Sunglasses",
             "Bandana",
-            "Old clothes"
-        ]
-    },
-    "Jeep": {
-        "type": "fun",
-        "title": "Jeep Safari Adventure",
-        "sub": "Rocka Beach Tours",
-        "desc": "Explore Arikok National Park in open-air Land Rovers. Visit breathtaking caves and natural pools. <div class=\"price-box\"><div class=\"price-row\"><span>Adult (Tour A)</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (Tour A)</span><strong>$75.00</strong></div><div class=\"price-row\"><span>Adult (Tour B)</span><strong>$115.00</strong></div><div class=\"price-row\"><span>Child (Tour B)</span><strong>$85.00</strong></div></div>",
-        "gallery": [
-            "assets/Activities/Rockabeach/act_jeep_1.jpg"
-        ],
-        "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "4-6 Hours",
-        "time": "Pickups start 8:15 AM",
-        "itinerary": [
-            "Natural Pool",
-            "Fontein Cave",
-            "Boca Prins",
-            "3 Bridges",
-            "Natural Bridge",
-            "Baby Beach (Tour A)"
-        ],
-        "essentials": [
-            "Swimwear",
-            "Towel",
-            "Sunscreen",
-            "Camera"
+            "Old clothes",
+            "Optional: +$20 for lunch or dinner & a drink"
         ]
     },
     "GoKart": {
         "type": "fun",
         "title": "Bushiri Karting Speedway",
         "sub": "Rocka Beach Tours",
-        "desc": "Outdoor karting experience including 3 races (Practice, Lap Position, Final Race). <div class=\"price-box\"><div class=\"price-row\"><span>Race Experience (Adult)</span><strong>$85.00</strong></div><div class=\"price-row\"><span>Race Experience (Child)</span><strong>$60.00</strong></div><div class=\"price-row\"><span>Arrive & Drive</span><strong>$25.00</strong></div></div>",
+        "desc": "Outdoor karting at Bushiri Karting Speedway: a safety briefing, 1 practice race, 1 lap-position race, and 1 final race, with medals and champagne for the winners. Hotel pickup/drop-off, water, and snacks included. <div class=\"price-box\"><div class=\"price-row\"><span>Race Experience (Adult)</span><strong>$85.00</strong></div><div class=\"price-row\"><span>Race Experience (Child)</span><strong>$60.00</strong></div><div class=\"price-row\"><span>Arrive & Drive (Adult)</span><strong>$25.00</strong></div><div class=\"price-row\"><span>Arrive & Drive (Child)</span><strong>$25.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_gokart_1.jpg"
         ],
@@ -177,40 +153,42 @@ const defaultData = {
         "duration": "2 Hours",
         "time": "3:30 PM - 5:30 PM",
         "essentials": [
-            "Closed Toe Shoes Required"
+            "Closed-toe shoes required",
+            "Junior drivers (8-15) must be accompanied by a parent/guardian (18+)"
         ]
     },
     "Rentals": {
         "type": "fun",
         "title": "UTV & ATV Rentals",
         "sub": "Rocka Beach Tours",
-        "desc": "Freedom to explore at your own pace. Security Deposit: $500 per vehicle required. <div class=\"price-box\"><div class=\"price-row\"><span>UTV 2-Seater (4 hr)</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater (8 hr)</span><strong>$275.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (4 hr)</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (8 hr)</span><strong>$320.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (4 hr)</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (8 hr)</span><strong>$395.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (4 hr)</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (8 hr)</span><strong>$435.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (4 hr)</span><strong>$480.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (8 hr)</span><strong>$495.00</strong></div></div>",
+        "desc": "Freedom to explore at your own pace — ATV & UTV drop-off and pickup available at all hotels. Security Deposit: $500 per vehicle required. <div class=\"price-box\"><div class=\"price-row\"><span>UTV 2-Seater (4 hr)</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater (8 hr)</span><strong>$275.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (4 hr)</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (8 hr)</span><strong>$320.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (4 hr)</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (8 hr)</span><strong>$395.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (4 hr)</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (8 hr)</span><strong>$435.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (4 hr)</span><strong>$480.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (8 hr)</span><strong>$495.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_rentals_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4 or 8 Hours",
         "essentials": [
-            "Valid Drivers License (18+)"
+            "Valid Driver's License",
+            "Minimum driver age: 18"
         ]
     },
     "HalfIsland": {
         "type": "fun",
         "title": "Beach Bus Adventure",
         "sub": "Rocka Beach Tours",
-        "desc": "Fun 4-hour tour visiting key landmarks and beaches across the island. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$65.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$42.00</strong></div></div>",
+        "desc": "Full-day tour visiting key landmarks and beaches across the island, with an optional lunch or dinner add-on. <div class=\"price-box\"><div class=\"price-row\"><span>Adult (13+)</span><strong>$65.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$42.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_half_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "4 Hours",
-        "time": "10:00 AM - 2:00 PM",
+        "duration": "7 Hours",
+        "time": "10:00 AM – 5:00 PM | Pickup: 9:30–9:50 AM",
         "itinerary": [
             "California Lighthouse",
-            "Alto Vista Chapel",
+            "Oldest Chapel",
             "Casibari Rock Formation",
             "Natural Bridge",
-            "Arashi Beach"
+            "Bushiribana Gold Mine"
         ]
     },
     "SailingCoralSunset": {
@@ -265,16 +243,18 @@ const defaultData = {
     },
     "SailingNonPrivate": {
         "type": "fun",
-        "title": "Shared Sailing & Snorkel Tour",
+        "title": "Tropical Sailing Experience",
         "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
-        "desc": "A non-private (shared) sailing and snorkel outing — join other guests aboard rather than booking the boat exclusively. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$135.00</strong></div><div class=\"price-row\"><span>Child</span><strong>$75.00</strong></div></div>",
+        "desc": "A 4-hour sailing and snorkeling outing starting with a fruit bowl, then a BBQ lunch or BBQ sunset dinner with premium open bar. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$135.00</strong></div><div class=\"price-row\"><span>Child</span><strong>$75.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_sail_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "essentials": [
             "Notify us in advance of any food allergies or dietary needs"
-        ]
+        ],
+        "duration": "4 Hours",
+        "time": "9:00 AM – 1:00 PM or 3:00 PM – 7:00 PM"
     },
     "SpaPromo": {
         "type": "spa",
@@ -498,5 +478,90 @@ const defaultData = {
             "assets/Restaurants/Screaming Eagle/rest_screaming_5.jpg"
         ],
         "pdf": "assets/Restaurants/Screaming Eagle/menu_screaming.pdf"
+    },
+    "JeepTourA": {
+        "type": "fun",
+        "title": "Jeep Tour A: Natural Pool, Caves & Baby Beach",
+        "sub": "Rocka Beach Tours",
+        "desc": "Open-air Jeep safari to the island's natural pools and caves, with park entry included. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$75.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_jeep_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "5-6 Hours",
+        "time": "Pickup: 8:15–8:30 AM (Highrise) | 8:30–8:45 AM (Lowrise)",
+        "itinerary": [
+            "Natural Pool",
+            "Fontein Cave",
+            "Quadirikiri Cave",
+            "Boca Prins",
+            "Red Anchor / Baby Beach",
+            "San Nicolas Art City"
+        ],
+        "essentials": [
+            "Swimwear",
+            "Towel",
+            "Sunscreen",
+            "Camera",
+            "Park entry included",
+            "Optional: +$20 for lunch or dinner & a drink"
+        ]
+    },
+    "JeepTourB": {
+        "type": "fun",
+        "title": "Jeep Tour B: Cave Pool & Secret Beach",
+        "sub": "Rocka Beach Tours",
+        "desc": "Open-air Jeep safari to the north coast's cliffs and hidden swimming spots. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$115.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$85.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_jeep_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "4 Hours",
+        "time": "Morning & Afternoon | Pickup: 8:15–8:30 AM (Highrise) | 8:30–8:45 AM (Lowrise) or 1:45–2:00 PM",
+        "itinerary": [
+            "Black Stone Beach",
+            "3 Bridges",
+            "Natural Pool Cave",
+            "Natural Bridge",
+            "California Lighthouse",
+            "Secret Beach (cliff jumping)"
+        ],
+        "essentials": [
+            "Swimwear",
+            "Towel",
+            "Sunscreen",
+            "Camera",
+            "Optional: +$20 for lunch or dinner & a drink"
+        ]
+    },
+    "SailingBare": {
+        "type": "fun",
+        "title": "Bare Sailing Experience",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "desc": "A simple 2, 3, or 4-hour sailing and snorkeling outing, with water and soft drinks (Coke, Coke Zero, Sprite, Fuse Tea, Ginger Ale) provided. <div class=\"price-box\"><div class=\"price-row\"><span>Per Hour (up to 4 Guests)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>Per Hour (5-6 Guests)</span><strong>$300.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_sail_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "time": "9:00 AM or 3:00 PM departures",
+        "essentials": [
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+    "SailingAngelfish": {
+        "type": "fun",
+        "title": "Angelfish Snorkel & Brunch",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "desc": "A 3-hour snorkel sail with brunch-style tapas and a premium open bar with mimosas. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$700.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$150.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1300.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 15)</span><strong>$100.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_sail_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "3 Hours",
+        "time": "9:00 AM – 12:00 PM or 4:00 PM – 7:00 PM",
+        "essentials": [
+            "Private charter (your own group only)",
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
     }
 };

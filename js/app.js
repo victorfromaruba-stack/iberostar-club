@@ -65,7 +65,7 @@
         let fsVideoTimeoutId = null;
         
         // Bump whenever js/data.js's schema or paths change, to flush stale localStorage copies.
-        const DATA_VERSION = 301;
+        const DATA_VERSION = 302;
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
