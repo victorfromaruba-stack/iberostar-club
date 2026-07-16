@@ -93,6 +93,13 @@ const defaultData = {
         "gallery": [],
         "pdf": ""
     },
+    "MoreRetail": {
+        "type": "store",
+        "title": "More Retail Partners",
+        "sub": "Coming Soon",
+        "desc": "We're growing our lineup of local retail partners. Check back soon for more shopping recommendations around the island.",
+        "gallery": []
+    },
     "RedSailSail": {
         "type": "fun",
         "title": "Luxury Catamaran Sail",

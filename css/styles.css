@@ -167,7 +167,8 @@
 
         /* MAIN GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 35px; padding-bottom: 140px; margin-top: 30px; perspective: 1200px; }
-        
+        .grid.grid-sparse { justify-content: start; }
+
         .card { 
             background: var(--glass-card-light); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); 
             border: 1px solid var(--glass-border); border-radius: 36px; position: relative; cursor: pointer; 

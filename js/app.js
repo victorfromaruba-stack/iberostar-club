@@ -63,9 +63,10 @@
         let currentImgIndex = 0;
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
         let fsVideoTimeoutId = null;
+        let currentPdfBlobUrl = null;
         
         // Bump whenever js/data.js's schema or paths change, to flush stale localStorage copies.
-        const DATA_VERSION = 303;
+        const DATA_VERSION = 304;
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -299,9 +300,16 @@
                 </div>`;
             });
             html += `</div>`;
-            
+
             container.innerHTML = html;
-            container.querySelector('.grid').appendChild(noResults);
+            const gridEl = container.querySelector('.grid');
+            gridEl.appendChild(noResults);
+            // Sparse sections (1-2 items) otherwise leave empty grid tracks trailing off to the
+            // right; cap the columns to the real item count so the grid doesn't look abandoned.
+            if (itemsToShow.length > 0 && itemsToShow.length <= 2) {
+                gridEl.classList.add('grid-sparse');
+                gridEl.style.gridTemplateColumns = `repeat(${itemsToShow.length}, minmax(270px, 380px))`;
+            }
 
             document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });
             const navMap = { 'portfolio': 'nav-club', 'dining': 'nav-dining', 'activities': 'nav-fun', 'spa': 'nav-spa', 'golf': 'nav-golf', 'store': 'nav-store' };
@@ -570,8 +578,10 @@
             document.getElementById('fsCaption').style.display = 'none';
             document.getElementById('fsBackdrop').style.backgroundImage = 'none'; 
             
+            if (currentPdfBlobUrl) { URL.revokeObjectURL(currentPdfBlobUrl); currentPdfBlobUrl = null; }
+
             let finalUrl = url;
-            
+
             if ('caches' in window) {
                 try {
                     const cache = await caches.open('ib-aruba-v1');
@@ -579,6 +589,7 @@
                     if (response) {
                         const blob = await response.blob();
                         finalUrl = URL.createObjectURL(blob);
+                        currentPdfBlobUrl = finalUrl;
                     }
                 } catch(e) { console.log("Cache miss for PDF"); }
             }
@@ -660,7 +671,10 @@
             const video = fs.querySelector('video');
             if (video) video.pause();
 
-            setTimeout(() => document.getElementById('fsContent').innerHTML = '', 300);
+            setTimeout(() => {
+                document.getElementById('fsContent').innerHTML = '';
+                if (currentPdfBlobUrl) { URL.revokeObjectURL(currentPdfBlobUrl); currentPdfBlobUrl = null; }
+            }, 300);
         }
 
         function showToast(msg) {
