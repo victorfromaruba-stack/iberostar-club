@@ -115,7 +115,7 @@ const defaultData = {
         "type": "fun",
         "title": "UTV & ATV Adventure Tours",
         "sub": "Rocka Beach Tours",
-        "desc": "Guided off-road safari. Explore the wild side of Aruba. <div class=\"price-box\"><div class=\"price-row\"><span>ATV Single</span><strong>$160.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater</span><strong>$380.00</strong></div></div>",
+        "desc": "Guided off-road safari. Explore the wild side of Aruba. <div class=\"price-box\"><div class=\"price-row\"><span>ATV Single</span><strong>$160.00</strong></div><div class=\"price-row\"><span>ATV Double</span><strong>$200.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater</span><strong>$480.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_utv_1.jpg"
         ],
@@ -143,7 +143,7 @@ const defaultData = {
         "type": "fun",
         "title": "Jeep Safari Adventure",
         "sub": "Rocka Beach Tours",
-        "desc": "Explore Arikok National Park in open-air Land Rovers. Visit breathtaking caves and natural pools. <div class=\"price-box\"><div class=\"price-row\"><span>Adult (Tour A)</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (Tour A)</span><strong>$75.00</strong></div></div>",
+        "desc": "Explore Arikok National Park in open-air Land Rovers. Visit breathtaking caves and natural pools. <div class=\"price-box\"><div class=\"price-row\"><span>Adult (Tour A)</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (Tour A)</span><strong>$75.00</strong></div><div class=\"price-row\"><span>Adult (Tour B)</span><strong>$115.00</strong></div><div class=\"price-row\"><span>Child (Tour B)</span><strong>$85.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_jeep_1.jpg"
         ],
@@ -184,7 +184,7 @@ const defaultData = {
         "type": "fun",
         "title": "UTV & ATV Rentals",
         "sub": "Rocka Beach Tours",
-        "desc": "Freedom to explore at your own pace. Security Deposit: $500 required. <div class=\"price-box\"><div class=\"price-row\"><span>UTV 2-Seater (4 hr)</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater (8 hr)</span><strong>$275.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (8 hr)</span><strong>$395.00</strong></div></div>",
+        "desc": "Freedom to explore at your own pace. Security Deposit: $500 per vehicle required. <div class=\"price-box\"><div class=\"price-row\"><span>UTV 2-Seater (4 hr)</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater (8 hr)</span><strong>$275.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (4 hr)</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (8 hr)</span><strong>$320.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (4 hr)</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (8 hr)</span><strong>$395.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (4 hr)</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (8 hr)</span><strong>$435.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (4 hr)</span><strong>$480.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (8 hr)</span><strong>$495.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_rentals_1.jpg"
         ],
@@ -211,6 +211,69 @@ const defaultData = {
             "Casibari Rock Formation",
             "Natural Bridge",
             "Arashi Beach"
+        ]
+    },
+    "SailingCoralSunset": {
+        "type": "fun",
+        "title": "Coral Sunset Dinner Sail",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "desc": "A 3-hour sunset sail with a 3-course dinner and premium open bar. Choose one appetizer and one main course per guest, plus two shared side dishes; dessert included. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$850.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1,600.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_sail_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "3 Hours",
+        "time": "4:00 PM – 7:00 PM",
+        "essentials": [
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+    "SailingBlueParrot": {
+        "type": "fun",
+        "title": "Blue Parrot Snorkel Sail",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "desc": "A 4-hour snorkel sail with lunch or a 4-course dinner and premium open bar. Choose from two rounds of tapas plus a main course per guest, with shared sides and dessert. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,100.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$250.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$2,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_sail_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "4 Hours",
+        "time": "9:00 AM – 1:00 PM or 3:00 PM – 7:00 PM",
+        "essentials": [
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+    "SailingTropicalDream": {
+        "type": "fun",
+        "title": "Tropical Dream Snorkel & Dinner Sail",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "desc": "A 7-hour snorkel charter to the Spanish Lagoon, Boca Catalina, and the Antilla shipwreck, with a 4-course lunch or early dinner and premium open bar. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,500.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$400.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$3,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_sail_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "7 Hours",
+        "time": "9:00 AM – 4:00 PM or 1:00 PM – 7:00 PM",
+        "itinerary": [
+            "Spanish Lagoon",
+            "Boca Catalina",
+            "Antilla Shipwreck"
+        ],
+        "essentials": [
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+    "SailingNonPrivate": {
+        "type": "fun",
+        "title": "Shared Sailing & Snorkel Tour",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "desc": "A non-private (shared) sailing and snorkel outing — join other guests aboard rather than booking the boat exclusively. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$135.00</strong></div><div class=\"price-row\"><span>Child</span><strong>$75.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_sail_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "essentials": [
+            "Notify us in advance of any food allergies or dietary needs"
         ]
     },
     "SpaPromo": {
