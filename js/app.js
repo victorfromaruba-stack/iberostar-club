@@ -66,7 +66,7 @@
         let currentPdfBlobUrl = null;
         
         // Bump whenever js/data.js's schema or paths change, to flush stale localStorage copies.
-        const DATA_VERSION = 305;
+        const DATA_VERSION = 306;
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -265,8 +265,8 @@
                     const safeVid = item.video.replace(/'/g, "\\'");
                     mediaBadge = `<div class="media-badge" role="button" tabindex="0" aria-label="Play video tour" onclick="event.stopPropagation(); viewVideo('${safeVid}')" onkeydown="if(event.key==='Enter'){event.stopPropagation(); viewVideo('${safeVid}')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></div>`;
                 }
-                else if(item.pdf) {
-                    const safePdf = item.pdf.replace(/'/g, "\\'");
+                else if(item.pdf || (item.pdfs && item.pdfs.length)) {
+                    const safePdf = (item.pdf || item.pdfs[0].url).replace(/'/g, "\\'");
                     mediaBadge = `<div class="media-badge" role="button" tabindex="0" aria-label="View brochure PDF" onclick="event.stopPropagation(); viewPdf('${safePdf}')" onkeydown="if(event.key==='Enter'){event.stopPropagation(); viewPdf('${safePdf}')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>`;
                 }
 
@@ -429,11 +429,18 @@
             let actionButtons = '';
             let hasPrimary = false;
 
-            if(item.pdf) {
+            if(item.pdfs && item.pdfs.length) {
+                item.pdfs.forEach(p => {
+                    const safePdf = p.url.replace(/'/g, "\\'");
+                    const safeLabel = p.label.replace(/</g, "&lt;");
+                    actionButtons += `<button class="btn-big ${!hasPrimary ? 'btn-primary' : ''}" onclick="viewPdf('${safePdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> ${safeLabel}</button>`;
+                    hasPrimary = true;
+                });
+            } else if(item.pdf) {
                 const safePdf = item.pdf.replace(/'/g, "\\'");
                 actionButtons += `<button class="btn-big ${!hasPrimary ? 'btn-primary' : ''}" onclick="viewPdf('${safePdf}')"><svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> View Brochure</button>`;
                 hasPrimary = true;
-            } 
+            }
             if(item.video) {
                 const safeVid = item.video.replace(/'/g, "\\'");
                 actionButtons += `<button class="btn-big ${!hasPrimary ? 'btn-primary' : ''}" onclick="viewVideo('${safeVid}')"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Video Tour</button>`;

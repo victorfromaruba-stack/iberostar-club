@@ -355,7 +355,21 @@ const defaultData = {
         "title": "GAIA House of Grill",
         "sub": "Joia Aruba • Open-Air Grill",
         "desc": "An open-air grill at the front of the hotel overlooking Eagle Beach, named for the Greek goddess of the Earth. Executive Chef Alejandro Camurri leads a menu built around a balance of land and sea, with bold, smoky, Caribbean-inflected flavors. Saturdays after 10pm, GAIA transforms into an intimate lounge with handcrafted cocktails and a live DJ.",
-        "gallery": []
+        "gallery": [
+            "assets/Restaurants/Gaia/rest_gaia_1.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_2.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_3.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_4.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_5.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_6.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_7.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_8.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_9.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_10.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_11.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_12.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_13.jpg"
+        ]
     },
     "Azia": {
         "type": "food",
@@ -453,6 +467,11 @@ const defaultData = {
             "assets/Restaurants/Bucatini/rest_bucatini_12.jpg",
             "assets/Restaurants/Bucatini/rest_bucatini_13.jpg",
             "assets/Restaurants/Bucatini/rest_bucatini_14.jpg"
+        ],
+        "pdfs": [
+            { "label": "Food Menu", "url": "assets/Restaurants/Bucatini/menu_bucatini_food.pdf" },
+            { "label": "Dessert Menu", "url": "assets/Restaurants/Bucatini/menu_bucatini_desserts.pdf" },
+            { "label": "Drinks Menu", "url": "assets/Restaurants/Bucatini/menu_bucatini_drinks.pdf" }
         ]
     },
     "Marea": {
@@ -474,6 +493,10 @@ const defaultData = {
             "assets/Restaurants/Marea/rest_marea_11.jpg",
             "assets/Restaurants/Marea/rest_marea_12.jpg",
             "assets/Restaurants/Marea/rest_marea_13.jpeg"
+        ],
+        "pdfs": [
+            { "label": "Dessert Menu", "url": "assets/Restaurants/Marea/menu_marea_desserts.pdf" },
+            { "label": "Drinks Menu", "url": "assets/Restaurants/Marea/menu_marea_drinks.pdf" }
         ]
     },
     "Birdie": {

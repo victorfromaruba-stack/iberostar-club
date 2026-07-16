@@ -32,7 +32,7 @@ function showAdmin() {
 }
 
 let appData = {};
-const DATA_VERSION = 305;
+const DATA_VERSION = 306;
 
 function loadAppData() {
     const saved = localStorage.getItem('ib_app_data');
@@ -70,6 +70,7 @@ async function forceOfflineCache() {
         if (item.gallery) item.gallery.forEach(g => allUrls.push(...getSwaps(g)));
         if (item.partnerLogo) allUrls.push(...getSwaps(item.partnerLogo));
         if (item.pdf) allUrls.push(item.pdf);
+        if (item.pdfs) item.pdfs.forEach(p => allUrls.push(p.url));
         if (item.video) allUrls.push(item.video);
     });
 
@@ -175,13 +176,18 @@ function saveItem() {
     if (!key || !title) { alert('ID/Title required'); return; }
 
     const isVideo = file.toLowerCase().endsWith('.mp4');
+    // Items with multiple named menus/brochures (see pdfs on Bucatini/Marea in data.js) aren't
+    // editable through this single-file field — preserve that array rather than silently
+    // dropping it when the item is re-saved from this form.
+    const existingPdfs = appData[key] && appData[key].pdfs;
 
     appData[key] = {
         type, title, sub, desc, gallery,
         pdf: (!isVideo ? file : ''),
         video: (isVideo ? file : ''),
         partnerLogo: (type === 'fun' ? partnerLogo : ''),
-        duration, time, itinerary, essentials
+        duration, time, itinerary, essentials,
+        ...(existingPdfs ? { pdfs: existingPdfs } : {})
     };
     persistAppData();
     showToast('Changes Saved!');
