@@ -66,7 +66,7 @@
         let currentPdfBlobUrl = null;
         
         // Bump whenever js/data.js's schema or paths change, to flush stale localStorage copies.
-        const DATA_VERSION = 304;
+        const DATA_VERSION = 305;
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -270,6 +270,7 @@
                     mediaBadge = `<div class="media-badge" role="button" tabindex="0" aria-label="View brochure PDF" onclick="event.stopPropagation(); viewPdf('${safePdf}')" onkeydown="if(event.key==='Enter'){event.stopPropagation(); viewPdf('${safePdf}')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>`;
                 }
 
+                const cashBadgeHtml = item.type !== 'club' ? '<div class="cash-badge">IBEROCASH</div>' : '';
                 const cleanDesc = item.desc.replace(/<[^>]*>?/gm, '');
                 const delay = index * 0.05;
 
@@ -280,13 +281,13 @@
                     ? `<div class="card-img-blur" style="background-image: url('${mainImg}')"></div>
                         ${logoHtml} ${mediaBadge}
                         <div class="tag-pill ${item.sub.includes('Joia') || item.sub.includes('Exclusive') ? 'highlight' : ''}">${item.sub}</div>
-                        <div class="cash-badge">IBEROCASH</div>
+                        ${cashBadgeHtml}
                         <div class="card-img-wrapper">
                             <img src="${mainImg}" alt="${item.title}" onerror="handleImgError(this)" ${imgLoadingParams}>
                         </div>`
                     : `${logoHtml} ${mediaBadge}
                         <div class="tag-pill ${item.sub.includes('Joia') || item.sub.includes('Exclusive') ? 'highlight' : ''}">${item.sub}</div>
-                        <div class="cash-badge">IBEROCASH</div>`;
+                        ${cashBadgeHtml}`;
 
                 html += `<div class="card" onclick="openDetails('${safeKey}')" role="button" tabindex="0" aria-label="${item.title}" onkeydown="if(event.key==='Enter'){openDetails('${safeKey}')}" style="animation-delay: ${delay}s">
                     <div class="card-media ${mainImg ? '' : 'card-fallback'}">
@@ -308,7 +309,10 @@
             // right; cap the columns to the real item count so the grid doesn't look abandoned.
             if (itemsToShow.length > 0 && itemsToShow.length <= 2) {
                 gridEl.classList.add('grid-sparse');
-                gridEl.style.gridTemplateColumns = `repeat(${itemsToShow.length}, minmax(270px, 380px))`;
+                // auto-fit (not a fixed repeat count) lets the track count itself collapse to
+                // one column on narrow viewports instead of forcing N columns that overflow
+                // the screen and get clipped by main's overflow-x: hidden.
+                gridEl.style.gridTemplateColumns = 'repeat(auto-fit, minmax(270px, 380px))';
             }
 
             document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active'); b.removeAttribute('aria-current'); });

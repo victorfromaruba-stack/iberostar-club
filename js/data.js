@@ -207,7 +207,7 @@ const defaultData = {
         "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
         "desc": "A 3-hour sunset sail with a 3-course dinner and premium open bar. Choose one appetizer and one main course per guest, plus two shared side dishes; dessert included. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$850.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1,600.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_sail_1.jpg"
+            "assets/Activities/Rockabeach/act_coral_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "3 Hours",
@@ -222,7 +222,7 @@ const defaultData = {
         "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
         "desc": "A 4-hour snorkel sail with lunch or a 4-course dinner and premium open bar. Choose from two rounds of tapas plus a main course per guest, with shared sides and dessert. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,100.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$250.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$2,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_sail_1.jpg"
+            "assets/Activities/Rockabeach/act_blueparrot_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4 Hours",
@@ -237,7 +237,7 @@ const defaultData = {
         "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
         "desc": "A 7-hour snorkel charter to the Spanish Lagoon, Boca Catalina, and the Antilla shipwreck, with a 4-course lunch or early dinner and premium open bar. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,500.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$400.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$3,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_sail_1.jpg"
+            "assets/Activities/Rockabeach/act_tropicaldream_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "7 Hours",
@@ -257,7 +257,7 @@ const defaultData = {
         "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
         "desc": "A 4-hour sailing and snorkeling outing starting with a fruit bowl, then a BBQ lunch or BBQ sunset dinner with premium open bar. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$135.00</strong></div><div class=\"price-row\"><span>Child</span><strong>$75.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_sail_1.jpg"
+            "assets/Activities/Rockabeach/act_nonprivate_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "essentials": [
@@ -265,6 +265,22 @@ const defaultData = {
         ],
         "duration": "4 Hours",
         "time": "9:00 AM – 1:00 PM or 3:00 PM – 7:00 PM"
+    },
+    "SailingBare": {
+        "type": "fun",
+        "title": "Bare Sailing Experience",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "desc": "A 2, 3, or 4-hour sailing and snorkeling outing with water and soft drinks provided — the simplest, most flexible way to get out on the water. <div class=\"price-box\"><div class=\"price-row\"><span>Per Hour (up to 4 guests)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>Per Hour (5-6 guests)</span><strong>$300.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_baresail_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "2-4 Hours",
+        "time": "9:00 AM or 3:00 PM",
+        "essentials": [
+            "Water and soft drinks provided (Coke, Coke Zero, Sprite, Fuse Tea, Ginger Ale)",
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
     },
     "SpaPromo": {
         "type": "spa",
@@ -524,9 +540,9 @@ const defaultData = {
         "type": "fun",
         "title": "Jeep Tour B: Natural Pool, Caves & Baby Beach",
         "sub": "Rocka Beach Tours",
-        "desc": "Open-air Jeep safari through Arikok National Park to the island's natural pool and caves, with a professional guide. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$75.00</strong></div></div>",
+        "desc": "Open-air Jeep safari through Arikok National Park to the island's natural pool and caves, with a professional guide. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$115.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$85.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_jeep_1.jpg"
+            "assets/Activities/Rockabeach/act_jeepb_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4-6 Hours",
@@ -557,7 +573,7 @@ const defaultData = {
         "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
         "desc": "A 3-hour snorkel sail with brunch-style tapas and a premium open bar with mimosas. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$700.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$150.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1300.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 15)</span><strong>$100.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_sail_1.jpg"
+            "assets/Activities/Rockabeach/act_angelfish_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "3 Hours",
@@ -573,7 +589,7 @@ const defaultData = {
         "sub": "Rocka Beach Tours",
         "desc": "A hybrid tour: drive your own UTV to the Natural Pool, then swap into a guided Jeep safari for the rest of the route. Includes a meal with a drink and national park entrance. <div class=\"price-box\"><div class=\"price-row\"><span>2-Seater UTV</span><strong>$285.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_utv_1.jpg"
+            "assets/Activities/Rockabeach/act_utvjeep_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4 Hours",
