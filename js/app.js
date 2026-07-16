@@ -310,7 +310,15 @@
             }
         }
 
-        function nav(id) { renderApp(id); }
+        function nav(id) {
+            if (id === currentSection) return;
+            const container = document.getElementById('appContent');
+            container.classList.add('section-leaving');
+            setTimeout(() => {
+                renderApp(id);
+                container.classList.remove('section-leaving');
+            }, 160);
+        }
 
         function filterContent() {
             const input = document.getElementById('searchInput');
