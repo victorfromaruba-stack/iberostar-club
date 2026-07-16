@@ -25,8 +25,8 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   lightbox, sharing, time-of-day theming, in-house-mode toggle.
 - `js/admin.js` — staff-only CRUD over the catalog, the offline-cache tool, and the password
   gate. Not loaded by `index.html`.
-- `Hotels/`, `Restaurants/`, `Spa/`, `Golf/`, `Activites/` (note: misspelled, not "Activities"),
-  `Logos/` — media assets (jpg/png/pdf/mp4) in per-property subfolders.
+- `assets/` — all media (jpg/png/pdf/mp4), in per-category subfolders: `Hotels/`, `Restaurants/`,
+  `Spa/`, `Golf/`, `Activities/`, `Logos/`, each with per-property subfolders below that.
 
 There is no build tool, package manager, bundler, linter, or test suite. There's nothing to
 `npm install` or compile — edit files directly and serve the directory with any static file
@@ -42,7 +42,7 @@ by a short ID and shaped like:
 ```js
 "Marea": {
     "type": "food", "title": "Marea", "sub": "Joia Aruba • Caribbean", "desc": "...",
-    "gallery": ["Restaurants/Marea/rest_marea_1.png", "Restaurants/Marea/rest_marea_2.png", ...],
+    "gallery": ["assets/Restaurants/Marea/rest_marea_1.jpg", "assets/Restaurants/Marea/rest_marea_2.jpg", ...],
     "pdf": ""
 }
 ```
@@ -115,13 +115,10 @@ classes rather than pure media queries.
 - New content items go into `js/data.js`, grouped under the existing `// CLUBS` / `// GOLF` /
   `// STORE` / `// FUN` / `// SPA` / `// FOOD` comments — keep new entries under the matching
   section rather than appending at the end.
-- Match the existing asset folder layout (`<Category>/<PropertyName>/<prefix>_<n>.<ext>`), but
-  list the real files explicitly in `gallery` rather than relying on any numbering convention —
+- Match the existing asset folder layout (`assets/<Category>/<PropertyName>/<prefix>_<n>.<ext>`),
+  but list the real files explicitly in `gallery` rather than relying on any numbering convention —
   gaps and mixed extensions in a folder (there are several) are fine as long as `gallery` lists
   exactly what's there.
-- The `Activites/` folder name is a pre-existing typo baked into the filesystem. Don't silently
-  rename it to "Activities" — that would require moving every file and updating every reference
-  in `js/data.js` in the same change.
 - Accessibility: new interactive elements should get `alt`/`aria-label`/`role` as appropriate —
   this was a deliberate cleanup pass, not incidental, so don't regress it.
 - Commit history (pre-refactor) shows this repo was edited as a series of direct `index.html`

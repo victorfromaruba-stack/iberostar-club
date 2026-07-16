@@ -73,7 +73,7 @@ async function forceOfflineCache() {
         if (item.video) allUrls.push(item.video);
     });
 
-    allUrls.push('Logos/logo_club.png');
+    allUrls.push('assets/Logos/logo_club.png');
     allUrls = [...new Set(allUrls)];
 
     let loaded = 0;
