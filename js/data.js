@@ -125,12 +125,13 @@ const defaultData = {
         "itinerary": [
             "Black Stone Beach",
             "3 Bridges",
+            "Ayo Rock Formation",
             "Andicuri Beach (pass by)",
             "Baby Bridge",
             "Bushiribana Goldmill Ruins",
             "Wariruri Bridge (pass by)",
             "California Lighthouse",
-            "Secret Beach (cliff jumping)"
+            "Boca Catalina Beach (cliff jumping)"
         ],
         "essentials": [
             "Valid Driver's License",
@@ -181,14 +182,16 @@ const defaultData = {
             "assets/Activities/Rockabeach/act_half_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "7 Hours",
+        "duration": "5-7 Hours",
         "time": "10:00 AM – 5:00 PM | Pickup: 9:30–9:50 AM",
         "itinerary": [
+            "Alto Vista Chapel",
             "California Lighthouse",
-            "Oldest Chapel",
             "Casibari Rock Formation",
+            "Bushiribana Gold Mill Ruins",
+            "Matividiri Bay",
             "Natural Bridge",
-            "Bushiribana Gold Mine"
+            "Optional: Arashi Beach break or Boca Catalina/Tres Trapi cliff jumping"
         ]
     },
     "SailingCoralSunset": {
@@ -326,14 +329,14 @@ const defaultData = {
     },
     "Gaya": {
         "type": "food",
-        "title": "Gaya Restaurant",
-        "sub": "Joia Aruba • Fine Dining",
-        "desc": "An immersive culinary journey featuring world-class gastronomy. Gaya offers an elegant atmosphere paired with innovative flavors designed to delight the senses and elevate your dining experience.",
+        "title": "GAIA House of Grill",
+        "sub": "Joia Aruba • Open-Air Grill",
+        "desc": "An open-air grill at the front of the hotel overlooking Eagle Beach, named for the Greek goddess of the Earth. Executive Chef Alejandro Camurri leads a menu built around a balance of land and sea, with bold, smoky, Caribbean-inflected flavors. Saturdays after 10pm, GAIA transforms into an intimate lounge with handcrafted cocktails and a live DJ.",
         "gallery": []
     },
     "Azia": {
         "type": "food",
-        "title": "Azia Restaurant",
+        "title": "Azia Restaurant & Lounge",
         "sub": "Asian Fusion",
         "desc": "A journey through Asia with Tapas and modern atmosphere. Exquisite sushi, dim sum, and Asian-fusion dishes in a stylish, Zen-inspired environment.",
         "gallery": [
@@ -481,71 +484,64 @@ const defaultData = {
     },
     "JeepTourA": {
         "type": "fun",
-        "title": "Jeep Tour A: Natural Pool, Caves & Baby Beach",
+        "title": "Jeep Tour A: Northshore Safari",
         "sub": "Rocka Beach Tours",
-        "desc": "Open-air Jeep safari to the island's natural pools and caves, with park entry included. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$75.00</strong></div></div>",
+        "desc": "Open-air Jeep safari along Aruba's rugged north coast, with dramatic oceanfront views. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$75.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_jeep_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "5-6 Hours",
+        "duration": "4-6 Hours",
         "time": "Pickup: 8:15–8:30 AM (Highrise) | 8:30–8:45 AM (Lowrise)",
         "itinerary": [
-            "Natural Pool",
-            "Fontein Cave",
-            "Quadirikiri Cave",
+            "Ayo Rock Formation",
+            "Black Stone Beach",
+            "3 Bridges",
+            "Andicuri Beach",
+            "Baby Bridge",
+            "Bushiribana Goldmill Ruins",
+            "Wariruri Bridge",
+            "California Lighthouse",
+            "Boca Catalina Beach (cliff jumping)"
+        ],
+        "essentials": [
+            "Swimwear",
+            "Towel",
+            "Sunscreen",
+            "Sturdy sandals or shoes",
+            "Snorkel equipment included",
+            "Optional: +$20 for lunch or dinner & a drink"
+        ]
+    },
+    "JeepTourB": {
+        "type": "fun",
+        "title": "Jeep Tour B: Natural Pool, Caves & Baby Beach",
+        "sub": "Rocka Beach Tours",
+        "desc": "Open-air Jeep safari through Arikok National Park to the island's natural pool and caves, with a professional guide. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$75.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_jeep_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "4-6 Hours",
+        "time": "Pickup: 8:15–8:30 AM (Highrise) | 8:30–8:45 AM (Lowrise)",
+        "itinerary": [
+            "Arikok National Park",
+            "Natural Pool (Conchi)",
+            "Fontein Cave (Arawak drawings)",
             "Boca Prins",
-            "Red Anchor / Baby Beach",
+            "Quadirikiri Cave",
+            "Red Anchor",
+            "Baby Beach",
             "San Nicolas Art City"
         ],
         "essentials": [
             "Swimwear",
             "Towel",
             "Sunscreen",
-            "Camera",
-            "Park entry included",
+            "Sturdy sandals or shoes",
+            "Snorkel equipment included",
+            "National Park entry included",
             "Optional: +$20 for lunch or dinner & a drink"
-        ]
-    },
-    "JeepTourB": {
-        "type": "fun",
-        "title": "Jeep Tour B: Cave Pool & Secret Beach",
-        "sub": "Rocka Beach Tours",
-        "desc": "Open-air Jeep safari to the north coast's cliffs and hidden swimming spots. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$115.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$85.00</strong></div></div>",
-        "gallery": [
-            "assets/Activities/Rockabeach/act_jeep_1.jpg"
-        ],
-        "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "4 Hours",
-        "time": "Morning & Afternoon | Pickup: 8:15–8:30 AM (Highrise) | 8:30–8:45 AM (Lowrise) or 1:45–2:00 PM",
-        "itinerary": [
-            "Black Stone Beach",
-            "3 Bridges",
-            "Natural Pool Cave",
-            "Natural Bridge",
-            "California Lighthouse",
-            "Secret Beach (cliff jumping)"
-        ],
-        "essentials": [
-            "Swimwear",
-            "Towel",
-            "Sunscreen",
-            "Camera",
-            "Optional: +$20 for lunch or dinner & a drink"
-        ]
-    },
-    "SailingBare": {
-        "type": "fun",
-        "title": "Bare Sailing Experience",
-        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
-        "desc": "A simple 2, 3, or 4-hour sailing and snorkeling outing, with water and soft drinks (Coke, Coke Zero, Sprite, Fuse Tea, Ginger Ale) provided. <div class=\"price-box\"><div class=\"price-row\"><span>Per Hour (up to 4 Guests)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>Per Hour (5-6 Guests)</span><strong>$300.00</strong></div></div>",
-        "gallery": [
-            "assets/Activities/Rockabeach/act_sail_1.jpg"
-        ],
-        "partnerLogo": "assets/Logos/logo_rocka.png",
-        "time": "9:00 AM or 3:00 PM departures",
-        "essentials": [
-            "Notify us in advance of any food allergies or dietary needs"
         ]
     },
     "SailingAngelfish": {
@@ -562,6 +558,33 @@ const defaultData = {
         "essentials": [
             "Private charter (your own group only)",
             "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+    "UTVJeepNaturalPool": {
+        "type": "fun",
+        "title": "UTV & Safari Jeep Natural Pool Adventure",
+        "sub": "Rocka Beach Tours",
+        "desc": "A hybrid tour: drive your own UTV to the Natural Pool, then swap into a guided Jeep safari for the rest of the route. Includes a meal with a drink and national park entrance. <div class=\"price-box\"><div class=\"price-row\"><span>2-Seater UTV</span><strong>$285.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_utv_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "4 Hours",
+        "itinerary": [
+            "Natural Pool (Conchi)",
+            "Natural Bridge (UTV/Jeep swap point)",
+            "Bushiribana Gold Mill Ruins (fly-by)",
+            "Alto Vista Chapel (fly-by)",
+            "California Lighthouse (fly-by)",
+            "Boca Catalina Beach or Tres Trapi (cliff jumping)"
+        ],
+        "essentials": [
+            "Valid Driver's License",
+            "Sunglasses",
+            "Swimwear",
+            "Towel",
+            "Sunscreen",
+            "National Park entry included"
         ]
     }
 };

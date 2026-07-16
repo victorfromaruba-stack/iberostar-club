@@ -80,7 +80,7 @@
             <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close" ontouchstart="closeModal(event)" onclick="closeModal(event)">✕</button>
 
             <div class="modal-hero" onclick="launchLightbox(currentGallery, 0)" role="button" tabindex="0" aria-label="Expand photo" onkeydown="if(event.key==='Enter')launchLightbox(currentGallery, 0)">
-                <img id="dImg" src="" alt="" onerror="handleImgError(this)" onload="handleImgLoad(this)">
+                <img id="dImg" alt="" onerror="handleImgError(this)" onload="handleImgLoad(this)">
                 <div class="image-spinner active" aria-hidden="true"></div>
                 <div style="position:absolute; bottom:20px; right:20px; background:rgba(0,0,0,0.65); padding:8px 16px; border-radius:20px; color:#FFFFFF; font-size:11px; font-weight:800; backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px); border: 1px solid rgba(255,255,255,0.2); box-shadow:0 4px 16px rgba(0,0,0,0.3); letter-spacing:1px; pointer-events:none; z-index:20;" aria-hidden="true">TAP TO EXPAND</div>
             </div>

@@ -65,7 +65,7 @@
         let fsVideoTimeoutId = null;
         
         // Bump whenever js/data.js's schema or paths change, to flush stale localStorage copies.
-        const DATA_VERSION = 302;
+        const DATA_VERSION = 303;
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -107,19 +107,22 @@
             });
 
             let titleTaps = 0;
+            let titleTapResetId = null;
             document.getElementById('pageTitle').addEventListener('click', function() {
                 titleTaps++;
+                if (titleTapResetId) clearTimeout(titleTapResetId);
                 if(titleTaps === 3) {
                     inHouseMode = !inHouseMode;
                     localStorage.setItem('ib_in_house', inHouseMode);
                     showToast(inHouseMode ? "Mode: In-House Only" : "Mode: Full Off-Site");
-                    
+
                     if (currentSection === 'activities') {
                         renderApp('activities');
                     }
                     titleTaps = 0;
+                } else {
+                    titleTapResetId = setTimeout(() => { titleTaps = 0; titleTapResetId = null; }, 1500);
                 }
-                setTimeout(() => titleTaps = 0, 1500);
             });
         };
         
