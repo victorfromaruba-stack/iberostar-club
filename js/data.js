@@ -10,15 +10,15 @@ const defaultData = {
             "Hotels/Joia/hotel_joia_1.jpg",
             "Hotels/Joia/hotel_joia_2.jpg",
             "Hotels/Joia/hotel_joia_3.jpg",
-            "Hotels/Joia/hotel_joia_4.png",
-            "Hotels/Joia/hotel_joia_5.png",
-            "Hotels/Joia/hotel_joia_6.png",
-            "Hotels/Joia/hotel_joia_7.png",
-            "Hotels/Joia/hotel_joia_8.png",
-            "Hotels/Joia/hotel_joia_9.png",
-            "Hotels/Joia/hotel_joia_10.png",
-            "Hotels/Joia/hotel_joia_11.png",
-            "Hotels/Joia/hotel_joia_12.png"
+            "Hotels/Joia/hotel_joia_4.jpg",
+            "Hotels/Joia/hotel_joia_5.jpg",
+            "Hotels/Joia/hotel_joia_6.jpg",
+            "Hotels/Joia/hotel_joia_7.jpg",
+            "Hotels/Joia/hotel_joia_8.jpg",
+            "Hotels/Joia/hotel_joia_9.jpg",
+            "Hotels/Joia/hotel_joia_10.jpg",
+            "Hotels/Joia/hotel_joia_11.jpg",
+            "Hotels/Joia/hotel_joia_12.jpg"
         ]
     },
     "Tierra": {
@@ -78,10 +78,10 @@ const defaultData = {
         "sub": "Nature & Wildlife",
         "desc": "Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).",
         "gallery": [
-            "Golf/Birds/birds_1.png",
-            "Golf/Birds/birds_3.png",
-            "Golf/Birds/birds_4.png",
-            "Golf/Birds/birds_5.png"
+            "Golf/Birds/birds_1.jpg",
+            "Golf/Birds/birds_3.jpg",
+            "Golf/Birds/birds_4.jpg",
+            "Golf/Birds/birds_5.jpg"
         ],
         "pdf": ""
     },
@@ -219,14 +219,14 @@ const defaultData = {
         "sub": "Complimentary Voucher",
         "desc": "Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.",
         "gallery": [
-            "Spa/Promo/massage_1.png",
-            "Spa/Promo/massage_2.png",
-            "Spa/Promo/massage_3.png",
-            "Spa/Promo/massage_4.png",
-            "Spa/Promo/massage_5.png",
-            "Spa/Promo/massage_6.png",
-            "Spa/Promo/massage_7.png",
-            "Spa/Promo/massage_8.png"
+            "Spa/Promo/massage_1.jpg",
+            "Spa/Promo/massage_2.jpg",
+            "Spa/Promo/massage_3.jpg",
+            "Spa/Promo/massage_4.jpg",
+            "Spa/Promo/massage_5.jpg",
+            "Spa/Promo/massage_6.jpg",
+            "Spa/Promo/massage_7.jpg",
+            "Spa/Promo/massage_8.jpg"
         ],
         "pdf": "",
         "duration": "50 Minutes",
@@ -240,17 +240,17 @@ const defaultData = {
         "sub": "Joia Aruba • Wellness",
         "desc": "A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.",
         "gallery": [
-            "Spa/General/spa_1.png",
-            "Spa/General/spa_2.png",
-            "Spa/General/spa_3.png",
-            "Spa/General/spa_4.png",
-            "Spa/General/spa_5.png",
-            "Spa/General/spa_6.png",
-            "Spa/General/spa_7.png",
-            "Spa/General/spa_8.png",
-            "Spa/General/spa_9.png",
-            "Spa/General/spa_10.png",
-            "Spa/General/spa_11.png"
+            "Spa/General/spa_1.jpg",
+            "Spa/General/spa_2.jpg",
+            "Spa/General/spa_3.jpg",
+            "Spa/General/spa_4.jpg",
+            "Spa/General/spa_5.jpg",
+            "Spa/General/spa_6.jpg",
+            "Spa/General/spa_7.jpg",
+            "Spa/General/spa_8.jpg",
+            "Spa/General/spa_9.jpg",
+            "Spa/General/spa_10.jpg",
+            "Spa/General/spa_11.jpg"
         ]
     },
     "Giannis": {
@@ -382,8 +382,8 @@ const defaultData = {
             "Restaurants/Bucatini/rest_bucatini_10.jpg",
             "Restaurants/Bucatini/rest_bucatini_11.jpg",
             "Restaurants/Bucatini/rest_bucatini_12.jpg",
-            "Restaurants/Bucatini/rest_bucatini_13.png",
-            "Restaurants/Bucatini/rest_bucatini_14.png"
+            "Restaurants/Bucatini/rest_bucatini_13.jpg",
+            "Restaurants/Bucatini/rest_bucatini_14.jpg"
         ]
     },
     "Marea": {
@@ -392,18 +392,18 @@ const defaultData = {
         "sub": "Joia Aruba • Caribbean",
         "desc": "Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.",
         "gallery": [
-            "Restaurants/Marea/rest_marea_1.png",
-            "Restaurants/Marea/rest_marea_2.png",
-            "Restaurants/Marea/rest_marea_3.png",
-            "Restaurants/Marea/rest_marea_4.png",
-            "Restaurants/Marea/rest_marea_5.png",
-            "Restaurants/Marea/rest_marea_6.png",
-            "Restaurants/Marea/rest_marea_7.png",
-            "Restaurants/Marea/rest_marea_8.png",
-            "Restaurants/Marea/rest_marea_9.png",
-            "Restaurants/Marea/rest_marea_10.png",
-            "Restaurants/Marea/rest_marea_11.png",
-            "Restaurants/Marea/rest_marea_12.png",
+            "Restaurants/Marea/rest_marea_1.jpg",
+            "Restaurants/Marea/rest_marea_2.jpg",
+            "Restaurants/Marea/rest_marea_3.jpg",
+            "Restaurants/Marea/rest_marea_4.jpg",
+            "Restaurants/Marea/rest_marea_5.jpg",
+            "Restaurants/Marea/rest_marea_6.jpg",
+            "Restaurants/Marea/rest_marea_7.jpg",
+            "Restaurants/Marea/rest_marea_8.jpg",
+            "Restaurants/Marea/rest_marea_9.jpg",
+            "Restaurants/Marea/rest_marea_10.jpg",
+            "Restaurants/Marea/rest_marea_11.jpg",
+            "Restaurants/Marea/rest_marea_12.jpg",
             "Restaurants/Marea/rest_marea_13.jpeg"
         ]
     },
