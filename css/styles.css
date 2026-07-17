@@ -373,7 +373,11 @@
             nav { width: calc(100% - 32px); height: 70px; padding: 0 8px; bottom: calc(16px + env(safe-area-inset-bottom)); left: 16px; top: auto; transform: none; flex-direction: row; justify-content: space-around; border-radius: 35px; gap: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.4); }
             .nav-btn { width: 50px; height: 50px; border-radius: 25px; margin-bottom: 0; margin-right: 0; flex: 1; }
             
-            main { padding: 25px 20px 140px 20px; overflow-x: hidden; width: 100vw; max-width: 100vw; box-sizing: border-box; }
+            /* The shorthand below resets padding-top along with the other sides, which was
+               silently dropping the safe-area compensation the base main{} rule set up —
+               header content (greeting/date) ended up with no notch/Dynamic Island clearance
+               at all on mobile. Re-declare padding-top after the shorthand so it wins. */
+            main { padding: 25px 20px 140px 20px; overflow-x: hidden; width: 100vw; max-width: 100vw; box-sizing: border-box; padding-top: calc(25px + var(--safe-top)); }
             h1 { font-size: 3rem; }
             .search-container { max-width: 100%; width: 100%; margin-top: 25px; }
             .modal { width: 100%; height: 100%; max-width: none; border-radius: 0; top: 0; left: 0; transform: translateY(100vh); }
@@ -391,11 +395,11 @@
            (iPad Mini and other ~700-1024pt-wide tablets otherwise fell between the phone
            breakpoint and the full desktop side-dock spacing and were left cramped). */
         @media (min-width: 769px) and (max-width: 1100px) {
-            main { padding: 50px 40px 100px 130px; }
+            main { padding: 50px 40px 100px 130px; padding-top: calc(50px + var(--safe-top)); }
             .grid { gap: 28px; }
         }
         .device-tablet .modal { width: 92vw; }
-        .device-tablet main { padding: 50px 50px 100px 140px; }
+        .device-tablet main { padding: 50px 50px 100px 140px; padding-top: calc(50px + var(--safe-top)); }
 
         /* Landscape Orientation */
         @media (orientation: landscape) and (max-height: 600px) {
@@ -404,7 +408,7 @@
             nav { width: 70px; height: 85vh; left: 15px; top: 50%; bottom: auto; padding: 15px 0; margin: 0; transform: translateY(-50%); flex-direction: column; gap: 12px; border-radius: 35px; }
             .nav-btn { width: 48px; height: 48px; margin-bottom: 0; margin-right: 0; }
             .nav-btn svg { width: 22px; height: 22px; }
-            main { padding: 20px 25px 25px 110px; }
+            main { padding: 20px 25px 25px 110px; padding-top: calc(20px + var(--safe-top)); }
             .modal { flex-direction: row; height: 95vh; width: 95vw; }
             .modal-hero { width: 45%; height: 100%; }
             .modal-content { width: 55%; height: 100%; padding: 30px; }
