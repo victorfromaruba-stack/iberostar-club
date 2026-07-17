@@ -181,7 +181,8 @@ const defaultData = {
         "sub": "Rocka Beach Tours",
         "desc": "Freedom to explore at your own pace — ATV & UTV drop-off and pickup available at all hotels. Security Deposit: $500 per vehicle required. <div class=\"price-box\"><div class=\"price-row\"><span>UTV 2-Seater (4 hr)</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater (8 hr)</span><strong>$275.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (4 hr)</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (8 hr)</span><strong>$320.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (4 hr)</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (8 hr)</span><strong>$395.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (4 hr)</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (8 hr)</span><strong>$435.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (4 hr)</span><strong>$480.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (8 hr)</span><strong>$495.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_rentals_1.jpg"
+            "assets/Activities/Rockabeach/act_rentals_1.jpg",
+            "assets/Activities/Rockabeach/act_rentals_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4 or 8 Hours",
@@ -196,7 +197,8 @@ const defaultData = {
         "sub": "Rocka Beach Tours",
         "desc": "Full-day tour visiting key landmarks and beaches across the island, with an optional lunch or dinner add-on. <div class=\"price-box\"><div class=\"price-row\"><span>Adult (13+)</span><strong>$65.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$42.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_half_1.jpg"
+            "assets/Activities/Rockabeach/act_half_1.jpg",
+            "assets/Activities/Rockabeach/act_half_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "5-7 Hours",
@@ -544,7 +546,8 @@ const defaultData = {
         "sub": "Rocka Beach Tours",
         "desc": "Open-air Jeep safari along Aruba's rugged north coast, with dramatic oceanfront views. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$75.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_jeep_1.jpg"
+            "assets/Activities/Rockabeach/act_jeep_1.jpg",
+            "assets/Activities/Rockabeach/act_jeep_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4-6 Hours",
@@ -622,7 +625,8 @@ const defaultData = {
         "sub": "Rocka Beach Tours",
         "desc": "A hybrid tour: drive your own UTV to the Natural Pool, then swap into a guided Jeep safari for the rest of the route. Includes a meal with a drink and national park entrance. <div class=\"price-box\"><div class=\"price-row\"><span>2-Seater UTV</span><strong>$285.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_utvjeep_1.jpg"
+            "assets/Activities/Rockabeach/act_utvjeep_1.jpg",
+            "assets/Activities/Rockabeach/act_utvjeep_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4 Hours",
