@@ -338,7 +338,7 @@
         /* LIGHTBOX VIEWER */
         .fs-viewer { position: fixed; inset: 0; z-index: 2500; background: #000; display: none; align-items: center; justify-content: center; }
         .fs-viewer.active { display: flex; animation: fadeIn 0.4s; }
-        .fs-backdrop { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(40px) brightness(0.3); transform: scale(1.1); z-index: -1; opacity: 0.8; }
+        .fs-backdrop { position: absolute; inset: 0; background-size: cover; background-position: center; filter: blur(50px) saturate(140%) brightness(0.55); transform: scale(1.15); z-index: -1; opacity: 0.9; }
         .fs-image { max-width: 95%; max-height: 95%; object-fit: contain; box-shadow: 0 30px 60px rgba(0,0,0,0.6); border-radius: 12px; }
         .fs-close { position: fixed; top: 40px; right: 40px; color: white; background: rgba(255,255,255,0.15); width: 60px; height: 60px; border-radius: 50%; font-size: 28px; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; z-index: 1500; backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .fs-close:active { transform: scale(0.85); background: white; color: black; }
@@ -366,7 +366,9 @@
             .date-display { font-size: 0.85rem; }
             
             .grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding-bottom: 120px; margin-top: 20px; }
-            .fs-nav { width: 44px; height: 44px; font-size: 24px; } .fs-prev { left: 10px; } .fs-next { right: 10px; } .fs-close { top: 20px; right: 20px; width: 44px; height: 44px; }
+            .fs-nav { width: 44px; height: 44px; font-size: 24px; } .fs-prev { left: 10px; } .fs-next { right: 10px; }
+            /* Safe area inset fix so the close button isn't hidden under the iPhone notch/Dynamic Island */
+            .fs-close { top: calc(20px + env(safe-area-inset-top)); right: 20px; width: 44px; height: 44px; }
             
             nav { width: calc(100% - 32px); height: 70px; padding: 0 8px; bottom: calc(16px + env(safe-area-inset-bottom)); left: 16px; top: auto; transform: none; flex-direction: row; justify-content: space-around; border-radius: 35px; gap: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.4); }
             .nav-btn { width: 50px; height: 50px; border-radius: 25px; margin-bottom: 0; margin-right: 0; flex: 1; }
