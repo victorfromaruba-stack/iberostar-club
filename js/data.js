@@ -381,6 +381,9 @@ const defaultData = {
             "assets/Restaurants/Gaia/rest_gaia_11.jpg",
             "assets/Restaurants/Gaia/rest_gaia_12.jpg",
             "assets/Restaurants/Gaia/rest_gaia_13.jpg"
+        ],
+        "pdfs": [
+            { "label": "Menu", "url": "assets/Restaurants/Gaia/menu_gaia_english.pdf" }
         ]
     },
     "Azia": {

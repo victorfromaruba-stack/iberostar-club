@@ -66,7 +66,7 @@
         let currentPdfBlobUrl = null;
         
         // Bump whenever js/data.js's schema or paths change, to flush stale localStorage copies.
-        const DATA_VERSION = 308;
+        const DATA_VERSION = 309;
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -260,14 +260,17 @@
                 let logoHtml = ''; if(item.partnerLogo) logoHtml = `<img src="${item.partnerLogo}" class="partner-badge" alt="${item.sub} logo" onerror="this.style.display='none'">`;
                 const mainImg = item.gallery && item.gallery[0];
 
+                // A package can have both a menu/brochure PDF and a video tour; show a badge
+                // for each rather than letting one hide the other.
                 let mediaBadge = '';
                 if(item.video) {
                     const safeVid = item.video.replace(/'/g, "\\'");
-                    mediaBadge = `<div class="media-badge" role="button" tabindex="0" aria-label="Play video tour" onclick="event.stopPropagation(); viewVideo('${safeVid}')" onkeydown="if(event.key==='Enter'){event.stopPropagation(); viewVideo('${safeVid}')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></div>`;
+                    mediaBadge += `<div class="media-badge" role="button" tabindex="0" aria-label="Play video tour" onclick="event.stopPropagation(); viewVideo('${safeVid}')" onkeydown="if(event.key==='Enter'){event.stopPropagation(); viewVideo('${safeVid}')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></div>`;
                 }
-                else if(item.pdf || (item.pdfs && item.pdfs.length)) {
+                if(item.pdf || (item.pdfs && item.pdfs.length)) {
                     const safePdf = (item.pdf || item.pdfs[0].url).replace(/'/g, "\\'");
-                    mediaBadge = `<div class="media-badge" role="button" tabindex="0" aria-label="View brochure PDF" onclick="event.stopPropagation(); viewPdf('${safePdf}')" onkeydown="if(event.key==='Enter'){event.stopPropagation(); viewPdf('${safePdf}')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>`;
+                    const secondaryClass = item.video ? ' secondary' : '';
+                    mediaBadge += `<div class="media-badge${secondaryClass}" role="button" tabindex="0" aria-label="View brochure PDF" onclick="event.stopPropagation(); viewPdf('${safePdf}')" onkeydown="if(event.key==='Enter'){event.stopPropagation(); viewPdf('${safePdf}')}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg></div>`;
                 }
 
                 const cashBadgeHtml = item.type !== 'club' ? '<div class="cash-badge">IBEROCASH</div>' : '';
