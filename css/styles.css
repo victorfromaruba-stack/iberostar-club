@@ -368,7 +368,7 @@
             .grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; padding-bottom: 120px; margin-top: 20px; }
             .fs-nav { width: 44px; height: 44px; font-size: 24px; } .fs-prev { left: 10px; } .fs-next { right: 10px; }
             /* Safe area inset fix so the close button isn't hidden under the iPhone notch/Dynamic Island */
-            .fs-close { top: calc(20px + env(safe-area-inset-top)); right: 20px; width: 44px; height: 44px; }
+            .fs-close { top: calc(20px + max(env(safe-area-inset-top), 44px)); right: 20px; width: 44px; height: 44px; }
             
             nav { width: calc(100% - 32px); height: 70px; padding: 0 8px; bottom: calc(16px + env(safe-area-inset-bottom)); left: 16px; top: auto; transform: none; flex-direction: row; justify-content: space-around; border-radius: 35px; gap: 0; box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.4); }
             .nav-btn { width: 50px; height: 50px; border-radius: 25px; margin-bottom: 0; margin-right: 0; flex: 1; }
@@ -376,8 +376,11 @@
             /* The shorthand below resets padding-top along with the other sides, which was
                silently dropping the safe-area compensation the base main{} rule set up —
                header content (greeting/date) ended up with no notch/Dynamic Island clearance
-               at all on mobile. Re-declare padding-top after the shorthand so it wins. */
-            main { padding: 25px 20px 140px 20px; overflow-x: hidden; width: 100vw; max-width: 100vw; box-sizing: border-box; padding-top: calc(25px + var(--safe-top)); }
+               at all on mobile. Re-declare padding-top after the shorthand so it wins.
+               env(safe-area-inset-top) reports 0 in regular Safari tabs (not just installed
+               PWAs) in some iOS versions even though the physical notch still overlaps the
+               page, so fall back to a fixed minimum rather than trusting it alone. */
+            main { padding: 25px 20px 140px 20px; overflow-x: hidden; width: 100vw; max-width: 100vw; box-sizing: border-box; padding-top: calc(25px + max(var(--safe-top), 44px)); }
             h1 { font-size: 3rem; }
             .search-container { max-width: 100%; width: 100%; margin-top: 25px; }
             .modal { width: 100%; height: 100%; max-width: none; border-radius: 0; top: 0; left: 0; transform: translateY(100vh); }
@@ -386,7 +389,7 @@
             .modal-content { padding: 30px 20px; }
             
             /* 🚨 SAFE AREA INSET FIX FOR IPHONE NOTCH & DYNAMIC ISLAND 🚨 */
-            .modal-close-btn { top: calc(20px + env(safe-area-inset-top)); right: 20px; width: 44px; height: 44px; font-size: 20px; }
+            .modal-close-btn { top: calc(20px + max(env(safe-area-inset-top), 44px)); right: 20px; width: 44px; height: 44px; font-size: 20px; }
         }
 
         body.keyboard-open .device-mobile nav { display: none; }
@@ -408,7 +411,7 @@
             nav { width: 70px; height: 85vh; left: 15px; top: 50%; bottom: auto; padding: 15px 0; margin: 0; transform: translateY(-50%); flex-direction: column; gap: 12px; border-radius: 35px; }
             .nav-btn { width: 48px; height: 48px; margin-bottom: 0; margin-right: 0; }
             .nav-btn svg { width: 22px; height: 22px; }
-            main { padding: 20px 25px 25px 110px; padding-top: calc(20px + var(--safe-top)); }
+            main { padding: 20px 25px 25px 110px; padding-top: calc(20px + max(var(--safe-top), 44px)); }
             .modal { flex-direction: row; height: 95vh; width: 95vw; }
             .modal-hero { width: 45%; height: 100%; }
             .modal-content { width: 55%; height: 100%; padding: 30px; }
