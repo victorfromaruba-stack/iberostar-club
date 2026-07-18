@@ -1,3 +1,18 @@
+        /* Self-hosted fonts — replaces the Google Fonts CDN link, which was a hard external
+           dependency with no fallback (it fails outright under some network policies and adds
+           a render-blocking third-party round trip on every visit). Latin subset only, matching
+           what the guest-facing English/Spanish/Papiamento copy actually needs. */
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 300; font-display: swap; src: url('../assets/fonts/inter-300.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('../assets/fonts/inter-400.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('../assets/fonts/inter-500.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url('../assets/fonts/inter-600.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; font-display: swap; src: url('../assets/fonts/inter-700.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-style: normal; font-weight: 800; font-display: swap; src: url('../assets/fonts/inter-800.woff2') format('woff2'); }
+        @font-face { font-family: 'Playfair Display'; font-style: normal; font-weight: 500; font-display: swap; src: url('../assets/fonts/playfair-500.woff2') format('woff2'); }
+        @font-face { font-family: 'Playfair Display'; font-style: normal; font-weight: 600; font-display: swap; src: url('../assets/fonts/playfair-600.woff2') format('woff2'); }
+        @font-face { font-family: 'Playfair Display'; font-style: normal; font-weight: 700; font-display: swap; src: url('../assets/fonts/playfair-700.woff2') format('woff2'); }
+        @font-face { font-family: 'Playfair Display'; font-style: italic; font-weight: 600; font-display: swap; src: url('../assets/fonts/playfair-600italic.woff2') format('woff2'); }
+
         :root {
             /* V300 Ultimate Luxury Palette */
             --bg-gradient-1: #A9D0EA;
@@ -7,6 +22,10 @@
             --gold: #D4AF37;
             --gold-light: #EED284;
             --gold-deep: #A8842A;
+            /* Darkened gold specifically for small text set directly on light/white — the
+               brighter --gold reads beautifully as an icon/border/background accent but only
+               hits ~2.1:1 against white, well under WCAG AA's 4.5:1 for text that size. */
+            --gold-text: #8A7224;
             --gold-gradient: linear-gradient(135deg, #EED284 0%, #D4AF37 55%, #B8912E 100%);
 
             /* Ultra-Premium Glassmorphism - Polished */
@@ -106,6 +125,11 @@
         .stars-overlay { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 3s ease; background-image: radial-gradient(white, rgba(255,255,255,.5) 1px, transparent 2px); background-size: 250px 250px; }
         .stars-active { opacity: 0.8 !important; }
 
+        /* SKIP LINK — invisible until keyboard-focused, lets a keyboard/screen-reader user
+           jump past the nav dock and decorative layers straight to the content. */
+        .skip-link { position: fixed; top: -60px; left: 16px; z-index: 10000; background: var(--ocean-deep); color: white; padding: 14px 22px; border-radius: 12px; font-family: var(--font-body); font-weight: 700; text-decoration: none; box-shadow: 0 8px 24px rgba(0,0,0,0.3); transition: top 0.2s ease; }
+        .skip-link:focus { top: 16px; }
+
         /* TOAST NOTIFICATION */
         #modeToast { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: rgba(6, 18, 30, 0.9); color: white; padding: 12px 24px; border-radius: 30px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); pointer-events: none; opacity: 0; transition: opacity 0.4s ease; z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.15); }
 
@@ -122,7 +146,7 @@
         .nav-btn:hover { background: rgba(212, 175, 55, 0.1); color: var(--gold-deep); }
         .nav-btn.active { background: var(--gold-gradient); color: white; box-shadow: var(--shadow-gold); }
         .nav-btn svg { width: 24px; height: 24px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
-        .nav-btn.active svg { transform: scale(1.1); fill: white; }
+        .nav-btn.active svg { transform: scale(1.1); fill: #06121E; }
 
         /* Section switch crossfade */
         #appContent { transition: opacity 0.16s ease, transform 0.16s ease; }
@@ -215,7 +239,7 @@
 
         /* Badge Positioning Logic */
         .tag-pill { position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 8px 16px; border-radius: 12px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-family: var(--font-body); color: #06121E; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 3; }
-        .tag-pill.highlight { background: var(--gold-gradient); color: white; border: 1px solid rgba(255,255,255,0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+        .tag-pill.highlight { background: var(--gold-gradient); color: #06121E; border: 1px solid rgba(255,255,255,0.4); }
 
         .cash-badge { position: absolute; bottom: 16px; left: 16px; background: var(--gold-gradient); color: #06121E; padding: 6px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; z-index: 3; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); border: 1px solid rgba(255,255,255,0.3); text-shadow: 0 1px 0 rgba(255,255,255,0.3); }
 
@@ -271,7 +295,8 @@
         body.dark-theme .modal-content { background: #06121E; }
         
         .modal-meta h2 { font-family: var(--font-head); font-size: 3.9rem; color: var(--text-main); margin: 0; line-height: 1.03; letter-spacing: -1.8px; font-weight: 700; }
-        .modal-meta span { font-family: var(--font-body); color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; font-size: 0.95rem; display: block; margin-bottom: 14px; }
+        .modal-meta span { font-family: var(--font-body); color: var(--gold-text); font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; font-size: 0.95rem; display: block; margin-bottom: 14px; }
+        body.dark-theme .modal-meta span { color: var(--gold); }
         .modal-desc { margin-top: 25px; font-size: 1.2rem; color: var(--text-muted); line-height: 1.75; max-width: 800px; white-space: pre-wrap; font-family: var(--font-body); font-weight: 500; }
         body.dark-theme .modal-desc { color: rgba(255,255,255,0.85); }
 
@@ -286,7 +311,8 @@
 
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-top: 35px; border-top: 1px solid rgba(6,18,30,0.1); padding-top: 25px; }
         body.dark-theme .info-grid { border-top: 1px solid rgba(255,255,255,0.1); }
-        .info-item h5 { margin: 0 0 8px 0; font-size: 0.85rem; text-transform: uppercase; color: var(--gold); letter-spacing: 1.5px; font-weight: 800; }
+        .info-item h5 { margin: 0 0 8px 0; font-size: 0.85rem; text-transform: uppercase; color: var(--gold-text); letter-spacing: 1.5px; font-weight: 800; }
+        body.dark-theme .info-item h5 { color: var(--gold); }
         .info-item p { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
         body.dark-theme .info-item p { color: white; }
         

@@ -98,14 +98,34 @@
             });
             
             document.addEventListener('keydown', (e) => {
-                if(document.getElementById('fsViewer').style.display === 'flex' || document.getElementById('fsViewer').classList.contains('active')) {
+                const fsOpen = document.getElementById('fsViewer').style.display === 'flex' || document.getElementById('fsViewer').classList.contains('active');
+                const modalOpen = document.getElementById('detailModal').classList.contains('active');
+                if(fsOpen) {
                     if(e.key === 'ArrowLeft') prevFs();
                     if(e.key === 'ArrowRight') nextFs();
                     if(e.key === 'Escape') closeFs();
-                } else if(document.getElementById('detailModal').classList.contains('active')) {
+                    if(e.key === 'Tab') trapFocus(document.getElementById('fsViewer'), e);
+                } else if(modalOpen) {
                     if(e.key === 'Escape') closeModal();
+                    if(e.key === 'Tab') trapFocus(document.querySelector('.modal'), e);
                 }
             });
+
+            // Keep Tab/Shift+Tab cycling within an open modal/lightbox instead of escaping
+            // to the page content sitting behind it.
+            function trapFocus(container, e) {
+                const focusable = container.querySelectorAll('button, [href], input, [tabindex]:not([tabindex="-1"])');
+                if (focusable.length === 0) return;
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
 
             let titleTaps = 0;
             let titleTapResetId = null;

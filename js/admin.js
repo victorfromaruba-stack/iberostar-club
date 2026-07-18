@@ -114,6 +114,23 @@ async function clearOfflineCache() {
     }
 }
 
+// Tracks whether the form has edits the staff member hasn't saved yet, so a stray tap on
+// another item in the list (or the browser back button) can't silently throw work away.
+let formDirty = false;
+const FORM_FIELD_IDS = ['newKey', 'newTitle', 'newSub', 'newDesc', 'newGallery', 'newFile',
+    'newPartnerLogo', 'newDuration', 'newTime', 'newItinerary', 'newEssentials', 'newType'];
+
+function markFormDirty() { formDirty = true; }
+
+function confirmDiscardIfDirty() {
+    if (!formDirty) return true;
+    return confirm('You have unsaved changes on this item. Discard them?');
+}
+
+window.addEventListener('beforeunload', (e) => {
+    if (formDirty) { e.preventDefault(); e.returnValue = ''; }
+});
+
 function renderAdminList() {
     const listContainer = document.getElementById('itemListContainer');
     listContainer.innerHTML = '';
@@ -127,8 +144,8 @@ function renderAdminList() {
         div.setAttribute('role', 'button');
         div.setAttribute('tabindex', '0');
         div.innerHTML = `<strong style="color:#06121E; font-size:1.05rem;">${item.title}</strong> <span style="color:#8898AA;font-size:13px;font-weight:700;">${key}</span>`;
-        div.onclick = () => loadItemIntoForm(key);
-        div.onkeydown = (e) => { if (e.key === 'Enter') loadItemIntoForm(key); };
+        div.onclick = () => { if (confirmDiscardIfDirty()) loadItemIntoForm(key); };
+        div.onkeydown = (e) => { if (e.key === 'Enter' && confirmDiscardIfDirty()) loadItemIntoForm(key); };
         listDiv.appendChild(div);
     });
     listContainer.appendChild(listDiv);
@@ -148,13 +165,13 @@ function loadItemIntoForm(key) {
     document.getElementById('newGallery').value = item.gallery ? item.gallery.join(', ') : '';
     document.getElementById('newPartnerLogo').value = item.partnerLogo || '';
     document.getElementById('newFile').value = item.pdf || item.video || '';
+    formDirty = false;
 }
 
 function clearForm() {
-    ['newKey', 'newTitle', 'newSub', 'newDesc', 'newGallery', 'newFile', 'newPartnerLogo',
-     'newDuration', 'newTime', 'newItinerary', 'newEssentials'].forEach(id => {
-        document.getElementById(id).value = '';
-    });
+    if (!confirmDiscardIfDirty()) return;
+    FORM_FIELD_IDS.forEach(id => { document.getElementById(id).value = ''; });
+    formDirty = false;
 }
 
 function saveItem() {
@@ -190,6 +207,7 @@ function saveItem() {
         ...(existingPdfs ? { pdfs: existingPdfs } : {})
     };
     persistAppData();
+    formDirty = false;
     showToast('Changes Saved!');
     renderAdminList();
 }
@@ -200,6 +218,7 @@ function deleteItem() {
     if (confirm("Delete " + key + "?")) {
         delete appData[key];
         persistAppData();
+        formDirty = false;
         showToast('Item Deleted!');
         clearForm();
         renderAdminList();
@@ -228,5 +247,9 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('gateForm').addEventListener('submit', (e) => {
         e.preventDefault();
         checkPassword();
+    });
+    FORM_FIELD_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', markFormDirty);
     });
 });
