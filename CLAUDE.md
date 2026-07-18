@@ -27,11 +27,30 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   gate. Not loaded by `index.html`.
 - `assets/` — all media (jpg/png/pdf/mp4), in per-category subfolders: `Hotels/`, `Restaurants/`,
   `Spa/`, `Golf/`, `Activities/`, `Logos/`, each with per-property subfolders below that.
+  `assets/fonts/` holds the self-hosted Inter/Playfair Display woff2 files (see Fonts below).
+- `scripts/verify.js` — zero-dependency Node script, run with `node scripts/verify.js`. Checks
+  every `gallery`/`pdf`/`video`/`partnerLogo`/`pdfs[]` path in `data.js` resolves to a real file,
+  that `DATA_VERSION` matches between `app.js`/`admin.js`, and that no responsive CSS rule resets
+  a safe-area-aware `padding-top`/`margin-top` via a bare shorthand (the exact bug class that has
+  shipped here before — a shorthand `padding: ...` later in the cascade silently wins over an
+  earlier longhand `padding-top: calc(... var(--safe-top) ...)`). Not wired into anything
+  automatically; run it by hand after touching `data.js` or `styles.css`.
 
-There is no build tool, package manager, bundler, linter, or test suite. There's nothing to
-`npm install` or compile — edit files directly and serve the directory with any static file
-server (e.g. `python3 -m http.server`) to preview changes. `admin.html`'s password check uses
-`crypto.subtle`, which requires a secure context (`localhost` or HTTPS), not `file://`.
+There is no build tool, package manager, bundler, or test suite (there is now one small
+verification script — see above). There's nothing to `npm install` or compile — edit files
+directly and serve the directory with any static file server (e.g. `python3 -m http.server`) to
+preview changes. `admin.html`'s password check uses `crypto.subtle`, which requires a secure
+context (`localhost` or HTTPS), not `file://`.
+
+### Fonts
+Inter and Playfair Display are self-hosted from `assets/fonts/` (declared via `@font-face` at the
+top of `css/styles.css`), not loaded from the Google Fonts CDN — that was a hard external
+dependency with no fallback that failed outright under at least one tested network policy. Only
+the `latin` subset is downloaded (10 static-weight woff2 files, ~240KB total), which covers the
+site's English/Spanish/Papiamento copy. If a new weight or style is needed, re-fetch it from
+Google Fonts' CSS API with an older browser User-Agent (e.g. Chrome 60) to force static
+per-weight files rather than a single variable-font blob, then add both the woff2 file and its
+`@font-face` block.
 
 ## Architecture
 
