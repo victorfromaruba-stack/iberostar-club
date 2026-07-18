@@ -109,7 +109,9 @@
 
             let titleTaps = 0;
             let titleTapResetId = null;
-            document.getElementById('pageTitle').addEventListener('click', function() {
+            // Bound to the greeting/date corner (not the big page-title heading) so guests
+            // casually tapping the prominent H1 can't accidentally trip in-house mode.
+            document.querySelector('.greeting-wrap').addEventListener('click', function() {
                 titleTaps++;
                 if (titleTapResetId) clearTimeout(titleTapResetId);
                 if(titleTaps === 3) {
