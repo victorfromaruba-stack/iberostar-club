@@ -15,6 +15,10 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   `js/image-utils.js` → `js/data.js` → `js/app.js` (in that order, all `defer`).
 - `admin.html` — separate, unlinked staff page for editing content. Password-gated (see
   Admin panel below). Loads `css/styles.css`, `js/data.js`, `js/admin.js`.
+- `qr.html` — standalone, printable "scan to save" page: a QR code (inline SVG, pre-generated
+  for `https://victorfromaruba-stack.github.io/iberostar-club/` — regenerate the path data if the
+  URL changes) plus iPhone/Android Add-to-Home-Screen steps. `manifest.webmanifest` (linked from
+  `index.html`) makes the Android install use the proper name/icon/standalone mode.
 - `css/styles.css` — all styling for both pages (glassmorphism cards, modal, lightbox, nav,
   ambient day/night decorations, admin form styles).
 - `js/data.js` — the entire content catalog (`defaultData`). This is the file you edit to add,

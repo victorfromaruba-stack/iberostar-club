@@ -1,0 +1,12 @@
+{
+    "name": "Iberostar Aruba",
+    "short_name": "Iberostar",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#FBF8F1",
+    "theme_color": "#D4AF37",
+    "icons": [
+        { "src": "assets/Logos/app_logo_club.png?v=200", "sizes": "480x480", "type": "image/png", "purpose": "any" }
+    ]
+}
