@@ -5,7 +5,9 @@
 
    Degradation, 3 layers:
      1. No js/media.js (or no entry)  → lib.js imgHTML() already emits the original.
-     2. A derivative fails             → swap once to data-orig, drop srcset/sizes.
+     2. A derivative fails             → retry the same variant once (a Wi-Fi hiccup or roam is far
+                                         likelier than a missing file: verify.js checks every variant),
+                                         then swap to data-orig, drop srcset/sizes.
      3. The original fails             → jpg↔png / jpeg→jpg / decodeURIComponent retries
                                          (skipped while offline), then triggerFallback()
                                          puts the branded .ph placeholder in the .media box.
@@ -45,9 +47,24 @@ function handleImgError(img) {
     const current = img.currentSrc || img.src || '';
     if (!current || current === location.href) return; // empty src (e.g. data-src slide not yet loaded)
 
-    // Layer 2: a derivative failed → fall back to the original exactly once.
+    // Layer 2: a derivative failed. Retry the same variant once after a short pause, or when the
+    // connection comes back; the original (up to 10× the bytes) is only the next step.
     const orig = img.dataset.orig;
-    if (orig && img.dataset.stage !== 'orig' && (img.hasAttribute('srcset') || !img.getAttribute('src') || img.getAttribute('src') !== orig)) {
+    const isVariant = orig && img.dataset.stage !== 'orig' && (img.hasAttribute('srcset') || !img.getAttribute('src') || img.getAttribute('src') !== orig);
+    if (isVariant && !img.dataset.vretry) {
+        img.dataset.vretry = '1';
+        const again = () => {
+            if (!img.isConnected || img.dataset.stage === 'orig') return;
+            // re-setting the attributes (even to the same value) restarts the fetch
+            const ss = img.getAttribute('srcset'), src = img.getAttribute('src');
+            if (ss) img.setAttribute('srcset', ss);
+            if (src) img.setAttribute('src', src);
+        };
+        if (navigator.onLine === false) window.addEventListener('online', again, { once: true });
+        else setTimeout(again, 700);
+        return;
+    }
+    if (isVariant) {
         img.dataset.stage = 'orig';
         img.removeAttribute('srcset');
         img.removeAttribute('sizes');
@@ -138,9 +155,21 @@ const lazyIO = 'IntersectionObserver' in window ? new IntersectionObserver(entri
 function railLazy(track) {
     const imgs = track.querySelectorAll('img[data-src]');
     if (!imgs.length) return;
+    if (track._io) track._io.disconnect();
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { io.unobserve(e.target); promoteImg(e.target); } }),
         { root: track, rootMargin: '0px 50% 0px 0px' });
+    track._io = io;
     imgs.forEach(i => io.observe(i));
+}
+/* Before a view re-renders in place: stop observing the nodes it is about to drop (the per-rail
+   observers and the shared lazyIO entries), so detached elements are not kept alive. */
+function releaseLazy(root) {
+    if (!root) return;
+    root.querySelectorAll('.rail__track, .saved-strip').forEach(g => {
+        if (g._io) { g._io.disconnect(); g._io = null; }
+        if (g._lazy && lazyIO) { lazyIO.unobserve(g); g._lazy = 0; }
+    });
+    if (lazyIO) root.querySelectorAll('img[data-src]').forEach(i => lazyIO.unobserve(i));
 }
 function observeLazy(root) {
     (root || document).querySelectorAll('img[data-src]').forEach(img => {

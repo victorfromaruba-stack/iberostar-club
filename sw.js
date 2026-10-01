@@ -5,11 +5,21 @@
  * new VERSION creates a fresh `ib-shell-<VERSION>` cache and the old one is deleted on activate.
  *
  * Caches
- *   ib-shell-<VERSION>  app shell + any same-origin .html/.js/.css/.webmanifest (network-first)
+ *   ib-shell-<VERSION>  this release's app shell: index.html, qr.html, every `?v=<VERSION>` script/style/manifest,
+ *                       fonts, brand logos, plus visited pages (admin.html) re-fetched for each new release
  *   ib-media-v1         hash-named derivatives (assets/img), fonts, brand logos (cache-first, immutable),
  *                       plus anything the staff "Cache everything" button pins for offline use
  *   ib-runtime-v1       originals, PDFs and other assets/** (stale-while-revalidate, LRU 150 entries)
  * Never cached: non-GET, cross-origin, Range requests, *.mp4.
+ *
+ * Release consistency. GitHub Pages ignores query strings, so after a deploy `js/app.js?v=<n>` returns the
+ * NEW app.js. Each worker therefore treats `?v=<n>` URLs as immutable snapshots of release n:
+ *   - `?v=VERSION`  cache-first from SHELL (install fills it); a miss is fetched once and kept.
+ *   - `?v=<other>`  that release's own ib-shell-<other> if it exists (a newer worker installing), else
+ *                   the network — never written to SHELL, never answered with this release's bytes.
+ *   - pages         network-first, but a page is stored in SHELL only when every ?v= script/style it
+ *                   loads is this VERSION. Offline/slow, the stored page therefore loads a consistent shell.
+ * So every file change that ships needs a VERSION bump (verify.js keeps the numbers in sync).
  *
  * Messages (page → worker)
  *   {type:'warm', urls?}     card-size photo of every item + Today heroes (~0.6 MB). urls[] = extra same-origin URLs.
@@ -45,13 +55,14 @@ const RUNTIME_MAX = 150;
 const NET_TIMEOUT = 3000;
 const SHELL_URLS = ['./', 'index.html', `css/styles.css?v=${VERSION}`, `js/image-utils.js?v=${VERSION}`,
   `js/data.js?v=${VERSION}`, `js/media.js?v=${VERSION}`, `js/lib.js?v=${VERSION}`, `js/app.js?v=${VERSION}`,
-  'manifest.webmanifest', 'assets/fonts/inter-400.woff2', 'assets/fonts/inter-500.woff2',
+  `manifest.webmanifest?v=${VERSION}`, 'assets/fonts/inter-400.woff2', 'assets/fonts/inter-500.woff2',
   'assets/fonts/inter-600.woff2', 'assets/fonts/playfair-600.woff2', 'assets/fonts/playfair-600italic.woff2',
-  'assets/Logos/logo_iberostar_ink.png', 'assets/Logos/logo_iberostar_ivory.png', 'assets/Logos/app_logo_club.png'];
-// Install fails only if one of these fails; the rest (media.js, fonts, logos) are best effort.
+  'assets/Logos/logo_iberostar_ink.png', 'assets/Logos/logo_iberostar_ivory.png', 'assets/Logos/app_logo_club.png',
+  'qr.html'];
+// Install fails only if one of these fails; the rest (media.js, fonts, logos, qr.html) are best effort.
 const SHELL_REQUIRED = SHELL_URLS.slice(0, 8).filter((u) => !u.startsWith('js/media.js'));
 // Mirror of TODAY_HERO in js/app.js (§B5.1) — keep in sync, like scripts/build-images.py does.
-const TODAY_HERO = ['assets/Hotels/Joia/hotel_joia_9.jpg', 'assets/Hotels/Joia/hotel_joia_1.jpg',
+const TODAY_HERO = ['assets/Hotels/Joia/hotel_joia_2.jpg', 'assets/Hotels/Joia/hotel_joia_1.jpg',
   'assets/Restaurants/Zima/rest_zima_1.jpg'];
 
 // Catalog + derivative map for warm/precache. Both optional: a 404 here must never break the worker.
@@ -67,16 +78,30 @@ const relPath = (url) => { try { return decodeURIComponent(url.pathname.slice(SC
 const pickW = (m, want) => { const f = m.v.find((x) => x >= want); return f != null ? f : m.v[m.v.length - 1]; };
 const variant = (m, w) => abs(`assets/img/${m.id}-${w}.webp`);
 const cacheable = (res) => !!res && res.ok && res.type === 'basic';
+const shellCache = (v) => `ib-shell-${v}`;
+// The release a URL is pinned to by its ?v=, or null when it carries none.
+const versionOf = (url) => { const v = url.searchParams.get('v'); return v && /^\d+$/.test(v) ? Number(v) : null; };
+// ?v=<n> scripts/styles/manifest an HTML page loads (images' ?v= is only an icon cache-buster).
+const pageRefs = (html) => [...html.matchAll(/(?:src|href)\s*=\s*["']([^"'#]+\.(?:js|css|webmanifest)\?v=(\d+))["']/gi)];
+// True when the page belongs to this worker's release: every versioned script/style is ?v=VERSION.
+const pageIsThisRelease = (html) => pageRefs(html).every((m) => Number(m[2]) === VERSION);
+const keepPage = async (res) => pageIsThisRelease(await res.text());
 
 /* ---------------------------------------------------------------- lifecycle */
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(SHELL);
-    const req = (u) => new Request(u, { cache: 'reload' });
-    try { await cache.addAll(SHELL_URLS.map(req)); return; } catch (e) { /* e.g. media.js 404 → one by one */ }
-    const results = await Promise.allSettled(SHELL_URLS.map((u) => cache.add(req(u)).then(() => u)));
-    const failed = SHELL_URLS.filter((u, i) => results[i].status === 'rejected');
-    if (failed.some((u) => SHELL_REQUIRED.includes(u))) throw new Error(`shell incomplete: ${failed.join(', ')}`);
+    // 'no-cache', not 'reload': the server still validates every file, but one the page has just
+    // downloaded costs a 304 instead of a second full copy over the resort Wi-Fi.
+    const req = (u) => new Request(u, { cache: 'no-cache' });
+    let done = false;
+    try { await cache.addAll(SHELL_URLS.map(req)); done = true; } catch (e) { /* e.g. media.js 404 → one by one */ }
+    if (!done) {
+      const results = await Promise.allSettled(SHELL_URLS.map((u) => cache.add(req(u)).then(() => u)));
+      const failed = SHELL_URLS.filter((u, i) => results[i].status === 'rejected');
+      if (failed.some((u) => SHELL_REQUIRED.includes(u))) throw new Error(`shell incomplete: ${failed.join(', ')}`);
+    }
+    await carryVisitedPages(cache, req);
   })());
   // No automatic skipWaiting: the page shows "Updated info available · Refresh" and posts 'skip-waiting'.
 });
@@ -106,7 +131,10 @@ self.addEventListener('fetch', (event) => {
   if (req.mode === 'navigate' && (!ext || ext === 'html')) {
     event.respondWith(navigation(event, url));
   } else if (['html', 'js', 'css', 'webmanifest'].includes(ext)) {
-    event.respondWith(networkFirst(event, req));
+    const v = versionOf(url);
+    if (v === VERSION) event.respondWith(pinned(event, req));
+    else if (v != null) event.respondWith(otherRelease(req, v));
+    else event.respondWith(networkFirst(event, req));
   } else if (/^assets\/(img|fonts|logos)\//i.test(rel)) {
     event.respondWith(cacheFirst(req, url));
   } else if (/^assets\//i.test(rel)) {
@@ -121,10 +149,10 @@ const timeout = (ms) => new Promise((r) => setTimeout(r, ms, 'timeout'));
 let slowUntil = 0;
 
 // Network with a soft deadline: after NET_TIMEOUT, answer from cache if we have it, but let the
-// network response finish in the background and refresh the cache.
-async function fresh(event, fetchURL, cacheKey, fallback) {
+// network response finish in the background and refresh the cache (only when keep(res) agrees).
+async function fresh(event, fetchURL, cacheKey, fallback, keep) {
   const net = fetch(fetchURL, { cache: 'no-cache', credentials: 'same-origin' }).then(async (res) => {
-    if (cacheable(res)) {
+    if (cacheable(res) && (!keep || await keep(res.clone()))) {
       const copy = res.redirected ? await unredirect(res.clone()) : res.clone();
       await (await caches.open(SHELL)).put(cacheKey, copy);
     }
@@ -145,20 +173,70 @@ async function navigation(event, url) {
   const isApp = rel === '' || rel === 'index.html';
   // Bare URL (no query) as the cache key; the app's own pages share one 'index.html' entry.
   const key = isApp ? abs('index.html') : url.origin + url.pathname;
+  // A page whose ?v= files are another release (a deploy this worker predates) is passed through but
+  // never stored, so SHELL's copy keeps loading SHELL's own files. Only the app's own URLs fall back
+  // to index.html; any other page with no stored copy waits for the network, then shows offlinePage.
   const res = await fresh(event, url.href, key, async () =>
-    (await caches.match(key)) ||
-    (await matchIn(SHELL, abs('index.html'))) || (await matchIn(SHELL, abs('./'))));
+    (await matchIn(SHELL, key)) || (await caches.match(key)) ||
+    (isApp ? await matchIn(SHELL, abs('./')) : null), keepPage);
   if (res && !res.redirected) return res;
   if (res) return unredirect(res);
   return offlinePage('You’re offline', 'Connect to Wi-Fi and try again. After one visit online, the guide opens even without a connection.');
 }
 
+// Unversioned scripts/styles (nothing in the shell; e.g. a hand-typed URL). Versioned ones never get here.
 async function networkFirst(event, req) {
   const url = new URL(req.url);
   const res = await fresh(event, req.url, url.href, async () =>
     (await caches.match(req)) || (await matchIn(SHELL, req, { ignoreSearch: true })) ||
     (await caches.match(req, { ignoreSearch: true })));
   return res || Response.error();
+}
+
+// ?v=VERSION: immutable for this release. Install stored the shell; anything else (admin.js?v=…) is
+// fetched once and kept.
+async function pinned(event, req) {
+  const hit = await matchIn(SHELL, req);
+  if (hit) return hit;
+  return (await fresh(event, req.url, req.url, async () => null)) || Response.error();
+}
+
+// ?v=<other release>: a page from a deploy this worker predates (or postdates). Its own shell, when a
+// newer worker has installed one, is a consistent copy; otherwise the network. Never stored here and
+// never answered from SHELL, whose bytes belong to a different release.
+async function otherRelease(req, v) {
+  if (await caches.has(shellCache(v))) {
+    const hit = await matchIn(shellCache(v), req);
+    if (hit) return hit;
+  }
+  try { return await fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' }); } catch (e) { return Response.error(); }
+}
+
+// Pages outside the shell that this device has opened before (admin.html) live in the per-release
+// shell, which activate deletes. Re-fetch them, and the ?v=VERSION files they load, into the new
+// shell so they keep opening offline after a release. Best effort: never fails the install.
+async function carryVisitedPages(cache, req) {
+  try {
+    const shellPages = new Set(SHELL_URLS.map(abs).concat(abs('index.html')));
+    const pages = new Set();
+    for (const name of await caches.keys()) {
+      if (!name.startsWith('ib-shell-') || name === SHELL) continue;
+      for (const r of await (await caches.open(name)).keys()) {
+        const u = new URL(r.url);
+        if (u.search || !/\.html$/i.test(u.pathname) || shellPages.has(u.href)) continue;
+        if (u.origin === SCOPE.origin && u.pathname.startsWith(SCOPE.pathname)) pages.add(u.href);
+      }
+    }
+    await Promise.allSettled([...pages].map(async (page) => {
+      const res = await fetch(req(page));
+      if (!cacheable(res)) return;
+      const html = await res.clone().text();
+      if (!pageIsThisRelease(html)) return;
+      const refs = pageRefs(html).map((m) => new URL(m[1], page).href).filter((u) => u.startsWith(SCOPE.href));
+      await Promise.allSettled(refs.map(async (u) => { if (!(await cache.match(u))) await cache.add(req(u)); }));
+      await cache.put(page, res);
+    }));
+  } catch (e) { /* best effort */ }
 }
 
 async function cacheFirst(req, url) {
@@ -372,7 +450,12 @@ async function fill(urls, onEach) {
             if (cacheable(res)) {
               const blob = await res.clone().blob();
               bytes = blob.size;
-              await (/\.(html|js|css|webmanifest)$/i.test(new URL(u).pathname) ? shell : media).put(u, res);
+              const x = new URL(u);
+              const isShellType = /\.(html|js|css|webmanifest)$/i.test(x.pathname);
+              const v = versionOf(x);
+              // Shell-type files of another release would break SHELL's snapshot: fetched, not stored.
+              if (!isShellType) await media.put(u, res);
+              else if (v === VERSION || (v == null && !/\.html$/i.test(x.pathname))) await shell.put(u, res);
               ok = true;
             }
           } finally { clearTimeout(t); }

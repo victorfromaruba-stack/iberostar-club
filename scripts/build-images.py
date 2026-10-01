@@ -24,6 +24,10 @@ Idempotent: derivative names carry sha1(source)[:8], so an unchanged source is n
 re-encoded, and js/media.js is only rewritten when its content changes. Files in assets/img
 that no current source maps to are pruned (that directory is wholly generated).
 
+A source that cannot be read (truncated upload, an iPhone .HEIC this Pillow cannot decode) is
+reported as "ERROR <path>" and skipped; everything else is still built and js/media.js is still
+written, but the exit code is 1. CROPS trims baked-in junk (e.g. a screen-grab edge) off a source.
+
 The app works without any of this: when js/media.js is missing, or has no entry for a path,
 it falls back to the original file.
 """
@@ -39,7 +43,7 @@ import shutil
 import subprocess
 import sys
 import time
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 try:
@@ -55,15 +59,32 @@ DATA_JS = ROOT / "js" / "data.js"
 # Mirror of TODAY_HERO in js/app.js (spec B.1 "Phase sky"). Keep these literal and in sync:
 # staff may swap a hero photo by editing both lists and re-running this script.
 TODAY_HERO = {
-    "morning": "assets/Hotels/Joia/hotel_joia_9.jpg",
+    "morning": "assets/Hotels/Joia/hotel_joia_2.jpg",
     "day": "assets/Hotels/Joia/hotel_joia_1.jpg",
     "sunset": "assets/Restaurants/Zima/rest_zima_1.jpg",
     "night": "assets/Restaurants/Zima/rest_zima_1.jpg",
 }
 
+# Per-source crops, applied before every derivative (after EXIF orientation). Keyed by the path
+# as written in js/data.js; "sha" pins the crop to one exact source file, so a replacement photo
+# with the same name is never cropped blindly (the run prints a NOTE instead). box = (left, top,
+# right, bottom) in source pixels. The crop is folded into the derivative id, so editing a box
+# re-encodes that photo on the next run. The crop applies to the WebP derivatives only; the
+# original stays untouched (it is only served if a derivative fails), so prefer a cropped source
+# file when one can be committed.
+# {path: {"sha": sha1(source)[:8], "box": (left, top, right, bottom)}}. Pinned to the source hash, so a
+# replaced file is never cropped blindly. Prefer fixing the original file itself (act_jeepb_1.jpg was
+# cropped in place this way) and keep this for sources that must stay untouched.
+CROPS = {}
+
+# Formats every target browser can show as an original (the app falls back to the original when a
+# WebP derivative is missing or fails). Anything else (iPhone .HEIC/.HEIF, .tif...) is reported.
+WEB_IMAGE_EXT = (".jpg", ".jpeg", ".png", ".webp", ".gif")
+HERO_MIN_WIDTH = 800                # gallery[0] narrower than this looks soft as a full-width hero
+
 PHOTO_WIDTHS = (480, 800, 1600)
-LOGO_WIDTHS = (160, 320)            # 160 per spec; 320 so 72px tiles stay sharp at 3x DPR
-QUALITY = {160: 85, 320: 85, 480: 72, 800: 72, 1600: 78}   # by tier; native widths use the next tier up
+LOGO_WIDTHS = (160, 320, 640)       # 160 per spec; 320 so 72px tiles stay sharp at 3x DPR; 640 for wide lockups (Marea) at 3x
+QUALITY = {160: 85, 320: 85, 640: 85, 480: 72, 800: 72, 1600: 78}   # by tier; native widths use the next tier up
 NATIVE_MIN_GAIN = 1.10              # only add a native-width variant if it beats the largest tier by 10%
 LQIP_WIDTH, LQIP_QUALITY = 24, 40
 POSTER_WIDTH, POSTER_QUALITY, POSTER_AT = 1280, 75, 3.0
@@ -71,7 +92,10 @@ POSTER_WIDTH, POSTER_QUALITY, POSTER_AT = 1280, 75, 3.0
 BRAND_SRC = "assets/Logos/logo_club.png"
 INK, IVORY, WHITE, NAVY = (0x0B, 0x1F, 0x33), (0xF4, 0xEF, 0xE4), (0xFF, 0xFF, 0xFF), (0x07, 0x13, 0x1F)
 BRAND_HEIGHT = 84                   # 3x of the 28px header height (spec asks 2x; 3x is crisp on iPhones)
-STARTUP_SIZES = [(1170, 2532), (1179, 2556), (1290, 2796), (750, 1334)]
+# Portrait launch images for every Home-Screen-capable iPhone size class (index.html links each one with
+# a matching device-width/height/DPR media query; a device with no match flashes white on launch).
+STARTUP_SIZES = [(1170, 2532), (1179, 2556), (1290, 2796), (750, 1334), (640, 1136), (1125, 2436),
+                 (828, 1792), (1242, 2688), (1284, 2778), (1206, 2622), (1320, 2868), (1260, 2736)]
 STARTUP_MARK_FRACTION = 0.34        # mark width as a fraction of screen width
 MASKABLE_SIZE, MASKABLE_SAFE = 512, 0.60
 
@@ -109,6 +133,20 @@ def sha8(path):
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
     return h.hexdigest()[:8]
+
+
+def crop_for(path, h8):
+    """The crop box for `path` if CROPS has one pinned to this exact source (sha8), else None."""
+    c = CROPS.get(path)
+    return tuple(c["box"]) if c and c.get("sha") == h8 else None
+
+
+def ident_for(path, h8):
+    """Derivative id: <slug>-<sha1(source)[:8]>, with a crop tag before the hash when a crop
+    applies (so editing a box re-encodes; verify.js still reads the trailing source hash)."""
+    box = crop_for(path, h8)
+    tag = "-c" + hashlib.sha1(",".join(map(str, box)).encode()).hexdigest()[:6] if box else ""
+    return f"{slug_for(path)}{tag}-{h8}"
 
 
 def which(name):
@@ -270,12 +308,16 @@ def resized(im, w):
 
 
 def process_image(job):
-    """Worker: build every derivative for one source file. Returns the MEDIA entry plus stats."""
-    path, h8, widths_tiers, need_q, force = job
+    """Worker: build every derivative for one source file. Returns the MEDIA entry plus stats.
+    Raises on an unreadable source; main() reports that per file and carries on."""
+    path, h8, box, widths_tiers, need_q, force = job
     im = open_normalized(path)
+    if box:
+        if not (0 <= box[0] < box[2] <= im.width and 0 <= box[1] < box[3] <= im.height):
+            raise ValueError(f"crop box {box} does not fit the {im.width}x{im.height} source")
+        im = im.crop(box)
     W, H = im.size
-    slug = slug_for(path)
-    ident = f"{slug}-{h8}"
+    ident = ident_for(path, h8)
     widths = plan_widths(W, widths_tiers)
     written, sizes = 0, {}
     for w in widths:
@@ -552,11 +594,14 @@ def main():
 
     media_img, jobs, reused = {}, [], 0
     orig_bytes = 0
+    stale_crops = []
     for p, (tiers, need_q) in sources.items():
         orig_bytes += (ROOT / p).stat().st_size
         h8 = sha8(p)
+        if p in CROPS and not crop_for(p, h8):
+            stale_crops.append(p)
         old = prev_img.get(p)
-        if (not args.force and old and old.get("id") == f"{slug_for(p)}-{h8}"
+        if (not args.force and old and old.get("id") == ident_for(p, h8)
                 and old.get("v") == plan_widths(old.get("w", 0), tiers)
                 and (not need_q or old.get("q"))
                 and all((OUT_DIR / f"{old['id']}-{w}.webp").exists() for w in old["v"])):
@@ -566,15 +611,27 @@ def main():
             media_img[p] = e
             reused += 1
         else:
-            jobs.append((p, h8, tiers, need_q, args.force))
+            jobs.append((p, h8, crop_for(p, h8), tiers, need_q, args.force))
 
-    written = 0
+    # One unreadable file (a truncated upload, an iPhone .HEIC Pillow cannot decode...) must not
+    # sink the whole run: it is reported by path and skipped, every other photo still gets its
+    # derivatives and MEDIA entry, media.js is still written, and the exit code is non-zero.
+    written, failed = 0, []
     if jobs:
         log(f"Encoding {len(jobs)} source image(s) with {args.jobs} worker(s)...")
         with ProcessPoolExecutor(max_workers=max(1, args.jobs)) as ex:
-            for n, (p, entry, w, _sizes) in enumerate(ex.map(process_image, jobs, chunksize=1), 1):
-                media_img[p] = entry
-                written += w
+            futures = {ex.submit(process_image, j): j[0] for j in jobs}
+            for n, fut in enumerate(as_completed(futures), 1):
+                try:
+                    p, entry, w, _sizes = fut.result()
+                except Exception as e:  # noqa: BLE001 — any per-file failure is reported, not fatal
+                    p = futures[fut]
+                    reason = f"{type(e).__name__}: {e}".replace(str(ROOT) + os.sep, "")
+                    failed.append((p, reason))
+                    log(f"  ERROR  {p}: {reason} (skipped)")
+                else:
+                    media_img[p] = entry
+                    written += w
                 if n % 20 == 0 or n == len(jobs):
                     log(f"  {n}/{len(jobs)} done")
 
@@ -636,7 +693,8 @@ def main():
     q_sizes = [len(e["q"]) for e in media_img.values() if e.get("q")]
     log("")
     log("Summary")
-    log(f"  sources      {len(media_img)} images ({human(orig_bytes)} originals): {reused} reused, {len(jobs)} encoded, {written} file(s) written")
+    log(f"  sources      {len(media_img)} images ({human(orig_bytes)} originals): {reused} reused, {len(jobs) - len(failed)} encoded, {written} file(s) written"
+        + (f", {len(failed)} FAILED" if failed else ""))
     log(f"  photos       {sum(1 for p in media_img if p in photos)} = {human(photo_orig)} as originals"
         f" -> {human(total_at(480))} at 480w, {human(total_at(800))} at 800w, {human(total_at(1600))} at 1600w")
     for p in sorted(logos):
@@ -655,6 +713,22 @@ def main():
     unref = [s for d, s in VIDEO_720.items() if (ROOT / d).exists() and d not in videos and s in videos]
     for s in unref:
         log(f"  NOTE         js/data.js still references {s}; point it at the 720p file.")
+    for p in stale_crops:
+        log(f"  NOTE         {p} changed since its CROPS entry was set: crop not applied; re-check the photo and update or remove CROPS[{p!r}].")
+    low = sorted((media_img[p]["w"], p) for p in gallery0 if p in media_img and media_img[p]["w"] < HERO_MIN_WIDTH)
+    if low:
+        log(f"  low-res      {len(low)} hero photo(s) (gallery[0]) narrower than {HERO_MIN_WIDTH}px look soft full-width; ask for larger originals:")
+        for w, p in low:
+            log(f"                 {w}px  {p}")
+    failed_paths = {p for p, _ in failed}
+    odd = sorted(p for p in sources if not p.lower().endswith(WEB_IMAGE_EXT) and p not in failed_paths)
+    for p in odd:
+        log(f"  WARNING      {p}: {os.path.splitext(p)[1] or 'no extension'} is not a web image format; Chrome, Android and"
+            f" Firefox cannot show the original. Export it as JPEG and update js/data.js.")
+    for p, reason in failed:
+        hint = (" (iPhone HEIC: export it as JPEG, e.g. Photos > File > Export, and update js/data.js)"
+                if p.lower().endswith((".heic", ".heif")) else " (re-export or re-upload the file)")
+        log(f"  ERROR        {p}: could not be read, no derivatives or MEDIA entry{hint}. {reason}")
     for m in missing:
         log(f"  MISSING      {m} (referenced in js/data.js but not on disk)")
     for b in bad:
@@ -663,7 +737,7 @@ def main():
         out, n = contact_sheet(data, args.out)
         log(f"  contact      {out} ({n} images; red labels = fewer than 1,600 colours, likely a logo)")
     log(f"Done in {time.time() - t0:.1f}s")
-    return 1 if (bad or missing) else 0
+    return 1 if (bad or missing or failed) else 0
 
 
 if __name__ == "__main__":

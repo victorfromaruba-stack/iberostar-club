@@ -673,6 +673,19 @@ check('5. Media', () => {
     if (!underscore.length && fileStatus('.nojekyll') === 'ok') ok('no _-prefixed directories under assets/, .nojekyll present');
 
     const refs = referencedImages();
+    // Non-web image formats (iPhone .HEIC/.HEIF, .tif, .bmp...) never reach referencedImages()
+    // (IMAGE_EXT), so nothing else flags them: Chrome/Android/Firefox cannot show the original and
+    // build-images.py may not decode it.
+    const nonWeb = [];
+    const seeImg = (p, where) => { if (typeof p === 'string' && p && !EXTERNAL_URL.test(p) && !IMAGE_EXT.test(p)) nonWeb.push(`${p} (${where})`); };
+    if (data) for (const [key, item] of Object.entries(data)) {
+        if (!item || typeof item !== 'object') continue;
+        (Array.isArray(item.gallery) ? item.gallery : []).forEach((p) => seeImg(p, `${key}.gallery`));
+        seeImg(item.logo, `${key}.logo`);
+        seeImg(item.partnerLogo, `${key}.partnerLogo`);
+    }
+    heroes.forEach((p) => seeImg(p, 'TODAY_HERO'));
+    nonWeb.forEach((s) => fail(`${s}: not a web image format (jpg/jpeg/png/webp/gif) — export the photo as JPEG and update js/data.js`));
     const mediaRes = loadGlobal('js/media.js', 'MEDIA');
     if (mediaRes.missing) {
         const big = [...refs.keys()].filter((p) => sizeOf(p) > 400e3);
@@ -734,6 +747,28 @@ check('5. Media', () => {
     if (fs.existsSync(abs('assets/img'))) {
         const orphans = fs.readdirSync(abs('assets/img')).filter((f) => !expected.has(`assets/img/${f}`) && !f.startsWith('.'));
         if (orphans.length) warn(`${plural(orphans.length, 'file')} in assets/img/ not referenced by media.js (e.g. ${orphans.slice(0, 3).join(', ')}) — stale derivatives, safe to delete`);
+    }
+
+    // index.html's boot script preloads the Today hero by derivative id; a stale id (new photo,
+    // re-encoded crop, changed TODAY_HERO) silently preloads a 404 and the hero arrives late.
+    const indexHtml = read('index.html') || '';
+    const hp = /HERO_PRELOAD\s*=\s*\{([^}]*)\}/.exec(indexHtml);
+    const heroByPhase = (() => {
+        const m = appJs && /\bTODAY_HERO\s*=\s*\{([\s\S]*?)\}/.exec(appJs);
+        if (!m) return null;
+        return Object.fromEntries([...m[1].matchAll(/(\w+)\s*:\s*['"`]([^'"`]+)['"`]/g)].map((x) => [x[1], x[2]]));
+    })();
+    if (!hp) warn('index.html: HERO_PRELOAD not found — the Today hero is not preloaded');
+    else if (heroByPhase) {
+        const f1 = cur.fails;
+        for (const [, phase, id, w] of hp[1].matchAll(/(\w+)\s*:\s*\[\s*'([^']+)'\s*,\s*(\d+)\s*\]/g)) {
+            const src = heroByPhase[phase];
+            const m = src && MEDIA.img[src];
+            if (!m) { fail(`index.html HERO_PRELOAD.${phase}: TODAY_HERO.${phase} (${src}) has no MEDIA entry`); continue; }
+            if (m.id !== id) fail(`index.html HERO_PRELOAD.${phase} id '${id}' ≠ media.js '${m.id}' for ${src} — update the boot script`);
+            else if (!m.v.includes(800) || !m.v.includes(+w)) fail(`index.html HERO_PRELOAD.${phase}: ${src} has no ${m.v.includes(800) ? w : 800}w derivative (media.js has ${m.v.join('/')})`);
+        }
+        if (cur.fails === f1) ok('index.html HERO_PRELOAD ids/widths match js/media.js and TODAY_HERO');
     }
 });
 

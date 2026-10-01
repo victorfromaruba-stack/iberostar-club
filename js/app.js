@@ -20,12 +20,17 @@ const DATA_VERSION = 400;
 const APP_VERSION = '4.0';
 /* Today hero photo per phase (§B.1). build-images.py mirrors this list — keep paths literal. */
 const TODAY_HERO = {
-    morning: 'assets/Hotels/Joia/hotel_joia_9.jpg',
+    morning: 'assets/Hotels/Joia/hotel_joia_2.jpg',
     day: 'assets/Hotels/Joia/hotel_joia_1.jpg',
     sunset: 'assets/Restaurants/Zima/rest_zima_1.jpg',
     night: 'assets/Restaurants/Zima/rest_zima_1.jpg'
 };
-const TODAY_HERO_POS = { morning: '50% 60%', day: '50% 55%', sunset: '50% 60%', night: '50% 60%' };
+const TODAY_HERO_POS = { morning: '50% 45%', day: '50% 55%', sunset: '50% 60%', night: '50% 60%' };
+/* Today hero <img> sizes. 3× phones are capped at ~2× density ((min-resolution:2.5dppx) → ⅔ of the
+   width): the 800w file, which the service worker's 'warm' step already caches, instead of a 1400/1600w
+   download on slow resort Wi-Fi. index.html's boot script preloads the same srcset + sizes, so this must
+   match HERO_PRELOAD there. */
+const TODAY_HERO_SIZES = '(min-width:1024px) 1200px, (min-resolution:2.5dppx) 67vw, 100vw';
 /* Stay empty until staff provide verified values (spec §0.2, Appendix 1). */
 const CONCIERGE = { phone: '', whatsapp: '', email: '' };
 const IBEROCASH_NOTE = '';
@@ -57,7 +62,9 @@ const TYPES = new Set(['club', 'food', 'fun', 'spa', 'golf', 'store']);
 let appData = {};
 const strArr = a => Array.isArray(a) ? a.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim()) : (typeof a === 'string' && a.trim() ? [a.trim()] : []);
 function normalize(src) {
-    const out = {};
+    // Prototype-free: a route or shared link naming 'constructor', 'toString' or '__proto__' must not
+    // resolve to an inherited Object.prototype member and pass as a catalog item.
+    const out = Object.create(null);
     if (!src || typeof src !== 'object') return out;
     Object.keys(src).forEach(k => {
         const v = src[k];
@@ -91,6 +98,9 @@ function loadData() {
     buildFacets(appData);
 }
 
+/* Is k a real catalog key? Every key check goes through this (never a bare appData[k] truthiness test). */
+const hasItem = k => typeof k === 'string' && FACETS.has(k);
+
 /* ---------- 3. State + saved list ---------- */
 const S = {
     preview: false,
@@ -108,20 +118,38 @@ const S = {
 };
 function loadSaved() {
     const a = store.json('ib_saved', []);
-    S.saved = Array.isArray(a) ? a.filter((k, i) => typeof k === 'string' && appData[k] && a.indexOf(k) === i) : [];
+    S.saved = Array.isArray(a) ? a.filter((k, i) => hasItem(k) && a.indexOf(k) === i) : [];
 }
 const isSaved = k => S.saved.includes(k);
 function setSaved(k, on) {
-    if (!appData[k] || on === isSaved(k)) return;
+    if (!hasItem(k) || on === isSaved(k)) return;
     if (on) S.saved.push(k); else S.saved = S.saved.filter(x => x !== k);
     store.setJSON('ib_saved', S.saved);
     $$('[data-action="save"]').forEach(b => { if ((b.dataset.key || S.detailKey) === k) b.setAttribute('aria-pressed', String(on)); });
     updateBadge();
     S.dirty.add('saved'); S.dirty.add('today');
-    if (S.view === 'saved' && !Overlay.stack.length) renderView('saved');
+    if (S.view === 'saved' && !Overlay.stack.length) rerenderSavedKeepingFocus(k, on);
+}
+/* The Saved list re-renders on every (un)save, which destroys the focused heart. Keep keyboard and
+   screen-reader users in place: focus the card that took the removed one's slot (or the one before
+   it, or the heading when the list is now empty); after Undo, focus the restored card. */
+function rerenderSavedKeepingFocus(k, on) {
+    const el = viewEl('saved'), a = document.activeElement;
+    const fromView = a && a !== document.body && el.contains(a);
+    const fromToast = a && a.closest && a.closest('.toast-host');
+    let idx = -1;
+    if (fromView) { const cards = $$('article[data-key]', el), c = a.closest('article[data-key]'); idx = c ? cards.indexOf(c) : -1; }
+    renderView('saved');
+    if (!fromView && !fromToast) return;
+    const cards = $$('article[data-key]', el);
+    let target = null;
+    if (on) target = cards.find(c => c.dataset.key === k);
+    else if (idx >= 0 && cards.length) target = cards[Math.min(idx, cards.length - 1)];
+    const f = (target && $('.card__link', target)) || $('h1', el);
+    if (f) f.focus({ preventScroll: !target });
 }
 function toggleSave(k, btn) {
-    if (!appData[k]) return;
+    if (!hasItem(k)) return;
     const on = !isSaved(k), title = cleanTitle(appData[k]);
     setSaved(k, on);
     if (on) {
@@ -309,6 +337,41 @@ function initNetwork() {
     syncNet();
 }
 
+/* Keyboard focus never ends up hidden under sticky chrome (WCAG 2.4.11). Browsers only scroll a newly
+   focused control to the scroller's edge, which is under the tab bar, a sheet's action bar or the
+   request footer (or does not scroll at all when the control is already inside the scrollport).
+   Runs after the browser's own focus scroll, keyboard users only (html.kbd). */
+function revealFocused(t) {
+    if (!t || !t.isConnected || t === document.body || !t.getBoundingClientRect) return;
+    const r = t.getBoundingClientRect();
+    if (!r.height) return;
+    const vis = el => el && !el.contains(t) && getComputedStyle(el).visibility !== 'hidden' && el.getClientRects().length > 0 && getComputedStyle(el).opacity !== '0';
+    let top = 0, bottom = window.innerHeight;
+    const below = el => { if (vis(el)) bottom = Math.min(bottom, el.getBoundingClientRect().top); };
+    const above = el => { if (vis(el)) top = Math.max(top, el.getBoundingClientRect().bottom); };
+    const ov = t.closest('.ov');
+    if (ov) {
+        below($('.sheet__actions', ov)); below($('.rq__foot', ov));
+        if (ov.classList.contains('sheet--auto')) above($('.sheet__head', ov));
+        if (ov.classList.contains('scrolled')) above($('.sheet__topbar', ov));
+    } else if (t.closest('#main')) {
+        below($('.tabbar')); above($('.appbar.is-shown')); above($('.topnav'));
+        const cb = t.closest('.view') && $('.view:not([hidden]) .chipbar');
+        if (cb && getComputedStyle(cb).position === 'sticky') above(cb);
+    } else return;
+    let dy = 0;
+    if (r.bottom > bottom - 8) dy = r.bottom - bottom + 16;
+    if (r.top - dy < top + 8) dy = r.top - top - 16;
+    if (Math.abs(dy) < 2) return;
+    let sc = t.parentElement;
+    while (sc && sc !== document.body) {
+        const oy = getComputedStyle(sc).overflowY;
+        if ((oy === 'auto' || oy === 'scroll') && sc.scrollHeight > sc.clientHeight) break;
+        sc = sc.parentElement;
+    }
+    if (sc && sc !== document.body) sc.scrollTop += dy; else window.scrollBy(0, dy);
+}
+
 /* ---------- 7. Overlay manager (§B.9) ---------- */
 let scrollLockY = 0;
 const Overlay = {
@@ -331,6 +394,8 @@ const Overlay = {
         }
         void el.offsetWidth; // commit the un-hidden state so the open transition runs
         el.classList.add('is-open');
+        el._openedAt = performance.now(); // ghost-click guard (onClickGuard)
+        if (o.resetScroll) o.resetScroll(); // after un-hiding: scrollTop on a display:none box is a no-op
         if (o.focusNow) { const f = o.focusNow; f.focus({ preventScroll: true }); }
         else requestAnimationFrame(() => {
             const f = el.querySelector('[data-autofocus]') || el.querySelector('[tabindex="-1"]') || el.querySelector('h1,h2,button,a[href]');
@@ -356,8 +421,10 @@ const Overlay = {
             if (html.classList.contains('device-ios')) {
                 const b = document.body.style;
                 b.position = ''; b.top = ''; b.left = ''; b.right = ''; b.width = '';
-                window.scrollTo(0, scrollLockY);
             }
+            // scrollLockY is the (current) view's own offset — showView() rewrites it when the view
+            // changes underneath an overlay
+            window.scrollTo(0, scrollLockY);
         }
         if (o.restoreFocus === false) return;
         const op = entry.opener;
@@ -372,6 +439,8 @@ const Overlay = {
         const top = this.stack[this.stack.length - 1];
         $$('#main, .tabbar, .topnav, .appbar, .skip-link').forEach(e => { e.inert = !!top; });
         $$('.ov').forEach(o => { o.inert = !!top && o !== top.el; });
+        // black full-screen viewers: the standalone status-bar band goes transparent over them
+        document.documentElement.classList.toggle('ov-dark', !!top && (top.el.id === 'ovLightbox' || top.el.id === 'ovMedia'));
     },
     top() { return this.stack[this.stack.length - 1] || null; }
 };
@@ -414,17 +483,23 @@ function parseRoute(hash) {
         r.view = head;
         if (head === 'saved' && seg[1] === 'show') r.overlays.push({ type: 'savedshow' });
         else if (seg.length > 1) r.bad = true;
-    } else if (head === 'search') r.overlays.push({ type: 'search' });
+    } else if (head === 'search') r.overlays.push({ type: 'search', q: r.q });
     else if (head === 'settings') r.overlays.push({ type: 'settings' });
     else if (head === 'item' && seg[1]) {
         const key = seg[1];
-        if (!appData[key]) r.missing = key;
+        if (!hasItem(key)) r.missing = key;
         else {
-            r.parent = PARENT_BY_TYPE[appData[key].type] || 'today';
+            const F = facet(key);
+            r.parent = PARENT_BY_TYPE[F.item.type] || 'today';
             r.overlays.push({ type: 'detail', key });
             const sub = seg[2];
             if (sub === 'photos') r.overlays.push({ type: 'photos', key, n: Math.max(1, parseInt(seg[3], 10) || 1) });
+            // A stale or hand-edited /video or /menu link for an item that has none opens just the
+            // detail (render() rewrites the URL to #/item/<key>); a stale /menu/<i> keeps the pdf
+            // overlay, which says "This menu is no longer available."
+            else if (sub === 'menu' && seg[3] == null && !F.menus.length) r.canon = itemHash(key);
             else if (sub === 'menu') r.overlays.push(seg[3] != null ? { type: 'pdf', key, i: Math.max(0, parseInt(seg[3], 10) || 0) } : { type: 'menus', key });
+            else if (sub === 'video' && !F.item.video) r.canon = itemHash(key);
             else if (sub === 'video') r.overlays.push({ type: 'video', key });
             else if (sub === 'request') { r.overlays.push({ type: 'request', key }); if (seg[3] === 'show') r.overlays.push({ type: 'ticket', key }); }
             else if (sub) r.bad = true;
@@ -510,6 +585,7 @@ function render(route, o) {
             return;
         }
         if (route.bad) { history.replaceState({ ib: 1, idx: histIdx() }, '', '#/today'); render(parseRoute('#/today'), o); return; }
+        if (route.canon && location.hash !== route.canon) history.replaceState(history.state, '', route.canon);
         const st = history.state;
         if (st && st.keep && route.overlays.length) {
             const k = parseRoute(st.keep);
@@ -530,7 +606,10 @@ function showView(v, route, o) {
     const changed = S.view !== v;
     if (!route.overlays.length) applyViewParams(v, route);
     if (changed) {
-        if (S.view) { S.scroll.set(S.view, window.scrollY); viewEl(S.view).hidden = true; }
+        // Under an open overlay the page is scroll-locked (iOS: body position:fixed, so scrollY reads 0):
+        // the view's real offset is scrollLockY.
+        const locked = document.documentElement.classList.contains('ov-open');
+        if (S.view) { S.scroll.set(S.view, locked ? scrollLockY : window.scrollY); viewEl(S.view).hidden = true; }
         S.view = v;
         const el = viewEl(v);
         if (S.dirty.has(v) || !el.firstElementChild) renderView(v);
@@ -539,6 +618,11 @@ function showView(v, route, o) {
         if (!o.initial) maybeReshowUpdate();
         const y = S.scroll.get(v) || 0;
         if (!Overlay.stack.length) { window.scrollTo(0, y); requestAnimationFrame(() => window.scrollTo(0, y)); }
+        else if (locked) { // the view changed underneath an overlay: Overlay.close restores this view's offset
+            scrollLockY = y;
+            if (document.documentElement.classList.contains('device-ios')) document.body.style.top = `-${y}px`;
+            else window.scrollTo(0, y);
+        }
         observeTitle(v);
         if (o.nav && !route.overlays.length) {
             const h = el.querySelector('h1');
@@ -562,7 +646,7 @@ function updateDocTitle() {
     const top = S.route && S.route.overlays[S.route.overlays.length - 1];
     const key = top && top.key;
     const base = 'Iberostar Aruba';
-    if (key && appData[key]) document.title = `${cleanTitle(appData[key])} · ${base}`;
+    if (key && hasItem(key)) document.title = `${cleanTitle(appData[key])} · ${base}`;
     else if (top && top.type === 'search') document.title = `Search · ${base}`;
     else if (top && top.type === 'settings') document.title = `Settings · ${base}`;
     else document.title = S.view && S.view !== 'today' ? `${VIEW_TITLE[S.view]} · ${base}` : base;
@@ -577,7 +661,7 @@ function applyViewParams(v, route) {
             if (viewEl(v).firstElementChild && !S.dirty.has(v)) syncFilterUI(v); else S.dirty.add(v);
         }
     } else if (v === 'saved') {
-        const ids = route.ids.length ? route.ids.filter(k => appData[k]) : null;
+        const ids = route.ids.length ? route.ids.filter((k, i, a) => hasItem(k) && a.indexOf(k) === i) : null;
         if (JSON.stringify(ids) !== JSON.stringify(S.shared)) { S.shared = ids; S.dirty.add('saved'); }
     }
 }
@@ -590,9 +674,11 @@ function syncOverlays(route, o) {
     for (let j = stack.length - 1; j >= i; j--) {
         const e = stack[j];
         const key = e.id.split(':')[1];
+        if (e.id === 'search:') clearTimeout(searchState.t); // a pending debounce must not rewrite the URL after close
         Overlay.close(e.el, { restoreFocus: j === i && i >= want.length, key });
     }
     for (let j = i; j < want.length; j++) openOverlay(want[j], o);
+    if (!Overlay.stack.length && S.holdImages) releaseHeldImages();
     document.documentElement.classList.toggle('has-actionbar', !!want.length && want[want.length - 1].type === 'detail');
     document.documentElement.classList.toggle('has-rqbar', !!want.length && want[want.length - 1].type === 'request');
 }
@@ -600,7 +686,7 @@ function openOverlay(ov, o) {
     const el = document.getElementById(OV_EL[ov.type]);
     const fn = OV_RENDER[ov.type];
     const res = fn ? fn(ov, el, o) : null;
-    Overlay.open(el, { id: ovId(ov), focusNow: res && res.focusNow });
+    Overlay.open(el, { id: ovId(ov), focusNow: res && res.focusNow, resetScroll: res && res.resetScroll });
     if (res && res.after) res.after();
 }
 function updateOverlay(ov, isTop, route) {
@@ -613,6 +699,7 @@ function updateOverlay(ov, isTop, route) {
 }
 function renderView(v) {
     const el = viewEl(v);
+    if (typeof releaseLazy === 'function') releaseLazy(el); // the old DOM's lazy observers
     try {
         VIEW_RENDER[v](el);
         S.dirty.delete(v);
@@ -620,13 +707,21 @@ function renderView(v) {
         console.error('[ib] view render failed:', v, err);
         renderError(el);
     }
-    sweepImages(el);
+    // A view built underneath a cold deep link's overlay (e.g. Dine under #/item/Marea) keeps its
+    // photos parked until the overlays close, so they do not compete with the sheet hero.
+    if (S.holdImages) el._held = true; else sweepImages(el);
+    // An in-place re-render replaced the nodes the app-bar observers watch.
+    if (v === S.view && !el.hidden) observeTitle(v);
+}
+function releaseHeldImages() {
+    S.holdImages = false;
+    VIEWS.forEach(v => { const el = viewEl(v); if (el._held) { el._held = false; sweepImages(el); } });
 }
 function renderError(el) {
     if (!el) return;
     el.innerHTML = `<div class="wrap view-head"><div class="empty">${icon('info')}<h1 class="view-title" tabindex="-1">Something went wrong</h1>
       <p>Please reload the guide.</p><button type="button" class="btn btn--primary" data-action="reload">Reload</button>
-      ${S.preview ? '<button type="button" class="btn btn--secondary" data-action="exit-preview">Exit preview</button>' : ''}</div></div>`;
+      ${S.preview ? '<button type="button" class="btn btn--secondary" data-action="exit-preview">Hide preview</button>' : ''}</div></div>`;
 }
 
 /* ---------- 9. Card components (§B.4) ---------- */
@@ -637,11 +732,14 @@ function phData(F) {
 /* <div class="media …">img | .ph</div> */
 function mediaBox(F, o) {
     o = o || {};
-    const src = o.src !== undefined ? o.src : F.item.gallery[0];
+    const g = F.item.gallery;
+    // o.avoid: a photo already on screen (the Today hero) → the card shows the item's next photo
+    const src = o.src !== undefined ? o.src : (o.avoid && g[0] === o.avoid && g[1] ? g[1] : g[0]);
     const cls = 'media' + (o.cls ? ' ' + o.cls : '');
     if (!src) return `<div class="${cls}"${phData(F)}>${phHTML(phSpecFor(F))}</div>`;
     // non-eager images get data-src and are released by image-utils observeLazy() near the viewport
-    return `<div class="${cls}"${mediaAttrs(src, o.style)}${phData(F)}>${imgHTML(src, { widths: o.widths || [480, 800], sizes: o.sizes, eager: o.eager, priority: o.priority, alt: o.alt || '', lazySrc: !o.eager })}</div>`;
+    const eager = !!o.eager && !S.holdImages;
+    return `<div class="${cls}"${mediaAttrs(src, o.style)}${phData(F)}>${imgHTML(src, { widths: o.widths || [480, 800], sizes: o.sizes, eager, priority: o.priority, alt: o.alt || '', lazySrc: !eager })}</div>`;
 }
 function saveBtn(F, cls) {
     const on = isSaved(F.key);
@@ -659,7 +757,7 @@ function cardHTML(F, o) {
     const st = !o.reason && m.status && m.status.state !== 'unknown'
         ? `<p class="status status--${m.status.state}" data-status-key="${esc(F.key)}">${esc(m.status.text)}</p>` : '';
     return `<article class="${cls}${o.cls ? ' ' + o.cls : ''}" data-key="${esc(F.key)}">`
-        + mediaBox(F, { cls: 'card__media', widths: v === 'row' ? [480] : [480, 800], sizes, eager: o.eager })
+        + mediaBox(F, { cls: 'card__media', widths: v === 'row' ? [480] : [480, 800], sizes, eager: o.eager, avoid: o.avoid })
         + `<div class="card__body">${m.eyebrow && !o.reason ? `<p class="eyebrow">${m.eyebrow}</p>` : ''}`
         + `<h3 class="card__title"><a class="card__link" href="${itemHash(F.key)}">${esc(cleanTitle(it))}</a></h3>${lines}${st}</div>`
         + (F.status === 'coming-soon' ? '' : saveBtn(F)) + `</article>`;
@@ -684,8 +782,8 @@ function csRowHTML(F) {
 }
 function searchRowHTML(F, q) {
     const m = cardMeta(F);
-    const meta = F.item.type === 'fun' ? [F.dur.text, F.from ? 'From ' + fromText(F.from) : ''].filter(Boolean).join(' · ') : stripTags(m.meta) || F.item.sub;
-    const eb = F.status === 'coming-soon' ? statusLabel(F.item) : decodeEntities(stripTags(m.eyebrow));
+    const meta = F.item.type === 'fun' ? [F.dur.text, F.from ? 'From ' + fromText(F.from) : ''].filter(Boolean).join(' · ') : plainSegs(decodeEntities(stripTags(m.meta))) || F.item.sub;
+    const eb = F.status === 'coming-soon' ? statusLabel(F.item) : plainSegs(decodeEntities(stripTags(m.eyebrow)));
     return `<div class="srow" data-key="${esc(F.key)}">${mediaBox(F, { widths: [480], sizes: '56px', cls: 'srow__thumb' })}<div class="srow__text">`
         + `<a class="srow__title card__link" href="${itemHash(F.key)}">${highlight(cleanTitle(F.item), q)}</a>`
         + `<span class="srow__meta">${highlight(eb, q)}${meta && F.status !== 'coming-soon' ? ' · ' + esc(meta) : ''}</span></div>${icon('chevron-right', 'srow__go')}</div>`;
@@ -724,7 +822,7 @@ function renderToday(el) {
     const intents = (INTENTS[ph] || INTENTS.day).filter(i => intentHasResults(i[1]));
     const picks = todayPicks(info, { inHouse: S.inHouse });
     let h = `<div class="today-top"><section class="today-hero" aria-labelledby="h-today">`
-        + `<div class="today-hero__media media"${mediaAttrs(hero, '--pos:' + (TODAY_HERO_POS[ph] || '50% 50%'))}>${imgHTML(hero, { widths: [800, 1600], sizes: '(min-width:1024px) 1200px, 100vw', eager: true, priority: true, alt: '' })}</div>`
+        + `<div class="today-hero__media media"${mediaAttrs(hero, '--pos:' + (TODAY_HERO_POS[ph] || '50% 50%'))}>${imgHTML(hero, { widths: [800, 1600], sizes: TODAY_HERO_SIZES, eager: true, priority: true, alt: '' })}</div>`
         + `<div class="today-hero__scrim"></div>${ph === 'night' ? starfieldSVG(info.now) : ''}`
         + `<div class="today-hero__top"><a class="today-hero__brand on-photo" href="#/today" aria-label="Iberostar Aruba"><img src="assets/Logos/logo_iberostar_ivory.png" alt="" height="26" data-noph><span class="brand__word">Iberostar <em>Aruba</em></span></a>`
         + `<a class="icon-btn on-photo" href="#/settings" aria-label="Settings">${icon('sliders')}</a></div>`
@@ -735,32 +833,70 @@ function renderToday(el) {
         + `<nav class="intents" aria-label="Quick picks">${intents.map(i => `<a class="chip chip--intent" href="${i[1]}">${icon(i[2])}${esc(i[0])}</a>`).join('')}</nav></div>`;
     if (picks.length) {
         h += railHTML({ id: 'r-picks', title: PICKS_TITLE[pkey], all: PICKS_ALL[pkey], cols: 3,
-            body: picks.map((p, i) => cardHTML(facet(p.key), { reason: p.reason, eager: i < 2, sizes: '(min-width:1024px) 370px, (min-width:600px) 260px, (min-resolution:2.5dppx) 147px, 220px' })).join('') });
+            body: spreadPhotoless(picks).map((p, i) => cardHTML(facet(p.key), { reason: p.reason, eager: i < 2, avoid: hero, sizes: '(min-width:1024px) 370px, (min-width:600px) 260px, (min-resolution:2.5dppx) 147px, 220px' })).join('') });
     }
     const spa = facet('SpaPromo');
     const spot = spa && !spa.status ? `<article class="card spotlight" data-key="SpaPromo">${mediaBox(spa, { cls: 'card__media', widths: [480], sizes: '120px' })}`
         + `<div class="card__body"><span class="chip-comp">Complimentary</span><h3 class="card__title"><a class="card__link" href="${itemHash('SpaPromo')}">${esc(cleanTitle(spa.item))}</a></h3>`
-        + `<p class="card__meta">${esc([spa.dur.text, 'Spa Sensations at Joia'].filter(Boolean).join(' · '))}</p></div></article>` : '';
+        + `<p class="card__meta">${segsHTML([spa.dur.text, 'Spa Sensations at Joia'])}</p></div></article>` : '';
     const strip = S.saved.length ? `<section class="saved-sec" aria-labelledby="r-saved"><div class="rail__head"><h2 class="rail__title" id="r-saved">Your plans · ${S.saved.length}</h2><a class="btn--text" href="#/saved">View${icon('chevron-right')}</a></div>`
-        + `<div class="saved-strip">${S.saved.slice(0, 5).map(k => { const F = facet(k); return `<a class="saved-pill" href="${itemHash(k)}">${mediaBox(F, { widths: [480], sizes: '28px' })}<span>${esc(cleanTitle(F.item))}</span></a>`; }).join('')}</div></section>` : '';
+        + `<div class="saved-strip">${S.saved.map(facet).filter(Boolean).slice(0, 5).map(F => `<a class="saved-pill" href="${itemHash(F.key)}">${mediaBox(F, { widths: [480], sizes: '28px' })}<span>${esc(cleanTitle(F.item))}</span></a>`).join('')}</div></section>` : '';
     if (spot || strip) h += `<div class="wrap today-duo">${spot ? `<section class="spot-sec" aria-label="Spotlight">${spot}</section>` : ''}${strip}</div>`;
-    const joia = facetsWhere(F => F.item.type === 'food' && F.area === 'joia').concat(facetsWhere(F => F.item.type === 'food' && F.area === 'tierra'));
+    const allJoia = facetsWhere(F => F.item.type === 'food' && F.area === 'joia').concat(facetsWhere(F => F.item.type === 'food' && F.area === 'tierra'));
+    // Restaurants already shown in the picks rail one screen up are left out (when ≥2 others remain),
+    // so the evening Today page does not show the same four photos twice.
+    const picked = new Set(picks.map(p => p.key));
+    const unpicked = allJoia.filter(F => !picked.has(F.key));
+    const joia = unpicked.length >= 2 ? unpicked : allJoia;
     if (joia.length) h += railHTML({ id: 'r-joia', eyebrow: 'On property', title: 'Dine at Joia', all: '#/dine?f=joia', cols: joia.length === 5 ? 5 : 4, cls: 'below-fold',
-        body: joia.map(F => cardHTML(F, { sizes: '(min-width:1024px) 270px, (min-width:600px) 260px, (min-resolution:2.5dppx) 147px, 220px' })).join('') });
+        body: joia.map(F => cardHTML(F, { avoid: hero, sizes: '(min-width:1024px) 270px, (min-width:600px) 260px, (min-resolution:2.5dppx) 147px, 220px' })).join('') });
     if (ph === 'night') {
         const tm = todayPicks({ phase: 'morning', late: true, now: info.now, sun: info.sun }, { inHouse: S.inHouse }).filter(p => facet(p.key).item.type === 'fun');
         const more = facetsWhere(F => F.item.type === 'fun' && visibleInMode(F.item, S.inHouse) && !tm.some(p => p.key === F.key));
-        const list = tm.concat(more.map(F => ({ key: F.key, reason: '' }))).slice(0, 6);
+        // every card in the rail uses the same compact "reason" body, so the row has no half-empty cards
+        const list = tm.concat(more.map(F => ({ key: F.key, reason: fillerReason(F) }))).slice(0, 6);
         if (list.length && pkey !== 'late') h += railHTML({ id: 'r-tomorrow', title: 'Plan tomorrow', all: '#/explore', cols: 3, cls: 'below-fold',
-            body: list.map(p => cardHTML(facet(p.key), p.reason ? { reason: p.reason, sizes: '(min-width:1024px) 370px, (min-resolution:2.5dppx) 147px, 220px' } : { sizes: '(min-width:1024px) 370px, (min-resolution:2.5dppx) 147px, 220px' })).join('') });
+            body: list.map(p => cardHTML(facet(p.key), { reason: p.reason || fillerReason(facet(p.key)), sizes: '(min-width:1024px) 370px, (min-resolution:2.5dppx) 147px, 220px' })).join('') });
     }
     const clubs = facetsWhere(F => F.item.type === 'club');
     const open = clubs.filter(F => F.status !== 'coming-soon'), soon = clubs.filter(F => F.status === 'coming-soon');
     if (clubs.length) h += railHTML({ id: 'r-resorts', eyebrow: 'Iberostar in Aruba', title: 'Our resorts', all: '#/resorts', cls: 'rail--resorts below-fold', cols: 2,
-        body: open.map(F => cardHTML(F, { cls: 'card--wide', sizes: '(min-width:1024px) 560px, (min-resolution:2.5dppx) 174px, 260px' })).join(''),
+        body: open.map(F => cardHTML(F, { cls: 'card--wide', avoid: hero, sizes: '(min-width:1024px) 560px, (min-resolution:2.5dppx) 174px, 260px' })).join(''),
         after: soon.length ? `<div class="wrap"><div class="cs-list">${soon.map(csRowHTML).join('')}</div></div>` : '' });
-    h += `<footer class="wrap today-foot">${a2hsHTML()}<p class="foot-note">Iberostar Aruba guest guide · v${APP_VERSION}</p></footer>`;
+    h += `<footer class="wrap today-foot" tabindex="-1">${a2hsHTML()}<p class="foot-note">Iberostar Aruba guest guide · v${APP_VERSION}</p></footer>`;
     el.innerHTML = h;
+    watchIntents(el);
+}
+/* lg: the quick-pick chips sit over the hero, below the search pill. Their real height (2 rows at
+   16px text, 3+ with a larger default font) is what the pill reserves (--intents-h). */
+let intentsRO = null;
+function watchIntents(el) {
+    if (intentsRO) intentsRO.disconnect();
+    const nav = $('.intents', el), top = $('.today-top', el);
+    if (!nav || !top || !('ResizeObserver' in window)) return;
+    intentsRO = new ResizeObserver(() => { if (nav.offsetHeight) top.style.setProperty('--intents-h', nav.offsetHeight + 'px'); });
+    intentsRO.observe(nav);
+}
+/* Photo-less items (designed .ph tiles) never lead the picks rail or sit side by side when photo
+   cards are available to separate them; their ranking among themselves is kept. */
+function spreadPhotoless(picks) {
+    const has = p => facet(p.key).item.gallery.length > 0;
+    const photo = picks.filter(has), none = picks.filter(p => !has(p));
+    if (!none.length || !photo.length) return picks;
+    const out = [];
+    while (photo.length || none.length) {
+        if (photo.length) out.push(photo.shift());
+        if (none.length && (!photo.length || out.length)) out.push(none.shift());
+        if (!photo.length) out.push(...none.splice(0));
+    }
+    return out;
+}
+/* One-line reason for a "Plan tomorrow" filler card: first departure, else duration, else price. */
+function fillerReason(F) {
+    const starts = F.slots.filter(x => x.range).map(x => x.range.start).sort((a, b) => a - b);
+    if (starts.length) return `Departs ${fmtClock(starts[0])}`;
+    if (F.dur.text) return F.dur.text + (F.from ? ' · From ' + fromText(F.from) : '');
+    return F.from ? 'From ' + fromText(F.from) : funCategory(F);
 }
 let deferredInstall = null;
 function a2hsHTML() {
@@ -799,7 +935,7 @@ function renderDine(el) {
         + g.items.map(F => cardHTML(F, { eager: i++ < 2 })).join('')).join('');
     el.innerHTML = viewHead('dine', { eyebrow, title: 'Dine', lede: 'From Joia’s terraces to the island’s best tables.', extra: fieldHTML('dine', 'Search restaurants') })
         + chipbarHTML('dine', items, 'Filter restaurants')
-        + `<div class="wrap"><p class="result-count" aria-live="polite" data-count></p><div class="results grid grid--dine" data-results>${body}</div><div data-empty></div><div data-xsec></div></div>`;
+        + `<div class="wrap"><p class="result-count" aria-live="polite" data-count></p><h2 class="sr-only" data-results-h hidden>Results</h2><div class="results grid grid--dine" data-results>${body}</div><div data-empty></div><div data-xsec></div></div>`;
     syncFilterUI('dine');
 }
 
@@ -831,7 +967,7 @@ function renderExplore(el) {
         : { eyebrow: `${plural(nFun, 'tour')} · Golf · Shopping`, title: 'Explore', lede: 'Tours, golf and island finds from our partners.', ledeOpt: true };
     head.extra = fieldHTML('explore', 'Search tours, golf, shops');
     el.innerHTML = viewHead('explore', head) + chipbarHTML('explore', items, 'Filter experiences')
-        + `<div class="wrap"><p class="result-count" aria-live="polite" data-count></p><div class="results grid grid--explore" data-results>${body}</div><div data-empty></div><div data-xsec></div></div>`;
+        + `<div class="wrap"><p class="result-count" aria-live="polite" data-count></p><h2 class="sr-only" data-results-h hidden>Results</h2><div class="results grid grid--explore" data-results>${body}</div><div data-empty></div><div data-xsec></div></div>`;
     syncFilterUI('explore');
 }
 
@@ -845,7 +981,7 @@ function renderSpa(el) {
     if (main) body += featureHTML(main, { h: 2, eager: true, eyebrow: areaLabel(main.area) || 'Spa Sensations', meta: 'Treatments, rituals and a hydrotherapy circuit' });
     if (promo) body += `<article class="voucher" data-key="${esc(promo.key)}"><div class="voucher__main"><p class="eyebrow">Complimentary</p>`
         + `<h2 class="voucher__title"><a class="card__link" href="${itemHash(promo.key)}">${esc(cleanTitle(promo.item))}</a></h2>`
-        + `<p class="voucher__meta">${esc([promo.dur.text, promo.area === 'joia' ? 'Spa Sensations at Joia' : ''].filter(Boolean).join(' · '))}</p></div>`
+        + `<p class="voucher__meta">${segsHTML([promo.dur.text, promo.area === 'joia' ? 'Spa Sensations at Joia' : ''])}</p></div>`
         + `<a class="btn btn--secondary" href="${itemHash(promo.key)}" tabindex="-1" aria-hidden="true">View</a></article>`;
     el.innerHTML = viewHead('spa', { title: 'Spa & Wellness', lede: 'Spa Sensations at Iberostar Joia' })
         + `<div class="wrap"><div class="spa-layout">${body}</div>${rest.length ? `<div class="group"><div class="list resorts-grid">${rest.map(F => featureHTML(F, { h: 2 })).join('')}</div></div>` : ''}</div>`;
@@ -884,7 +1020,7 @@ function renderSaved(el) {
     el.innerHTML = h + '</div>';
 }
 async function shareSaved(btn) {
-    const keys = S.saved;
+    const keys = S.saved.filter(hasItem);
     const url = location.origin + location.pathname + '#/saved?ids=' + keys.map(encodeURIComponent).join(',');
     const text = keys.map(k => '• ' + appData[k].title).join('\n');
     try { if (navigator.share) { await navigator.share({ title: 'Our Aruba plans', text, url }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
@@ -961,6 +1097,8 @@ function syncFilterUI(v) {
     }
     const box = $('[data-results]', el);
     $$('[data-group]', box).forEach(g => { g.hidden = filtering; });
+    // the flat list loses the group h2s: an sr-only "Results" h2 keeps the outline h1 → h2 → h3
+    const rh = $('[data-results-h]', el); if (rh) rh.hidden = !filtering;
     $$('[data-key]', box).forEach(c => {
         const r = rank.get(c.dataset.key);
         c.hidden = filtering && r == null;
@@ -1034,7 +1172,22 @@ const OV_RENDER = {};
 
 /* 12a. Detail sheet (§B5.8) */
 let dheroIO = null, slideIO = null;
-OV_RENDER.detail = (ov, el) => { resetSheetDrag(el); renderDetail(ov.key, el); return { after: () => wireDetail(el) }; };
+OV_RENDER.detail = (ov, el) => {
+    resetSheetDrag(el); renderDetail(ov.key, el);
+    // a sheet that was hidden (display:none) keeps its old scroll offset: reset once it is shown again
+    return { resetScroll: () => { $('.sheet__scroll', el).scrollTop = 0; $('.dbody', el).scrollTop = 0; }, after: () => wireDetail(el) };
+};
+/* sizes for the detail hero. Phone sheet: the full width (3× screens capped at ~2× density, like the
+   cards). Two-pane layouts (lg dialog, landscape phone): the pane is portrait and object-fit:cover, so
+   the photo renders at max(pane width, pane height × aspect) — ask for that, per photo. */
+function dheroSizes(src) {
+    if (!twoPane()) return '(min-width:600px) 720px, (min-resolution:2.5dppx) 67vw, 100vw';
+    const m = mediaOf(src), ar = m && m.w && m.h ? m.w / m.h : 1.5;
+    const W = window.innerWidth, H = window.innerHeight;
+    const paneW = isLg() ? Math.min(1100, W * 0.92) * 0.55 : W * 0.45;
+    const paneH = isLg() ? Math.min(820, H * 0.9) : H;
+    return Math.ceil(Math.max(paneW, paneH * ar)) + 'px';
+}
 function renderDetail(key, el) {
     const F = facet(key), it = F.item, K = F.key;
     S.detailKey = K;
@@ -1048,11 +1201,14 @@ function renderDetail(key, el) {
     dh.classList.remove('is-slow');
     dh.style.setProperty('--lqip', m0 && m0.q ? `url('${m0.q}')` : 'none');
     dh.style.setProperty('--dom', m0 && m0.c ? m0.c : '');
-    if (!g.length) dh.innerHTML = phHTML(phSpecFor(F));
+    // no photos: the designed placeholder (the eyebrow already says "Coming soon", so no chip here)
+    if (!g.length) dh.innerHTML = phHTML(Object.assign(phSpecFor(F), { chip: '', logoBox: [168, 112] }));
     else {
-        const sizes = isLg() ? '(min-width:1200px) 605px, 55vw' : isLandPhone() ? '45vw' : '(min-width:600px) 720px, 100vw';
-        dh.innerHTML = `<div class="dhero__track">${g.map((src, i) => `<button type="button" class="dhero__slide" data-action="photo" data-n="${i + 1}" aria-label="Open photo ${i + 1} of ${g.length}">`
-            + `<div class="media"${mediaAttrs(src)}${phData(F)}>${imgHTML(src, { widths: [800, 1600], sizes, eager: i === 0, priority: i === 0, alt: '', lazySrc: i > 1 })}</div></button>`).join('')}</div>`
+        // One tab stop for the whole carousel (roving tabindex, moved by the slide observer); arrow keys
+        // page. Only the first photo loads now: its neighbour waits for it (wireDetail), so on slow
+        // Wi-Fi the hero does not share its bandwidth with slide 2.
+        dh.innerHTML = `<div class="dhero__track">${g.map((src, i) => `<button type="button" class="dhero__slide" data-action="photo" data-n="${i + 1}"${i ? ' tabindex="-1"' : ''} aria-label="Open photo ${i + 1} of ${g.length}">`
+            + `<div class="media"${mediaAttrs(src)}${phData(F)}>${imgHTML(src, { widths: [800, 1600], sizes: dheroSizes(src), eager: i === 0, priority: i === 0, alt: '', lazySrc: i > 0 })}</div></button>`).join('')}</div>`
             + (g.length > 1 ? `<span class="dhero__count" aria-hidden="true">1 / ${g.length}</span>`
                 + `<button type="button" class="icon-btn on-photo dhero__arrow dhero__arrow--prev" data-action="hero-prev" aria-label="Previous photo">${icon('chevron-left')}</button>`
                 + `<button type="button" class="icon-btn on-photo dhero__arrow dhero__arrow--next" data-action="hero-next" aria-label="Next photo">${icon('chevron-right')}</button>` : '')
@@ -1061,7 +1217,10 @@ function renderDetail(key, el) {
         dh._slowT = setTimeout(() => { const im = $('img', dh); if (im && !im.classList.contains('is-loaded') && S.detailKey === K) dh.classList.add('is-slow'); }, 400);
     }
     $('.dbody', el).innerHTML = detailBodyHTML(F);
-    $('.sheet__actions', el).innerHTML = actionsHTML(F);
+    const bar = $('.sheet__actions', el);
+    bar.innerHTML = actionsHTML(F);
+    // CSS: on narrow phones a CTA + play + save + share bar drops its duplicate Save (the sheet has one)
+    if (bar.children.length >= 4 && $('[href$="/video"].icon-btn', bar)) bar.dataset.crowded = ''; else delete bar.dataset.crowded;
     $('.sheet__scroll', el).scrollTop = 0;
     $('.dbody', el).scrollTop = 0;
     sweepImages(el);
@@ -1131,10 +1290,10 @@ function detailBodyHTML(F) {
     if (it.logo && it.gallery.length) h += `<div class="dlogo">${logoImgHTML(it.logo, { alt: cleanTitle(it) + ' logo', box: [192, 36], eager: true })}</div>`;
     const eb = eyebrowFor(F);
     if (eb) h += `<p class="eyebrow">${esc(eb)}</p>`;
-    h += `<h2 class="dtitle" id="dTitle" tabindex="-1">${esc(cleanTitle(it))}</h2>`;
+    h += `<h2 class="dtitle" id="dTitle" tabindex="-1" data-autofocus>${esc(cleanTitle(it))}</h2>`;
     if (it.type === 'food' && F.hours.some(x => x.ok)) { const st = openState(it); h += `<p class="status status--${st.state}" data-status-key="${esc(K)}">${esc(st.text)}</p>`; }
     const facts = factsOf(F);
-    if (facts.length) h += `<dl class="facts">${facts.map(f => `<div><dt>${esc(f.dt)}</dt><dd>${esc(f.dd)}</dd></div>`).join('')}</dl>`;
+    if (facts.length) h += `<dl class="facts">${facts.map(f => `<div><dt>${esc(f.dt)}</dt><dd>${nwTimes(esc(f.dd))}</dd></div>`).join('')}</dl>`;
     if (F.slots.length > 1) h += `<div class="slots" role="group" aria-label="Departure options">${F.slots.map(s => `<span class="slot">${s.label ? `<b>${esc(s.label)}</b>` : ''}${esc(s.short || s.value)}${s.note ? ` · ${esc(s.note)}` : ''}</span>`).join('')}</div>`;
     if (it.bookingNote) h += `<p class="booking-note">${esc(it.bookingNote)}</p>`;
     const unparsed = F.hours.filter(x => !x.ok);
@@ -1152,10 +1311,10 @@ function detailBodyHTML(F) {
     h += contactHTML(it);
     const g = it.gallery;
     if (g.length >= 3) {
-        const tiles = g.slice(1, 10);
+        const tiles = g.slice(0, 9); // starts with the hero photo, so the count matches the tiles
         h += `<section class="dsec" aria-labelledby="photosH"><h3 id="photosH">Photos · ${g.length}</h3><div class="photos-grid">`
             + tiles.map((src, i) => {
-                const n = i + 2, last = i === tiles.length - 1 && g.length > 10;
+                const n = i + 1, last = i === tiles.length - 1 && g.length > 9;
                 return `<button type="button" data-action="photo" data-n="${last ? 1 : n}" aria-label="${last ? `See all ${g.length} photos` : `Open photo ${n} of ${g.length}`}">`
                     + `<div class="media"${mediaAttrs(src)}>${imgHTML(src, { widths: [480], sizes: '(min-width:1024px) 150px, 33vw', alt: '', lazySrc: true })}</div>${last ? `<span class="more">See all ${g.length}</span>` : ''}</button>`;
             }).join('') + `</div></section>`;
@@ -1232,7 +1391,16 @@ function wireDetail(el) {
             if (!e.isIntersecting) return;
             const i = slides.indexOf(e.target);
             if (count) count.textContent = `${i + 1} / ${slides.length}`;
-            [i - 1, i, i + 1].forEach(j => slides[j] && loadLazyImg($('img', slides[j])));
+            const cur = $('img', slides[i]);
+            loadLazyImg(cur);
+            // neighbours only once the visible photo is in, so they never share its bandwidth
+            const near = () => [i - 1, i + 1].forEach(j => slides[j] && loadLazyImg($('img', slides[j])));
+            if (!cur || cur.complete || cur.classList.contains('is-loaded')) near();
+            else { cur.addEventListener('load', near, { once: true }); cur.addEventListener('error', near, { once: true }); }
+            // roving tabindex: only the visible slide is a tab stop
+            const had = slides.some(s => s === document.activeElement);
+            slides.forEach((s, j) => { s.tabIndex = j === i ? 0 : -1; });
+            if (had && document.activeElement !== slides[i]) slides[i].focus({ preventScroll: true });
             dh.dataset.cur = String(i);
             const p = $('[data-action="hero-prev"]', dh), n = $('[data-action="hero-next"]', dh);
             if (p) p.disabled = i === 0;
@@ -1353,7 +1521,9 @@ const TRY_CHIPS = [['Dinner', 'dine'], ['Sunset', 'today'], ['Snorkel', 'sail'],
 const SEARCH_GROUPS = [['Dine', t => t === 'food'], ['Explore', t => t === 'fun' || t === 'golf' || t === 'store'], ['Spa', t => t === 'spa'], ['Resorts', t => t === 'club']];
 const BROWSE = [['Dine', '#/dine', 'dine', 'Restaurants, bars and menus'], ['Explore', '#/explore', 'explore', 'Tours, golf and shopping'], ['Spa', '#/spa', 'spa', 'Spa Sensations at Joia'], ['Our resorts', '#/resorts', 'star', 'Joia, Tierra del Sol and more']];
 OV_RENDER.search = (ov, el) => {
-    const q = (S.route && S.route.q) || parseRoute(location.hash).q || '';
+    // The query comes from the search route itself (#/search?q=…, or the `keep` stack under an item),
+    // never from the view being left: what the field shows is always what the URL says.
+    const q = ov.q || '';
     searchState.q = q; searchState.showAll.clear();
     el.innerHTML = `<div class="search__scrim" data-action="close" aria-hidden="true"></div><div class="search__panel"><div class="search__bar"><div class="field" role="search">${icon('search', 'field__icon')}`
         + `<input id="searchInput" class="field__input" type="search" enterkeyhint="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Search dining, tours and spa" aria-controls="searchResults" placeholder="Search the guide" data-autofocus>`
@@ -1403,6 +1573,8 @@ function renderSearchResults(el) {
 }
 /* Applies a query now: URL (replace), state, results. */
 function setSearchQuery(v) {
+    const top = Overlay.top();
+    if (!top || top.el.id !== 'ovSearch') return; // closed meanwhile (a late debounce): leave the URL alone
     searchState.q = v;
     searchState.showAll.clear();
     const t = v.trim();
@@ -1515,13 +1687,30 @@ function startVideo(el, url) {
         v.hidden = true; err.hidden = false;
         const r = $('[data-action="video-retry"]', err); if (r) r.focus({ preventScroll: true });
     };
-    if (navigator.onLine === false) { fail(); return; }
+    if (!url || navigator.onLine === false) { fail(); return; }
     v.onerror = fail;
-    v.oncanplay = () => clearTimeout(videoTimer);
+    // The stall timer runs only while playback has really been requested (the 'play' event). A video
+    // opened without a tap (cold deep link, reload, restored tab, Low Power Mode) is refused by the
+    // autoplay policy: that is not a network failure, so the poster and native controls stay up and
+    // the guest presses play.
+    const arm = () => { clearTimeout(videoTimer); videoTimer = setTimeout(() => { if (!v.paused && (v.readyState < 3 || v.networkState === 3)) fail(); }, 12000); };
+    v.onplay = arm;
+    v.onwaiting = () => { if (!v.paused) arm(); };
+    v.oncanplay = v.onplaying = v.onpause = () => clearTimeout(videoTimer);
     v.src = encodePath(url); // set directly (no <source>) so `error` fires on the element
-    videoTimer = setTimeout(() => { if (v.readyState < 3 || v.networkState === 3) fail(); }, 12000);
     const p = v.play(); // inside the tap chain, so iOS allows playback with sound
-    if (p && p.catch) p.catch(() => { if (v.networkState === 3) fail(); });
+    if (p && p.catch) p.catch(err => {
+        const n = err && err.name;
+        if (n === 'AbortError') { clearTimeout(videoTimer); return; }
+        if (n === 'NotAllowedError') {
+            // needs a tap. Fetch just the metadata meanwhile: a missing or broken file still reports its
+            // `error` (→ the panel), a good one shows its first frame under the native play button.
+            clearTimeout(videoTimer);
+            try { v.preload = 'metadata'; v.load(); } catch (e) { /* ignore */ }
+            return;
+        }
+        if (n === 'NotSupportedError' || v.networkState === 3) fail();
+    });
 }
 
 /* 12f. Lightbox (§B5.9): scroll-snap track, only the current slide ±1 hold a src, counter +
@@ -1690,15 +1879,19 @@ function rqSessions(F) {
     const s = F.slots;
     if (s.length < 2) return null;
     if (s.some(x => /pickup/i.test(x.label))) { // pickup points (Highrise/Lowrise) are a real choice; "tour + pickup" is not
-        return s.every(x => x.note) ? { legend: 'Pickup', opts: s.map(x => ({ id: x.note, label: x.note, sub: x.short || x.value })) } : null;
+        return s.every(x => x.note) ? { legend: 'Pickup', opts: s.map(x => ({ id: x.note, label: x.note, sub: x.short || x.value, start: x.range ? x.range.start : null })) } : null;
     }
     return { legend: 'Session', opts: s.map(x => {
         const st = x.range ? x.range.start : null;
         const lab = x.label || (st == null ? '' : st < 720 ? 'Morning' : st < 1020 ? 'Afternoon' : 'Evening');
-        return { id: (lab ? lab + ' · ' : '') + (x.short || x.value), label: lab || x.value, sub: lab ? (x.short || x.value) : '' };
+        return { id: (lab ? lab + ' · ' : '') + (x.short || x.value), label: lab || x.value, sub: lab ? (x.short || x.value) : '', start: st };
     }) };
 }
 const rqHasChildren = F => F.rows.some(rqChildRow);
+/* Price as the detail sheet shows it ("$160", not the data's "$160.00") */
+const rqPrice = r => (r.value != null ? fmtPrice(r.value) : r.text);
+/* A session that already left today (start ≤ now in Aruba) */
+const rqPast = (o, nowM) => o && o.start != null && o.start <= nowM;
 function rqDates() {
     const n = arubaNow();
     const at = add => new Date(Date.UTC(n.y, n.mo - 1, n.d + add));
@@ -1718,12 +1911,18 @@ function rqDraft(F) {
     // After 23:00 the next bookable day is tomorrow; after midnight it is today again.
     const gone = (info.late && info.now.m >= 1380) || (starts.length > 0 && starts.every(m => m <= info.now.m));
     const opts = rqOptions(F), sess = rqSessions(F);
-    const base = { opt: opts[0] ? opts[0].label : '', sess: sess ? sess.opts[0].id : '', date: gone ? 'tomorrow' : 'today', other: '', adults: 2, children: 0, time: '', room: '', note: '', addons: [] };
+    // Today: preselect the next session still ahead, never one that has already left
+    const ahead = sess ? sess.opts.filter(o => !rqPast(o, info.now.m)) : [];
+    const date0 = gone ? 'tomorrow' : 'today';
+    const sess0 = sess ? (date0 === 'today' && ahead.length ? ahead[0] : sess.opts[0]).id : '';
+    const base = { opt: opts[0] ? opts[0].label : '', sess: sess0, date: date0, other: '', adults: 2, children: 0, time: '', room: '', note: '', addons: [] };
     const out = Object.assign(base, d && typeof d === 'object' ? d : {});
     // sanitise a stale draft
     if (opts.length && !opts.some(r => r.label === out.opt)) out.opt = base.opt;
     if (sess && !sess.opts.some(o => o.id === out.sess)) out.sess = base.sess;
     if (!['today', 'tomorrow', 'other'].includes(out.date)) out.date = base.date;
+    if (out.date === 'today' && gone) out.date = 'tomorrow';
+    if (sess && out.date === 'today' && rqPast(sess.opts.find(o => o.id === out.sess), info.now.m)) out.sess = ahead.length ? ahead[0].id : sess.opts[0].id;
     if (out.date === 'other' && out.other && out.other < rqDates().today) out.other = '';
     out.adults = Math.min(20, Math.max(1, parseInt(out.adults, 10) || 2));
     out.children = rqHasChildren(F) ? Math.min(10, Math.max(0, parseInt(out.children, 10) || 0)) : 0;
@@ -1753,14 +1952,14 @@ function rqDateText(d) {
 function rqRows(F, d) {
     const rows = [];
     const opt = rqOptions(F).find(r => r.label === d.opt);
-    if (opt) rows.push(['Option', enDash(opt.label), opt.text]);
+    if (opt) rows.push(['Option', enDash(opt.label), rqPrice(opt)]);
     else if (F.from) rows.push(['From', fromText(F.from)]);
     if (d.sess) rows.push([(rqSessions(F) || {}).legend || 'Session', d.sess]);
     rows.push(['Date', rqDateText(d)]);
     if (d.time) { const [hh, mm] = d.time.split(':').map(Number); rows.push(['Time', fmtClock(hh * 60 + mm) + ' (preferred)']); }
     rows.push(['Guests', plural(d.adults, 'adult') + (d.children ? ' · ' + plural(d.children, 'child', 'children') : '')]);
     const adds = rqAddons(F).filter(r => d.addons.includes(r.label));
-    if (adds.length) rows.push(['Add-ons', adds.map(r => `${rqAddonLabel(r)} (${r.text})`).join(', ')]);
+    if (adds.length) rows.push(['Add-ons', adds.map(r => `${rqAddonLabel(r)} (${rqPrice(r)})`).join(', ')]);
     if (d.room) rows.push(['Room', d.room]);
     if (d.note) rows.push(['Note', d.note]);
     return rows;
@@ -1782,16 +1981,16 @@ function stepperHTML(name, label, val, min, max) {
 OV_RENDER.request = (ov, el) => {
     const F = facet(ov.key), it = F.item, d = rqDraft(F), ds = rqDates();
     const opts = rqOptions(F), sess = rqSessions(F), adds = rqAddons(F), wa = rqWhatsApp(it);
-    const radio = (name, value, checked, inner, cls) => `<label class="${cls}"><input type="radio" name="${name}" value="${esc(value)}"${checked ? ' checked' : ''}>${inner}</label>`;
+    const radio = (name, value, checked, inner, cls, start) => `<label class="${cls}"><input type="radio" name="${name}" value="${esc(value)}"${checked ? ' checked' : ''}${start != null ? ` data-start="${start}"` : ''}>${inner}</label>`;
     let h = `<div class="sheet__scrim" data-action="close"></div><div class="sheet__panel"><div class="sheet__grabber" aria-hidden="true"></div><div class="sheet__scroll">`
         + `<div class="sheet__head"><h2 id="rqTitle" tabindex="-1">Request with concierge</h2><button type="button" class="icon-btn" data-action="close" aria-label="Close">${icon('close')}</button></div>`
         + `<form class="rq" data-rq="${esc(F.key)}" novalidate>`
         + `<div class="rq__item">${mediaBox(F, { widths: [480], sizes: '56px' })}<div class="rq__itemtext"><p class="rq__itemtitle">${esc(cleanTitle(it))}</p>`
         + `<p class="rq__itemsub">${esc([partnerName(it), F.from && !opts.length ? fromText(F.from) : ''].filter(Boolean).join(' · '))}</p></div></div>`;
     if (opts.length) h += `<fieldset class="rq__group"><legend>Option</legend><div class="rq__opts">`
-        + opts.map(r => radio('opt', r.label, r.label === d.opt, `<span class="rq__optl">${esc(enDash(r.label))}</span><span class="rq__optp">${esc(r.text)}</span>`, 'rq__opt')).join('') + `</div></fieldset>`;
+        + opts.map(r => radio('opt', r.label, r.label === d.opt, `<span class="rq__optl">${esc(nbHyphen(enDash(r.label)))}</span><span class="rq__optp">${esc(rqPrice(r))}</span>`, 'rq__opt')).join('') + `</div></fieldset>`;
     if (sess) h += `<fieldset class="rq__group"><legend>${sess.legend}</legend><div class="rq__chips">`
-        + sess.opts.map(o => radio('sess', o.id, o.id === d.sess, `<span>${esc(o.label)}${o.sub ? ` <small>${esc(o.sub)}</small>` : ''}</span>`, 'rq__chip')).join('') + `</div></fieldset>`;
+        + sess.opts.map(o => radio('sess', o.id, o.id === d.sess, `<span>${esc(o.label)}${o.sub ? ` <small>${nwTimes(esc(o.sub))}</small>` : ''}<small class="rq__past"> · Departed</small></span>`, 'rq__chip', o.start)).join('') + `</div></fieldset>`;
     h += `<fieldset class="rq__group"><legend>Date</legend><div class="rq__seg">`
         + radio('date', 'today', d.date === 'today', `<span>Today<small>${esc(fmtDay(ds.today))}</small></span>`, 'rq__segopt')
         + radio('date', 'tomorrow', d.date === 'tomorrow', `<span>Tomorrow<small>${esc(fmtDay(ds.tomorrow))}</small></span>`, 'rq__segopt')
@@ -1800,7 +1999,7 @@ OV_RENDER.request = (ov, el) => {
     h += `<fieldset class="rq__group"><legend>Guests</legend><div class="rq__steppers">${stepperHTML('adults', 'Adults', d.adults, 1, 20)}`
         + (rqHasChildren(F) ? stepperHTML('children', 'Children', d.children, 0, 10) : '') + `</div></fieldset>`;
     if (adds.length) h += `<fieldset class="rq__group"><legend>Add-ons</legend><div class="rq__adds">`
-        + adds.map(r => `<label class="rq__add"><input type="checkbox" name="addon" value="${esc(r.label)}"${d.addons.includes(r.label) ? ' checked' : ''}><span class="rq__addl">${esc(rqAddonLabel(r))}</span><span class="rq__optp">${esc(r.text)}</span></label>`).join('') + `</div></fieldset>`;
+        + adds.map(r => `<label class="rq__add"><input type="checkbox" name="addon" value="${esc(r.label)}"${d.addons.includes(r.label) ? ' checked' : ''}><span class="rq__addl">${esc(rqAddonLabel(r))}</span><span class="rq__optp">${esc(rqPrice(r))}</span></label>`).join('') + `</div></fieldset>`;
     h += `<div class="rq__group rq__fields">`
         + (it.type === 'food' ? `<label class="rq__field"><span>Preferred time <em>optional</em></span><input class="rq__input" type="time" name="time" step="900" value="${esc(d.time)}"></label>` : '')
         + `<label class="rq__field"><span>Room number <em>optional</em></span><input class="rq__input" name="room" inputmode="numeric" autocomplete="off" maxlength="12" value="${esc(d.room)}"></label>`
@@ -1810,11 +2009,30 @@ OV_RENDER.request = (ov, el) => {
         + `<button type="button" class="btn btn--secondary" data-action="rq-share">${icon('share')}<span>Share request</span></button>`
         + (wa ? `<button type="button" class="btn btn--secondary" data-action="rq-wa">Send on WhatsApp</button>` : '') + `</div></form></div></div>`;
     el.innerHTML = h;
+    rqSyncForm($('form.rq', el));
 };
+/* Form state the CSS cannot derive everywhere: sessions that already left today are disabled (the
+   choice moves to the next one ahead), and checked options carry .is-checked — the :has() selectors
+   need Safari 15.4+, this works on every version. Runs on render and on every change. */
+function rqSyncForm(form) {
+    if (!form) return;
+    const today = (form.elements.date && form.elements.date.value) === 'today';
+    const nowM = arubaNow().m;
+    const sess = $$('input[name="sess"]', form);
+    sess.forEach(i => {
+        const past = today && i.dataset.start != null && i.dataset.start !== '' && +i.dataset.start <= nowM;
+        i.disabled = past;
+        i.closest('label').classList.toggle('is-past', past);
+    });
+    const cur = sess.find(i => i.checked);
+    if (cur && cur.disabled) { cur.checked = false; const next = sess.find(i => !i.disabled); if (next) next.checked = true; }
+    $$('input[type=radio], input[type=checkbox]', form).forEach(i => { const l = i.closest('label'); if (l) l.classList.toggle('is-checked', i.checked); });
+}
 function rqForm() { return $('#ovRequest form.rq'); }
 function rqPersist(form) {
     form = form || rqForm();
     if (!form) return null;
+    rqSyncForm(form);
     const d = rqRead(form);
     rqSave(form.dataset.rq, d);
     const date = $('.rq__date', form);
@@ -1885,7 +2103,7 @@ function ticketHTML(o) {
         + `<div class="ticket__card"><div class="ticket__top">${o.media || ''}<div class="ticket__head"><p class="ticket__eyebrow">${esc(o.eyebrow || 'Concierge request')}</p>`
         + `<h2 class="ticket__title" id="tkTitle" tabindex="-1">${esc(o.title)}</h2>${o.sub ? `<p class="ticket__sub">${esc(o.sub)}</p>` : ''}</div></div>`
         + `<div class="ticket__perf" aria-hidden="true"></div>`
-        + (o.rows.length ? `<dl class="ticket__rows">${o.rows.map(r => `<div><dt>${esc(r[0])}</dt><dd>${esc(r[1])}${r[2] ? `<small>${esc(r[2])}</small>` : ''}</dd></div>`).join('')}</dl>` : (o.empty || ''))
+        + (o.rows.length ? `<dl class="ticket__rows">${o.rows.map(r => `<div><dt>${esc(r[0])}</dt><dd>${nwTimes(esc(nbHyphen(r[1])))}${r[2] ? `<small>${nwTimes(esc(r[2]))}</small>` : ''}</dd></div>`).join('')}</dl>` : (o.empty || ''))
         + `<p class="ticket__foot">${esc(o.foot || 'Request only. Not a confirmed booking. Please confirm availability with the concierge.')}</p>`
         + `<p class="ticket__stamp">Iberostar Aruba guest guide · ${esc(fmtDay(rqDates().today))}, ${esc(fmtClock(n.m))}</p></div></div>`;
 }
@@ -1913,7 +2131,13 @@ const ACTIONS = {
     photo: (b) => navigate(itemHash(S.detailKey, '/photos/' + (parseInt(b.dataset.n, 10) || 1))),
     'hero-prev': () => heroStep(-1),
     'hero-next': () => heroStep(1),
-    'prices-more': (b) => { const sec = b.closest('.prices'); $$('[data-more]', sec).forEach(li => { li.hidden = false; }); b.setAttribute('aria-expanded', 'true'); b.hidden = true; },
+    'prices-more': (b) => {
+        const sec = b.closest('.prices'), more = $$('[data-more]', sec);
+        more.forEach(li => { li.hidden = false; });
+        b.setAttribute('aria-expanded', 'true'); b.hidden = true;
+        // the button hides itself: hand focus to the first revealed price so it is not dropped to <body>
+        if (more[0]) { more[0].tabIndex = -1; more[0].focus({ preventScroll: true }); }
+    },
     chip: (b) => { const v = b.dataset.view, st = S.filt[v], id = b.dataset.filter; if (st.f.has(id)) st.f.delete(id); else st.f.add(id); commitFilters(v); },
     'clear-filters': (b) => { const v = b.dataset.view; if (!S.filt[v]) return; S.filt[v].f.clear(); S.filt[v].q = ''; const inp = $(`[data-inline-search="${v}"]`); if (inp) inp.value = ''; commitFilters(v); },
     'field-clear': (b) => { const v = b.dataset.view, inp = $(`[data-inline-search="${v}"]`); S.filt[v].q = ''; if (inp) { inp.value = ''; inp.focus(); } commitFilters(v); },
@@ -1924,9 +2148,16 @@ const ACTIONS = {
     iberocash: () => { if (IBEROCASH_NOTE) toast(IBEROCASH_NOTE, { ms: 6000 }); },
     'recent-clear': () => { store.remove(RECENT_KEY); renderSearchResults(); },
     theme: (b) => setThemePref(b.dataset.value),
-    'exit-preview': () => { store.remove('ib_admin_preview'); location.reload(); },
+    // "Hide preview": paused ('0'), not removed. The admin editor still loads ib_app_data while the
+    // flag is '0' or '1', so unexported edits stay editable and a later save resumes the preview.
+    'exit-preview': () => { store.set('ib_admin_preview', '0'); location.reload(); },
     reload: () => location.reload(),
-    'a2hs-dismiss': (b) => { store.set('ib_a2hs_dismissed', '1'); const a = b.closest('.a2hs'); if (a) a.remove(); },
+    'a2hs-dismiss': (b) => {
+        store.set('ib_a2hs_dismissed', '1');
+        const a = b.closest('.a2hs'), foot = a && a.closest('.today-foot');
+        if (a) a.remove();
+        if (foot) foot.focus({ preventScroll: true }); // keep focus where the banner was
+    },
     install: async () => { if (!deferredInstall) return; deferredInstall.prompt(); try { await deferredInstall.userChoice; } catch (e) { /* ignore */ } deferredInstall = null; S.dirty.add('today'); },
     'saved-share': (b) => shareSaved(b),
     'shared-save-all': () => { const ks = S.shared || []; S.shared = null; ks.forEach(k => setSaved(k, true)); S.dirty.add('saved'); toast(`Saved ${plural(ks.length, 'item')}`); go('#/saved', { replace: true }); },
@@ -1943,8 +2174,29 @@ const ACTIONS = {
     'rq-share': () => rqShare(),
     'rq-wa': () => rqWa()
 };
+/* Ghost-click guard (capture phase): a double-click / double-tap opens an overlay with its first
+   click, and the second one would land on whatever the new sheet put under the pointer (the scrim →
+   closes it again; a hero slide → opens the lightbox). Pointer clicks inside an overlay during its
+   first 300 ms are dropped; keyboard activations (detail 0) are never affected. */
+function onClickGuard(e) {
+    if (!e.detail) return;
+    const ov = e.target.closest && e.target.closest('.ov');
+    if (ov && ov._openedAt && performance.now() - ov._openedAt < 300) { e.preventDefault(); e.stopPropagation(); }
+}
+/* Same-page fragment links that are not routes (the skip link → #main): focus the target in place.
+   Following them natively would change the hash, and the router would treat '#main' as an unknown
+   route and send the guest to Today. */
+function focusFragment(id) {
+    const t = id === 'main' ? ($('.view:not([hidden]) h1') || $('#main')) : document.getElementById(id);
+    if (!t) return;
+    if (!t.hasAttribute('tabindex') && !t.matches('a[href],button,input,select,textarea')) t.tabIndex = -1;
+    t.focus({ preventScroll: true });
+    if (t.scrollIntoView && t.getBoundingClientRect().top < 0) t.scrollIntoView({ block: 'start' });
+}
 function onClick(e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const frag = e.target.closest && e.target.closest('a[href^="#"]:not([href^="#/"])');
+    if (frag && frag.getAttribute('href').length > 1) { e.preventDefault(); focusFragment(frag.getAttribute('href').slice(1)); return; }
     const act = e.target.closest('[data-action]');
     if (act && !act.disabled && ACTIONS[act.dataset.action]) {
         const r = ACTIONS[act.dataset.action](act, e);
@@ -1963,6 +2215,10 @@ function onKey(e) {
     if (!e.metaKey && !e.ctrlKey && /^(Tab|Arrow|Enter| |Escape|Home|End)/.test(e.key)) document.documentElement.classList.add('kbd');
     if (e.key === 'Escape' && Overlay.stack.length) { e.preventDefault(); closeTop(); return; }
     if (e.key === 'Tab') trapTab(e);
+    // detail hero carousel: one tab stop, arrow keys page through the photos
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && e.target.matches && e.target.matches('.dhero__slide')) {
+        e.preventDefault(); heroStep(e.key === 'ArrowRight' ? 1 : -1); return;
+    }
     // Space on a card's stretched link opens it too (links only react to Enter natively)
     if (e.key === ' ' && e.target.matches && e.target.matches('a.card__link, .srow a, a.menu-row, a.video-row')) { e.preventDefault(); e.target.click(); return; }
     const top = Overlay.top();
@@ -1977,7 +2233,8 @@ function onKey(e) {
         const next = radios[(i + d + radios.length) % radios.length];
         e.preventDefault(); next.focus(); next.click();
     }
-    if (e.key === 'Enter' && e.target.id === 'searchInput') { rememberQuery(e.target.value); e.target.blur(); }
+    // Enter in search: blur only to drop the on-screen keyboard (touch); a keyboard user keeps focus
+    if (e.key === 'Enter' && e.target.id === 'searchInput') { rememberQuery(e.target.value); if (mq('(pointer:coarse)')) e.target.blur(); }
 }
 function onInput(e) {
     const t = e.target;
@@ -2013,10 +2270,10 @@ function setInHouse(on, notify) {
 const NAV_IDS = { portfolio: '#/resorts', dining: '#/dine', activities: '#/explore', spa: '#/spa', golf: '#/explore?f=golf', store: '#/explore?f=shop', today: '#/today', dine: '#/dine', explore: '#/explore', saved: '#/saved', resorts: '#/resorts' };
 function nav(id) { navigate(NAV_IDS[id] || '#/today'); }
 function renderApp(id) { nav(id); }
-function openDetails(key) { if (appData[key]) navigate(itemHash(key)); }
+function openDetails(key) { if (hasItem(key)) navigate(itemHash(key)); }
 function launchLightbox(listOrKey, i) {
     const key = typeof listOrKey === 'string' ? listOrKey : S.detailKey;
-    if (key && appData[key]) navigate(itemHash(key, '/photos/' + ((i || 0) + 1)));
+    if (hasItem(key)) navigate(itemHash(key, '/photos/' + ((i || 0) + 1)));
 }
 function findByUrl(field, url) {
     for (const F of FACETS.values()) {
@@ -2032,8 +2289,8 @@ function viewPdf(url) {
 }
 function viewVideo(url) { const hit = findByUrl('video', url); if (hit) navigate(itemHash(hit.key, '/video')); }
 async function sharePackage(key, btn) {
+    if (!hasItem(key)) return;
     const it = appData[key];
-    if (!it) return;
     const url = location.origin + location.pathname + '#/item/' + encodeURIComponent(key);
     const flash = () => {
         if (!btn) return;
@@ -2062,10 +2319,26 @@ function initServiceWorker(params) {
     if (!secure) return;
     const hadController = !!navigator.serviceWorker.controller;
     let reloading = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloading || !hadController) return; reloading = true; location.reload(); });
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloading || !hadController) return;
+        const c = navigator.serviceWorker.controller;
+        if (S.swSilent && !S.swReloading && c === S.swSilent) return; // the quiet same-release switch (offer())
+        reloading = true; location.reload();
+    });
     navigator.serviceWorker.register('sw.js').then(reg => {
-        const offer = w => {
-            if (!w || !hadController || S.swWaiting === w) return;
+        swReg = reg;
+        swCheckedAt = Date.now();
+        const offer = async w => {
+            if (!w || !hadController || S.swWaiting === w || S.swSilent === w) return;
+            // The old worker serves navigations network-first (and each page's ?v= scripts from that
+            // page's own release), so on normal Wi-Fi this page is often already the new release. Then there is nothing to refresh: activate the new worker
+            // quietly (no reload) instead of offering a "Refresh" that changes nothing.
+            const v = await swVersion(w);
+            if (v != null && v === DATA_VERSION) {
+                S.swSilent = w;
+                try { w.postMessage({ type: 'skip-waiting' }); } catch (e) { /* ignore */ }
+                return;
+            }
             S.swWaiting = w;
             showUpdateToast();
         };
@@ -2080,6 +2353,26 @@ function initServiceWorker(params) {
             idle(() => { try { r.active.postMessage({ type: 'warm' }); store.sset('ib_warmed', String(DATA_VERSION)); } catch (e) { /* ignore */ } });
         }).catch(() => {});
     }).catch(() => { /* sw.js missing or blocked: the app works without it */ });
+}
+/* Asks a worker which release it carries ({type:'status'} → {version}); null if it does not answer. */
+function swVersion(w) {
+    return new Promise(res => {
+        try {
+            const ch = new MessageChannel();
+            const t = setTimeout(() => res(null), 1500);
+            ch.port1.onmessage = e => { clearTimeout(t); const d = e.data || {}; res(d.type === 'status' && typeof d.version === 'number' ? d.version : null); };
+            w.postMessage({ type: 'status' }, [ch.port2]);
+        } catch (e) { res(null); }
+    });
+}
+/* Hash routing means no navigations after the first load, and an iOS Home Screen app is resumed far
+   more often than relaunched, so the browser's own sw.js check can lag by a day. Look for a new
+   release when the app comes back to the foreground and every 30 min while it is in use. */
+let swReg = null, swCheckedAt = 0;
+function checkForUpdate() {
+    if (!swReg || document.hidden || navigator.onLine === false || Date.now() - swCheckedAt < 30 * 60000) return;
+    swCheckedAt = Date.now();
+    try { const p = swReg.update(); if (p && p.catch) p.catch(() => {}); } catch (e) { /* offline or unsupported */ }
 }
 /* "Updated info available · Refresh" (5 s). Re-shown once more on the next tab switch or return to the app. */
 function showUpdateToast() {
@@ -2131,22 +2424,41 @@ function boot() {
     applyTheme();
     updateBadge();
     $('.preview-pill').hidden = !S.preview;
+    document.addEventListener('click', onClickGuard, true);
     document.addEventListener('click', onClick);
+    document.addEventListener('focusin', e => {
+        const kbd = document.documentElement.classList.contains('kbd');
+        if (kbd) requestAnimationFrame(() => revealFocused(e.target));
+        const l = e.target.matches && e.target.matches('.rq label > input') ? e.target.parentElement : null;
+        if (l) l.classList.toggle('is-focus', kbd); // ring on the visible option (no :has() before Safari 15.4)
+    });
+    document.addEventListener('focusout', e => { if (e.target.matches && e.target.matches('.rq label > input')) e.target.parentElement.classList.remove('is-focus'); });
+    // auto-height sheets: a hairline under the sticky title once the content scrolls under it
+    document.addEventListener('scroll', e => { const t = e.target; if (t && t.classList && t.classList.contains('sheet__scroll')) t.classList.toggle('is-scrolled', t.scrollTop > 4); }, true);
     document.addEventListener('keydown', onKey);
     document.addEventListener('input', onInput);
     document.addEventListener('change', e => { const f = e.target.form; if (f && f.classList.contains('rq')) rqPersist(f); });
     document.addEventListener('submit', e => { const f = e.target; if (f.classList && f.classList.contains('rq')) { e.preventDefault(); rqSubmit(f); } });
     document.addEventListener('pointerup', onGreetingTap);
     document.addEventListener('pointerdown', () => document.documentElement.classList.remove('kbd'), true);
-    window.addEventListener('popstate', () => render(parseRoute(location.hash), { nav: true }));
+    // A hash that is not a route ('#main' from a fragment link that slipped through) is not navigation:
+    // put the route back without a new render and focus the element instead.
+    const notRoute = () => {
+        const h = location.hash;
+        if (!h || h.startsWith('#/')) return false;
+        history.replaceState(history.state, '', lastRendered || '#/today');
+        focusFragment(h.slice(1));
+        return true;
+    };
+    window.addEventListener('popstate', () => { if (!notRoute()) render(parseRoute(location.hash), { nav: true }); });
     window.addEventListener('hashchange', () => { // manual edits of the address bar
-        if (location.hash === lastRendered) return;
+        if (location.hash === lastRendered || notRoute()) return;
         if (!(history.state && history.state.ib)) history.replaceState({ ib: 1, idx: histIdx() + 1 }, '', location.hash);
         render(parseRoute(location.hash), { nav: true });
     });
     document.addEventListener('visibilitychange', () => {
         document.documentElement.classList.toggle('doc-hidden', document.hidden);
-        if (!document.hidden) { tick(); maybeReshowUpdate(); }
+        if (!document.hidden) { tick(); maybeReshowUpdate(); checkForUpdate(); }
     });
     window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; S.dirty.add('today'); if (S.view === 'today' && !Overlay.stack.length) renderView('today'); });
     let rT = 0;
@@ -2161,8 +2473,10 @@ function boot() {
     initNetwork();
     initSheetDrag($('#ovDetail'));
     seedHistory();
+    // a cold deep link into an overlay: the view underneath keeps its photos until the overlays close
+    S.holdImages = parseRoute(location.hash).overlays.length > 0;
     render(parseRoute(location.hash), { initial: true });
-    setInterval(tick, 60000);
+    setInterval(() => { tick(); checkForUpdate(); }, 60000);
     idle(() => initServiceWorker(params));
 }
 

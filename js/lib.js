@@ -30,6 +30,23 @@ function stripTags(html) { return String(html || '').replace(/<[^>]*>/g, ' ').re
 function decodeEntities(s) {
     return String(s).replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: ' ' }[e]));
 }
+/* Line-break control for short UI strings ("At Joia · Open-air grill", "Morning · 9:30 AM–1:30 PM").
+   A line may break only after a " · " separator: short segments are kept whole (.nw = nowrap),
+   hyphens inside a segment never break (U+2011) and a time range stays on one line. */
+const NBH = '\u2011';
+function nbHyphen(s) { return String(s == null ? '' : s).replace(/(\w)-(?=\w)/g, '$1' + NBH); }
+/* inverse, for plain-text uses (search highlighting, share text) */
+function plainSegs(s) { return String(s == null ? '' : s).replace(/\u2011/g, '-').replace(/\u00a0/g, ' '); }
+const TIME_SPAN_RE = /\d{1,2}(?::\d{2})?\s?[AP]M(?:\s?[–\u2011-]\s?\d{1,2}(?::\d{2})?\s?[AP]M)?|\d{1,2}(?::\d{2})?[–\u2011-]\d{1,2}(?::\d{2})?\s?[AP]M/g;
+/* escaped HTML in → time ranges wrapped in nowrap spans */
+function nwTimes(html) { return String(html).replace(TIME_SPAN_RE, m => `<span class="nw">${m}</span>`); }
+/* one segment → escaped HTML */
+function segHTML(t) {
+    const p = String(t == null ? '' : t).trim();
+    return p.length <= 16 ? `<span class="nw">${esc(nbHyphen(p))}</span>` : nwTimes(esc(nbHyphen(p)));
+}
+/* [segments] → escaped HTML "a&nbsp;· b": the dot stays with the segment before it */
+function segsHTML(parts) { return parts.filter(Boolean).map(segHTML).join('&nbsp;· '); }
 function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
 function slugify(s) { return normText(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
 
@@ -529,16 +546,15 @@ function cardMeta(F) {
     if (t === 'food') {
         // the area part is wrapped so grouped Dine (whose group heading already names the area) can hide it
         const a = areaShort(F.area);
-        out.eyebrow = a && F.cuisine ? `<span class="eb-area">${esc(a)} · </span>${esc(F.cuisine)}` : esc(a || F.cuisine || '');
-        const parts = [];
-        if (F.meals.length) parts.push(F.meals.map(m => m === 'drinks' ? 'Drinks' : m[0].toUpperCase() + m.slice(1)).join(' · '));
+        out.eyebrow = a && F.cuisine ? `<span class="eb-area">${segHTML(a)}&nbsp;· </span>${segHTML(F.cuisine)}` : segsHTML([a || F.cuisine || '']);
+        const parts = F.meals.map(m => m === 'drinks' ? 'Drinks' : m[0].toUpperCase() + m.slice(1));
         if (F.menus.length) parts.push(F.menus.length === 1 ? 'Menu' : F.menus.length + ' menus');
-        out.meta = esc(parts.join(' · '));
+        out.meta = segsHTML(parts);
         if (F.hours.some(h => h.ok)) out.status = openState(it);
     } else if (t === 'fun') {
-        out.eyebrow = esc(partnerShort(it) + ' · ' + funCategory(F, true));
+        out.eyebrow = segsHTML([partnerShort(it), funCategory(F, true)]);
         const bits = [F.dur.text, slotSummary(F.slots)].filter(Boolean);
-        out.meta = bits.length ? `<svg class="ic ic--meta" aria-hidden="true"><use href="#i-clock"/></svg>${esc(bits.join(' · '))}` : '';
+        out.meta = bits.length ? `<svg class="ic ic--meta" aria-hidden="true"><use href="#i-clock"/></svg>${segsHTML(bits)}` : '';
         if (F.from) out.price = `<span class="from">From</span> <b>${esc(fromText(F.from))}</b>`;
     } else if (t === 'spa') {
         out.eyebrow = esc(areaShort(F.area) || 'Spa Sensations');
@@ -547,8 +563,12 @@ function cardMeta(F) {
         out.eyebrow = esc(areaShort(F.area) || 'Golf & nature');
         const tee = F.slots[0] && F.slots[0].short;
         out.meta = esc(tee ? 'Tee times ' + tee : it.sub || '');
+    } else if (t === 'club') {
+        // the location, not "Iberostar in Aruba" (the resorts rail and view already say that)
+        out.eyebrow = esc(it.sub || 'Iberostar in Aruba');
+        out.meta = it.video ? 'Video tour' : '';
     } else {
-        out.eyebrow = esc(t === 'club' ? 'Iberostar in Aruba' : 'Shopping');
+        out.eyebrow = 'Shopping';
         out.meta = esc(it.sub || '');
     }
     if (F.status === 'coming-soon') out.eyebrow = esc(statusLabel(it));
@@ -577,9 +597,8 @@ function factsOf(F) {
         const sf = slotFact(it, F.slots); if (sf) add(sf.dt, sf.dd);
         add('Where', areaShort(F.area));
     } else if (t === 'club') {
-        add('Location', it.sub && F.status !== 'coming-soon' ? it.sub : '');
-        add('Status', F.status === 'coming-soon' ? statusLabel(it) : 'Open');
-        if (it.video) add('Video', 'Video tour');
+        // No strip: the data has no structured resort facts, and "Location: Golf & Estates / Status: Open /
+        // Video: Video tour" only repeated the eyebrow, the obvious and the video section below.
     } else if (t === 'store') {
         add('Type', F.status === 'coming-soon' ? statusLabel(it) : it.sub);
     }
@@ -830,7 +849,11 @@ function logoImgHTML(src, o) {
     const lazy = o.eager ? 'eager' : 'lazy';
     if (!m || !Array.isArray(m.v) || !m.v.length) return `<img src="${orig}" alt="${alt}" loading="${lazy}" decoding="async" data-noph data-orig="${orig}">`;
     const set = m.v.map(w => `${variantURL(m, w)} ${w}w`);
-    if (m.w && m.w > m.v[m.v.length - 1]) set.push(`${orig} ${m.w}w`);
+    // The original joins as the top candidate only when it is at most 2× the largest WebP: a much
+    // wider original is a heavy JPEG/PNG (Marea: 907w, 45 KB) that a 192px lockup on a 3× phone would
+    // otherwise pick over the 2 KB 320w WebP.
+    const top = m.v[m.v.length - 1];
+    if (m.w && m.w > top && m.w <= top * 2) set.push(`${orig} ${m.w}w`);
     // o.box = [maxW, maxH] of the contain box → the slot width the logo really renders at
     const sizes = o.box && m.w && m.h ? Math.max(16, Math.round(Math.min(o.box[0], o.box[1] * m.w / m.h))) + 'px' : (o.sizes || '72px');
     return `<img src="${variantURL(m, m.v[0])}" srcset="${set.join(', ')}" sizes="${esc(sizes)}" alt="${alt}" loading="${lazy}" decoding="async" data-noph data-orig="${orig}">`;
@@ -839,7 +862,7 @@ function logoImgHTML(src, o) {
 function phHTML(o) {
     o = o || {};
     const icon = o.logo
-        ? `<span class="ph__logo">${logoImgHTML(o.logo, { box: [56, 56] })}</span>`
+        ? `<span class="ph__logo">${logoImgHTML(o.logo, { box: o.logoBox || [56, 56] })}</span>`
         : o.icon ? `<svg class="ph__icon" aria-hidden="true"><use href="#i-${esc(o.icon)}"/></svg>` : '';
     return `<div class="ph" aria-hidden="true">`
         + `<svg class="ph__waves" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true">`
@@ -851,7 +874,7 @@ function phSpecFor(F) {
     const it = F.item;
     const icon = it.type === 'fun' ? 'sail' : it.type === 'store' ? 'bag' : it.type === 'club' ? 'star' : it.type === 'spa' ? 'spa' : it.type === 'food' ? 'dine' : 'star';
     return {
-        name: it.type === 'fun' ? partnerName(it) || it.title : cleanTitle(it),
+        name: it.type === 'fun' ? partnerShort(it) || it.title : cleanTitle(it),
         icon, logo: it.logo || '',
         chip: F.status === 'coming-soon' ? statusLabel(it) : ''
     };
@@ -863,5 +886,5 @@ if (typeof module !== 'undefined' && module.exports) {
         slotStartMinutes, parseTimeRange, fmtRangeShort, area, cuisine, meals, mealsInfo, hours, openState, tagsOf, classifyEssential, channel,
         visibleInMode, status, iberocash, partnerName, partnerShort, funCategory, menusOf, buildFacets, facet, FACETS, cardMeta, factsOf,
         searchItems, highlight, todayPicks, phaseInfo, arubaNow, sunTimes, fmtClock, contextLine, dateEyebrow, greetingFor, starfieldSVG,
-        mediaOf, variantURL, pickW, encodePath, imgHTML, logoImgHTML, mediaAttrs, phHTML, cleanTitle };
+        mediaOf, variantURL, pickW, encodePath, imgHTML, logoImgHTML, mediaAttrs, phHTML, cleanTitle, nbHyphen, plainSegs, nwTimes, segHTML, segsHTML };
 }

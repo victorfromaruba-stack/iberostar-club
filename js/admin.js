@@ -8,6 +8,10 @@
  * saveItem() merges the form into the existing item ({ ...appData[key], ...fields }), so optional
  * fields the form doesn't know about (pdfs, future fields) survive a save. Empty optional fields
  * are deleted rather than stored as ''.
+ *
+ * Several admin tabs can be open on one device. Save/delete re-read ib_app_data first and change only
+ * their own item (per-item read-modify-write), and a 'storage' listener reloads the catalog when
+ * another tab writes it, so tabs never silently overwrite each other's edits.
  */
 'use strict';
 
@@ -126,37 +130,85 @@ let appData = {};
 let published = {};
 let previewInfo = { active: false, version: null, unreadable: false };
 let legacyRaw = null;
+// True after a localStorage write failed: from then on the in-memory catalog holds edits storage
+// never received, so it (not storage) is the source of truth until a later write succeeds.
+let storageFailed = false;
 
+// Fingerprints (cyrb53 of JSON.stringify(defaultData)) of every catalog a pre-v4 guest app or editor
+// shipped (git history up to f531916). Those versions wrote an unedited copy of the catalog to
+// ib_app_data on first visit, so a stored value matching one of these is a stale cache, not edits.
+// Generated once from git history; it never needs updating (v4+ never writes ib_app_data unflagged).
+const PRE_V4_CATALOGS = new Set([
+    '1dq3j3mq0bi', '190qr8sexul', '10u4f066y2q', '7b64x2rm8o', '231janngrso', '7hz5ydzxck', '2985hrff832', '18kq1nerlp9',
+    '3w7p232fne', 'bv8remja6x', '15iylvc5jz', '2kiqnp6han', '2bocp2ofpzm', '25vt7qusvd6', '1pnc9wxemd6', '1gnzaa448nm',
+    'fat3boq590', '1j6hwbklujz', '2536rkzs6c4', '1fp6lxe9r4g', '4hyjiz2jz9', '2firqkau4mx', '13uqfczt3z0', '24i2j2ek8fb'
+]);
+// cyrb53: small, fast, synchronous 53-bit string hash (not for security — only to recognise known copies).
+function cyrb53(str) {
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for (let i = 0, ch; i < str.length; i++) {
+        ch = str.charCodeAt(i);
+        h1 = Math.imul(h1 ^ ch, 2654435761);
+        h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
+// (Re)reads the catalog from localStorage. Also the "read" half of every save/delete, so a tab always
+// writes on top of what other tabs stored rather than on top of its own stale copy.
 function loadAppData() {
     published = typeof defaultData !== 'undefined' && isPlainObject(defaultData) ? clone(defaultData) : {};
     appData = clone(published);
-    previewInfo = { active: false, version: null, unreadable: false };
+    previewInfo = { active: false, version: null, unreadable: false, paused: false };
     legacyRaw = null;
 
     const raw = store.get(LS_DATA);
-    if (store.get(LS_PREVIEW) === '1') {
+    // '1' = preview on; '0' = the guest app's "Hide preview" paused it. Either way these are staff
+    // edits that must stay loadable here; the next save writes '1' again, which resumes the preview.
+    const flag = store.get(LS_PREVIEW);
+    if (flag === '1' || flag === '0') {
+        const paused = flag === '0';
         let parsed = null;
         try { parsed = JSON.parse(raw); } catch (e) { parsed = null; }
         if (isPlainObject(parsed) && Object.values(parsed).every(isPlainObject)) {
             appData = parsed;
-            previewInfo = { active: true, version: parseInt(store.get(LS_VERSION), 10) || null, unreadable: false };
+            previewInfo = { active: true, version: parseInt(store.get(LS_VERSION), 10) || null, unreadable: false, paused };
         } else {
-            previewInfo = { active: true, version: null, unreadable: true };
+            previewInfo = { active: true, version: null, unreadable: true, paused };
         }
     } else if (raw) {
-        // Edits saved by the pre-v4 editor. The guest app ignores them; keep them until staff decide.
-        legacyRaw = raw;
+        if (PRE_V4_CATALOGS.has(cyrb53(raw))) {
+            // An unedited copy of an old published catalog that the pre-v4 site cached on every first
+            // visit. It holds no staff edits, so drop it instead of warning about "older edits".
+            store.remove(LS_DATA);
+            store.remove(LS_VERSION);
+        } else {
+            // Edits saved by the pre-v4 editor. The guest app ignores them; keep them until staff decide.
+            legacyRaw = raw;
+        }
     }
 }
 
+// Pulls in whatever other tabs saved, unless this tab holds edits storage never received.
+function syncFromStorage() {
+    if (!storageFailed) loadAppData();
+}
+
+// Writes the whole in-memory catalog. Callers sync first, so this only adds their own change.
+// Returns false (and changes nothing about the preview state) when storage refuses the write.
 function persistAppData() {
     const ok = store.set(LS_DATA, JSON.stringify(appData)) && store.set(LS_VERSION, DATA_VERSION) && store.set(LS_PREVIEW, '1');
-    previewInfo = { active: true, version: DATA_VERSION, unreadable: false };
-    legacyRaw = null;
+    storageFailed = !ok;
+    if (ok) {
+        previewInfo = { active: true, version: DATA_VERSION, unreadable: false, paused: false };
+        legacyRaw = null;
+    }
     renderBanners();
-    if (!ok) showToast('Could not save on this device (storage is full or blocked).', true);
     return ok;
 }
+const STORAGE_FAILED_MSG = 'Not saved — this device’s storage is full or blocked. Use Copy code or Download data.js now to keep this edit.';
 
 function changeSummary() {
     const keys = new Set([...Object.keys(appData), ...Object.keys(published)]);
@@ -174,6 +226,7 @@ function itemState(key) {
 }
 
 function renderBanners() {
+    $('storageBanner').hidden = !storageFailed;
     const banner = $('previewBanner');
     banner.hidden = !previewInfo.active;
     if (previewInfo.active) {
@@ -187,6 +240,7 @@ function renderBanners() {
         else if (previewInfo.version && previewInfo.version < DATA_VERSION) {
             detail += ` These edits were made against an older release (content v${previewInfo.version}); check them before exporting.`;
         }
+        if (previewInfo.paused && !previewInfo.unreadable) detail += ' Preview hidden in the guest app — saving any item turns it back on.';
         $('previewBannerDetail').textContent = detail;
     }
     const legacy = $('legacyBanner');
@@ -204,6 +258,7 @@ function resetToPublished() {
     store.remove(LS_VERSION);
     store.remove(LS_PREVIEW);
     formDirty = false;
+    storageFailed = false; // the unsaved in-memory edits are discarded on purpose here
     loadAppData();
     renderBanners();
     renderAdminList();
@@ -446,6 +501,14 @@ const FORM_FIELD_IDS = ['newKey', 'newType', 'newDesc', 'newGallery', 'newTags',
 
 let loadedKey = null;
 let formDirty = false;
+// JSON of the item as it was when loaded into the form (detects edits made in another tab meanwhile).
+let loadedItemJSON = null;
+// Every form control's value right after load/save/clear. "Dirty" means the form differs from this,
+// not merely that an input/change event fired (a blur after Ctrl/⌘+S fires 'change' with nothing new).
+let formSnapshot = null;
+function formFingerprint() {
+    return JSON.stringify([...$('itemForm').elements].map((el) => (el.type === 'checkbox' || el.type === 'radio' ? el.checked : el.value)));
+}
 
 function setSelect(id, value) {
     const sel = $(id);
@@ -487,7 +550,9 @@ function loadItemIntoForm(key) {
     $('newExtra').value = Object.keys(extra).length ? JSON.stringify(extra, null, 2) : '';
 
     loadedKey = key;
+    loadedItemJSON = JSON.stringify(item);
     formDirty = false;
+    formSnapshot = formFingerprint();
     try { history.replaceState(null, '', `#${encodeURIComponent(key)}`); } catch (e) { /* ignore */ }
     updateEditorHead();
     renderGalleryStrip();
@@ -503,7 +568,9 @@ function clearForm(force) {
     $('itemForm').reset();
     $('newType').value = 'food';
     loadedKey = null;
+    loadedItemJSON = null;
     formDirty = false;
+    formSnapshot = formFingerprint();
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* ignore */ }
     updateEditorHead();
     renderGalleryStrip();
@@ -654,6 +721,19 @@ async function saveItem() {
         return;
     }
 
+    // Another admin tab may have saved since this one loaded: check against what is stored now.
+    syncFromStorage();
+    renderBanners();
+    if (loadedKey && loadedItemJSON !== null) {
+        const current = appData[loadedKey];
+        if ((current ? JSON.stringify(current) : null) !== loadedItemJSON && !confirm(current
+            ? `“${current.title || loadedKey}” was changed in another tab after you opened it here.\n\nSave this form’s version over it?`
+            : `“${loadedKey}” was deleted in another tab after you opened it here.\n\nSave it again from this form?`)) {
+            renderAdminList();
+            return;
+        }
+    }
+
     const renaming = loadedKey && key !== loadedKey && appData[loadedKey];
     if (renaming && appData[key]) {
         setFieldError('newKey', `That ID is already used by “${appData[key].title || key}”.`);
@@ -669,10 +749,14 @@ async function saveItem() {
         if (missing.length) warnings.push(`${missing.length} gallery photo${missing.length > 1 ? 's' : ''} can’t be found:\n${missing.join('\n')}`);
         if (warnings.length && !confirm(`${warnings.join('\n\n')}\n\nSave anyway?`)) return;
 
+        // Read-modify-write: re-read storage (the awaits/dialogs above let other tabs save) and apply
+        // only this item's change on top. Everything from here to persistAppData() is synchronous.
+        syncFromStorage();
+
         // The form owns its keys; everything else is "extra". Only an item that was loaded into the
         // form has its extras shown, so only then may removing a key from the JSON delete it.
         const sameItemLoaded = !!loadedKey && (loadedKey === key || renaming);
-        if (renaming) renameKeyInPlace(loadedKey, key);
+        if (renaming && appData[loadedKey]) renameKeyInPlace(loadedKey, key);
         const before = appData[key] ? clone(appData[key]) : null;
         const isNew = !before;
 
@@ -694,14 +778,24 @@ async function saveItem() {
         if (sameItemLoaded && before) {
             Object.keys(before).forEach((k) => { if (!KNOWN_FIELDS.has(k) && !(k in extra)) delete item[k]; });
         }
-        if (isNew) placeNewItem(key);
+        // New items, and items whose type changed, go to the end of their type's block so the
+        // export keeps one // SECTION per type.
+        if (isNew || before.type !== item.type) placeNewItem(key);
 
         loadedKey = key;
-        persistAppData();
-        formDirty = false;
+        const ok = persistAppData();
         renderAdminList();
         loadItemIntoForm(key);
-        probeItem(key);
+        probeAll();
+        if (!ok) {
+            // The edit is kept in memory (so Copy code / Download still include it) but is NOT on the
+            // device: stay dirty so leaving warns, and say so instead of "Saved".
+            formDirty = true;
+            formSnapshot = null;
+            setFormState(STORAGE_FAILED_MSG, 'error');
+            showToast('Could not save on this device (storage is full or blocked)', true);
+            return;
+        }
         showToast(renaming ? `Renamed and saved · ${key}` : 'Saved on this device');
         setFormState('Saved on this device. Export from Publish when you’re done.', 'ok');
     } finally {
@@ -721,9 +815,9 @@ function placeNewItem(key) {
     const keys = Object.keys(appData).filter((k) => k !== key);
     let at = -1;
     keys.forEach((k, i) => { if (appData[k].type === type) at = i; });
-    if (at === -1) return; // first of its type: stays at the end
     const next = {};
     keys.forEach((k, i) => { next[k] = appData[k]; if (i === at) next[key] = appData[key]; });
+    if (at === -1) next[key] = appData[key]; // first of its type: goes to the end
     appData = next;
 }
 
@@ -731,13 +825,21 @@ function deleteItem() {
     const key = loadedKey || $('newKey').value.trim();
     if (!key || !appData[key]) { showToast('Select an item first', true); return; }
     if (!confirm(`Delete “${appData[key].title || key}” (${key})?\n\nIt disappears on this device now and for everyone once you publish the export.`)) return;
+    syncFromStorage(); // read-modify-write: keep what other tabs saved meanwhile
+    const existed = key in appData;
     delete appData[key];
     delete brokenByKey[key];
-    persistAppData();
+    const ok = existed ? persistAppData() : true;
     formDirty = false;
     clearForm(true);
+    renderBanners();
     renderAdminList();
-    showToast('Item deleted on this device');
+    if (!ok) {
+        setFormState(STORAGE_FAILED_MSG.replace('this edit', 'this deletion'), 'error');
+        showToast('Could not delete on this device (storage is full or blocked)', true);
+        return;
+    }
+    showToast(existed ? 'Item deleted on this device' : 'Already deleted in another tab');
 }
 
 /* ------------------------------------------------------------------ gallery strip */
@@ -810,7 +912,15 @@ function fmtValue(v, depth) {
 function buildExportCode() {
     const lines = [];
     let prevType = null;
-    const keys = Object.keys(appData);
+    // One block per type (in order of first appearance, catalog order kept within a type), so the
+    // file always has a single // SECTION comment per type even if older local edits left one split.
+    const byType = new Map();
+    Object.keys(appData).forEach((k) => {
+        const t = appData[k].type;
+        if (!byType.has(t)) byType.set(t, []);
+        byType.get(t).push(k);
+    });
+    const keys = [...byType.values()].flat();
     keys.forEach((key, i) => {
         const item = appData[key];
         if (item.type !== prevType && SECTION_COMMENT[item.type]) {
@@ -990,16 +1100,54 @@ function showToast(msg, isError) {
 }
 
 function markFormDirty() {
+    if (formSnapshot !== null && formFingerprint() === formSnapshot) {
+        // Back to what was loaded/saved (e.g. the 'change' fired by a blur after Ctrl/⌘+S).
+        if (formDirty) {
+            formDirty = false;
+            if ($('formState').dataset.kind === 'dirty') setFormState('');
+        }
+        return;
+    }
     formDirty = true;
-    setFormState('Unsaved changes', 'dirty');
+    if (storageFailed) setFormState(STORAGE_FAILED_MSG, 'error');
+    else setFormState('Unsaved changes', 'dirty');
 }
 function confirmDiscardIfDirty() {
     if (!formDirty) return true;
     return confirm('You have unsaved changes on this item. Discard them?');
 }
 window.addEventListener('beforeunload', (e) => {
-    if (formDirty) { e.preventDefault(); e.returnValue = ''; }
+    if (formDirty || storageFailed) { e.preventDefault(); e.returnValue = ''; }
 });
+
+/* ------------------------------------------------------------------ other admin tabs */
+// 'storage' fires in every OTHER tab of this origin when one writes localStorage.
+let externalSyncTimer = null;
+window.addEventListener('storage', (e) => {
+    if (!adminStarted || storageFailed) return;
+    if (e.key !== null && e.key !== LS_DATA && e.key !== LS_PREVIEW && e.key !== LS_VERSION) return;
+    try { if (e.storageArea && e.storageArea !== localStorage) return; } catch (err) { return; }
+    clearTimeout(externalSyncTimer);
+    externalSyncTimer = setTimeout(onExternalCatalogChange, 60); // one save writes three keys
+});
+function onExternalCatalogChange() {
+    if (saving) { externalSyncTimer = setTimeout(onExternalCatalogChange, 200); return; } // saveItem syncs itself
+    loadAppData();
+    renderBanners();
+    renderAdminList();
+    probeAll();
+    if (!loadedKey) return;
+    const current = appData[loadedKey];
+    if ((current ? JSON.stringify(current) : null) === loadedItemJSON) return; // this item untouched
+    if (!formDirty) {
+        if (current) { loadItemIntoForm(loadedKey); showToast('This item was updated in another tab'); }
+        else { clearForm(true); showToast('This item was deleted in another tab'); }
+    } else {
+        setFormState(current
+            ? 'This item was also changed in another tab. Saving replaces that version.'
+            : 'This item was deleted in another tab. Saving adds it back.', 'error');
+    }
+}
 
 /* ------------------------------------------------------------------ wiring (no inline handlers) */
 function init() {
@@ -1034,6 +1182,8 @@ function init() {
     $('exportFallbackClose').addEventListener('click', () => { $('exportFallback').hidden = true; $('exportBtn').focus(); });
 
     $('resetPublishedBtn').addEventListener('click', resetToPublished);
+    $('storageExportBtn').addEventListener('click', exportData);
+    $('storageDownloadBtn').addEventListener('click', downloadDataJs);
     $('legacyBackupBtn').addEventListener('click', downloadLegacyBackup);
     $('legacyDiscardBtn').addEventListener('click', discardLegacy);
 

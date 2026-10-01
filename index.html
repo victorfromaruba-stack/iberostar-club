@@ -16,6 +16,14 @@
 <link rel="apple-touch-startup-image" href="assets/Logos/startup-1170x2532.png?v=400" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
 <link rel="apple-touch-startup-image" href="assets/Logos/startup-1179x2556.png?v=400" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
 <link rel="apple-touch-startup-image" href="assets/Logos/startup-1290x2796.png?v=400" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-640x1136.png?v=400" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-1125x2436.png?v=400" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-828x1792.png?v=400" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-1242x2688.png?v=400" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-1284x2778.png?v=400" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-1206x2622.png?v=400" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-1320x2868.png?v=400" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-1260x2736.png?v=400" media="(device-width: 420px) and (device-height: 912px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
 <script>
 /* BOOT — runs before first paint. Single source of the Aruba clock, NOAA sun times and
    phase (js/lib.js wraps window.IB_TIME). Sets data-phase / data-theme / theme-color so
@@ -27,11 +35,17 @@ T.phaseAt=function(n){var s=T.sunTimes(n.y,n.mo,n.d),m=n.m,p=m>=s.rise-30&&m<660
 T.state=function(){var P=T.phaseAt(T.arubaNow()),o=G('sessionStorage','ib_time_override'),t=G('localStorage','ib_theme');if(/^(morning|day|sunset|night)$/.test(o)&&o!=P.phase){P.phase=o;P.late=false}else o='';P.override=o;P.pref=/^(light|dark)$/.test(t)?t:'auto';P.theme=P.pref!='auto'?P.pref:/^(morning|day)$/.test(P.phase)?'light':'dark';return P};
 T.apply=function(){var S=T.state(),m=d.getElementById('metaTheme');e.setAttribute('data-phase',S.phase);e.setAttribute('data-theme',S.theme);m&&m.setAttribute('content',S.theme=='dark'?'#07131F':'#FAF7F1');return S};
 try{var q=/[?&]time=(morning|day|sunset|night|auto)\b/.exec(location.search+'&'+location.hash);q&&(q[1]=='auto'?sessionStorage.removeItem('ib_time_override'):sessionStorage.setItem('ib_time_override',q[1]))}catch(x){}
-w.IB_TIME=T;try{T.apply()}catch(x){}})(window,document);
+w.IB_TIME=T;try{T.apply()}catch(x){}
+try{if(w.navigator.standalone===true)e.classList.add('standalone')}catch(x){}
+/* Today hero preload: the <img> only exists once app.js has run, so tell the browser now. imagesrcset +
+   imagesizes must equal what app.js renders (imgHTML(TODAY_HERO[phase],{widths:[800,1600]}) with
+   TODAY_HERO_SIZES) or the preload is a second download. Variant ids come from js/media.js
+   (scripts/build-images.py): re-sync HERO_PRELOAD after re-running it or changing TODAY_HERO. */
+try{var h=location.hash;if(!h||/^#\/?(today)?(\?|$)/.test(h)){var HERO_PRELOAD={morning:['hotels-joia-hotel-joia-2-293b142f',1400],day:['hotels-joia-hotel-joia-1-29826714',1400],sunset:['restaurants-zima-rest-zima-1-78d321f9',1600],night:['restaurants-zima-rest-zima-1-78d321f9',1600]},p=HERO_PRELOAD[e.getAttribute('data-phase')],l=d.createElement('link');if(p){l.rel='preload';l.setAttribute('as','image');l.setAttribute('fetchpriority','high');l.setAttribute('imagesrcset','assets/img/'+p[0]+'-800.webp 800w, assets/img/'+p[0]+'-'+p[1]+'.webp '+p[1]+'w');l.setAttribute('imagesizes','(min-width:1024px) 1200px, (min-resolution:2.5dppx) 67vw, 100vw');d.head.appendChild(l)}}}catch(x){}
+})(window,document);
 </script>
-<link rel="preload" href="assets/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/inter-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/playfair-600.woff2" as="font" type="font/woff2" crossorigin>
+<!-- No font preloads: Today is rendered by app.js, so they only competed with the CSS, the scripts and
+     the hero for slow Wi-Fi (font-display:swap, CLS 0 without them). -->
 <link rel="stylesheet" href="css/styles.css?v=400">
 <title>Iberostar Aruba</title>
 <script src="js/image-utils.js?v=400" defer></script>
@@ -130,7 +144,7 @@ w.IB_TIME=T;try{T.apply()}catch(x){}})(window,document);
 <div id="live" class="sr-only" aria-live="polite"></div>
 <div class="toast-host" role="status" aria-live="polite"></div>
 <div class="net-pill" hidden><svg class="ic" aria-hidden="true"><use href="#i-wifi-off"/></svg>Offline · showing saved content</div>
-<div class="preview-pill" hidden>Preview: local edits · <button type="button" data-action="exit-preview">Exit</button></div>
+<div class="preview-pill" hidden>Preview: local edits · <button type="button" data-action="exit-preview">Hide preview</button></div>
 
 <!-- Overlays: all start hidden; managed by Overlay.open/close in js/app.js -->
 <div id="ovDetail" class="ov sheet" role="dialog" aria-modal="true" aria-labelledby="dTitle" hidden>

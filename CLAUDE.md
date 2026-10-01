@@ -38,8 +38,9 @@ service worker needs a secure context: use `localhost` or HTTPS, not `file://`.
 ### Fonts
 Self-hosted latin subsets, declared with `@font-face` at the top of `css/styles.css` (and copied
 in `css/admin.css`): **Inter 400/500/600, Playfair Display 600 and 600 italic — only these five
-files exist.** No weight 800/900. `index.html` preloads inter-400, inter-600 and playfair-600; the
-preload URLs must match the `@font-face` URLs and `SHELL_URLS` in `sw.js`. To add a weight, fetch
+files exist.** No weight 800/900. `index.html` deliberately has **no font preloads** (they competed
+with the CSS, scripts and Today hero on slow Wi-Fi; `font-display:swap`). The `@font-face` URLs
+must match `SHELL_URLS` in `sw.js`. To add a weight, fetch
 it from the Google Fonts CSS API with an old browser User-Agent (e.g. Chrome 60) to get static
 per-weight woff2 files, then add the file, its `@font-face` block, and the `sw.js` shell entry.
 
@@ -48,8 +49,10 @@ per-weight woff2 files, then add the file, its `@font-face` block, and the `sw.j
 `DATA_VERSION` in `js/app.js` **and** `js/admin.js`, `VERSION` in `sw.js`, and **every** local
 `?v=NNN` in `index.html` and `admin.html` must be equal (currently **400**). Bump them all
 together whenever you change anything guests download (data, JS, CSS). The new `VERSION` creates a
-fresh `ib-shell-<VERSION>` cache; returning guests see "Updated info available · Refresh".
-`node scripts/verify.js` fails if they drift.
+fresh `ib-shell-<VERSION>` cache; returning guests see "Updated info available · Refresh" (or switch
+silently when the page already runs the new release). `?v=` files are served **cache-first and
+treated as immutable per release** by the service worker, so a shipped JS/CSS/data change without a
+version bump never reaches returning guests. `node scripts/verify.js` fails if they drift.
 
 ## Data model (`js/data.js`)
 
@@ -101,7 +104,9 @@ fresh `ib-shell-<VERSION>` cache; returning guests see "Updated info available �
 ### Where the guest app gets its data
 The guest app always renders `normalize(defaultData)` and **never writes `ib_app_data`**. The only
 exception is staff preview: if `localStorage.ib_admin_preview === '1'`, the admin's local catalog in
-`ib_app_data` is validated and used, and a "Preview: local edits · Exit" pill shows. Legacy
+`ib_app_data` is validated and used, and a "Preview: local edits" pill with "Hide preview" shows.
+"Hide preview" sets the flag to `'0'` (paused, not removed): the guest app ignores the edits, the
+admin still loads them, and the next admin save sets `'1'` again. Legacy
 `ib_app_data` without the flag is ignored (not deleted). All storage goes through `store`
 (never throws: private mode / blocked storage still renders).
 
@@ -109,9 +114,13 @@ exception is staff preview: if `localStorage.ib_admin_preview === '1'`, the admi
 
 Run by hand after adding or replacing photos: `python3 scripts/build-images.py [--contact [--out
 PATH]] [--video] [--force] [--jobs N]`. It reads `js/data.js`, writes WebP derivatives
-`assets/img/<slug>-<sha1[:8]>-<w>.webp` (480/800/1600, never upscaled; logos 160/320), LQIP and
-dominant colours into `js/media.js`, the ink/ivory header logos, the maskable icon and iOS startup
-images. Idempotent (content-hashed names; unchanged sources are skipped). `--contact` writes a
+`assets/img/<slug>-<sha1[:8]>-<w>.webp` (480/800/1600, never upscaled; logos 160/320/640), LQIP and
+dominant colours into `js/media.js`, the ink/ivory header logos, the maskable icon and the iOS startup
+images (`STARTUP_SIZES`, one per iPhone size class; each needs a matching
+`apple-touch-startup-image` link in `index.html`). One unreadable photo (HEIC, truncated upload) is
+reported and skipped, not fatal (exit 1). `CROPS` trims a baked-in edge from a source before encoding.
+If a Today hero's derivative id changes, update `HERO_PRELOAD` in `index.html`'s boot script
+(verify.js checks it). Idempotent (content-hashed names; unchanged sources are skipped). `--contact` writes a
 contact sheet to spot logos used as photos; `--video` re-encodes the golf film to 720p (then point
 `video` at the new file). Commit the outputs. Until it is re-run, newly added photos simply load the
 original (verify.js warns). The app works without `js/media.js` at all.
@@ -185,8 +194,11 @@ checks this).
 ## Service worker (`sw.js`)
 
 - Registered by `app.js` (`sw.js`, scope `./`) after first render, on HTTPS/localhost only.
-- Caches: `ib-shell-<VERSION>` (shell; network-first with `cache:'no-cache'` and a 3 s timeout for
-  navigations and `.html/.js/.css/.webmanifest`), `ib-media-v1` (`assets/img`, fonts, `assets/Logos`;
+  `app.js` calls `registration.update()` on resume and every 30 min (throttled).
+- Caches: `ib-shell-<VERSION>` (shell: `?v=<VERSION>` files cache-first and pinned to this release;
+  `?v=<other>` files only ever from that release's own cache or the network; navigations network-first
+  with a 3 s timeout, stored only when the page references this release; only the app's own URLs
+  fall back to `index.html` offline, other pages get an offline page; `qr.html` is precached), `ib-media-v1` (`assets/img`, fonts, `assets/Logos`;
   cache-first, immutable), `ib-runtime-v1` (PDFs and other `assets/**`; stale-while-revalidate,
   150 entries). Never cached: non-GET, cross-origin, Range, `*.mp4`.
 - Messages: `warm` (sent once per session: card-size photo of every item + Today heroes, ~0.6 MB),

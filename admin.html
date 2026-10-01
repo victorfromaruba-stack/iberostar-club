@@ -54,6 +54,18 @@
         </header>
 
         <div class="admin-notices">
+            <section id="storageBanner" class="banner banner--warn" hidden role="alert" aria-labelledby="storageBannerTitle">
+                <div class="banner__icon" aria-hidden="true">!</div>
+                <div class="banner__body">
+                    <p class="banner__title" id="storageBannerTitle">This device could not save your edits (storage is full or blocked).</p>
+                    <p class="banner__detail" id="storageBannerDetail">They exist only in this tab and are lost if you close or reload it. Copy the code or download data.js now to keep them.</p>
+                </div>
+                <div class="banner__actions">
+                    <button type="button" class="btn btn--secondary btn--sm" id="storageExportBtn">Copy code</button>
+                    <button type="button" class="btn btn--ghost btn--sm" id="storageDownloadBtn">Download data.js</button>
+                </div>
+            </section>
+
             <section id="previewBanner" class="banner banner--preview" hidden aria-labelledby="previewBannerTitle">
                 <div class="banner__icon" aria-hidden="true">●</div>
                 <div class="banner__body">
