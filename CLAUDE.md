@@ -4,146 +4,233 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A guest-facing web app for the Iberostar Aruba resort ("club" portfolio of hotels, restaurants,
-spa, golf, activities, and retail partners). It's a mobile-first PWA-style directory: browse by
-category, view a detail modal with a photo gallery/lightbox, view PDFs/videos, and share items.
-There is no backend — everything is static HTML/CSS/JS plus a local media library.
+A guest-facing web app for the Iberostar Aruba resort: our resorts, restaurants, spa, golf, tours
+and retail partners. It is a mobile-first, installable PWA ("v4", Concierge design): a Today screen
+that changes with the time of day, Dine / Explore / Spa / Saved tabs, a global search, a detail
+sheet with photos, prices, menus and video, a concierge request ticket, and offline support through a
+service worker. There is no backend and no build step — static HTML/CSS/JS plus a media library,
+hosted on GitHub Pages under `/iberostar-club/`.
 
 ## Repository structure
 
-- `index.html` — guest-facing markup only. Links `css/styles.css` and loads
-  `js/image-utils.js` → `js/data.js` → `js/app.js` (in that order, all `defer`).
-- `admin.html` — separate, unlinked staff page for editing content. Password-gated (see
-  Admin panel below). Loads `css/styles.css`, `js/data.js`, `js/admin.js`.
-- `qr.html` — standalone, printable "scan to save" page: a QR code (inline SVG, pre-generated
-  for `https://victorfromaruba-stack.github.io/iberostar-club/` — regenerate the path data if the
-  URL changes) plus iPhone/Android Add-to-Home-Screen steps. `manifest.webmanifest` (linked from
-  `index.html`) makes the Android install use the proper name/icon/standalone mode.
-- `css/styles.css` — all styling for both pages (glassmorphism cards, modal, lightbox, nav,
-  ambient day/night decorations, admin form styles).
-- `js/data.js` — the entire content catalog (`defaultData`). This is the file you edit to add,
-  remove, or fix a hotel/restaurant/activity/etc.
-- `js/image-utils.js` — device-class detection (adds `device-ios`/`device-mobile`/etc. to
-  `<html>`) and the broken-image fallback chain (`handleImgError`/`handleImgLoad`).
-- `js/app.js` — guest app: rendering (`renderApp`, `openDetails`), search (`filterContent`),
-  lightbox, sharing, time-of-day theming, in-house-mode toggle.
-- `js/admin.js` — staff-only CRUD over the catalog, the offline-cache tool, and the password
-  gate. Not loaded by `index.html`.
-- `assets/` — all media (jpg/png/pdf/mp4), in per-category subfolders: `Hotels/`, `Restaurants/`,
-  `Spa/`, `Golf/`, `Activities/`, `Logos/`, each with per-property subfolders below that.
-  `assets/fonts/` holds the self-hosted Inter/Playfair Display woff2 files (see Fonts below).
-- `scripts/verify.js` — zero-dependency Node script, run with `node scripts/verify.js`. Checks
-  every `gallery`/`pdf`/`video`/`partnerLogo`/`pdfs[]` path in `data.js` resolves to a real file,
-  that `DATA_VERSION` matches between `app.js`/`admin.js`, and that no responsive CSS rule resets
-  a safe-area-aware `padding-top`/`margin-top` via a bare shorthand (the exact bug class that has
-  shipped here before — a shorthand `padding: ...` later in the cascade silently wins over an
-  earlier longhand `padding-top: calc(... var(--safe-top) ...)`). Not wired into anything
-  automatically; run it by hand after touching `data.js` or `styles.css`.
+| Path | What it is |
+|---|---|
+| `index.html` | Guest shell: inline pre-paint BOOT script (Aruba clock, NOAA sun times, phase/theme → no white flash), font preloads, SVG icon sprite, top nav (≥1024px), app bar, tab bar, toast/offline/preview pills, and the empty overlay containers. Loads `js/image-utils.js` → `js/data.js` → `js/media.js` → `js/lib.js` → `js/app.js`, all classic `defer`. |
+| `css/styles.css` | All guest styling. Design tokens at the top (`:root` + `html[data-theme="light"|"dark"]`), then shell, components, screens, overlays. |
+| `js/data.js` | The content catalog, `const defaultData = {…}`, grouped under `// CLUBS`, `// GOLF`, `// STORE`, `// FUN`, `// SPA`, `// FOOD`. Edit this to add/remove/fix content. |
+| `js/media.js` | **Generated** by `scripts/build-images.py` — never edit. `const MEDIA = {img, pdf, video}`. Optional at runtime: if it 404s, everything falls back to the original files. |
+| `js/lib.js` | Pure helpers, no DOM writes (also `module.exports` for node tests): time/sun/phase (wraps `window.IB_TIME` from the BOOT script), price parsing, durations/slots, facets (area, cuisine, meals, hours/open state, tags, channel, status), search index + synonyms, Today picks scoring, media helpers (`imgHTML`, `logoImgHTML`, `phHTML`). |
+| `js/app.js` | Guest app: state, `store` (try/catch localStorage wrapper), router + history model, overlay manager, views, cards, detail sheet, search, lightbox, menus/video, concierge request/tickets, settings, SW registration. Last line calls `boot()`. |
+| `js/image-utils.js` | Device classes on `<html>`; one capture-phase `load`/`error` listener on `document` (no inline handlers anywhere); the 3-layer image fallback; viewport-gated loading of `data-src` images (`observeLazy`, called from `sweepImages`). |
+| `sw.js` | Service worker (repo root). Versioned shell cache + media + runtime caches; see "Service worker" below. |
+| `manifest.webmanifest` | Install metadata (start_url `./#/today`, navy theme, `any` + `maskable` icons, tab shortcuts). |
+| `admin.html` + `js/admin.js` + `css/admin.css` | Separate, unlinked staff editor (password gate). `admin.css` is self-contained — admin never loads `styles.css`, so guest CSS changes cannot break it. |
+| `qr.html` | Printable "scan to save" page (inline SVG QR for `https://victorfromaruba-stack.github.io/iberostar-club/` — regenerate the path data if the URL changes) + Add-to-Home-Screen steps. |
+| `scripts/verify.js` | Zero-dependency checker — run `node scripts/verify.js` before every commit (see below). |
+| `scripts/build-images.py` | Image pipeline (Python 3.9+, Pillow ≥10; ffmpeg/pdfinfo optional). |
+| `assets/` | Originals in `assets/<Category>/<Property>/…` (`Hotels/`, `Restaurants/`, `Spa/`, `Golf/`, `Activities/`, `Logos/`), generated WebP derivatives in `assets/img/`, self-hosted fonts in `assets/fonts/`. |
+| `.nojekyll` | Required: GitHub Pages' Jekyll would otherwise drop `_`-prefixed paths. Never create `_`-prefixed dirs under `assets/`. |
 
-There is no build tool, package manager, bundler, or test suite (there is now one small
-verification script — see above). There's nothing to `npm install` or compile — edit files
-directly and serve the directory with any static file server (e.g. `python3 -m http.server`) to
-preview changes. `admin.html`'s password check uses `crypto.subtle`, which requires a secure
-context (`localhost` or HTTPS), not `file://`.
+There is no package manager, bundler or test suite. Serve the directory with any static server
+(`python3 -m http.server`) to preview. `admin.html`'s password check uses `crypto.subtle` and the
+service worker needs a secure context: use `localhost` or HTTPS, not `file://`.
 
 ### Fonts
-Inter and Playfair Display are self-hosted from `assets/fonts/` (declared via `@font-face` at the
-top of `css/styles.css`), not loaded from the Google Fonts CDN — that was a hard external
-dependency with no fallback that failed outright under at least one tested network policy. Only
-the `latin` subset is downloaded (10 static-weight woff2 files, ~240KB total), which covers the
-site's English/Spanish/Papiamento copy. If a new weight or style is needed, re-fetch it from
-Google Fonts' CSS API with an older browser User-Agent (e.g. Chrome 60) to force static
-per-weight files rather than a single variable-font blob, then add both the woff2 file and its
-`@font-face` block.
+Self-hosted latin subsets, declared with `@font-face` at the top of `css/styles.css` (and copied
+in `css/admin.css`): **Inter 400/500/600, Playfair Display 600 and 600 italic — only these five
+files exist.** No weight 800/900. `index.html` preloads inter-400, inter-600 and playfair-600; the
+preload URLs must match the `@font-face` URLs and `SHELL_URLS` in `sw.js`. To add a weight, fetch
+it from the Google Fonts CSS API with an old browser User-Agent (e.g. Chrome 60) to get static
+per-weight woff2 files, then add the file, its `@font-face` block, and the `sw.js` shell entry.
 
-## Architecture
+## The version rule (do not skip)
 
-### Data model
-All content lives in one JS object literal, `defaultData`, in `js/data.js`. Each entry is keyed
-by a short ID and shaped like:
+`DATA_VERSION` in `js/app.js` **and** `js/admin.js`, `VERSION` in `sw.js`, and **every** local
+`?v=NNN` in `index.html` and `admin.html` must be equal (currently **400**). Bump them all
+together whenever you change anything guests download (data, JS, CSS). The new `VERSION` creates a
+fresh `ib-shell-<VERSION>` cache; returning guests see "Updated info available · Refresh".
+`node scripts/verify.js` fails if they drift.
+
+## Data model (`js/data.js`)
 
 ```js
 "Marea": {
-    "type": "food", "title": "Marea", "sub": "Joia Aruba • Caribbean", "desc": "...",
-    "gallery": ["assets/Restaurants/Marea/rest_marea_1.jpg", "assets/Restaurants/Marea/rest_marea_2.jpg", ...],
-    "pdf": ""
+    "type": "food", "title": "Marea", "sub": "Joia Aruba • Caribbean",
+    "area": "joia", "cuisine": "Caribbean",
+    "desc": "…HTML allowed, incl. <div class=\"price-box\"><div class=\"price-row\">…</div></div>…",
+    "gallery": ["assets/Restaurants/Marea/rest_marea_1.jpg", …],
+    "logo": "assets/Restaurants/Marea/rest_marea_13.jpeg",
+    "pdfs": [{ "label": "Dessert Menu", "url": "assets/Restaurants/Marea/menu_marea_desserts.pdf" }, …]
 }
 ```
 
-Recognized fields: `type` (`club`, `food`, `fun`, `spa`, `golf`, `store` — drives which nav
-section an item appears in), `title`, `sub`, `desc` (HTML allowed, e.g. embedded `.price-box`
-markup), `gallery`, `video`, `pdf`, `partnerLogo`, `duration`, `time`, `itinerary`, `essentials`.
-`gallery[0]` is used as the card/hero image — there's no separate `img` field.
+- `type` ∈ `club | food | fun | spa | golf | store` (unknown types are dropped by `normalize`).
+- **`gallery[0]` is the card and hero image. `gallery` holds photos only — logos and wordmarks go
+  in `logo`.** Every path in `gallery`/`logo`/`pdf`/`pdfs[].url`/`video`/`partnerLogo` must be a
+  real file (exact case — GitHub Pages is case-sensitive). verify.js checks this.
+- Existing fields: `title`, `sub` (partner • category, or location), `desc`, `video`, `pdf`,
+  `pdfs`, `partnerLogo`, `duration`, `time` (slots, `|` or ` or ` separated, optional `Label:`
+  prefix), `itinerary` and `essentials` (arrays, one entry per line).
+- **Optional v4 fields** (all optional; absent = derived default):
 
-**Every path in `gallery`/`pdf`/`video`/`partnerLogo` must be a real file that exists on disk.**
-Unlike some earlier versions of this data, there's no `imageCount`-driven filename guessing
-anymore — `openDetails()` just renders `item.gallery` as-is. Before adding a path, verify the
-file exists; the fallback chain in `image-utils.js` only covers extension typos, not missing
-files.
+  | Field | Type | Default when absent |
+  |---|---|---|
+  | `logo` | path | none |
+  | `area` | `joia`\|`tierra`\|`partner`\|`island` | /joia/ or /tierra/ in sub; food → partner; fun → island |
+  | `cuisine` | string | text after "•" in sub (food) |
+  | `meals` | `breakfast`\|`lunch`\|`dinner`\|`drinks`[] | bar/rooftop → drinks; bagel/breakfast/brunch → breakfast+lunch; else dinner |
+  | `hours` | string[] like `"Dinner 17:00-23:00"`, `"Daily 07:00-23:00"`, `"Lunch 11:00-17:00 Mon-Sat"`, `"Dinner from 18:00"` | no open/closed status shown |
+  | `tags` | string[] | derived from title/desc (sunset, water, snorkel, offroad, island, private, kids, …) |
+  | `featured` | phases[] (`morning`\|`day`\|`sunset`\|`night`) | none (+10 in Today picks for that phase) |
+  | `channel` | `in-house`\|`off-site`\|`both` | /red sail/ → in-house, /rocka/ → off-site, else both |
+  | `status` | `''`\|`coming-soon` | coming-soon if sub says "Coming soon"/"In development" |
+  | `iberocash` | boolean | true except clubs, coming-soon and complimentary items |
+  | `priceFrom` | number | min of parsed price rows (add-on/optional/extra/each-additional and child rows excluded) |
+  | `phone` (E.164), `whatsapp` (digits), `bookUrl` (https), `bookingNote`, `address` | | no button / no contact section |
+  | `order` | number | data order |
 
-At runtime, `appData` is loaded from `localStorage` (`ib_app_data`) if present and its stored
-`ib_data_version` is `>= DATA_VERSION`; otherwise it resets to `defaultData`. **If you change the
-shape or content of `defaultData`, bump `DATA_VERSION`** (in both `js/app.js` and `js/admin.js` —
-they load independently) so returning visitors' stale cached copy is flushed.
+- **Never invent content.** Do not add hours, phone or WhatsApp numbers, booking links, addresses,
+  prices, redemption steps or IberoCash copy that staff have not verified. `CONCIERGE` and
+  `IBEROCASH_NOTE` in `js/app.js` stay empty until staff supply real values (the WhatsApp button
+  and the IberoCash info button only appear when they are set).
+- Keep new entries under the matching `// SECTION` comment. Admin's export and "Download data.js"
+  re-create these comments, so a pasted export keeps them.
+- `HOURS_RE` is duplicated verbatim in `js/lib.js` and `js/admin.js` — keep them in sync
+  (verify.js warns on drift).
 
-### Rendering pipeline (`js/app.js`)
-- `renderApp(sectionId)` — maps a nav section (`portfolio`/`dining`/`activities`/`spa`/`golf`/`store`)
-  to a `type`, filters `appData`, and renders the card grid. For `type: 'fun'`, it further filters
-  by `inHouseMode` (see below), matching `sub` containing `"red sail"` vs `"rocka"`. Items with an
-  empty `gallery` render the branded fallback treatment directly (no failed image request).
-- `filterContent()` — client-side search over title/sub/description for the current grid.
-- `openDetails(key)` — populates and opens the full-screen detail modal and photo gallery, and
-  wires up action buttons for PDF/video. Hides the "Gallery" heading when `gallery` is empty.
-- `launchLightbox`/`updateFsImage`/`nextFs`/`prevFs` — full-screen swipeable image/video viewer.
-- Focus is moved into the modal/lightbox on open and restored to the triggering element on close
-  (`lastFocusedEl`) — keep this pattern when adding new overlays.
+### Where the guest app gets its data
+The guest app always renders `normalize(defaultData)` and **never writes `ib_app_data`**. The only
+exception is staff preview: if `localStorage.ib_admin_preview === '1'`, the admin's local catalog in
+`ib_app_data` is validated and used, and a "Preview: local edits · Exit" pill shows. Legacy
+`ib_app_data` without the flag is ignored (not deleted). All storage goes through `store`
+(never throws: private mode / blocked storage still renders).
 
-### Image error recovery (`js/image-utils.js`)
-`handleImgError()` retries a broken image through a short list of fallback transforms (jpg↔png
-swap, jpeg→jpg, `decodeURIComponent`) before giving up and hiding the element via
-`triggerFallback()`, which shows a branded "IBEROSTAR" placeholder (`.card-fallback` /
-`.hero-fallback` in `css/styles.css`) rather than a broken-image icon. Since `js/data.js` paths
-are verified against disk, treat this purely as a defensive net for future typos — don't rely on
-it to paper over a wrong path; fix the path in `js/data.js` instead.
+## Image pipeline (`scripts/build-images.py`)
 
-### Admin panel (`admin.html` + `js/admin.js`)
-A separate, unlinked page (not reachable from guest nav) with a client-side password gate
-(SHA-256 comparison, unlocked state kept in `sessionStorage`). **This is a deterrent, not real
-security** — there's no backend, so anyone who reads the JS can see the check. To change the
-password: compute `crypto.subtle.digest('SHA-256', new TextEncoder().encode('newPassword'))`,
-hex-encode it, and replace `ADMIN_PASSWORD_HASH` in `js/admin.js`.
+Run by hand after adding or replacing photos: `python3 scripts/build-images.py [--contact [--out
+PATH]] [--video] [--force] [--jobs N]`. It reads `js/data.js`, writes WebP derivatives
+`assets/img/<slug>-<sha1[:8]>-<w>.webp` (480/800/1600, never upscaled; logos 160/320), LQIP and
+dominant colours into `js/media.js`, the ink/ivory header logos, the maskable icon and iOS startup
+images. Idempotent (content-hashed names; unchanged sources are skipped). `--contact` writes a
+contact sheet to spot logos used as photos; `--video` re-encodes the golf film to 720p (then point
+`video` at the new file). Commit the outputs. Until it is re-run, newly added photos simply load the
+original (verify.js warns). The app works without `js/media.js` at all.
 
-Once unlocked, it's a form-based CRUD UI over `appData`. Saves/deletes write straight to
-`localStorage['ib_app_data']` (device-local only). "Copy Code" (`exportData()`) copies a
-formatted `const defaultData = {...}` string to the clipboard — the workflow for a permanent
-change is: edit in the admin panel, verify it looks right, then paste the exported object into
-`js/data.js` and commit it.
+## Guest app architecture (`js/app.js`)
 
-### In-house mode / time theming
-- Tapping the greeting text 3× toggles `inHouseMode` (persisted to `localStorage` as
-  `ib_in_house`), which switches the Activities section between Red Sail (in-house) and Rocka
-  Beach (off-site) partner tours.
-- Tapping the greeting also cycles `toggleTimeMode()`, and `updateTimeVibe()` drives time-of-day
-  ambient theming (sky gradient, stars/fireflies/boat decorations) based on the visitor's local
-  clock.
+### Routes (hash router)
+| Hash | Shows |
+|---|---|
+| `#/today` (default), `#/dine`, `#/explore`, `#/spa`, `#/saved`, `#/resorts` | views; `?f=a,b&q=text` on dine/explore (chips + query), `?ids=a,b` on saved (shared list) |
+| `#/search?q=` | search overlay |
+| `#/settings` | settings sheet (theme Auto/Light/Dark, offline status) |
+| `#/saved/show` | saved-list ticket |
+| `#/item/:key` + `/photos/:n` \| `/menu` \| `/menu/:i` \| `/video` \| `/request` \| `/request/show` | detail sheet and its overlays |
 
-### Device detection
-On `DOMContentLoaded`, the app sniffs `navigator.userAgent` and adds one of
-`device-ios`/`device-android`/`device-tablet`/`device-mobile`/`device-desktop` classes to `<html>`;
-a fair amount of CSS and touch-gesture logic (modal swipe-to-close, nav layout) branches on these
-classes rather than pure media queries.
+Parent view by type: food → dine; fun/golf/store → explore; spa → spa; club → resorts.
+
+### History model
+Overlays `pushState`; filters, queries and lightbox paging `replaceState`; tab → tab replaces,
+except leaving Today, which pushes (Back from any tab → Today → exits). A cold deep link to an
+overlay seeds Today → parent view → overlay levels, so Back peels one level at a time and never
+drops the guest out of the app. Use `go(hash, {replace})`, `navigate(hash, srcEl)`, `closeTop()`.
+
+### Overlay manager
+**New overlays must use `Overlay.open(el, …)` / `Overlay.close(el, …)`** and be registered in
+`OV_RENDER` / `OV_EL` plus the route parser. The manager sets `inert` on the page and lower
+overlays, adds `html.ov-open`, applies the iOS body scroll-lock, moves focus to `[data-autofocus]`
+or the overlay heading after the open class is added, and restores focus on close (opener → the
+card link → the view h1). Closed overlays carry `hidden`. Esc → `closeTop()`.
+
+### Kept globals (console/legacy)
+`nav(id)`, `renderApp(id)`, `openDetails(key)`, `closeModal()`, `filterContent()`,
+`launchLightbox(list|key, i)`, `viewPdf(url)`, `viewVideo(url)`, `sharePackage(key)`,
+`toggleTimeMode()` (console-only phase preview), `showToast(msg)`.
+
+### Images
+Cards use `imgHTML()` (srcset from `MEDIA`, `width`/`height`, LQIP + dominant colour on the
+`.media` box). Only the Today hero and the first two cards of a view are eager; every other image
+is rendered with `data-src` and released by `observeLazy()` when it comes within ~300px of the
+viewport (rails release card by card as they scroll). Phone tiles cap density at ~2× via
+`(min-resolution:2.5dppx)` in `sizes`. Fallback layers: no MEDIA entry → original; derivative fails
+→ `data-orig`; original fails → jpg/png/jpeg/decode retries (skipped offline) → the branded `.ph`
+placeholder element. Treat the fallback as a safety net — fix wrong paths in `data.js`.
+
+### Time, theme and modes
+- The BOOT script computes the Aruba phase (`morning` [sunrise−30, 11:00), `day`, `sunset`
+  [sunset−75, sunset+30), `night`) and sets `html[data-phase]` and `html[data-theme]` before first
+  paint. Theme preference `ib_theme` = auto|light|dark (Settings); auto = light morning/day, dark
+  sunset/night.
+- Ambient motion is only the Today hero Ken Burns and, at night, an 8-star twinkle — all paused
+  under overlays, when hidden, and with reduced motion. The old decoration layers (waves, palms,
+  clouds, fish, dolphin, birds, fireflies, boat, glow, shimmer, tilt, splash) are deleted; do not
+  bring them back.
+- Debug URL params (stripped from the URL after load): `?time=morning|day|sunset|night|auto`
+  (session override), `?mode=inhouse|offsite` (lobby iPads), `?nosw=1` (unregister the SW + clear
+  caches on this device).
+- In-house mode (`ib_in_house`): three taps on the Today greeting, `?mode=`, or admin's "Lobby
+  device" switch. Shows Red Sail (in-house) instead of Rocka Beach (off-site) tours. It never
+  changes the theme.
+
+### Design tokens and contrast
+Colours are semantic tokens (`--bg`, `--surface`, `--text`, `--text-2`, `--text-3`, `--accent`,
+`--accent-text`, `--on-accent`, …) defined for light and dark. Body text pairs must stay ≥4.5:1 and
+`--focus` ≥3:1 in both themes (verify.js computes this). Gold is never text on light backgrounds
+(use `--accent-text`); text on photos only over a scrim. Every tab stop needs a visible
+`:focus-visible` ring; never add `outline:none` except under `:focus:not(:focus-visible)`.
+Sticky chrome (tab bar, app bar) stays ≥0.94 alpha. Respect safe areas with **longhand**
+`padding-top: calc(var(--safe-top) + …)` — a later shorthand `padding:` silently wins (verify.js
+checks this).
+
+## Service worker (`sw.js`)
+
+- Registered by `app.js` (`sw.js`, scope `./`) after first render, on HTTPS/localhost only.
+- Caches: `ib-shell-<VERSION>` (shell; network-first with `cache:'no-cache'` and a 3 s timeout for
+  navigations and `.html/.js/.css/.webmanifest`), `ib-media-v1` (`assets/img`, fonts, `assets/Logos`;
+  cache-first, immutable), `ib-runtime-v1` (PDFs and other `assets/**`; stale-while-revalidate,
+  150 entries). Never cached: non-GET, cross-origin, Range, `*.mp4`.
+- Messages: `warm` (sent once per session: card-size photo of every item + Today heroes, ~0.6 MB),
+  `precache-all` (admin "Cache everything": every photo, logo, PDF, poster, ~24 MB, with progress),
+  `clear`, `skip-waiting` (the "Refresh" button in the update toast), `status`.
+- Support: `?nosw=1` fixes one device. **Kill switch** for every device: replace `sw.js` with the
+  snippet in its header comment (unregister, delete `ib-*` caches, `clients.navigate`), deploy, and
+  keep it live for a few weeks.
+
+## Admin panel (`admin.html` + `js/admin.js`)
+
+Unlinked staff page with a client-side SHA-256 password gate (a deterrent, not security — anyone
+can read the JS). To change the password, hex-encode
+`crypto.subtle.digest('SHA-256', new TextEncoder().encode('newPassword'))` into
+`ADMIN_PASSWORD_HASH`. Features: searchable grouped item list (with missing-file warnings), a form
+for every field including the optional v4 fields and an "Extra fields (JSON)" box, live hours
+preview, rename, gallery thumbnail strip, "Copy code" / "Download data.js", offline "Cache
+everything" / "Clear", and the "Lobby device" switch.
+
+Saving merges into the existing item (`{...appData[key], ...fields}`) so unknown fields survive,
+splits list fields on newlines only, writes `ib_app_data`, `ib_data_version` and
+`ib_admin_preview='1'` (device-local preview only). **To publish:** verify in the guest app on that
+device, then Download data.js (or Copy code), replace `js/data.js`, bump the version, run
+verify.js, commit. "Reset to published" removes the local preview.
+
+## `scripts/verify.js`
+
+`node scripts/verify.js [rootDir] [--all]` — exit 0 = pass (warnings never block a deploy), 1 = a
+check failed. Checks: (1) every asset path exists with exact case, no root-absolute paths;
+(2) optional-field types/enums, hours grammar (warning); (3) keys match `^[A-Za-z0-9_-]+$`;
+(4) version sync (app.js, admin.js, sw.js, every `?v=`), sw.js shell URLs exist; (5) `media.js`
+hashes/derivatives, `.nojekyll`, no `_` dirs; (6) CSS lint (focus rings, no stray `outline:none`,
+no `body .device-` selectors, only allowlisted infinite animations, no overshoot easing,
+safe-area shorthand cascade); (7) HTML lint (zoom allowed, no inline `on*` handlers, local
+references exist, manifest valid); (8) token contrast in both themes; (9) admin.js save/merge and
+no comma-splitting of itinerary/essentials; (10) every CSS `url()` exists, unused font files.
 
 ## Conventions when editing
 
-- New content items go into `js/data.js`, grouped under the existing `// CLUBS` / `// GOLF` /
-  `// STORE` / `// FUN` / `// SPA` / `// FOOD` comments — keep new entries under the matching
-  section rather than appending at the end.
-- Match the existing asset folder layout (`assets/<Category>/<PropertyName>/<prefix>_<n>.<ext>`),
-  but list the real files explicitly in `gallery` rather than relying on any numbering convention —
-  gaps and mixed extensions in a folder (there are several) are fine as long as `gallery` lists
-  exactly what's there.
-- Accessibility: new interactive elements should get `alt`/`aria-label`/`role` as appropriate —
-  this was a deliberate cleanup pass, not incidental, so don't regress it.
-- Commit history (pre-refactor) shows this repo was edited as a series of direct `index.html`
-  updates with terse commit messages (`Update index.html`). Feel free to write more descriptive
-  messages going forward.
+- Run `node scripts/verify.js` after touching `data.js`, CSS, HTML, `sw.js` or the version.
+- Content goes in `js/data.js` under the matching `// SECTION`; list real files explicitly in
+  `gallery` (gaps and mixed extensions in a folder are fine). Re-run the image pipeline after adding
+  photos.
+- Every control is a real `<a>`/`<button>` with an accessible name; cards are stretched links with a
+  sibling save button; headings follow h1 (view) → h2 (groups/sheet title) → h3 (cards/sections).
+  Inputs are ≥16px. No inline `on*` handlers or `javascript:` URLs (verify.js lints this).
+- Write descriptive commit messages (the old history is a run of "Update index.html").

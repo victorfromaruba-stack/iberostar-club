@@ -1,12 +1,24 @@
 {
     "name": "Iberostar Aruba",
     "short_name": "Iberostar",
-    "start_url": "./",
+    "description": "Your Iberostar Aruba guide: resorts, dining, tours, spa and golf — works offline.",
+    "id": "./",
+    "start_url": "./#/today",
     "scope": "./",
     "display": "standalone",
-    "background_color": "#FBF8F1",
-    "theme_color": "#D4AF37",
+    "lang": "en",
+    "dir": "ltr",
+    "categories": ["travel", "lifestyle"],
+    "background_color": "#07131F",
+    "theme_color": "#07131F",
     "icons": [
-        { "src": "assets/Logos/app_logo_club.png?v=200", "sizes": "480x480", "type": "image/png", "purpose": "any" }
+        { "src": "assets/Logos/app_logo_club.png?v=400", "sizes": "480x480", "type": "image/png", "purpose": "any" },
+        { "src": "assets/Logos/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    ],
+    "shortcuts": [
+        { "name": "Dine", "short_name": "Dine", "description": "Restaurants and menus", "url": "./#/dine" },
+        { "name": "Explore", "short_name": "Explore", "description": "Tours, golf and shopping", "url": "./#/explore" },
+        { "name": "Spa", "short_name": "Spa", "description": "Spa treatments", "url": "./#/spa" },
+        { "name": "Saved", "short_name": "Saved", "description": "Your saved places", "url": "./#/saved" }
     ]
 }

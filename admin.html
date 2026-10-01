@@ -1,85 +1,386 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
-    <link rel="shortcut icon" href="assets/Logos/app_logo_club.png?v=200" type="image/png">
-    <link rel="stylesheet" href="css/styles.css">
-    <title>Iberostar Aruba — Admin</title>
-    <style>
-        body { overflow: auto; background: linear-gradient(150deg, #95BFE0 0%, #1D5C8A 100%); }
-        #gateScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        #gateCard { background: rgba(255,255,255,0.97); border-radius: 28px; padding: 40px; max-width: 380px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        #gateCard h1 { font-family: var(--font-head); font-size: 1.8rem; margin: 0 0 8px 0; color: #06121E; }
-        #gateCard p { color: #4A5D70; font-size: 0.95rem; margin: 0 0 24px 0; }
-        #gateError { display: none; color: #d32f2f; font-weight: 700; font-size: 0.9rem; margin-top: 12px; }
-        .admin-back { color: var(--gold); text-decoration: none; font-weight: 700; font-size: 0.95rem; }
-    </style>
+    <meta name="theme-color" content="#FAF7F1">
+    <title>Iberostar Aruba — Staff Editor</title>
+    <link rel="icon" href="assets/Logos/app_logo_club.png?v=400" type="image/png">
+    <link rel="preload" href="assets/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="assets/fonts/inter-600.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="css/admin.css?v=400">
 </head>
 <body>
+    <a class="skip-link" href="#editorCard">Skip to editor</a>
 
-    <div id="modeToast" role="status" aria-live="polite">Mode: Auto</div>
+    <div id="modeToast" role="status" aria-live="polite"></div>
 
-    <div id="gateScreen">
-        <div id="gateCard">
-            <h1>Staff Access</h1>
-            <p>This page edits live content for the Iberostar Aruba guest app. Enter the staff password to continue.</p>
-            <form id="gateForm">
+    <!-- ============ Password gate ============ -->
+    <main id="gateScreen" class="gate">
+        <div id="gateCard" class="gate__card">
+            <img class="gate__logo" src="assets/Logos/app_logo_club.png?v=400" alt="" width="64" height="64">
+            <p class="eyebrow">Iberostar Aruba</p>
+            <h1>Staff access</h1>
+            <p class="gate__lead">This page edits the content of the guest app. Enter the staff password to continue.</p>
+            <form id="gateForm" novalidate>
                 <div class="form-group">
                     <label for="gatePassword">Password</label>
-                    <input type="password" id="gatePassword" autocomplete="current-password" required>
+                    <input type="password" id="gatePassword" autocomplete="current-password" required aria-describedby="gateError">
                 </div>
-                <button type="submit" class="btn-admin" style="width:100%;">Unlock</button>
-                <div id="gateError" role="alert">Incorrect password.</div>
+                <button type="submit" class="btn btn--primary btn--block" id="gateSubmit">Unlock</button>
+                <p id="gateError" class="field-msg is-error" role="alert" hidden>Incorrect password. Try again.</p>
             </form>
+            <a class="gate__back" href="index.html">← Back to guest app</a>
         </div>
-    </div>
+    </main>
 
-    <div class="admin-panel" id="adminContent" style="position: static; height: auto; min-height: 100vh; backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255,255,255,0.7);">
-        <div class="admin-header">
-            <h3>Admin Editor</h3>
-            <div>
-                <button class="btn-admin" onclick="exportData()">Copy Code</button>
-                <a class="admin-back" href="index.html" style="margin-left:20px;">← Back to App</a>
-            </div>
-        </div>
-        <div class="admin-body">
-            <div class="admin-card" style="border: 2px solid #D4AF37;">
-                <h4 style="margin-top:0; color:#06121E; font-family:var(--font-head);">Super Cache (Offline Prep)</h4>
-                <p style="font-size:1.05rem; color:#4A5D70; margin-bottom:20px; font-weight:500;">Downloads all current images, PDFs, and videos into the browser's offline cache.</p>
-                <div style="display:flex; gap: 15px; flex-wrap: wrap;">
-                    <button class="btn-big btn-primary" id="preloadBtn" onclick="forceOfflineCache()" style="flex: 1;">Cache Everything</button>
-                    <button class="btn-big" onclick="clearOfflineCache()" style="color:#ff3b30; flex: 1;">Clear Cache</button>
+    <!-- ============ Editor ============ -->
+    <div class="admin-panel" id="adminContent">
+        <header class="admin-header">
+            <div class="admin-header__inner">
+                <div class="brand">
+                    <img class="brand__logo" src="assets/Logos/app_logo_club.png?v=400" alt="" width="40" height="40">
+                    <div class="brand__text">
+                        <p class="eyebrow">Iberostar Aruba · Staff</p>
+                        <h1 class="brand__title">Content editor</h1>
+                    </div>
                 </div>
-                <div id="cacheStatus" style="margin-top:15px; font-weight:800; color:#06121E; text-align:center;" role="status" aria-live="polite"></div>
+                <div class="admin-header__meta">
+                    <span class="chip chip--quiet" id="versionChip">Content v400</span>
+                    <a class="admin-back" href="index.html">← Back to App</a>
+                </div>
             </div>
+        </header>
 
-            <div class="admin-card">
-                <h4 style="margin-top:0; color:#06121E; font-family:var(--font-head);">Edit Existing Items</h4>
-                <div id="itemListContainer"></div>
-            </div>
-            <div class="admin-card">
-                <h4 style="margin-top:0; color:#06121E; font-family:var(--font-head);">Add / Update Item</h4>
-                <p style="font-size:0.9rem; color:#4A5D70; margin-top:-10px;">Changes here save to this browser only. Use "Copy Code" and paste the result into <code>js/data.js</code> to make them permanent for every visitor.</p>
-                <div class="form-group"><label for="newType">Type</label><select id="newType"><option value="food">Restaurant</option><option value="fun">Activity</option><option value="club">Hotel/Club</option><option value="spa">Spa &amp; Wellness</option><option value="golf">Golf &amp; Nature</option><option value="store">Store / Retail</option></select></div>
-                <div class="form-group"><label for="newKey">ID</label><input type="text" id="newKey" placeholder="e.g. MyNewItem"></div>
-                <div class="form-group"><label for="newTitle">Title</label><input type="text" id="newTitle"></div>
-                <div class="form-group"><label for="newSub">Subtitle</label><input type="text" id="newSub"></div>
-                <div class="form-group"><label for="newPartnerLogo">Partner Logo</label><input type="text" id="newPartnerLogo"></div>
-                <div class="form-group"><label for="newDesc">Description</label><textarea id="newDesc" rows="5"></textarea></div>
-                <div class="form-group"><label for="newDuration">Duration</label><input type="text" id="newDuration"></div>
-                <div class="form-group"><label for="newTime">Departure</label><input type="text" id="newTime"></div>
-                <div class="form-group"><label for="newItinerary">Itinerary</label><textarea id="newItinerary" rows="3"></textarea></div>
-                <div class="form-group"><label for="newEssentials">Essentials</label><textarea id="newEssentials" rows="3"></textarea></div>
-                <div class="form-group"><label for="newGallery">Gallery (comma-separated real file paths)</label><textarea id="newGallery" rows="3"></textarea></div>
-                <div class="form-group"><label for="newFile">PDF/Video Path</label><input type="text" id="newFile" placeholder="e.g. assets/Restaurants/Name/menu.pdf"></div>
-                <div style="display:flex; gap:15px; margin-top:30px;"><button class="btn-admin" onclick="saveItem()">Save</button><button class="btn-admin" style="background:#d32f2f;" onclick="deleteItem()">Delete</button><button class="btn-admin" style="background:#8e8e93;" onclick="clearForm()">Clear</button></div>
-            </div>
+        <div class="admin-notices">
+            <section id="previewBanner" class="banner banner--preview" hidden aria-labelledby="previewBannerTitle">
+                <div class="banner__icon" aria-hidden="true">●</div>
+                <div class="banner__body">
+                    <p class="banner__title" id="previewBannerTitle">Local edits are active on this device only. Paste the exported code into js/data.js to publish.</p>
+                    <p class="banner__detail" id="previewBannerDetail"></p>
+                </div>
+                <div class="banner__actions">
+                    <a class="btn btn--ghost btn--sm" id="previewOpenApp" href="index.html" target="_blank" rel="noopener">Open guest app ↗</a>
+                    <button type="button" class="btn btn--secondary btn--sm" id="resetPublishedBtn">Reset to published</button>
+                </div>
+            </section>
+
+            <section id="legacyBanner" class="banner banner--warn" hidden aria-labelledby="legacyBannerTitle">
+                <div class="banner__icon" aria-hidden="true">!</div>
+                <div class="banner__body">
+                    <p class="banner__title" id="legacyBannerTitle">Older unpublished edits were found on this device.</p>
+                    <p class="banner__detail" id="legacyBannerDetail">They come from a previous version of the editor and are not shown here or in the guest app. Download a backup before discarding them if someone may still need them.</p>
+                </div>
+                <div class="banner__actions">
+                    <button type="button" class="btn btn--ghost btn--sm" id="legacyBackupBtn">Download backup</button>
+                    <button type="button" class="btn btn--secondary btn--sm" id="legacyDiscardBtn">Discard</button>
+                </div>
+            </section>
         </div>
+
+        <main class="admin-body" id="adminMain">
+            <!-- ----- Item list ----- -->
+            <section class="admin-card list-card" aria-labelledby="listHeading">
+                <div class="card-head">
+                    <h2 id="listHeading">Items <span class="count" id="itemCount"></span></h2>
+                    <button type="button" class="btn btn--secondary btn--sm" id="newItemBtn">+ New item</button>
+                </div>
+                <div class="search-field">
+                    <label class="visually-hidden" for="listSearch">Search items</label>
+                    <svg class="search-field__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <input type="search" id="listSearch" placeholder="Search title, subtitle or ID" autocomplete="off" spellcheck="false">
+                </div>
+                <p class="list-legend" id="listLegend"><span class="dot dot--edited" aria-hidden="true"></span> edited on this device <span class="dot dot--broken" aria-hidden="true"></span> file not found</p>
+                <div id="itemListContainer" class="item-list"></div>
+            </section>
+
+            <!-- ----- Editor form ----- -->
+            <section class="admin-card editor-card" id="editorCard" tabindex="-1" aria-labelledby="editorHeading">
+                <div class="card-head editor-head">
+                    <div>
+                        <p class="eyebrow" id="editorEyebrow">New item</p>
+                        <h2 id="editorHeading">Add an item</h2>
+                    </div>
+                    <a class="btn btn--ghost btn--sm" id="viewInAppLink" href="index.html" target="_blank" rel="noopener" hidden>View in app ↗</a>
+                </div>
+                <p class="card-lead">Saving stores changes in this browser only. Use <strong>Publish</strong> to copy or download the code for <code>js/data.js</code>.</p>
+
+                <form id="itemForm" class="item-form" novalidate>
+                    <fieldset class="fs">
+                        <legend>Basics</legend>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="newType">Type</label>
+                                <select id="newType">
+                                    <option value="food">Restaurant</option>
+                                    <option value="fun">Activity</option>
+                                    <option value="club">Hotel / Club</option>
+                                    <option value="spa">Spa &amp; Wellness</option>
+                                    <option value="golf">Golf &amp; Nature</option>
+                                    <option value="store">Store / Retail</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="newKey">ID</label>
+                                <input type="text" id="newKey" placeholder="e.g. MyNewItem" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="newKeyHint">
+                                <p class="hint" id="newKeyHint">Letters, numbers, - and _ only. It appears in shared links.</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newTitle">Title</label>
+                            <input type="text" id="newTitle" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="newSub">Subtitle</label>
+                            <input type="text" id="newSub" autocomplete="off" aria-describedby="newSubHint">
+                            <p class="hint" id="newSubHint">Usually “Partner • Detail”, e.g. “Joia Aruba • Caribbean”.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="newDesc">Description</label>
+                            <textarea id="newDesc" rows="6" aria-describedby="newDescHint"></textarea>
+                            <p class="hint" id="newDescHint">HTML allowed. Keep the <code>price-box</code> markup intact; the app reads each price row to show “From $…”.</p>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="fs">
+                        <legend>Photos &amp; media</legend>
+                        <div class="form-group">
+                            <label for="newGallery">Gallery photos (one path per line)</label>
+                            <textarea id="newGallery" rows="5" spellcheck="false" class="mono-ish" aria-describedby="newGalleryHint galleryMsg"></textarea>
+                            <p class="hint" id="newGalleryHint">The first photo is the card and hero image. Logos go in “Logo”, not here.</p>
+                            <p class="hint" id="galleryMsg" aria-live="polite"></p>
+                            <div id="galleryStrip" class="g-strip" aria-label="Gallery preview"></div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="newFile">Menu / brochure PDF</label>
+                                <input type="text" id="newFile" placeholder="assets/Restaurants/Name/menu.pdf" spellcheck="false" autocapitalize="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="newVideo">Video (.mp4)</label>
+                                <input type="text" id="newVideo" placeholder="assets/Hotels/Name/video.mp4" spellcheck="false" autocapitalize="off">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPartnerLogo">Partner logo</label>
+                            <input type="text" id="newPartnerLogo" placeholder="assets/Logos/logo_partner.png" spellcheck="false" autocapitalize="off" aria-describedby="newPartnerLogoHint">
+                            <p class="hint" id="newPartnerLogoHint">Tour operator logo (e.g. Rocka Beach). Kept for every type.</p>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="fs">
+                        <legend>Tour details</legend>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="newDuration">Duration</label>
+                                <input type="text" id="newDuration" placeholder="e.g. 4 Hours" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="newTime">Departure times</label>
+                                <input type="text" id="newTime" placeholder="e.g. 9:00 AM or 3:00 PM" autocomplete="off" aria-describedby="newTimeHint">
+                                <p class="hint" id="newTimeHint">Separate times with “or” or “|”.</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newItinerary">Itinerary (one stop per line)</label>
+                            <textarea id="newItinerary" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="newEssentials">Essentials (one per line)</label>
+                            <textarea id="newEssentials" rows="4" aria-describedby="newEssentialsHint"></textarea>
+                            <p class="hint" id="newEssentialsHint">Commas inside a line are kept, e.g. “Coke, Coke Zero, Sprite”.</p>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="fs fs--guest">
+                        <legend>Guest app details (optional)</legend>
+                        <p class="fs-note"><strong>Leave blank for automatic.</strong> Only enter hours, phone or WhatsApp numbers, booking links and prices that have been confirmed with the venue.</p>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="newArea">Area</label>
+                                <select id="newArea">
+                                    <option value="">Auto (from subtitle)</option>
+                                    <option value="joia">At Iberostar Joia</option>
+                                    <option value="tierra">Tierra del Sol</option>
+                                    <option value="partner">Partner restaurant (off-site)</option>
+                                    <option value="island">Island-wide</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="newChannel">Tour channel</label>
+                                <select id="newChannel" aria-describedby="newChannelHint">
+                                    <option value="">Auto (from subtitle)</option>
+                                    <option value="in-house">In-house (lobby)</option>
+                                    <option value="off-site">Off-site</option>
+                                    <option value="both">Both</option>
+                                </select>
+                                <p class="hint" id="newChannelHint">Auto: Red Sail → in-house, Rocka → off-site, others both.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="newStatus">Status</label>
+                                <select id="newStatus">
+                                    <option value="">Live (auto)</option>
+                                    <option value="coming-soon">Coming soon</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="newIberocash">Accepts IberoCash</label>
+                                <select id="newIberocash">
+                                    <option value="">Auto</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <fieldset class="checks">
+                                <legend>Meals</legend>
+                                <label class="check"><input type="checkbox" name="meals" value="breakfast"> Breakfast</label>
+                                <label class="check"><input type="checkbox" name="meals" value="lunch"> Lunch</label>
+                                <label class="check"><input type="checkbox" name="meals" value="dinner"> Dinner</label>
+                                <label class="check"><input type="checkbox" name="meals" value="drinks"> Drinks</label>
+                            </fieldset>
+                            <fieldset class="checks">
+                                <legend>Feature on Today during</legend>
+                                <label class="check"><input type="checkbox" name="featured" value="morning"> Morning</label>
+                                <label class="check"><input type="checkbox" name="featured" value="day"> Day</label>
+                                <label class="check"><input type="checkbox" name="featured" value="sunset"> Sunset</label>
+                                <label class="check"><input type="checkbox" name="featured" value="night"> Night</label>
+                            </fieldset>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="newLogo">Logo</label>
+                                <input type="text" id="newLogo" placeholder="assets/Restaurants/Name/logo.jpg" spellcheck="false" autocapitalize="off" aria-describedby="newLogoHint">
+                                <p class="hint" id="newLogoHint">Brand wordmark for the detail page.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="newCuisine">Cuisine</label>
+                                <input type="text" id="newCuisine" placeholder="e.g. Seafood" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="newPriceFrom">“From” price override (USD)</label>
+                                <input type="number" id="newPriceFrom" min="0" step="any" inputmode="decimal" aria-describedby="newPriceFromHint">
+                                <p class="hint" id="newPriceFromHint">Blank = lowest price row in the description.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="newOrder">Sort order</label>
+                                <input type="number" id="newOrder" step="1" inputmode="numeric" aria-describedby="newOrderHint">
+                                <p class="hint" id="newOrderHint">Lower numbers show first.</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newAddress">Address</label>
+                            <input type="text" id="newAddress" autocomplete="off" aria-describedby="newAddressHint">
+                            <p class="hint" id="newAddressHint">Opens in Maps for the guest.</p>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="newPhone">Phone</label>
+                                <input type="tel" id="newPhone" autocomplete="off" placeholder="+297 …" aria-describedby="newPhoneHint">
+                                <p class="hint" id="newPhoneHint">International format starting with +.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="newWhatsapp">WhatsApp number</label>
+                                <input type="tel" id="newWhatsapp" autocomplete="off" inputmode="numeric" aria-describedby="newWhatsappHint">
+                                <p class="hint" id="newWhatsappHint">Digits only, with country code (spaces and + are removed).</p>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="newBookUrl">Booking link</label>
+                                <input type="url" id="newBookUrl" placeholder="https://…" autocomplete="off" spellcheck="false" autocapitalize="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="newBookingNote">Booking note</label>
+                                <input type="text" id="newBookingNote" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newTags">Tags (one per line)</label>
+                            <textarea id="newTags" rows="3" spellcheck="false" aria-describedby="newTagsHint"></textarea>
+                            <p class="hint" id="newTagsHint">Extra search words, e.g. sunset, rooftop.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="newHours">Opening hours (one per line)</label>
+                            <textarea id="newHours" rows="3" spellcheck="false" aria-describedby="newHoursHint hoursPreview"></textarea>
+                            <p class="hint" id="newHoursHint">24-hour time: <code>Dinner 17:00-23:00</code>, <code>Lunch 11:00-17:00 Mon-Sat</code>, <code>Dinner from 18:00</code>.</p>
+                            <ul id="hoursPreview" class="hours-preview" aria-live="polite"></ul>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="fs">
+                        <legend>Extra fields (JSON)</legend>
+                        <div class="form-group">
+                            <label for="newExtra">Other fields on this item</label>
+                            <textarea id="newExtra" rows="5" spellcheck="false" class="code" aria-describedby="newExtraHint"></textarea>
+                            <p class="hint" id="newExtraHint">Anything without its own field above, e.g. <code>pdfs</code> (several named menus). Must be a JSON object. Remove a key to delete that field.</p>
+                        </div>
+                    </fieldset>
+
+                    <div class="editor-actions">
+                        <p class="editor-actions__state" id="formState" aria-live="polite"></p>
+                        <div class="editor-actions__buttons">
+                            <button type="button" class="btn btn--ghost" id="clearBtn">Clear form</button>
+                            <button type="button" class="btn btn--danger" id="deleteBtn">Delete</button>
+                            <button type="submit" class="btn btn--primary" id="saveBtn">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ----- Tools ----- -->
+            <div class="tools-col">
+                <section class="admin-card" aria-labelledby="publishHeading">
+                    <h2 id="publishHeading">Publish</h2>
+                    <ol class="steps">
+                        <li>Edit and <strong>Save</strong> items here (this device only).</li>
+                        <li>Check them in the guest app on this device.</li>
+                        <li><strong>Download data.js</strong> and replace <code>js/data.js</code> in the repository, bump the version (see CLAUDE.md), then commit.</li>
+                    </ol>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn--primary" id="downloadBtn">Download data.js</button>
+                        <button type="button" class="btn btn--secondary" id="exportBtn">Copy code</button>
+                    </div>
+                    <div id="exportFallback" class="export-fallback" hidden>
+                        <label for="exportOutput">Copying isn’t allowed here. Select all and copy manually:</label>
+                        <textarea id="exportOutput" rows="8" readonly spellcheck="false" class="code"></textarea>
+                        <button type="button" class="btn btn--ghost btn--sm" id="exportFallbackClose">Done</button>
+                    </div>
+                </section>
+
+                <section class="admin-card" aria-labelledby="deviceHeading">
+                    <h2 id="deviceHeading">This device</h2>
+
+                    <div class="tool">
+                        <h3>Offline prep</h3>
+                        <p class="tool__lead">Downloads every photo size and menu so the guest app works without Wi-Fi (about 24&nbsp;MB). Videos stream only.</p>
+                        <div class="btn-row">
+                            <button type="button" class="btn btn--primary" id="preloadBtn">Cache everything</button>
+                            <button type="button" class="btn btn--secondary" id="clearCacheBtn">Clear offline cache</button>
+                        </div>
+                        <progress id="cacheProgress" class="progress" max="1" value="0" hidden aria-label="Offline download progress"></progress>
+                        <p id="cacheStatus" class="tool__status" role="status" aria-live="polite"></p>
+                        <p id="cacheStorage" class="hint"></p>
+                    </div>
+
+                    <div class="tool">
+                        <div class="switch-row">
+                            <label for="lobbySwitch" class="switch-row__label">
+                                <span class="switch-row__title">Lobby device: show in-house partners only</span>
+                                <span class="hint">Explore lists Red Sail (on-site) tours instead of off-site partners. Same as opening the app with <code>?mode=inhouse</code>.</span>
+                            </label>
+                            <input type="checkbox" role="switch" id="lobbySwitch" class="switch">
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
 
-    <script src="js/data.js" defer></script>
-    <script src="js/admin.js" defer></script>
+    <script src="js/data.js?v=400" defer></script>
+    <script src="js/media.js?v=400" defer></script>
+    <script src="js/admin.js?v=400" defer></script>
 </body>
 </html>

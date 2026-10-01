@@ -1,10 +1,16 @@
-// Content catalog. gallery[0] is the card/hero image; every gallery entry is a real file on disk
-// (verified against the asset folders — do not add paths here without confirming the file exists).
+// Content catalog. gallery[0] is the card/hero image and gallery holds photos only — brand logos and
+// wordmarks go in the optional "logo" field, never in gallery. Every path is a real file on disk
+// (checked by `node scripts/verify.js` — do not add paths here without confirming the file exists).
+// Optional guest-app fields (area, cuisine, meals, tags, featured, channel, status, iberocash, …) are
+// documented in CLAUDE.md. Never add hours, phone/WhatsApp numbers, booking links, prices or redemption
+// copy that staff have not verified.
 const defaultData = {
+    // CLUBS
     "Joia": {
         "type": "club",
         "title": "Iberostar Joia",
         "sub": "Eagle Beach",
+        "area": "joia",
         "desc": "Experience the crown jewel of Aruba. Located on the pristine shores of Eagle Beach, Joia is an adults-only haven offering butler service, swim-up suites, and a level of exclusivity that redefines Caribbean luxury.",
         "gallery": [
             "assets/Hotels/Joia/hotel_joia_1.jpg",
@@ -25,6 +31,7 @@ const defaultData = {
         "type": "club",
         "title": "Tierra del Sol",
         "sub": "Golf & Estates",
+        "area": "tierra",
         "desc": "Escape to the island's most prestigious gated community. Featuring luxury villas, a championship golf course, and panoramic views of the California Lighthouse and rugged North Coast.",
         "gallery": [
             "assets/Hotels/Tierra/golf_tierra_1.jpg",
@@ -33,37 +40,40 @@ const defaultData = {
             "assets/Hotels/Tierra/golf_tierra_4.jpg",
             "assets/Hotels/Tierra/golf_tierra_5.jpg"
         ],
-        "video": "assets/Hotels/Tierra/golf_tierra.mp4"
+        "video": "assets/Hotels/Tierra/golf_tierra_720.mp4"
     },
     "Selection": {
         "type": "club",
         "title": "Iberostar Selection",
         "sub": "Coming Soon",
+        "status": "coming-soon",
         "desc": "Bringing the premium Selection family experience to the Caribbean. Designed for families who refuse to compromise on luxury.",
-        "gallery": [
-            "assets/Hotels/Selection/hotel_selection_1.png"
-        ],
+        "gallery": [],
+        "logo": "assets/Hotels/Selection/hotel_selection_1.png",
         "video": ""
     },
     "Joia2": {
         "type": "club",
         "title": "Iberostar Joia (Lighthouse)",
         "sub": "In Development",
+        "status": "coming-soon",
         "desc": "The next chapter of the Joia collection is currently in development. This exclusive property will feature unparalleled luxury and direct access to the island's most secluded beaches.",
-        "gallery": [
-            "assets/Hotels/Joia2/hotel_joia2_1.jpg"
-        ],
+        "gallery": [],
+        "logo": "assets/Hotels/Joia2/hotel_joia2_1.jpg",
         "video": ""
     },
+
+    // GOLF
     "TierraGolf": {
         "type": "golf",
-        "title": "Tierra del Sol",
+        "title": "Tierra del Sol Golf Course",
         "sub": "Championship Golf",
+        "area": "tierra",
         "desc": "Play a round at Tierra del Sol, Aruba's premier 18-hole championship golf course designed by Robert Trent Jones II. Experience challenging play with sweeping ocean views on every hole.",
         "gallery": [
             "assets/Golf/Course/golf_1.jpg"
         ],
-        "video": "assets/Hotels/Tierra/golf_tierra.mp4",
+        "video": "assets/Hotels/Tierra/golf_tierra_720.mp4",
         "duration": "4 Hours",
         "time": "Tee Times: 7am - 2pm",
         "essentials": [
@@ -76,6 +86,8 @@ const defaultData = {
         "type": "golf",
         "title": "Audubon Sanctuary",
         "sub": "Nature & Wildlife",
+        "area": "tierra",
+        "iberocash": false,
         "desc": "Iberostar is committed to sustainability. Our golf course is a certified Audubon Cooperative Sanctuary, providing a protected habitat for the endemic Shoco (Burrowing Owl).",
         "gallery": [
             "assets/Golf/Birds/birds_1.jpg",
@@ -85,13 +97,14 @@ const defaultData = {
         ],
         "pdf": ""
     },
+
+    // STORE
     "ArubaAloe": {
         "type": "store",
         "title": "Aruba Aloe",
         "sub": "Local Skincare & Gifts",
         "desc": "Discover the healing power of Aruban Aloe. Founded in 1890, Aruba Aloe is one of the oldest aloe companies in the world, offering premium sun care, lotions, and locally made gifts perfect for bringing a piece of Aruba home.",
         "gallery": [
-            "assets/Store/ArubaAloe/store_aloe_1.jpg",
             "assets/Store/ArubaAloe/store_aloe_2.jpg",
             "assets/Store/ArubaAloe/store_aloe_3.jpg",
             "assets/Store/ArubaAloe/store_aloe_4.jpg",
@@ -101,19 +114,24 @@ const defaultData = {
             "assets/Store/ArubaAloe/store_aloe_8.jpg",
             "assets/Store/ArubaAloe/store_aloe_9.jpg",
             "assets/Store/ArubaAloe/store_aloe_10.jpg"
-        ]
+        ],
+        "logo": "assets/Store/ArubaAloe/store_aloe_1.jpg"
     },
     "MoreRetail": {
         "type": "store",
         "title": "More Retail Partners",
         "sub": "Coming Soon",
+        "status": "coming-soon",
         "desc": "We're growing our lineup of local retail partners. Check back soon for more shopping recommendations around the island.",
         "gallery": []
     },
+
+    // FUN
     "RedSailSail": {
         "type": "fun",
         "title": "Luxury Catamaran Sail",
         "sub": "Red Sail Sports Aruba",
+        "channel": "in-house",
         "desc": "Experience the beautiful Caribbean waters aboard a luxury catamaran. Includes premium snorkeling stops at the famous Antilla shipwreck and vibrant coral reefs, complete with an open bar and snacks. <div class=\"price-box\"><div class=\"price-row\"><span>Adult Ticket</span><strong>$107.00</strong></div><div class=\"price-row\"><span>Child Ticket</span><strong>$65.00</strong></div></div>",
         "gallery": [],
         "duration": "4 Hours",
@@ -123,6 +141,7 @@ const defaultData = {
         "type": "fun",
         "title": "Sunset Cruise",
         "sub": "Red Sail Sports Aruba",
+        "channel": "in-house",
         "desc": "Enjoy a romantic and relaxing sunset sail along the stunning Aruban coastline. Sip on premium cocktails and enjoy hors d'oeuvres while watching the sun dip below the horizon. <div class=\"price-box\"><div class=\"price-row\"><span>Adult Ticket</span><strong>$69.00</strong></div><div class=\"price-row\"><span>Child Ticket</span><strong>$45.00</strong></div></div>",
         "gallery": [],
         "duration": "2 Hours",
@@ -132,6 +151,7 @@ const defaultData = {
         "type": "fun",
         "title": "UTV & ATV Adventure Tours",
         "sub": "Rocka Beach Tours",
+        "channel": "off-site",
         "desc": "Guided off-road safari to Aruba's wild north coast. Includes water, snacks, and a professional tour guide. <div class=\"price-box\"><div class=\"price-row\"><span>ATV Single</span><strong>$160.00</strong></div><div class=\"price-row\"><span>ATV Double</span><strong>$200.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater</span><strong>$480.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_utv_1.jpg"
@@ -163,6 +183,7 @@ const defaultData = {
         "type": "fun",
         "title": "Bushiri Karting Speedway",
         "sub": "Rocka Beach Tours",
+        "channel": "off-site",
         "desc": "Outdoor karting at Bushiri Karting Speedway: a safety briefing, 1 practice race, 1 lap-position race, and 1 final race, with medals and champagne for the winners. Hotel pickup/drop-off, water, and snacks included. <div class=\"price-box\"><div class=\"price-row\"><span>Race Experience (Adult)</span><strong>$85.00</strong></div><div class=\"price-row\"><span>Race Experience (Child)</span><strong>$60.00</strong></div><div class=\"price-row\"><span>Arrive & Drive (Adult)</span><strong>$25.00</strong></div><div class=\"price-row\"><span>Arrive & Drive (Child)</span><strong>$25.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_gokart_1.jpg"
@@ -179,6 +200,7 @@ const defaultData = {
         "type": "fun",
         "title": "UTV & ATV Rentals",
         "sub": "Rocka Beach Tours",
+        "channel": "off-site",
         "desc": "Freedom to explore at your own pace — ATV & UTV drop-off and pickup available at all hotels. Security Deposit: $500 per vehicle required. <div class=\"price-box\"><div class=\"price-row\"><span>UTV 2-Seater (4 hr)</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater (8 hr)</span><strong>$275.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (4 hr)</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (8 hr)</span><strong>$320.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (4 hr)</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (8 hr)</span><strong>$395.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (4 hr)</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (8 hr)</span><strong>$435.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (4 hr)</span><strong>$480.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (8 hr)</span><strong>$495.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_rentals_1.jpg",
@@ -195,6 +217,7 @@ const defaultData = {
         "type": "fun",
         "title": "Beach Bus Adventure",
         "sub": "Rocka Beach Tours",
+        "channel": "off-site",
         "desc": "Full-day tour visiting key landmarks and beaches across the island, with an optional lunch or dinner add-on. <div class=\"price-box\"><div class=\"price-row\"><span>Adult (13+)</span><strong>$65.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$42.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_half_1.jpg",
@@ -213,340 +236,11 @@ const defaultData = {
             "Optional: Arashi Beach break or Boca Catalina/Tres Trapi cliff jumping"
         ]
     },
-    "SailingCoralSunset": {
-        "type": "fun",
-        "title": "Coral Sunset Dinner Sail",
-        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
-        "desc": "A 3-hour sunset sail with a 3-course dinner and premium open bar. Choose one appetizer and one main course per guest, plus two shared side dishes; dessert included. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$850.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1,600.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
-        "gallery": [
-            "assets/Activities/Rockabeach/act_coral_1.jpg"
-        ],
-        "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "3 Hours",
-        "time": "4:00 PM – 7:00 PM",
-        "essentials": [
-            "Notify us in advance of any food allergies or dietary needs"
-        ]
-    },
-    "SailingBlueParrot": {
-        "type": "fun",
-        "title": "Blue Parrot Snorkel Sail",
-        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
-        "desc": "A 4-hour snorkel sail with lunch or a 4-course dinner and premium open bar. Choose from two rounds of tapas plus a main course per guest, with shared sides and dessert. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,100.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$250.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$2,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
-        "gallery": [
-            "assets/Activities/Rockabeach/act_blueparrot_1.jpg"
-        ],
-        "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "4 Hours",
-        "time": "9:00 AM – 1:00 PM or 3:00 PM – 7:00 PM",
-        "essentials": [
-            "Notify us in advance of any food allergies or dietary needs"
-        ]
-    },
-    "SailingTropicalDream": {
-        "type": "fun",
-        "title": "Tropical Dream Snorkel & Dinner Sail",
-        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
-        "desc": "A 7-hour snorkel charter to the Spanish Lagoon, Boca Catalina, and the Antilla shipwreck, with a 4-course lunch or early dinner and premium open bar. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,500.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$400.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$3,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
-        "gallery": [
-            "assets/Activities/Rockabeach/act_tropicaldream_1.jpg"
-        ],
-        "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "7 Hours",
-        "time": "9:00 AM – 4:00 PM or 1:00 PM – 7:00 PM",
-        "itinerary": [
-            "Spanish Lagoon",
-            "Boca Catalina",
-            "Antilla Shipwreck"
-        ],
-        "essentials": [
-            "Notify us in advance of any food allergies or dietary needs"
-        ]
-    },
-    "SailingNonPrivate": {
-        "type": "fun",
-        "title": "Tropical Sailing Experience",
-        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
-        "desc": "A 4-hour sailing and snorkeling outing starting with a fruit bowl, then a BBQ lunch or BBQ sunset dinner with premium open bar. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$135.00</strong></div><div class=\"price-row\"><span>Child</span><strong>$75.00</strong></div></div>",
-        "gallery": [
-            "assets/Activities/Rockabeach/act_nonprivate_1.jpg"
-        ],
-        "partnerLogo": "assets/Logos/logo_rocka.png",
-        "essentials": [
-            "Notify us in advance of any food allergies or dietary needs"
-        ],
-        "duration": "4 Hours",
-        "time": "9:00 AM – 1:00 PM or 3:00 PM – 7:00 PM"
-    },
-    "SailingBare": {
-        "type": "fun",
-        "title": "Bare Sailing Experience",
-        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
-        "desc": "A 2, 3, or 4-hour sailing and snorkeling outing with water and soft drinks provided — the simplest, most flexible way to get out on the water. <div class=\"price-box\"><div class=\"price-row\"><span>Per Hour (up to 4 guests)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>Per Hour (5-6 guests)</span><strong>$300.00</strong></div></div>",
-        "gallery": [
-            "assets/Activities/Rockabeach/act_baresail_1.jpg"
-        ],
-        "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "2-4 Hours",
-        "time": "9:00 AM or 3:00 PM",
-        "essentials": [
-            "Water and soft drinks provided (Coke, Coke Zero, Sprite, Fuse Tea, Ginger Ale)",
-            "Notify us in advance of any food allergies or dietary needs"
-        ]
-    },
-    "SpaPromo": {
-        "type": "spa",
-        "title": "Swedish Massage (50min)",
-        "sub": "Complimentary Voucher",
-        "desc": "Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.",
-        "gallery": [
-            "assets/Spa/Promo/massage_1.jpg",
-            "assets/Spa/Promo/massage_2.jpg",
-            "assets/Spa/Promo/massage_3.jpg",
-            "assets/Spa/Promo/massage_4.jpg",
-            "assets/Spa/Promo/massage_5.jpg",
-            "assets/Spa/Promo/massage_6.jpg",
-            "assets/Spa/Promo/massage_7.jpg",
-            "assets/Spa/Promo/massage_8.jpg"
-        ],
-        "pdf": "",
-        "duration": "50 Minutes",
-        "essentials": [
-            "Arrive 15min early"
-        ]
-    },
-    "SpaMain": {
-        "type": "spa",
-        "title": "Spa Sensations",
-        "sub": "Joia Aruba • Wellness",
-        "desc": "A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.",
-        "gallery": [
-            "assets/Spa/General/spa_1.jpg",
-            "assets/Spa/General/spa_2.jpg",
-            "assets/Spa/General/spa_3.jpg",
-            "assets/Spa/General/spa_4.jpg",
-            "assets/Spa/General/spa_5.jpg",
-            "assets/Spa/General/spa_6.jpg",
-            "assets/Spa/General/spa_7.jpg",
-            "assets/Spa/General/spa_8.jpg",
-            "assets/Spa/General/spa_9.jpg",
-            "assets/Spa/General/spa_10.jpg",
-            "assets/Spa/General/spa_11.jpg"
-        ]
-    },
-    "Giannis": {
-        "type": "food",
-        "title": "Gianni's Ristorante",
-        "sub": "Italian",
-        "desc": "Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.",
-        "gallery": [
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_1.jpg",
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_2.jpg",
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_3.jpg",
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_4.jpg",
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_5.jpg"
-        ],
-        "pdf": "assets/Restaurants/Gianni's Ristorante/menu_giannis.pdf"
-    },
-    "Daniels": {
-        "type": "food",
-        "title": "Daniel's Steak & Chop",
-        "sub": "Steakhouse",
-        "desc": "Premium Certified Angus Beef and wood-fired chops. A classic steakhouse experience with a rustic touch, perfect for meat lovers seeking quality cuts.",
-        "gallery": [
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_1.jpg",
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_2.jpg",
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_3.jpg",
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_4.jpg",
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_5.jpg"
-        ],
-        "pdf": "assets/Restaurants/Daniel's Steak & Chop/menu_daniels.pdf"
-    },
-    "Gaya": {
-        "type": "food",
-        "title": "GAIA House of Grill",
-        "sub": "Joia Aruba • Open-Air Grill",
-        "desc": "An open-air grill at the front of the hotel overlooking Eagle Beach, named for the Greek goddess of the Earth. Executive Chef Alejandro Camurri leads a menu built around a balance of land and sea, with bold, smoky, Caribbean-inflected flavors. Saturdays after 10pm, GAIA transforms into an intimate lounge with handcrafted cocktails and a live DJ.",
-        "gallery": [
-            "assets/Restaurants/Gaia/rest_gaia_1.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_2.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_3.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_4.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_5.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_6.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_7.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_8.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_9.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_10.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_11.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_12.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_13.jpg"
-        ],
-        "pdfs": [
-            { "label": "Menu", "url": "assets/Restaurants/Gaia/menu_gaia_english.pdf" }
-        ]
-    },
-    "Azia": {
-        "type": "food",
-        "title": "Azia Restaurant & Lounge",
-        "sub": "Asian Fusion",
-        "desc": "A journey through Asia with Tapas and modern atmosphere. Exquisite sushi, dim sum, and Asian-fusion dishes in a stylish, Zen-inspired environment.",
-        "gallery": [
-            "assets/Restaurants/Azia Restaurant/rest_azia_1.jpg",
-            "assets/Restaurants/Azia Restaurant/rest_azia_2.jpg",
-            "assets/Restaurants/Azia Restaurant/rest_azia_3.jpg",
-            "assets/Restaurants/Azia Restaurant/rest_azia_4.jpg",
-            "assets/Restaurants/Azia Restaurant/rest_azia_5.jpg"
-        ],
-        "pdf": "assets/Restaurants/Azia Restaurant/menu_azia.pdf"
-    },
-    "Azzurro": {
-        "type": "food",
-        "title": "Azzurro Ristorante",
-        "sub": "Seafood",
-        "desc": "Located right on the beach, serving authentic Italian seafood. Enjoy panoramic ocean views and fresh catches prepared with traditional Italian flair.",
-        "gallery": [
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_1.jpg",
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_2.jpg",
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_3.jpg",
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_4.jpg",
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_5.jpg"
-        ],
-        "pdf": "assets/Restaurants/Azzurro Ristorante/menu_azzurro.pdf"
-    },
-    "AmoreMio": {
-        "type": "food",
-        "title": "Amore Mio",
-        "sub": "Pizzeria",
-        "desc": "Authentic Neapolitan pizza with a crispy, airy crust. A cozy pizzeria offering a variety of traditional toppings and Italian comfort food.",
-        "gallery": [
-            "assets/Restaurants/Amore Mio/rest_amoremio_1.jpg",
-            "assets/Restaurants/Amore Mio/rest_amoremio_2.jpg",
-            "assets/Restaurants/Amore Mio/rest_amoremio_3.jpg",
-            "assets/Restaurants/Amore Mio/rest_amoremio_4.jpg",
-            "assets/Restaurants/Amore Mio/rest_amoremio_5.jpg"
-        ],
-        "pdf": "assets/Restaurants/Amore Mio/menu_amoremio.pdf"
-    },
-    "Dushi": {
-        "type": "food",
-        "title": "Dushi Bagels",
-        "sub": "Casual",
-        "desc": "The go-to spot for New York style bagels and hearty burgers. A casual, friendly eatery perfect for breakfast or a quick, delicious lunch.",
-        "gallery": [
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_1.jpg",
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_2.jpg",
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_3.jpg",
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_4.jpg",
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_5.jpg"
-        ],
-        "pdf": "assets/Restaurants/Dushi Bagels & Burgers/menu_dushi.pdf"
-    },
-    "Zima": {
-        "type": "food",
-        "title": "Zima Rooftop Bar",
-        "sub": "Joia Aruba • Rooftop",
-        "desc": "Perched atop the Joia hotel, Zima Bar offers the best sunset views. Enjoy handcrafted cocktails and a sophisticated atmosphere while watching the sun dip below the horizon.",
-        "gallery": [
-            "assets/Restaurants/Zima/rest_zima_1.jpg",
-            "assets/Restaurants/Zima/rest_zima_2.jpg",
-            "assets/Restaurants/Zima/rest_zima_3.jpg",
-            "assets/Restaurants/Zima/rest_zima_4.jpg",
-            "assets/Restaurants/Zima/rest_zima_5.jpg",
-            "assets/Restaurants/Zima/rest_zima_6.jpg",
-            "assets/Restaurants/Zima/rest_zima_7.jpg",
-            "assets/Restaurants/Zima/rest_zima_9.jpg",
-            "assets/Restaurants/Zima/rest_zima_10.jpg",
-            "assets/Restaurants/Zima/rest_zima_11.jpg",
-            "assets/Restaurants/Zima/rest_zima_12.jpg",
-            "assets/Restaurants/Zima/rest_zima_13.jpg"
-        ]
-    },
-    "Bucatini": {
-        "type": "food",
-        "title": "Bucatini",
-        "sub": "Joia Aruba • Italian",
-        "desc": "Modern Italian cuisine featuring a curated Antipasto station. Indulge in fresh pasta, artisanal pizzas, and a wide selection of fine wines in an elegant setting.",
-        "gallery": [
-            "assets/Restaurants/Bucatini/rest_bucatini_1.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_2.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_3.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_4.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_5.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_6.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_7.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_8.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_9.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_10.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_11.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_12.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_13.jpg",
-            "assets/Restaurants/Bucatini/rest_bucatini_14.jpg"
-        ],
-        "pdfs": [
-            { "label": "Food Menu", "url": "assets/Restaurants/Bucatini/menu_bucatini_food.pdf" },
-            { "label": "Dessert Menu", "url": "assets/Restaurants/Bucatini/menu_bucatini_desserts.pdf" },
-            { "label": "Drinks Menu", "url": "assets/Restaurants/Bucatini/menu_bucatini_drinks.pdf" }
-        ]
-    },
-    "Marea": {
-        "type": "food",
-        "title": "Marea",
-        "sub": "Joia Aruba • Caribbean",
-        "desc": "Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.",
-        "gallery": [
-            "assets/Restaurants/Marea/rest_marea_1.jpg",
-            "assets/Restaurants/Marea/rest_marea_2.jpg",
-            "assets/Restaurants/Marea/rest_marea_3.jpg",
-            "assets/Restaurants/Marea/rest_marea_4.jpg",
-            "assets/Restaurants/Marea/rest_marea_5.jpg",
-            "assets/Restaurants/Marea/rest_marea_6.jpg",
-            "assets/Restaurants/Marea/rest_marea_7.jpg",
-            "assets/Restaurants/Marea/rest_marea_8.jpg",
-            "assets/Restaurants/Marea/rest_marea_9.jpg",
-            "assets/Restaurants/Marea/rest_marea_10.jpg",
-            "assets/Restaurants/Marea/rest_marea_11.jpg",
-            "assets/Restaurants/Marea/rest_marea_12.jpg",
-            "assets/Restaurants/Marea/rest_marea_13.jpeg"
-        ],
-        "pdfs": [
-            { "label": "Dessert Menu", "url": "assets/Restaurants/Marea/menu_marea_desserts.pdf" },
-            { "label": "Drinks Menu", "url": "assets/Restaurants/Marea/menu_marea_drinks.pdf" }
-        ]
-    },
-    "Birdie": {
-        "type": "food",
-        "title": "The Birdie",
-        "sub": "Tierra del Sol",
-        "desc": "Experience the \"Tapas Affair\" with breathtaking views. Located at Tierra del Sol, this spot offers a unique blend of small plates and scenic golf course vistas.",
-        "gallery": [
-            "assets/Restaurants/Birdie/rest_birdie_1.jpg",
-            "assets/Restaurants/Birdie/rest_birdie_2.jpg",
-            "assets/Restaurants/Birdie/rest_birdie_3.jpg",
-            "assets/Restaurants/Birdie/rest_birdie_4.jpg",
-            "assets/Restaurants/Birdie/rest_birdie_5.jpg",
-            "assets/Restaurants/Birdie/rest_birdie_6.jpg",
-            "assets/Restaurants/Birdie/rest_birdie_7.jpg"
-        ]
-    },
-    "Screaming": {
-        "type": "food",
-        "title": "Screaming Eagle",
-        "sub": "French Fusion",
-        "desc": "Inspired by French-fusion cuisine, known for its \"Dinner in Bed\" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.",
-        "gallery": [
-            "assets/Restaurants/Screaming Eagle/rest_screaming_1.jpg",
-            "assets/Restaurants/Screaming Eagle/rest_screaming_2.jpg",
-            "assets/Restaurants/Screaming Eagle/rest_screaming_3.jpg",
-            "assets/Restaurants/Screaming Eagle/rest_screaming_4.jpg",
-            "assets/Restaurants/Screaming Eagle/rest_screaming_5.jpg"
-        ],
-        "pdf": "assets/Restaurants/Screaming Eagle/menu_screaming.pdf"
-    },
     "JeepTourA": {
         "type": "fun",
         "title": "Jeep Tour A: Northshore Safari",
         "sub": "Rocka Beach Tours",
+        "channel": "off-site",
         "desc": "Open-air Jeep safari along Aruba's rugged north coast, with dramatic oceanfront views. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$75.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_jeep_1.jpg",
@@ -579,6 +273,7 @@ const defaultData = {
         "type": "fun",
         "title": "Jeep Tour B: Natural Pool, Caves & Baby Beach",
         "sub": "Rocka Beach Tours",
+        "channel": "off-site",
         "desc": "Open-air Jeep safari through Arikok National Park to the island's natural pool and caves, with a professional guide. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$115.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$85.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_jeepb_1.jpg"
@@ -606,30 +301,15 @@ const defaultData = {
             "Optional: +$20 for lunch or dinner & a drink"
         ]
     },
-    "SailingAngelfish": {
-        "type": "fun",
-        "title": "Angelfish Snorkel & Brunch",
-        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
-        "desc": "A 3-hour snorkel sail with brunch-style tapas and a premium open bar with mimosas. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$700.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$150.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1300.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 15)</span><strong>$100.00</strong></div></div>",
-        "gallery": [
-            "assets/Activities/Rockabeach/act_angelfish_1.jpg"
-        ],
-        "partnerLogo": "assets/Logos/logo_rocka.png",
-        "duration": "3 Hours",
-        "time": "9:00 AM – 12:00 PM or 4:00 PM – 7:00 PM",
-        "essentials": [
-            "Private charter (your own group only)",
-            "Notify us in advance of any food allergies or dietary needs"
-        ]
-    },
     "UTVJeepNaturalPool": {
         "type": "fun",
         "title": "UTV & Safari Jeep Natural Pool Adventure",
         "sub": "Rocka Beach Tours",
+        "channel": "off-site",
         "desc": "A hybrid tour: drive your own UTV to the Natural Pool, then swap into a guided Jeep safari for the rest of the route. Includes a meal with a drink and national park entrance. <div class=\"price-box\"><div class=\"price-row\"><span>2-Seater UTV</span><strong>$285.00</strong></div></div>",
         "gallery": [
-            "assets/Activities/Rockabeach/act_utvjeep_1.jpg",
-            "assets/Activities/Rockabeach/act_utvjeep_2.jpg"
+            "assets/Activities/Rockabeach/act_utvjeep_2.jpg",
+            "assets/Activities/Rockabeach/act_utvjeep_1.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4 Hours",
@@ -649,5 +329,401 @@ const defaultData = {
             "Sunscreen",
             "National Park entry included"
         ]
+    },
+    "SailingCoralSunset": {
+        "type": "fun",
+        "title": "Coral Sunset Dinner Sail",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "featured": [
+            "sunset"
+        ],
+        "channel": "off-site",
+        "desc": "A 3-hour sunset sail with a 3-course dinner and premium open bar. Choose one appetizer and one main course per guest, plus two shared side dishes; dessert included. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$850.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1,600.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_coral_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "3 Hours",
+        "time": "4:00 PM – 7:00 PM",
+        "essentials": [
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+    "SailingBlueParrot": {
+        "type": "fun",
+        "title": "Blue Parrot Snorkel Sail",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "channel": "off-site",
+        "desc": "A 4-hour snorkel sail with lunch or a 4-course dinner and premium open bar. Choose from two rounds of tapas plus a main course per guest, with shared sides and dessert. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,100.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$250.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$2,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_blueparrot_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "4 Hours",
+        "time": "9:00 AM – 1:00 PM or 3:00 PM – 7:00 PM",
+        "essentials": [
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+    "SailingTropicalDream": {
+        "type": "fun",
+        "title": "Tropical Dream Snorkel & Dinner Sail",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "channel": "off-site",
+        "desc": "A 7-hour snorkel charter to the Spanish Lagoon, Boca Catalina, and the Antilla shipwreck, with a 4-course lunch or early dinner and premium open bar. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,500.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$400.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$3,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_tropicaldream_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "7 Hours",
+        "time": "9:00 AM – 4:00 PM or 1:00 PM – 7:00 PM",
+        "itinerary": [
+            "Spanish Lagoon",
+            "Boca Catalina",
+            "Antilla Shipwreck"
+        ],
+        "essentials": [
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+    "SailingNonPrivate": {
+        "type": "fun",
+        "title": "Tropical Sailing Experience",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "channel": "off-site",
+        "desc": "A 4-hour sailing and snorkeling outing starting with a fruit bowl, then a BBQ lunch or BBQ sunset dinner with premium open bar. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$135.00</strong></div><div class=\"price-row\"><span>Child</span><strong>$75.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_nonprivate_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "essentials": [
+            "Notify us in advance of any food allergies or dietary needs"
+        ],
+        "duration": "4 Hours",
+        "time": "9:00 AM – 1:00 PM or 3:00 PM – 7:00 PM"
+    },
+    "SailingBare": {
+        "type": "fun",
+        "title": "Bare Sailing Experience",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "channel": "off-site",
+        "desc": "A 2, 3, or 4-hour sailing and snorkeling outing with water and soft drinks provided — the simplest, most flexible way to get out on the water. <div class=\"price-box\"><div class=\"price-row\"><span>Per Hour (up to 4 guests)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>Per Hour (5-6 guests)</span><strong>$300.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_baresail_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "2-4 Hours",
+        "time": "9:00 AM or 3:00 PM",
+        "essentials": [
+            "Water and soft drinks provided (Coke, Coke Zero, Sprite, Fuse Tea, Ginger Ale)",
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+    "SailingAngelfish": {
+        "type": "fun",
+        "title": "Angelfish Snorkel & Brunch",
+        "sub": "Rocka Beach Tours • Tropical Sailing Aruba",
+        "channel": "off-site",
+        "desc": "A 3-hour snorkel sail with brunch-style tapas and a premium open bar with mimosas. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$700.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$150.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1300.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 15)</span><strong>$100.00</strong></div></div>",
+        "gallery": [
+            "assets/Activities/Rockabeach/act_angelfish_1.jpg"
+        ],
+        "partnerLogo": "assets/Logos/logo_rocka.png",
+        "duration": "3 Hours",
+        "time": "9:00 AM – 12:00 PM or 4:00 PM – 7:00 PM",
+        "essentials": [
+            "Private charter (your own group only)",
+            "Notify us in advance of any food allergies or dietary needs"
+        ]
+    },
+
+    // SPA
+    "SpaPromo": {
+        "type": "spa",
+        "title": "Swedish Massage (50min)",
+        "sub": "Complimentary Voucher",
+        "area": "joia",
+        "iberocash": false,
+        "desc": "Relax and unwind with our signature 50-minute Swedish massage. Designed to relieve tension and improve circulation, this complimentary treatment is the perfect way to start your vacation.",
+        "gallery": [
+            "assets/Spa/Promo/massage_1.jpg",
+            "assets/Spa/Promo/massage_2.jpg",
+            "assets/Spa/Promo/massage_3.jpg",
+            "assets/Spa/Promo/massage_4.jpg",
+            "assets/Spa/Promo/massage_5.jpg",
+            "assets/Spa/Promo/massage_6.jpg",
+            "assets/Spa/Promo/massage_7.jpg",
+            "assets/Spa/Promo/massage_8.jpg"
+        ],
+        "pdf": "",
+        "duration": "50 Minutes",
+        "essentials": [
+            "Arrive 15min early"
+        ]
+    },
+    "SpaMain": {
+        "type": "spa",
+        "title": "Spa Sensations",
+        "sub": "Joia Aruba • Wellness",
+        "area": "joia",
+        "desc": "A sanctuary of relaxation featuring a hydrotherapy circuit. Indulge in a wide array of treatments, from volcanic stone massages to aloe vera wraps, all designed to rejuvenate your body and mind.",
+        "gallery": [
+            "assets/Spa/General/spa_1.jpg",
+            "assets/Spa/General/spa_2.jpg",
+            "assets/Spa/General/spa_3.jpg",
+            "assets/Spa/General/spa_4.jpg",
+            "assets/Spa/General/spa_5.jpg",
+            "assets/Spa/General/spa_6.jpg",
+            "assets/Spa/General/spa_7.jpg",
+            "assets/Spa/General/spa_8.jpg",
+            "assets/Spa/General/spa_9.jpg",
+            "assets/Spa/General/spa_10.jpg",
+            "assets/Spa/General/spa_11.jpg"
+        ]
+    },
+
+    // FOOD
+    "Giannis": {
+        "type": "food",
+        "title": "Gianni's Ristorante",
+        "sub": "Italian",
+        "area": "partner",
+        "cuisine": "Italian",
+        "desc": "Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.",
+        "gallery": [
+            "assets/Restaurants/Gianni's Ristorante/rest_giannis_2.jpg",
+            "assets/Restaurants/Gianni's Ristorante/rest_giannis_3.jpg",
+            "assets/Restaurants/Gianni's Ristorante/rest_giannis_4.jpg",
+            "assets/Restaurants/Gianni's Ristorante/rest_giannis_5.jpg"
+        ],
+        "logo": "assets/Restaurants/Gianni's Ristorante/rest_giannis_1.jpg",
+        "pdf": "assets/Restaurants/Gianni's Ristorante/menu_giannis.pdf"
+    },
+    "Daniels": {
+        "type": "food",
+        "title": "Daniel's Steak & Chop",
+        "sub": "Steakhouse",
+        "area": "partner",
+        "cuisine": "Steakhouse",
+        "desc": "Premium Certified Angus Beef and wood-fired chops. A classic steakhouse experience with a rustic touch, perfect for meat lovers seeking quality cuts.",
+        "gallery": [
+            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_2.jpg",
+            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_3.jpg",
+            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_4.jpg",
+            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_5.jpg"
+        ],
+        "logo": "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_1.jpg",
+        "pdf": "assets/Restaurants/Daniel's Steak & Chop/menu_daniels.pdf"
+    },
+    "Gaya": {
+        "type": "food",
+        "title": "GAIA House of Grill",
+        "sub": "Joia Aruba • Open-Air Grill",
+        "area": "joia",
+        "cuisine": "Open-air grill",
+        "desc": "An open-air grill at the front of the hotel overlooking Eagle Beach, named for the Greek goddess of the Earth. Executive Chef Alejandro Camurri leads a menu built around a balance of land and sea, with bold, smoky, Caribbean-inflected flavors. Saturdays after 10pm, GAIA transforms into an intimate lounge with handcrafted cocktails and a live DJ.",
+        "gallery": [
+            "assets/Restaurants/Gaia/rest_gaia_4.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_2.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_3.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_5.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_6.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_7.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_8.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_9.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_10.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_11.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_12.jpg",
+            "assets/Restaurants/Gaia/rest_gaia_13.jpg"
+        ],
+        "logo": "assets/Restaurants/Gaia/rest_gaia_1.jpg",
+        "pdfs": [
+            { "label": "Menu", "url": "assets/Restaurants/Gaia/menu_gaia_english.pdf" }
+        ]
+    },
+    "Azia": {
+        "type": "food",
+        "title": "Azia Restaurant & Lounge",
+        "sub": "Asian Fusion",
+        "area": "partner",
+        "cuisine": "Asian fusion",
+        "desc": "A journey through Asia with Tapas and modern atmosphere. Exquisite sushi, dim sum, and Asian-fusion dishes in a stylish, Zen-inspired environment.",
+        "gallery": [
+            "assets/Restaurants/Azia Restaurant/rest_azia_3.jpg",
+            "assets/Restaurants/Azia Restaurant/rest_azia_2.jpg",
+            "assets/Restaurants/Azia Restaurant/rest_azia_4.jpg",
+            "assets/Restaurants/Azia Restaurant/rest_azia_5.jpg"
+        ],
+        "logo": "assets/Restaurants/Azia Restaurant/rest_azia_1.jpg",
+        "pdf": "assets/Restaurants/Azia Restaurant/menu_azia.pdf"
+    },
+    "Azzurro": {
+        "type": "food",
+        "title": "Azzurro Ristorante",
+        "sub": "Seafood",
+        "area": "partner",
+        "cuisine": "Seafood",
+        "desc": "Located right on the beach, serving authentic Italian seafood. Enjoy panoramic ocean views and fresh catches prepared with traditional Italian flair.",
+        "gallery": [
+            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_2.jpg",
+            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_3.jpg",
+            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_4.jpg",
+            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_5.jpg"
+        ],
+        "logo": "assets/Restaurants/Azzurro Ristorante/rest_azzurro_1.jpg",
+        "pdf": "assets/Restaurants/Azzurro Ristorante/menu_azzurro.pdf"
+    },
+    "AmoreMio": {
+        "type": "food",
+        "title": "Amore Mio",
+        "sub": "Pizzeria",
+        "area": "partner",
+        "cuisine": "Pizzeria",
+        "desc": "Authentic Neapolitan pizza with a crispy, airy crust. A cozy pizzeria offering a variety of traditional toppings and Italian comfort food.",
+        "gallery": [
+            "assets/Restaurants/Amore Mio/rest_amoremio_3.jpg",
+            "assets/Restaurants/Amore Mio/rest_amoremio_2.jpg",
+            "assets/Restaurants/Amore Mio/rest_amoremio_4.jpg",
+            "assets/Restaurants/Amore Mio/rest_amoremio_5.jpg"
+        ],
+        "logo": "assets/Restaurants/Amore Mio/rest_amoremio_1.jpg",
+        "pdf": "assets/Restaurants/Amore Mio/menu_amoremio.pdf"
+    },
+    "Dushi": {
+        "type": "food",
+        "title": "Dushi Bagels",
+        "sub": "Casual",
+        "area": "partner",
+        "cuisine": "Bagels & burgers",
+        "desc": "The go-to spot for New York style bagels and hearty burgers. A casual, friendly eatery perfect for breakfast or a quick, delicious lunch.",
+        "gallery": [
+            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_2.jpg",
+            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_3.jpg",
+            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_4.jpg",
+            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_5.jpg"
+        ],
+        "logo": "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_1.jpg",
+        "pdf": "assets/Restaurants/Dushi Bagels & Burgers/menu_dushi.pdf"
+    },
+    "Zima": {
+        "type": "food",
+        "title": "Zima Rooftop Bar",
+        "sub": "Joia Aruba • Rooftop",
+        "area": "joia",
+        "cuisine": "Rooftop bar",
+        "meals": [
+            "drinks"
+        ],
+        "tags": [
+            "sunset",
+            "rooftop"
+        ],
+        "featured": [
+            "sunset"
+        ],
+        "desc": "Perched atop the Joia hotel, Zima Bar offers the best sunset views. Enjoy handcrafted cocktails and a sophisticated atmosphere while watching the sun dip below the horizon.",
+        "gallery": [
+            "assets/Restaurants/Zima/rest_zima_1.jpg",
+            "assets/Restaurants/Zima/rest_zima_3.jpg",
+            "assets/Restaurants/Zima/rest_zima_4.jpg",
+            "assets/Restaurants/Zima/rest_zima_5.jpg",
+            "assets/Restaurants/Zima/rest_zima_6.jpg",
+            "assets/Restaurants/Zima/rest_zima_7.jpg",
+            "assets/Restaurants/Zima/rest_zima_9.jpg",
+            "assets/Restaurants/Zima/rest_zima_10.jpg",
+            "assets/Restaurants/Zima/rest_zima_11.jpg",
+            "assets/Restaurants/Zima/rest_zima_12.jpg",
+            "assets/Restaurants/Zima/rest_zima_13.jpg"
+        ],
+        "logo": "assets/Restaurants/Zima/rest_zima_2.jpg"
+    },
+    "Bucatini": {
+        "type": "food",
+        "title": "Bucatini",
+        "sub": "Joia Aruba • Italian",
+        "area": "joia",
+        "cuisine": "Italian",
+        "desc": "Modern Italian cuisine featuring a curated Antipasto station. Indulge in fresh pasta, artisanal pizzas, and a wide selection of fine wines in an elegant setting.",
+        "gallery": [
+            "assets/Restaurants/Bucatini/rest_bucatini_1.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_3.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_4.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_5.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_6.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_7.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_8.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_9.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_10.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_11.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_12.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_13.jpg",
+            "assets/Restaurants/Bucatini/rest_bucatini_14.jpg"
+        ],
+        "logo": "assets/Restaurants/Bucatini/rest_bucatini_2.jpg",
+        "pdfs": [
+            { "label": "Food Menu", "url": "assets/Restaurants/Bucatini/menu_bucatini_food.pdf" },
+            { "label": "Dessert Menu", "url": "assets/Restaurants/Bucatini/menu_bucatini_desserts.pdf" },
+            { "label": "Drinks Menu", "url": "assets/Restaurants/Bucatini/menu_bucatini_drinks.pdf" }
+        ]
+    },
+    "Marea": {
+        "type": "food",
+        "title": "Marea",
+        "sub": "Joia Aruba • Caribbean",
+        "area": "joia",
+        "cuisine": "Caribbean",
+        "desc": "Vibrant Caribbean flavors right on the oceanfront. Savor fresh seafood and local specialties while listening to the soothing sounds of the waves.",
+        "gallery": [
+            "assets/Restaurants/Marea/rest_marea_1.jpg",
+            "assets/Restaurants/Marea/rest_marea_2.jpg",
+            "assets/Restaurants/Marea/rest_marea_3.jpg",
+            "assets/Restaurants/Marea/rest_marea_4.jpg",
+            "assets/Restaurants/Marea/rest_marea_5.jpg",
+            "assets/Restaurants/Marea/rest_marea_6.jpg",
+            "assets/Restaurants/Marea/rest_marea_7.jpg",
+            "assets/Restaurants/Marea/rest_marea_8.jpg",
+            "assets/Restaurants/Marea/rest_marea_9.jpg",
+            "assets/Restaurants/Marea/rest_marea_10.jpg",
+            "assets/Restaurants/Marea/rest_marea_11.jpg",
+            "assets/Restaurants/Marea/rest_marea_12.jpg"
+        ],
+        "logo": "assets/Restaurants/Marea/rest_marea_13.jpeg",
+        "pdfs": [
+            { "label": "Dessert Menu", "url": "assets/Restaurants/Marea/menu_marea_desserts.pdf" },
+            { "label": "Drinks Menu", "url": "assets/Restaurants/Marea/menu_marea_drinks.pdf" }
+        ]
+    },
+    "Birdie": {
+        "type": "food",
+        "title": "The Birdie",
+        "sub": "Tierra del Sol",
+        "area": "tierra",
+        "cuisine": "Tapas",
+        "desc": "Experience the \"Tapas Affair\" with breathtaking views. Located at Tierra del Sol, this spot offers a unique blend of small plates and scenic golf course vistas.",
+        "gallery": [
+            "assets/Restaurants/Birdie/rest_birdie_1.jpg",
+            "assets/Restaurants/Birdie/rest_birdie_2.jpg",
+            "assets/Restaurants/Birdie/rest_birdie_3.jpg",
+            "assets/Restaurants/Birdie/rest_birdie_4.jpg",
+            "assets/Restaurants/Birdie/rest_birdie_5.jpg",
+            "assets/Restaurants/Birdie/rest_birdie_6.jpg",
+            "assets/Restaurants/Birdie/rest_birdie_7.jpg"
+        ]
+    },
+    "Screaming": {
+        "type": "food",
+        "title": "Screaming Eagle",
+        "sub": "French Fusion",
+        "area": "partner",
+        "cuisine": "French fusion",
+        "desc": "Inspired by French-fusion cuisine, known for its \"Dinner in Bed\" experience. A chic and trendy spot offering innovative dishes and a romantic ambiance.",
+        "gallery": [
+            "assets/Restaurants/Screaming Eagle/rest_screaming_1.jpg",
+            "assets/Restaurants/Screaming Eagle/rest_screaming_2.jpg",
+            "assets/Restaurants/Screaming Eagle/rest_screaming_3.jpg",
+            "assets/Restaurants/Screaming Eagle/rest_screaming_4.jpg",
+            "assets/Restaurants/Screaming Eagle/rest_screaming_5.jpg"
+        ],
+        "pdf": "assets/Restaurants/Screaming Eagle/menu_screaming.pdf"
     }
 };

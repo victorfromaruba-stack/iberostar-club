@@ -1,112 +1,163 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="light" data-phase="day">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" content="#D4AF37">
-    <link rel="manifest" href="manifest.webmanifest">
-
-    <link rel="apple-touch-icon" href="assets/Logos/app_logo_club.png?v=200">
-    <link rel="shortcut icon" href="assets/Logos/app_logo_club.png?v=200" type="image/png">
-
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="preload" href="assets/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="assets/fonts/playfair-700.woff2" as="font" type="font/woff2" crossorigin>
-
-    <title>Iberostar Aruba</title>
-
-    <script src="js/image-utils.js" defer></script>
-    <script src="js/data.js" defer></script>
-    <script src="js/app.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" id="metaTheme" content="#FAF7F1">
+<meta name="description" content="Iberostar Aruba guest guide: dining, tours, spa, golf and our resorts on Eagle Beach.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
+<link rel="manifest" href="manifest.webmanifest?v=400">
+<link rel="apple-touch-icon" href="assets/Logos/app_logo_club.png?v=400">
+<link rel="icon" href="assets/Logos/app_logo_club.png?v=400" type="image/png">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-750x1334.png?v=400" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-1170x2532.png?v=400" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-1179x2556.png?v=400" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="assets/Logos/startup-1290x2796.png?v=400" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<script>
+/* BOOT — runs before first paint. Single source of the Aruba clock, NOAA sun times and
+   phase (js/lib.js wraps window.IB_TIME). Sets data-phase / data-theme / theme-color so
+   night visitors never see a light flash. Everything is try/catch'd. */
+(function(w,d){var R=Math.PI/180,T={},e=d.documentElement,G=function(s,k){try{return w[s].getItem(k)||''}catch(x){return''}};
+T.arubaNow=function(){var n=new Date(),p={};try{new Intl.DateTimeFormat('en-US',{timeZone:'America/Aruba',hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric',weekday:'long'}).formatToParts(n).forEach(function(x){p[x.type]=x.value})}catch(x){p={year:n.getFullYear(),month:n.getMonth()+1,day:n.getDate(),hour:n.getHours(),minute:n.getMinutes(),weekday:n.toLocaleDateString('en-US',{weekday:'long'})}}return{y:+p.year,mo:+p.month,d:+p.day,wd:p.weekday,m:p.hour%24*60+ +p.minute}};
+T.sunTimes=function(y,mo,dd){var N=Math.round((Date.UTC(y,mo-1,dd)-Date.UTC(y,0,0))/864e5),l=-70.0558/15,a=12.5711*R,o={};[6,18].forEach(function(b,i){var t=N+(b-l)/24,M=.9856*t-3.289,L=(M+1.916*Math.sin(M*R)+.02*Math.sin(2*M*R)+282.634+720)%360,A=(Math.atan(.91764*Math.tan(L*R))/R+360)%360,s=.39782*Math.sin(L*R),H=Math.acos((Math.cos(90.833*R)-s*Math.sin(a))/(Math.cos(Math.asin(s))*Math.cos(a)))/R;A=(A+Math.floor(L/90)*90-Math.floor(A/90)*90)/15;H=(i?H:360-H)/15;o[i?'set':'rise']=Math.round((H+A-.06571*t-6.622-l+92)%24*60)});return o};
+T.phaseAt=function(n){var s=T.sunTimes(n.y,n.mo,n.d),m=n.m,p=m>=s.rise-30&&m<660?'morning':m>=660&&m<s.set-75?'day':m>=s.set-75&&m<s.set+30?'sunset':'night';return{phase:p,late:p=='night'&&(m>=1380||m<s.rise-30),sun:s,now:n}};
+T.state=function(){var P=T.phaseAt(T.arubaNow()),o=G('sessionStorage','ib_time_override'),t=G('localStorage','ib_theme');if(/^(morning|day|sunset|night)$/.test(o)&&o!=P.phase){P.phase=o;P.late=false}else o='';P.override=o;P.pref=/^(light|dark)$/.test(t)?t:'auto';P.theme=P.pref!='auto'?P.pref:/^(morning|day)$/.test(P.phase)?'light':'dark';return P};
+T.apply=function(){var S=T.state(),m=d.getElementById('metaTheme');e.setAttribute('data-phase',S.phase);e.setAttribute('data-theme',S.theme);m&&m.setAttribute('content',S.theme=='dark'?'#07131F':'#FAF7F1');return S};
+try{var q=/[?&]time=(morning|day|sunset|night|auto)\b/.exec(location.search+'&'+location.hash);q&&(q[1]=='auto'?sessionStorage.removeItem('ib_time_override'):sessionStorage.setItem('ib_time_override',q[1]))}catch(x){}
+w.IB_TIME=T;try{T.apply()}catch(x){}})(window,document);
+</script>
+<link rel="preload" href="assets/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/inter-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/playfair-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/styles.css?v=400">
+<title>Iberostar Aruba</title>
+<script src="js/image-utils.js?v=400" defer></script>
+<script src="js/data.js?v=400" defer></script>
+<script src="js/media.js?v=400" defer></script>
+<script src="js/lib.js?v=400" defer></script>
+<script src="js/app.js?v=400" defer></script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
-    <a href="#mainContainer" class="skip-link">Skip to content</a>
+<svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <symbol id="i-today" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.75 18.5h18.5"/><path d="M6.5 18.5a5.5 5.5 0 0 1 11 0"/><path d="M12 11.25V8.75"/><path d="M7.05 13.55 5.64 12.14"/><path d="M16.95 13.55l1.41-1.41"/><path d="M8.5 21.5h7"/></symbol>
+  <symbol id="i-today-fill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.75 18.5h18.5"/><path d="M6.5 18.5a5.5 5.5 0 0 1 11 0z" fill="currentColor"/><path d="M12 11.25V8.75"/><path d="M7.05 13.55 5.64 12.14"/><path d="M16.95 13.55l1.41-1.41"/><path d="M8.5 21.5h7"/></symbol>
+  <symbol id="i-dine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.75 3v5.25a2.75 2.75 0 0 0 5.5 0V3"/><path d="M8.5 3v5"/><path d="M8.5 11v10"/><path d="M17.75 21V3c-2.3 1.6-3.75 4.4-3.75 8.25V14.5h3.75"/></symbol>
+  <symbol id="i-dine-fill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.75 3v5.25a2.75 2.75 0 0 0 5.5 0V3"/><path d="M8.5 3v5"/><path d="M8.5 11v10"/><path d="M17.75 21V3c-2.3 1.6-3.75 4.4-3.75 8.25V14.5h3.75" /><path d="M17.75 14.5H14v-3.25C14 7.4 15.45 4.6 17.75 3z" fill="currentColor"/></symbol>
+  <symbol id="i-explore" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.6 8.4-2.15 5.05L8.4 15.6l2.15-5.05z"/></symbol>
+  <symbol id="i-explore-fill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.6 8.4-2.15 5.05L8.4 15.6l2.15-5.05z" fill="currentColor"/></symbol>
+  <symbol id="i-spa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.25c1.95 1.95 3.05 4.5 3.05 7.4S13.95 17.1 12 18.9c-1.95-1.8-3.05-4.35-3.05-7.25S10.05 6.2 12 4.25z"/><path d="M9.6 18.7c-2.95-.35-5.45-2.3-6.35-5.55 1.95-.45 3.8-.15 5.4.8"/><path d="M14.4 18.7c2.95-.35 5.45-2.3 6.35-5.55-1.95-.45-3.8-.15-5.4.8"/><path d="M7 21.25h10"/></symbol>
+  <symbol id="i-spa-fill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.25c1.95 1.95 3.05 4.5 3.05 7.4S13.95 17.1 12 18.9c-1.95-1.8-3.05-4.35-3.05-7.25S10.05 6.2 12 4.25z" fill="currentColor"/><path d="M9.6 18.7c-2.95-.35-5.45-2.3-6.35-5.55 1.95-.45 3.8-.15 5.4.8"/><path d="M14.4 18.7c2.95-.35 5.45-2.3 6.35-5.55-1.95-.45-3.8-.15-5.4.8"/><path d="M7 21.25h10"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.25s-7.75-4.6-8.9-10.05C2.4 6.9 4.6 4.25 7.55 4.25c1.95 0 3.45 1.05 4.45 2.65 1-1.6 2.5-2.65 4.45-2.65 2.95 0 5.15 2.65 4.45 5.95-1.15 5.45-8.9 10.05-8.9 10.05z"/></symbol>
+  <symbol id="i-heart-fill" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.25s-7.75-4.6-8.9-10.05C2.4 6.9 4.6 4.25 7.55 4.25c1.95 0 3.45 1.05 4.45 2.65 1-1.6 2.5-2.65 4.45-2.65 2.95 0 5.15 2.65 4.45 5.95-1.15 5.45-8.9 10.05-8.9 10.05z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.75" cy="10.75" r="6.75"/><path d="m20 20-4.5-4.5"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5v11"/><path d="m8 7.25 4-4 4 4"/><path d="M8.5 10.5H7A1.75 1.75 0 0 0 5.25 12.25v7A1.75 1.75 0 0 0 7 21h10a1.75 1.75 0 0 0 1.75-1.75v-7A1.75 1.75 0 0 0 17 10.5h-1.5"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.75"/><path d="M12 7.25V12l3 2"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.25"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7.25A2.25 2.25 0 0 0 5 5.25v13.5A2.25 2.25 0 0 0 7.25 21h9.5A2.25 2.25 0 0 0 19 18.75V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 16.5h4"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M5 12h14"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.75"/><path d="M12 11v5.5"/><circle cx="12" cy="7.9" r=".6" fill="currentColor"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.25 8h13.5l-1 12.25H6.25z"/><path d="M9 8V6.75a3 3 0 0 1 6 0V8"/></symbol>
+  <symbol id="i-sail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 3v13.5"/><path d="M12.5 4.5 19 15h-6.5"/><path d="M10.5 7.5 5.5 15h5"/><path d="M3.5 18h17l-2.25 2.75H5.75z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="m12 3.5 2.6 5.3 5.85.85-4.23 4.12 1 5.83L12 16.85l-5.22 2.75 1-5.83-4.23-4.12 5.85-.85z"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 7.5h9M18 7.5h2M4 16.5h3M11 16.5h9"/><circle cx="15.5" cy="7.5" r="2.25"/><circle cx="8.5" cy="16.5" r="2.25"/></symbol>
+  <symbol id="i-wifi-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M8.7 15.8a4.7 4.7 0 0 1 6.1-.3"/><path d="M5.3 12.4a9.6 9.6 0 0 1 4.3-2.3"/><path d="M15 10.4a9.6 9.6 0 0 1 3.7 2"/><path d="M2 8.9a15 15 0 0 1 3.9-2.6"/><path d="M10.4 5.6A15 15 0 0 1 22 8.9"/><circle cx="12" cy="19.25" r=".75" fill="currentColor"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4l-8.5 8.5"/><path d="M18 14v4.5A1.5 1.5 0 0 1 16.5 20h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 21V3.5"/><path d="M6.5 4h11l-2.75 3.75L17.5 11.5h-11"/><path d="M3.5 21h7"/></symbol>
+  <symbol id="i-glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 4h15L12 12.5z"/><path d="M12 12.5V20"/><path d="M8 20.25h8"/><path d="M15.5 4l2.5-1.5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7.5 10.75 4.5 4.5 4.5-4.5"/><path d="M5 19.5h14"/></symbol>
+</svg>
 
-    <div class="ocean-waves" aria-hidden="true"></div>
-    <div class="palm-shadows" id="palmShadows" aria-hidden="true"></div>
-    <div class="night-glow" id="nightGlow" aria-hidden="true"></div>
-    <div class="clouds" id="clouds" aria-hidden="true"></div>
-    <div class="living-fish" id="fish" aria-hidden="true"></div>
-    <div class="living-dolphin" id="dolphin" aria-hidden="true"></div>
-    <div class="living-birds" id="birds" aria-hidden="true"></div>
-    <div class="fireflies" id="fireflies" aria-hidden="true"></div>
-    <div class="stars-overlay" id="stars" aria-hidden="true"></div>
-    <div class="living-star" id="shootingStar" aria-hidden="true"></div>
-    <div class="horizon-boat" id="boat" aria-hidden="true"></div>
-    <div id="modeToast" role="status" aria-live="polite">Mode: Auto</div>
+<div class="statusbar-scrim" aria-hidden="true"></div>
 
-    <div id="splash" aria-hidden="true">
-        <img id="splashLogo" src="assets/Logos/logo_club.png" alt="" class="splash-logo" onerror="handleImgError(this)">
-    </div>
-
-    <nav id="mainNav" aria-label="Sections">
-        <button class="nav-btn active" id="nav-club" onclick="nav('portfolio')" title="Club" aria-label="Club" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
-        <button class="nav-btn" id="nav-dining" onclick="nav('dining')" title="Dining" aria-label="Dining"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg></button>
-        <button class="nav-btn" id="nav-fun" onclick="nav('activities')" title="Fun" aria-label="Activities"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg></button>
-        <button class="nav-btn" id="nav-spa" onclick="nav('spa')" title="Wellness" aria-label="Wellness"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C9 7 4 9 4 14c0 3 3 5 8 5s8-2 8-5c0-5-5-7-8-12zm0 18c-4.4 0-8-1.8-8-5 0-2.4 2.3-4.5 5-5.8 1.5 1.7 3 3.4 3 5.8 0-2.4 1.5-4.1 3-5.8 2.7 1.3 5 3.4 5 5.8 0 3.2-3.6 5-8 5z"/></svg></button>
-        <button class="nav-btn" id="nav-golf" onclick="nav('golf')" title="Golf" aria-label="Golf"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 19.5c-1 0-1.7-.6-2.1-1.5l-2.9-6.2c-.2-.4-.3-.8-.3-1.3 0-.2 0-.4.1-.6l.5-1.9c.2-.8-.2-1.7-1-2L12 5.5c-.1 0-.2-.1-.3-.1-1 0-1.8.7-2 1.7l-.3 1.7c-.2.9-.9 1.6-1.8 1.9l-2.1.6C4.7 11.6 4 12.4 4 13.3v.2c0 1 .6 1.9 1.5 2.3l2.2.9c.8.3 1.3 1.1 1.3 1.9v1.1c0 1.5 1.2 2.8 2.8 2.8h5.9c1 0 1.8-.8 1.8-1.8v-1.2zm-10-17c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/></svg></button>
-        <button class="nav-btn" id="nav-store" onclick="nav('store')" title="Shopping" aria-label="Shopping"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg></button>
+<header class="topnav">
+  <div class="topnav__inner">
+    <a class="brand" href="#/today" aria-label="Iberostar Aruba, Today">
+      <img class="brand__img brand__img--ink" src="assets/Logos/logo_iberostar_ink.png" alt="" width="52" height="28" loading="lazy" data-noph>
+      <img class="brand__img brand__img--ivory" src="assets/Logos/logo_iberostar_ivory.png" alt="" width="52" height="28" loading="lazy" data-noph>
+      <span class="brand__word">Iberostar <em>Aruba</em></span>
+    </a>
+    <nav class="topnav__links" aria-label="Main">
+      <a class="topnav__link" href="#/today" data-tab="today">Today</a>
+      <a class="topnav__link" href="#/dine" data-tab="dine">Dine</a>
+      <a class="topnav__link" href="#/explore" data-tab="explore">Explore</a>
+      <a class="topnav__link" href="#/spa" data-tab="spa">Spa</a>
+      <a class="topnav__link" href="#/saved" data-tab="saved">Saved<span class="topnav__count" hidden></span></a>
     </nav>
+    <a class="topnav__search" href="#/search" data-action="open-search">
+      <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg><span>Search dining, tours, spa…</span>
+    </a>
+    <a class="icon-btn topnav__settings" href="#/settings" aria-label="Settings"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg></a>
+  </div>
+</header>
 
-    <main id="mainContainer">
-        <header>
-            <div class="header-top">
-                <img id="headerLogo" src="assets/Logos/logo_club.png" alt="Iberostar Aruba" class="header-logo" onerror="handleImgError(this)">
-                <div class="greeting-wrap" onclick="toggleTimeMode()" role="button" tabindex="0" aria-label="Toggle time-of-day theme" onkeydown="if(event.key==='Enter')toggleTimeMode()">
-                    <div class="greeting" id="greeting">Bon Bini</div>
-                    <div class="date-display" id="dateDisplay">...</div>
-                </div>
-            </div>
+<div class="appbar" aria-hidden="true">
+  <span class="appbar__title"></span>
+  <a class="icon-btn appbar__search" href="#/search" data-action="open-search" tabindex="-1" aria-label="Search"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></a>
+</div>
 
-            <h1 id="pageTitle" data-text="Iberostar Aruba">Iberostar Aruba</h1>
-            <p class="subtitle" id="pageSub">Experience the ultimate Iberostar hotels on Aruba.</p>
+<main id="main" tabindex="-1">
+  <section class="view view--today" data-view="today" aria-label="Today" hidden></section>
+  <section class="view" data-view="dine" aria-labelledby="h-dine" hidden></section>
+  <section class="view" data-view="explore" aria-labelledby="h-explore" hidden></section>
+  <section class="view" data-view="spa" aria-labelledby="h-spa" hidden></section>
+  <section class="view" data-view="saved" aria-labelledby="h-saved" hidden></section>
+  <section class="view" data-view="resorts" aria-labelledby="h-resorts" hidden></section>
+</main>
 
-            <div class="search-container" id="searchBox">
-                <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                <input type="text" id="searchInput" class="search-input" placeholder="Search experiences, shops, tags..." aria-label="Search experiences, shops, tags" onkeyup="filterContent()" onfocus="handleKeyboard(true)" onblur="handleKeyboard(false)">
-                <button class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="Clear search">✕</button>
-            </div>
-        </header>
+<nav class="tabbar" aria-label="Main">
+  <div class="tabbar__track">
+    <a class="tab" href="#/today" data-tab="today"><span class="tab__pill"><svg class="ic ic--off" aria-hidden="true"><use href="#i-today"/></svg><svg class="ic ic--on" aria-hidden="true"><use href="#i-today-fill"/></svg></span><span class="tab__label">Today</span></a>
+    <a class="tab" href="#/dine" data-tab="dine"><span class="tab__pill"><svg class="ic ic--off" aria-hidden="true"><use href="#i-dine"/></svg><svg class="ic ic--on" aria-hidden="true"><use href="#i-dine-fill"/></svg></span><span class="tab__label">Dine</span></a>
+    <a class="tab" href="#/explore" data-tab="explore"><span class="tab__pill"><svg class="ic ic--off" aria-hidden="true"><use href="#i-explore"/></svg><svg class="ic ic--on" aria-hidden="true"><use href="#i-explore-fill"/></svg></span><span class="tab__label">Explore</span></a>
+    <a class="tab" href="#/spa" data-tab="spa"><span class="tab__pill"><svg class="ic ic--off" aria-hidden="true"><use href="#i-spa"/></svg><svg class="ic ic--on" aria-hidden="true"><use href="#i-spa-fill"/></svg></span><span class="tab__label">Spa</span></a>
+    <a class="tab" href="#/saved" data-tab="saved" aria-label="Saved"><span class="tab__pill"><svg class="ic ic--off" aria-hidden="true"><use href="#i-heart"/></svg><svg class="ic ic--on" aria-hidden="true"><use href="#i-heart-fill"/></svg><span class="tab__badge" aria-hidden="true" hidden></span></span><span class="tab__label">Saved</span></a>
+  </div>
+</nav>
 
-        <div id="appContent"></div>
-    </main>
+<div id="live" class="sr-only" aria-live="polite"></div>
+<div class="toast-host" role="status" aria-live="polite"></div>
+<div class="net-pill" hidden><svg class="ic" aria-hidden="true"><use href="#i-wifi-off"/></svg>Offline · showing saved content</div>
+<div class="preview-pill" hidden>Preview: local edits · <button type="button" data-action="exit-preview">Exit</button></div>
 
-    <div class="modal-wrap" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="dTitle">
-        <div class="modal">
-            <div class="modal-drag-handle" aria-hidden="true"></div>
-            <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close" ontouchstart="closeModal(event)" onclick="closeModal(event)">✕</button>
-
-            <div class="modal-hero" onclick="launchLightbox(currentGallery, 0)" role="button" tabindex="0" aria-label="Expand photo" onkeydown="if(event.key==='Enter')launchLightbox(currentGallery, 0)">
-                <img id="dImg" alt="" onerror="handleImgError(this)" onload="handleImgLoad(this)">
-                <div class="image-spinner active" aria-hidden="true"></div>
-                <div style="position:absolute; bottom:20px; right:20px; background:rgba(0,0,0,0.65); padding:8px 16px; border-radius:20px; color:#FFFFFF; font-size:11px; font-weight:800; backdrop-filter:blur(15px); -webkit-backdrop-filter:blur(15px); border: 1px solid rgba(255,255,255,0.2); box-shadow:0 4px 16px rgba(0,0,0,0.3); letter-spacing:1px; pointer-events:none; z-index:20;" aria-hidden="true">TAP TO EXPAND</div>
-            </div>
-
-            <div class="modal-content" id="modalContentScroll">
-                <div class="modal-meta"><span id="dSub">SUBTITLE</span><h2 id="dTitle">Title</h2></div>
-                <div class="action-bar" id="dAction"></div>
-                <div id="dInfoGrid" class="info-grid"></div>
-                <div id="dDetails" class="details-section"></div>
-                <p class="modal-desc" id="dDesc">Description.</p>
-                <h4 id="dGalleryHeading" style="margin-top:50px; color:var(--text-main); font-size:1.6rem; letter-spacing:-0.5px; font-family:var(--font-head); font-weight:700;">Gallery</h4>
-                <div class="gallery-scroller" id="dGallery"></div>
-            </div>
-        </div>
+<!-- Overlays: all start hidden; managed by Overlay.open/close in js/app.js -->
+<div id="ovDetail" class="ov sheet" role="dialog" aria-modal="true" aria-labelledby="dTitle" hidden>
+  <div class="sheet__scrim" data-action="close"></div>
+  <div class="sheet__panel">
+    <div class="sheet__grabber" aria-hidden="true"></div>
+    <div class="sheet__topbar">
+      <button type="button" class="icon-btn sheet__topclose" data-action="close" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></button>
+      <span class="sheet__toptitle" aria-hidden="true"></span>
+      <button type="button" class="icon-btn save save--plain sheet__topsave" data-action="save" aria-pressed="false" aria-label="Save"><svg class="ic ic--off" aria-hidden="true"><use href="#i-heart"/></svg><svg class="ic ic--on" aria-hidden="true"><use href="#i-heart-fill"/></svg></button>
     </div>
-
-    <div class="fs-viewer" id="fsViewer" role="dialog" aria-modal="true" aria-label="Photo viewer">
-        <button class="fs-close" onclick="closeFs()" aria-label="Close photo viewer">✕</button>
-        <button class="fs-nav fs-prev" id="fsPrev" onclick="prevFs()" aria-label="Previous photo">‹</button>
-        <button class="fs-nav fs-next" id="fsNext" onclick="nextFs()" aria-label="Next photo">›</button>
-        <div class="fs-backdrop" id="fsBackdrop" aria-hidden="true"></div>
-        <div id="fsContent" style="position:relative; width:100%; height:100%; display:flex; align-items:center; justify-content:center; -webkit-overflow-scrolling: touch;"></div>
-        <div class="fs-caption" id="fsCaption">1 / 5</div>
+    <button type="button" class="icon-btn on-photo sheet__close" data-action="close" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></button>
+    <button type="button" class="icon-btn on-photo save sheet__save" data-action="save" aria-pressed="false" aria-label="Save"><svg class="ic ic--off" aria-hidden="true"><use href="#i-heart"/></svg><svg class="ic ic--on" aria-hidden="true"><use href="#i-heart-fill"/></svg></button>
+    <button type="button" class="icon-btn sheet__lgclose" data-action="close" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
+    <div class="sheet__scroll">
+      <div class="dhero"></div>
+      <div class="dbody"></div>
     </div>
-
+    <div class="sheet__actions"></div>
+  </div>
+</div>
+<div id="ovSearch" class="ov search" role="dialog" aria-modal="true" aria-label="Search" hidden></div>
+<div id="ovLightbox" class="ov lightbox" role="dialog" aria-modal="true" aria-label="Photos" hidden></div>
+<div id="ovMedia" class="ov media" role="dialog" aria-modal="true" aria-label="Video tour" hidden></div>
+<div id="ovAction" class="ov sheet sheet--auto" role="dialog" aria-modal="true" aria-labelledby="acTitle" hidden></div>
+<div id="ovRequest" class="ov sheet sheet--auto" role="dialog" aria-modal="true" aria-labelledby="rqTitle" hidden></div>
+<div id="ovTicket" class="ov ticket" role="dialog" aria-modal="true" aria-labelledby="tkTitle" hidden></div>
+<div id="ovSettings" class="ov sheet sheet--auto" role="dialog" aria-modal="true" aria-labelledby="stTitle" hidden></div>
 </body>
 </html>
