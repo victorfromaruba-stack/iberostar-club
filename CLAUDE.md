@@ -47,12 +47,14 @@ per-weight woff2 files, then add the file, its `@font-face` block, and the `sw.j
 ## The version rule (do not skip)
 
 `DATA_VERSION` in `js/app.js` **and** `js/admin.js`, `VERSION` in `sw.js`, and **every** local
-`?v=NNN` in `index.html` and `admin.html` must be equal (currently **400**). Bump them all
-together whenever you change anything guests download (data, JS, CSS). The new `VERSION` creates a
-fresh `ib-shell-<VERSION>` cache; returning guests see "Updated info available · Refresh" (or switch
-silently when the page already runs the new release). `?v=` files are served **cache-first and
-treated as immutable per release** by the service worker, so a shipped JS/CSS/data change without a
-version bump never reaches returning guests. `node scripts/verify.js` fails if they drift.
+`?v=NNN` in `index.html` and `admin.html` must be equal, and above the number on `main` (what guests
+have; `node .claude/skills/release/bump-version.js --check` shows both). Bump them all together
+whenever you change anything guests download (data, JS, CSS); `bump-version.js` does it, once per
+release. The new `VERSION` creates a fresh `ib-shell-<VERSION>` cache; returning guests see
+"Updated info available · Refresh" (or switch silently when the page already runs the new release).
+`?v=` files are served **cache-first and treated as immutable per release** by the service worker,
+so a shipped JS/CSS/data change without a version bump never reaches returning guests.
+`node scripts/verify.js` fails if they drift.
 
 ## Data model (`js/data.js`)
 
@@ -194,7 +196,8 @@ checks this).
 ## Service worker (`sw.js`)
 
 - Registered by `app.js` (`sw.js`, scope `./`) after first render, on HTTPS/localhost only.
-  `app.js` calls `registration.update()` on resume and every 30 min (throttled).
+  `app.js` calls `registration.update()` on resume and while open, at most once every 30 min
+  (`checkForUpdate`).
 - Caches: `ib-shell-<VERSION>` (shell: `?v=<VERSION>` files cache-first and pinned to this release;
   `?v=<other>` files only ever from that release's own cache or the network; navigations network-first
   with a 3 s timeout, stored only when the page references this release; only the app's own URLs
@@ -246,3 +249,11 @@ no comma-splitting of itinerary/essentials; (10) every CSS `url()` exists, unuse
   sibling save button; headings follow h1 (view) → h2 (groups/sheet title) → h3 (cards/sections).
   Inputs are ≥16px. No inline `on*` handlers or `javascript:` URLs (verify.js lints this).
 - Write descriptive commit messages (the old history is a run of "Update index.html").
+
+## Project skills (`.claude/skills/`)
+
+| Skill | Use it to | Helpers in the skill folder |
+|---|---|---|
+| `add-content` | Add, update, mark coming-soon or remove a resort, restaurant, tour, spa, golf or shop item, its photos and menus | `to_jpg.py` (HEIC/oversized photos → upright, named JPEGs in the repo), `check-item.js` (how the app parses an item, format mistakes; `--files <Key>` before a removal) |
+| `release` | Ship to GitHub Pages (`main`): bump, build, verify, commit, push or merge, confirm live; rollback and kill switch | `bump-version.js` (the version rule in one command: fetches main, bumps once per release, always above main, settles version-only conflicts), `check-live.sh` (is main's commit deployed and this release served?) |
+| `preview` | Serve locally and screenshot the guest app and admin (iPhone 13 + 1440×900, day/night, lobby mode; a new item's card, search result, sheet and photos) with console/404/overflow/missing-card checks | `preview.js` (Playwright; `--check` tests the setup; `NODE_PATH=…` on the same command line if Playwright is installed elsewhere) |
