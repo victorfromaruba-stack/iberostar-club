@@ -1245,6 +1245,8 @@ let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e){}
 for (const [k, v] of Object.entries(blank())) if (typeof S[k] !== typeof v || (Array.isArray(v) && !Array.isArray(S[k]))) S[k] = v;
 if (S.daily.last && !S.days.includes(S.daily.last)) S.days.push(S.daily.last);
+/* Levels can get shorter between versions: a saved best run never shows more than the level has. */
+for (const id of Object.keys(S.best)){ const L = LEVELS.find(l => l.id === id); if (L) S.best[id] = Math.min(S.best[id], levelTotal(L)); }
 function save(sync = true){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} if (sync) queueSync(); }
 
 function reviewInfo(id){
@@ -2295,7 +2297,7 @@ function personHTML(p){
       <span class="pstreak${st.d ? "" : " off"}" title="Day streak">${icon("flame")}<b>${num(st.d, 9999)}</b></span></button>
     <div class="pdetail" hidden>
       <div class="grid2"><div class="statbox" style="color:var(--sun-2)">${icon("star")}<b style="color:var(--ink)">${nf(st.x||p.xp||0)}</b><span>XP</span></div><div class="statbox" style="color:var(--fire)">${icon("flame")}<b style="color:var(--ink)">${num(st.d, 9999)}</b><span>day streak</span></div><div class="statbox" style="color:var(--sea)">${icon("bolt")}<b style="color:var(--ink)">${num(st.l, 999)}</b><span>Lightning record</span></div><div class="statbox" style="color:var(--flamingo)">${icon("mic")}<b style="color:var(--ink)">${num(st.sl, 999)}/${Object.keys(SCRIPT_LINES).length}</b><span>script lines said</span></div></div>
-      <ul class="lvl-list">${LEVEL_IDS.map(id => `<li><span>${esc(byId(id).name)}</span>${m[id] ? `<span class="ok-t">mastered${m[id] > 1 ? ` ×${num(m[id], 999)}` : ""}</span>` : `<span class="no-t">${st.b && st.b[id] ? `best ${num(st.b[id], 999)}/${levelTotal(byId(id))}` : "not yet"}</span>`}</li>`).join("")}</ul>
+      <ul class="lvl-list">${LEVEL_IDS.map(id => `<li><span>${esc(byId(id).name)}</span>${m[id] ? `<span class="ok-t">mastered${m[id] > 1 ? ` ×${num(m[id], 999)}` : ""}</span>` : `<span class="no-t">${st.b && st.b[id] ? `best ${Math.min(num(st.b[id], 999), levelTotal(byId(id)))}/${levelTotal(byId(id))}` : "not yet"}</span>`}</li>`).join("")}</ul>
       ${Array.isArray(st.w) && st.w.length ? `<div><p class="eyebrow">Misses most</p><ul class="weak" style="padding-left:18px">${st.w.filter(([id]) => QBY[id]).slice(0,5).map(([id, n]) => `<li>${esc(QBY[id].q)} <span class="small muted">· ${num(n, 9999)}×</span><br><span class="ans">${esc(answerText(QBY[id]))}</span></li>`).join("")}</ul></div>` : ""}
       ${p.dupe ? `<p class="small muted">Another entry has the same name. If it's the same person on a new phone, hide the older one.</p>` : ""}
       ${p.pasted ? "" : `<button class="btn small ghost" data-hide="${esc(p.device)}">Hide this entry</button>`}
