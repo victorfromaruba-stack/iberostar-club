@@ -2443,7 +2443,7 @@ function renderPanel(keepScroll){
   <section class="tp-tiles" aria-label="Team summary">
     ${tile("crown", "t-sun", `${ready}<small> of ${n}</small>`, "Ready", "Passed the Final")}
     ${tile("flame", "t-good", `${week}<small> of ${n}</small>`, "Active this week", "Did a lesson in the last 7 days")}
-    ${tile("user", "t-fire", nudge.length, "Need a nudge", `No lesson in ${NUDGE_DAYS}+ days, not ready yet`)}
+    ${tile("user", "t-fire", nudge.length, "Need a nudge", `No lessons yet, or none in ${NUDGE_DAYS}+ days`)}
     ${tile("check", "t-sea", answers >= 20 ? `${pct(right, answers)}%` : "–", "Right answers", answers >= 20 ? `${nf(answers)} answers in lessons` : "Shows once they've answered 20")}
   </section>
   <section class="tp-card" aria-labelledby="kwH">
@@ -2473,6 +2473,7 @@ function renderPanel(keepScroll){
     <li>Mastered: they finished the level with no mistakes. It comes back for review after 1, 3, 7, 14 and 30 days.</li>
     <li>Started: they tried it but haven't done a clean run yet. The fill shows their best run.</li>
     <li>Ready: they passed the Final, 20 questions in a row.</li>
+    <li>Need a nudge: not ready yet, and either no lessons yet or none in the last ${NUDGE_DAYS} days.</li>
     <li>Right answers: every answer they gave in lessons since this update.</li>
     <li>Progress arrives from each phone after every answer, when it has internet.</li></ul></details>
   <details class="card"><summary>Change the manager code</summary><form class="name-form" id="newCode"><input class="field" id="nc" autocomplete="off" autocapitalize="characters" placeholder="New code, 6+ letters or numbers" aria-label="New manager code"><button class="btn small">Save</button></form><p class="small muted">Every manager will need the new code.</p></details>
