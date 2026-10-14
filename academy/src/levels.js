@@ -16,7 +16,7 @@ const LEVELS = [
       "Both fluent in English, or both fluent in Spanish.",
       "Staying at a hotel, timeshare or rental, and paying for it." ] },
     { h: "Central and South America and the Caribbean: full gift (Q)", li: [
-      "Not Aruba, Cuba, Venezuela, Haiti or Ecuador.",
+      "Mexico counts as Central America. Not Aruba, Cuba, Venezuela, Haiti or Ecuador.",
       "Ages 40 to 60. The man's age counts.",
       "Married or living together. No singles.",
       "One of them must work. No retirees.",
@@ -39,12 +39,12 @@ const LEVELS = [
     Q("q9","How long is the presentation?","90 minutes, breakfast included",["45 minutes, plus a full breakfast","30 minutes, breakfast is after","2 hours, breakfast included"],"90 minutes, and that includes breakfast."),
     Q("q10","How much free time do they need that morning?","3 hours, with no paid activities",["90 minutes, the length of the tour","2 hours, paid plans after are fine","Just until breakfast is over"],"The presentation is 90 minutes, but they need 3 free hours with nothing paid booked."),
     Q("q11","It's their departure day. When can they still tour?","At least 4 hours before pickup, or 5 before the flight if they rent a car",["At least 2 hours before pickup, or 3 before the flight if they rent a car","Any time, as long as it's before they check out of their hotel","They can't take the tour at all on the day they fly back home"],"At least 4 hours before airport pickup, or 5 hours before the flight if they drive a rental car."),
-    Q("q12","A couple from Colombia, Peru or Panama. What ages get the full gift?","40 to 60",["32 to 70","45 to 55","35 to 65"],"Central and South America and the Caribbean: 40 to 60, the man's age."),
-    Q("q13","Which countries are left out of the rules for Central and South America and the Caribbean?","Aruba, Cuba, Venezuela, Haiti, Ecuador",["Bolivia, Brazil, Chile, Peru, Uruguay","Colombia, Peru, Panama, Chile, Belize","Costa Rica, Panama, Jamaica, Belize, Bahamas"],"Guests from Aruba, Cuba, Venezuela, Haiti and Ecuador get no gift (NQ)."),
+    Q("q12","A couple from Mexico, Colombia or Peru. What ages get the full gift?","40 to 60",["32 to 70","45 to 55","35 to 65"],"Central and South America and the Caribbean: 40 to 60, the man's age."),
+    Q("q13","Which countries are left out of the rules for Central and South America and the Caribbean?","Aruba, Cuba, Venezuela, Haiti, Ecuador",["Bolivia, Brazil, Chile, Peru, Uruguay","Mexico, Colombia, Peru, Panama, Chile","Costa Rica, Panama, Jamaica, Belize, Bahamas"],"Guests from Aruba, Cuba, Venezuela, Haiti and Ecuador get no gift (NQ)."),
     Q("q14","A couple from Colombia, both 55, both retired. Which gift?","No gift (NQ): one must be working",["Full gift (Q): retired is fine","Half gift (CT): they're retired","Full gift (Q), with a Visa"],"Central and South America and the Caribbean: one of them must work. No retirees."),
     Q("q15","A couple from Central or South America, or the Caribbean. Which card does NOT work?","Discover",["Visa","Mastercard","American Express"],"Only Visa, Mastercard or American Express. Discover works only for the USA and Canada."),
     Q("q16","A couple from Argentina. What ages get the full gift?","45 to 55",["40 to 60","32 to 70","35 to 70"],"Argentina: 45 to 55, the man's age."),
-    MATCH("mq","Match each guest to their full-gift (Q) ages",[["USA or Canada couple","32 to 70"],["Colombian couple","40 to 60"],["Argentinian couple","45 to 55"],["USA single woman","40 to 65"]],"Full gift: USA and Canada 32 to 70, Colombia 40 to 60, Argentina 45 to 55, USA single women 40 to 65.")
+    MATCH("mq","Match each guest to their full-gift (Q) ages",[["USA or Canada couple","32 to 70"],["Mexican couple","40 to 60"],["Argentinian couple","45 to 55"],["USA single woman","40 to 65"]],"Full gift: USA and Canada 32 to 70, Mexico 40 to 60, Argentina 45 to 55, USA single women 40 to 65.")
   ]
 },
 {
@@ -102,7 +102,7 @@ const LEVELS = [
   gen: true, count: 12,
   notes: [
     { h: "Check a couple in this order", li: [
-      "Where are they from? USA or Canada, Argentina, or Central and South America and the Caribbean (not Aruba, Cuba, Venezuela, Haiti or Ecuador). Anyone else, like Europeans: NQ.",
+      "Where are they from? USA or Canada, Argentina, or Central America (Mexico too), South America and the Caribbean (not Aruba, Cuba, Venezuela, Haiti or Ecuador). Anyone else, like Europeans: NQ.",
       "How old is the man? Which age band is that?",
       "Are they a couple? Singles: only USA women, 40 to 65.",
       "Do they work? Retired is OK for USA and Canada only.",
@@ -190,7 +190,8 @@ const LEVELS = [
       "No high pressure and no obligation to book or buy." ] },
     { h: "What to bring", li: [
       "Their invitation, so they get everything they were promised.",
-      "Every adult: 2 forms of ID, like a driver's license or passport, and a credit card." ] },
+      "Every adult: 2 forms of ID, like a driver's license or passport.",
+      "A credit card: only one of them needs to bring one." ] },
     { h: "Our partners", li: [
       "At Joia: Marea, Bucatini, Gaia and the Zima rooftop bar.",
       "Dining around the island: Gianni's, Daniel's Steak & Chop, Azzurro, Azia, Amore Mio, Screaming Eagle, Dushi Bagels & Burgers, and The Birdie at Tierra del Sol.",
@@ -203,7 +204,7 @@ const LEVELS = [
     Q("o5","How does the free taxi work?","They take a taxi, and we pay both ways",["We send our own shuttle to their hotel","We pay for the ride there, not back","Only Iberostar hotel guests get a taxi"],"They arrange the taxi. We pay the fare when they arrive and again when they leave."),
     Q("o7","What is the Island Gift?","IberoCash for Aruba's top places",["A free night at the Joia hotel","Cash handed out at the desk","A discount on a timeshare week"],"A thank-you for their time, to use for dining, shopping, activities and rentals."),
     Q("o8","Where can guests use IberoCash?","Dining, shopping, activities, rentals",["Flights, hotels, cruises, trains","Groceries, gas, pharmacy, phone bills","Casino, lottery, bets, ATM cash"],"The pitch deck lists dining, shopping, activities and rentals."),
-    Q("o14","What does every adult bring?","2 forms of ID and a credit card",["Only the invitation, nothing more","Their hotel key card and receipt","One ID for the whole couple"],"Two IDs, like a driver's license or passport, and a credit card. Plus the invitation."),
+    Q("o14","Besides the invitation, what do they bring?","2 IDs each, and one credit card",["2 IDs each, and a credit card each","Only the invitation, nothing more","Their hotel key card and receipt"],"Every adult brings 2 forms of ID, like a driver's license or passport. One credit card for the couple is enough."),
     LINE("o15","Members book direct at ___ rates through our loyalty club.","wholesale",["retail","timeshare","weekly"],"Members book direct at wholesale rates. We don't sell timeshare: no weeks, points or maintenance fees."),
     LINE("o16","We ask for 90 minutes, including breakfast, the tour and information on ___.","booking direct",["buying a week","points and fees","the casino"],"Short and sweet: 90 minutes, including the breakfast, the property tour and information on booking direct."),
     Q("o18","How does the pitch deck describe Iberostar The Club?","The newest, most luxurious way to travel",["A timeshare with weeks, points and fees","A members-only resort here in Aruba","The most affordable way to take a cruise"],"The pitch deck calls Iberostar The Club the newest and most luxurious way to travel."),

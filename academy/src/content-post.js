@@ -91,7 +91,7 @@ function genScenario(){
       g, why:`USA and Canada: the man's age counts. He's ${his}, ${g==="Q" ? "between 32 and 70, so the full gift (Q)" : g==="CT" ? (his >= 71 ? "71 or older, so the half gift (CT)" : "between 28 and 31, so the half gift (CT)") : "under 28, so no gift (NQ)"}.` };
   }
   if (r < 0.65){
-    const from = pick(["Colombia","Peru","Chile","Uruguay","Costa Rica","Panama","the Dominican Republic","Guatemala","Bolivia"]);
+    const from = pick(["Mexico","Colombia","Peru","Chile","Uruguay","Costa Rica","Panama","the Dominican Republic","Guatemala","Bolivia"]);
     const his = pick([36,38,39,40,41,48,55,59,60,61,63]), her = herAge(his, bandLat);
     const card = pick(["Visa","Mastercard","Amex"]);
     const g = bandLat(his);
@@ -120,7 +120,7 @@ const FIXED_SCEN = [
   ["Couple from the USA, both 50. He's an active-duty Marine.","NQ","Active US military get no gift."],
   ["Married couple from the USA, both 50. He's in the National Guard. They have a Visa and are paying for their hotel.","Q","The National Guard is OK, and 50 is between 32 and 70."],
   ["Couple from the USA, both 44. She's a flight attendant for a US airline.","NQ","Airline pilots and crew get no gift."],
-  ["Married couple from Colombia, both 50. Both work. Their only card is a Discover.","NQ","Colombia needs Visa, Mastercard or Amex. Discover works only for the USA and Canada."],
+  ["Married couple from Mexico, both 50. Both work. Their only card is a Discover.","NQ","Mexico needs Visa, Mastercard or Amex. Discover works only for the USA and Canada."],
   ["Married couple from the USA. He's 69, she's 72. Retired, with an Amex, paying for their hotel.","Q","The man's age counts: 69 is between 32 and 70."],
   ["Married couple from the USA. He's 74, she's 72. Retired, with a Visa, paying for their timeshare.","CT","He's 74, so 71 or older: the half gift."],
   ["Married same-sex couple from Chicago, 45 and 52. Both work, with a Visa, paying for their hotel.","Q","Either partner's age counts, and both are between 32 and 70."],

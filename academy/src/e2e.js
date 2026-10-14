@@ -190,11 +190,11 @@ const EVIL = [
       let want;
       if (/Venezuela|Ecuador|Haiti|Cuba/.test(s.q)) want = "NQ";
       else if (/Argentina/.test(s.q)) want = bandArg(his);
-      else if (/Colombia|Peru|Chile|Uruguay|Costa Rica|Panama|Dominican|Guatemala|Bolivia/.test(s.q)) want = bandLat(his);
+      else if (/Mexico|Colombia|Peru|Chile|Uruguay|Costa Rica|Panama|Dominican|Guatemala|Bolivia/.test(s.q)) want = bandLat(his);
       else want = bandUSA(his);
       if (want !== s.g) errs.push(s.q + " → " + s.g);
-      // The PDF doesn't say which rules Mexico follows, and Brazil or Quebec cards leave the language in doubt.
-      if (/Mexico|Brazil|Quebec/.test(s.q)) errs.push("region or language in doubt " + s.q);
+      // Brazil or Quebec cards would leave the language rule in doubt.
+      if (/Brazil|Quebec/.test(s.q)) errs.push("language in doubt " + s.q);
       if (/Argentina/.test(s.q) && bandArg(his) !== "Q" && bandArg(her) !== bandArg(his)) errs.push("mixed band " + s.q);
     }
     return errs.slice(0, 3);
