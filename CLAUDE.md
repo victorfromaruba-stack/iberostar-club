@@ -32,6 +32,15 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
 - `assets/` — all media (jpg/png/pdf/mp4), in per-category subfolders: `Hotels/`, `Restaurants/`,
   `Spa/`, `Golf/`, `Activities/`, `Logos/`, each with per-property subfolders below that.
   `assets/fonts/` holds the self-hosted Inter/Playfair Display woff2 files (see Fonts below).
+- `academy/` — **staff-only**, unlinked from the guest app (like `admin.html`): "Show-Up Academy",
+  a training game for OPCs on guest qualifications and the Open House invitation pitch. Served at
+  `https://victorfromaruba-stack.github.io/iberostar-club/academy/`. It's self-contained and shares
+  nothing with the guest app: `academy/index.html` holds all its CSS and JS inline (content lives
+  in the `LEVELS`, `MAP_STEPS` and `CLIPS` constants at the top of its script), plus
+  `academy/audio/` (the trainer's voice notes, MP3; `CLIPS` holds their timed transcripts),
+  `academy/img/` (the Open House flyer and partner sheet), and its own `manifest.webmanifest` and
+  icons for Add to Home Screen. It has `noindex`. Progress is per device in
+  `localStorage['showup.v1']`. Don't link it from guest pages.
 - `scripts/verify.js` — zero-dependency Node script, run with `node scripts/verify.js`. Checks
   every `gallery`/`pdf`/`video`/`partnerLogo`/`pdfs[]` path in `data.js` resolves to a real file,
   that `DATA_VERSION` matches between `app.js`/`admin.js`, and that no responsive CSS rule resets

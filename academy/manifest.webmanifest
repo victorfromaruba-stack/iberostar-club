@@ -1,0 +1,17 @@
+{
+    "name": "Show-Up Academy",
+    "short_name": "Show-Up",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#eef6f6",
+    "theme_color": "#0a6b78",
+    "icons": [
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

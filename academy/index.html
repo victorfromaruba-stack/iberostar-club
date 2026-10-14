@@ -1,0 +1,1464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Staff training for OPCs: Aruba guest qualifications and the Open House invitation pitch.">
+<meta name="theme-color" content="#0a6b78">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Show-Up">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-512.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}</style>
+<title>Show-Up Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one phone-width column. The worker's pass on top; every level, question and game is printed on an "invitation" ticket with a perforated stub. */
+:root{
+  --bg:#eef6f6; --surface:#ffffff; --sunk:#e2eeef; --ink:#0d2a30; --muted:#4f6a70; --line:#cfe1e2;
+  --lagoon:#0a6b78; --lagoon-ink:#ffffff; --sun:#f5b301; --sun-ink:#3b2a00;
+  --good:#16834a; --good-bg:#e3f5ea; --bad:#c8323b; --bad-bg:#fbe7e8; --lock:#8fa5a8;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#071a1e; --surface:#0e272d; --sunk:#0a2126; --ink:#e4f1f2; --muted:#93adb1; --line:#1f3f46;
+  --lagoon:#3cc3d1; --lagoon-ink:#04191c; --sun:#ffc93c; --sun-ink:#2a1e00;
+  --good:#4fd18a; --good-bg:#0f3423; --bad:#ff6b72; --bad-bg:#3a1418; --lock:#4e6a6f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#071a1e; --surface:#0e272d; --sunk:#0a2126; --ink:#e4f1f2; --muted:#93adb1; --line:#1f3f46;
+  --lagoon:#3cc3d1; --lagoon-ink:#04191c; --sun:#ffc93c; --sun-ink:#2a1e00;
+  --good:#4fd18a; --good-bg:#0f3423; --bad:#ff6b72; --bad-bg:#3a1418; --lock:#4e6a6f; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);padding-inline:16px;padding-block:20px 56px}
+#app{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--f-display);line-height:1.1;margin:0;text-wrap:balance}
+p{margin:0}
+ul,ol{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--lagoon)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.eyebrow{font:700 12px/1.2 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* Buttons */
+.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:700;background:var(--lagoon);color:var(--lagoon-ink);min-height:44px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.sun{background:var(--sun);color:var(--sun-ink)}
+.btn.danger{background:var(--bad);color:var(--surface)}
+.btn.wide{width:100%;font-size:17px;padding:14px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.link{background:none;border:0;padding:4px 0;color:var(--muted);text-decoration:underline;font-size:14px;min-height:32px}
+
+/* Worker's pass */
+.pass{display:grid;grid-template-columns:1fr 84px;background:var(--lagoon);color:var(--lagoon-ink);border-radius:18px;position:relative;overflow:hidden}
+.pass .main{padding:18px 18px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.pass .eyebrow{color:inherit;opacity:.8}
+.pass h1{font-size:32px;font-weight:800;letter-spacing:-.02em}
+.pass .who{font-size:15px;display:flex;flex-wrap:wrap;gap:4px 12px}
+.pass .who b{font-family:var(--f-mono);font-weight:700}
+.pass .stub{border-left:2px dashed color-mix(in srgb,var(--lagoon-ink) 45%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;font-family:var(--f-mono)}
+.pass .stub b{font-size:24px;line-height:1}
+.pass .stub span{font-size:10px;letter-spacing:.12em}
+.pass::before,.pass::after,.ticket::before,.ticket::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:var(--bg)}
+.pass::before,.pass::after{right:76px}
+.pass::before{top:-8px}.pass::after{bottom:-8px}
+
+.name-row{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+.name-row label{flex-basis:100%}
+.name-row input{flex:1 1 180px;min-width:0;padding:12px 14px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit}
+
+/* Next up */
+.today{background:var(--surface);border:2px solid var(--sun);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.today h2{font-size:22px}
+
+/* Tracks and levels */
+.track{display:flex;flex-direction:column;gap:10px}
+.track-h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.track-h h2{font-size:24px;font-weight:800}
+.level{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center}
+.level .num{grid-row:span 2;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:700 15px/1 var(--f-mono);border:2px solid var(--lagoon);color:var(--lagoon)}
+.level.done .num{background:var(--lagoon);color:var(--lagoon-ink)}
+.level.locked{opacity:.62}
+.level.locked .num{border-color:var(--lock);color:var(--lock)}
+.level h3{font-size:19px}
+.level .meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+.level .actions{grid-column:2;display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.level.final{border:2px solid var(--lagoon)}
+.chip{font:700 11px/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.due{background:var(--sun);border-color:var(--sun);color:var(--sun-ink)}
+.chip.ok{background:var(--good-bg);border-color:transparent;color:var(--good)}
+
+/* Games */
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.game-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.game-card h3{font-size:19px}
+.game-card .big{font:700 28px/1 var(--f-mono)}
+.game-card .btn{margin-top:auto}
+.game-card.locked{opacity:.62}
+@media (max-width:420px){.games{grid-template-columns:1fr}}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.panel h3{font-size:19px}
+.weak ul{padding-left:18px;display:flex;flex-direction:column;gap:8px}
+.ans{color:var(--good);font-weight:700}
+.method{padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;gap:12px}
+.topbar .x{width:44px;height:44px;border-radius:10px;border:2px solid var(--line);background:var(--surface);font:700 18px/1 var(--f-mono);flex:none}
+.topbar .t{flex:1;min-width:0}
+.topbar .t h2{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Study */
+.note{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.note h3{font-size:18px}
+.note ul{padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.say{border-left:4px solid var(--sun);padding:6px 0 6px 12px;font-style:italic}
+.flyer{margin:0;display:flex;flex-direction:column;gap:6px}
+.flyer img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:var(--sunk)}
+
+/* Game HUD */
+.streak{display:flex;align-items:baseline;gap:6px;background:var(--sun);color:var(--sun-ink);padding:6px 12px;border-radius:999px;font:700 14px/1.2 var(--f-mono);flex:none}
+.streak.pop{animation:pop .35s ease}
+@keyframes pop{50%{transform:scale(1.18)}}
+.bar{display:flex;gap:3px;height:8px}
+.bar i{flex:1;border-radius:3px;background:var(--line)}
+.bar i.on{background:var(--lagoon)}
+.bar i.best{background:color-mix(in srgb,var(--sun) 55%,var(--line))}
+
+/* Ticket */
+.ticket{background:var(--surface);border:1px solid var(--line);border-radius:16px;display:grid;grid-template-columns:1fr 64px;position:relative}
+.ticket .body{padding:20px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ticket .stub{border-left:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--sunk);border-radius:0 15px 15px 0;font-family:var(--f-mono)}
+.ticket .stub b{font-size:22px;color:var(--lagoon)}
+.ticket .stub span{font-size:10px;letter-spacing:.1em;color:var(--muted)}
+.ticket::before,.ticket::after{right:56px;border:1px solid var(--line)}
+.ticket::before{top:-9px;clip-path:inset(50% 0 0 0)}
+.ticket::after{bottom:-9px;clip-path:inset(0 0 50% 0)}
+.ticket .q{font:700 21px/1.3 var(--f-display);text-wrap:pretty}
+.ticket.shake{animation:shake .4s ease}
+@keyframes shake{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.blank{display:inline-block;min-width:3.2em;border-bottom:3px solid var(--sun);text-align:center;color:var(--muted)}
+
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:center;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:12px 14px;min-height:56px;transition:border-color .15s,transform .1s}
+.opt:hover:not(:disabled){border-color:var(--lagoon)}
+.opt:active:not(:disabled){transform:scale(.99)}
+.opt .k{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font:700 14px/1 var(--f-mono);background:var(--sunk);color:var(--muted)}
+.opt .txt{min-width:0}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.right .k{background:var(--good);color:var(--surface)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt.wrong .k{background:var(--bad);color:var(--surface)}
+.opt:disabled{cursor:default}
+
+.feedback{border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.feedback.good{background:var(--good-bg)}
+.feedback.bad{background:var(--bad-bg)}
+.feedback h3{font-size:20px}
+.feedback.good h3{color:var(--good)}
+.feedback.bad h3{color:var(--bad)}
+.feedback .why{font-size:15px}
+.feedback ol{padding-left:22px;display:flex;flex-direction:column;gap:2px;font-size:15px}
+
+/* Pitch map */
+.map{list-style:none;padding:0;display:flex;flex-direction:column;gap:6px;counter-reset:step}
+.map li{counter-increment:step;display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;padding:10px 12px;border-radius:12px;border:2px dashed var(--line);min-height:48px;color:var(--muted)}
+.map li::before{content:counter(step);font:700 14px/30px var(--f-mono);text-align:center;width:30px;height:30px;border-radius:50%;background:var(--sunk);color:var(--muted)}
+.map li.set{border-style:solid;border-color:var(--lagoon);background:var(--surface);color:var(--ink)}
+.map li.set::before{background:var(--lagoon);color:var(--lagoon-ink)}
+.map li b{font-family:var(--f-display);font-size:16px}
+.map li span{display:block;font-size:14px;color:var(--muted)}
+.cards{display:flex;flex-direction:column;gap:8px}
+.card-btn{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:12px 14px;min-height:52px;font-size:16px}
+.card-btn:hover:not(:disabled){border-color:var(--lagoon)}
+.card-btn.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.round{font:700 13px/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--lagoon)}
+
+/* Lightning */
+.clock{display:flex;align-items:center;gap:12px}
+.clock .track-bar{flex:1;height:12px;border-radius:999px;background:var(--line);overflow:hidden}
+.clock .fill{height:100%;width:100%;background:var(--sun);transform-origin:left;border-radius:999px}
+.clock .fill.low{background:var(--bad)}
+.clock b{font:700 22px/1 var(--f-mono);min-width:3ch;text-align:right}
+.score{font:800 56px/1 var(--f-display);color:var(--lagoon)}
+.gq{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gq button{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:84px}
+.gq button b{font:800 26px/1 var(--f-display)}
+.gq button span{font-size:12px;color:var(--muted)}
+.gq button:hover{border-color:var(--lagoon)}
+.gq button.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.flash{animation:flash .3s ease}
+@keyframes flash{0%{background:var(--good-bg)}100%{background:var(--surface)}}
+
+/* Listen */
+.clips{display:flex;flex-direction:column;gap:10px}
+.clip{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.clip.on{border:2px solid var(--lagoon)}
+.clip-h{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center}
+.play{width:48px;height:48px;border-radius:50%;border:0;background:var(--lagoon);color:var(--lagoon-ink);display:grid;place-items:center}
+.play svg{width:22px;height:22px;fill:currentColor}
+.clip-h h3{font-size:17px}
+.clip-h .meta{font:500 12px/1.4 var(--f-mono);color:var(--muted)}
+.heard{color:var(--good);font-weight:700}
+.speed{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 10px;font:700 13px/1 var(--f-mono);min-height:36px}
+.seek{width:100%;accent-color:var(--lagoon);margin:0}
+.tx{max-height:240px;overflow-y:auto;border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:2px;position:relative}
+.seg{background:none;border:0;text-align:left;padding:6px 8px;border-radius:8px;font-size:15px;line-height:1.45;color:var(--muted)}
+.seg:hover{background:var(--sunk)}
+.seg.now{background:var(--sunk);color:var(--ink);box-shadow:inset 3px 0 0 var(--sun)}
+.seg time{font:500 11px/1 var(--f-mono);color:var(--muted);margin-right:6px}
+
+/* Win */
+.win{display:flex;flex-direction:column;gap:14px}
+.win h2{font-size:34px;font-weight:800}
+.cert{border:3px double var(--lagoon);border-radius:16px;padding:22px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.cert .who{font:800 30px/1.1 var(--f-display);color:var(--lagoon)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stats div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stats b{font:700 22px/1.1 var(--f-mono)}
+.stats span{font-size:12px;color:var(--muted)}
+
+/* Report and coach */
+.report{width:100%;min-height:220px;font:14px/1.5 var(--f-mono);padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);resize:vertical}
+.roster{list-style:none;padding:0;display:flex;flex-direction:column;gap:8px}
+.roster li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.r1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.r1 b{font-size:17px;min-width:0;overflow-wrap:anywhere}
+.r1 .mono{margin-left:auto}
+.r2{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;font-size:14px;color:var(--muted)}
+.r2 b{color:var(--ink)}
+.dots{display:inline-flex;gap:3px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--lagoon)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;z-index:20;max-width:calc(100% - 32px)}
+
+.foot{display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:13px}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:10}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<canvas id="fx" aria-hidden="true" hidden></canvas>
+
+<script>
+"use strict";
+/* =====================================================================
+   CONTENT
+   Sources: "Qualifications Aruba, 2 March 2026" (PDF) and the trainer's
+   nine voice notes of 29 Sept 2026.
+   ===================================================================== */
+const Q = (id, q, a, w, why) => ({ id, q, a, w, why });
+const LINE = (id, q, a, w, why) => ({ id, q, a, w, why, line: true });
+
+const TRACKS = [
+  { id: "qualify", name: "Qualify", sub: "Who gets which gift", levels: ["q", "ctnq", "who"] },
+  { id: "pitch", name: "The pitch", sub: "Solid bookings that show up", levels: ["why", "offer", "solid", "map"] }
+];
+
+const LEVELS = [
+{
+  id: "q", name: "Qualified guests", sub: "Q · full gift",
+  notes: [
+    { h: "USA & Canada · Q (full gift)", li: [
+      "Ages 32 to 70. The man's age counts. In a same-sex couple, either one.",
+      "Married or living together.",
+      "Single women: USA only, ages 40 to 65.",
+      "One of them employed or retired.",
+      "Visa, Mastercard, American Express or Discover.",
+      "Both fluent in English, or both fluent in Spanish.",
+      "Staying at a hotel, timeshare or rental, and paying for it." ] },
+    { h: "Latin America & Caribbean · Q", li: [
+      "Not Aruba, Cuba, Venezuela, Haiti or Ecuador.",
+      "Ages 40 to 60. The man's age counts.",
+      "Married or living together. No singles.",
+      "One must be employed. No retirees.",
+      "Visa, Mastercard or Amex. No Discover.",
+      "Same language and paid-accommodation rules." ] },
+    { h: "Argentina · Q", li: [ "Ages 45 to 55. The man's age counts." ] },
+    { h: "Time they need", li: [
+      "Presentation: 90 minutes, breakfast included.",
+      "They need 3 free hours that morning, with no paid activities.",
+      "Departure day: 4 hours before airport pickup, or 5 hours before the flight if they rent a car." ] }
+  ],
+  qs: [
+    Q("q1","USA or Canada couple. What ages get the full gift (Q)?","32 to 70",["28 to 70","35 to 65","40 to 60"],"USA & Canada Q is 32 to 70. Ages 28 to 31 and 71+ are CT, half gift."),
+    Q("q2","In a couple, whose age decides if they qualify?","The man's age",["The woman's age","Whoever is older","The average of both"],"The man qualifies the age."),
+    Q("q3","Same-sex couple. Whose age counts?","Either one of them",["Only the oldest","Only the youngest","Same-sex couples can't qualify"],"In a same-sex couple, either partner can qualify the age."),
+    Q("q4","Which single guests can be Q?","Single women from the USA, 40 to 65",["Any single from USA or Canada, 32 to 70","Single men from the USA, 40 to 65","No singles ever qualify"],"Only single women, only from the USA, only ages 40 to 65."),
+    Q("q5","USA or Canada Q. What's the work rule?","One of them employed or retired",["Both must be employed","No retirees allowed","Work doesn't matter"],"USA & Canada: one must be gainfully employed or retired."),
+    Q("q6","Which cards work for a USA or Canada Q?","Visa, Mastercard, Amex or Discover",["Visa or Mastercard only","Any debit card","A cash deposit"],"USA & Canada Q: Visa, Mastercard, American Express or Discover."),
+    Q("q7","What's the language rule?","Both fluent in English, or both fluent in Spanish",["One of them speaks English","Any language with a translator","English only"],"Both must speak the same language fluently: English or Spanish."),
+    Q("q8","What's the accommodation rule?","Staying at a hotel, timeshare or rental, and paying for it",["Anywhere, even free at a friend's place","Only guests of Iberostar hotels","Only all-inclusive guests"],"They must be paying for where they stay."),
+    Q("q9","How long is the presentation?","90 minutes, breakfast included",["45 minutes","60 minutes plus breakfast","2 hours"],"90 minutes including breakfast."),
+    Q("q10","How much free time do guests need that morning?","3 hours, with no paid activities",["90 minutes","2 hours","Until noon"],"3 hours total with no paid activities."),
+    Q("q11","Day of departure. What's the latest they can tour?","4 hours before airport pickup (5 before the flight with a rental car)",["2 hours before the flight","Any time before checkout","They can't tour on departure day"],"4 hours before pickup, or 5 hours before flight time if they're renting a car."),
+    Q("q12","Latin America & Caribbean couple. Q ages?","40 to 60",["32 to 70","45 to 55","35 to 65"],"Latin America & Caribbean Q is 40 to 60, the man's age."),
+    Q("q13","Which countries are left out of the Latin America & Caribbean rules?","Aruba, Cuba, Venezuela, Haiti & Ecuador",["Argentina, Brazil & Chile","Mexico, Colombia & Peru","Costa Rica, Panama & Jamaica"],"Aruba, Cuba, Venezuela, Haiti and Ecuador are excluded."),
+    Q("q14","Colombian couple, both 55, both retired. What are they?","NQ. Latin America needs one of them working",["Q. Retirees are fine everywhere","CT, half gift","Q if they show a Visa"],"Latin America & Caribbean: one must be employed. No retirees."),
+    Q("q15","Which card does NOT work for a Latin America Q?","Discover",["Visa","Mastercard","American Express"],"Latin America & Caribbean: Visa, Mastercard or Amex only."),
+    Q("q16","Argentinian couple. Q ages?","45 to 55",["40 to 60","32 to 70","35 to 70"],"Argentina Q is 45 to 55, the man's age."),
+    Q("q17","Can single guests from Latin America qualify?","No. Married or living together only",["Yes, single women 40 to 65","Yes, anyone 40 to 60","Only if retired"],"No singles from Latin America & Caribbean.")
+  ]
+},
+{
+  id: "ctnq", name: "Half gift & no gift", sub: "CT · NQ · extra rules",
+  notes: [
+    { h: "Courtesy Tour (CT) · half gift · USA & Canada", li: [
+      "Ages 28 to 31, or 71 and up.",
+      "Married or living together. One employed or retired.",
+      "A debit card is OK, or Visa, Mastercard, Amex, Discover.",
+      "Same language and paid-accommodation rules.",
+      "Presentation: minimum 60 minutes." ] },
+    { h: "Courtesy Tour (CT) · Argentina", li: [
+      "Ages 35 to 44 and 56 to 70 (the man's age).",
+      "No singles. No retirees. Visa, Mastercard or Amex.",
+      "90-minute presentation with breakfast, 3 free hours." ] },
+    { h: "Non-Qualified (NQ) · no gift", li: [
+      "Anyone who doesn't meet Q or CT, plus:",
+      "Travel agents and tour operators.",
+      "Commercial airline pilots and crew (flight attendants).",
+      "Active US military: Army, Air Force, Marines, Navy, Coast Guard. National Guard is OK.",
+      "Employees of hotel, timeshare and vacation club companies.",
+      "Toured Iberostar in-house in the last 6 months, or a street program in the last 12 months.",
+      "Trinella / Trifecta: three couples or more traveling together." ] },
+    { h: "Extra rules", li: [
+      "Guests show IDs and credit card to the hostess.",
+      "Max party: 6 people, max 4 adults (18+).",
+      "Quinella: two qualified couples together. 2 invitations, 2 gifts, 1 pay. Sales decides if they tour together.",
+      "Paid activities: excursions, spa, pre-arranged transfers, anything prepaid.",
+      "Shirts and shoes. No bathing suits.",
+      "The Club members staying off property: the GI team may invite them. Q if they bring IDs and card.",
+      "The Club beneficiaries staying off property: can't be invited. NQ." ] }
+  ],
+  qs: [
+    Q("c1","What does a CT guest get?","Half gift",["Full gift","No gift","Double gift"],"Q = full gift, CT = half gift, NQ = no gift."),
+    Q("c2","USA or Canada CT ages?","28 to 31, or 71 and up",["25 to 31","18 to 31, or 65 and up","71 and up only"],"CT for USA & Canada: 28 to 31 or 71+."),
+    Q("c3","Which card can a USA or Canada CT show?","A debit card, or Visa / Mastercard / Amex / Discover",["Credit card only","Amex only","No card needed"],"CT is the only group where a debit card is OK."),
+    Q("c4","Minimum presentation for a USA or Canada CT?","60 minutes",["30 minutes","90 minutes","2 hours"],"CT USA & Canada: minimum 60 minutes."),
+    Q("c5","Argentinian couple. CT ages?","35 to 44 and 56 to 70",["28 to 31 and 71+","30 to 44 and 56+","40 to 60"],"Argentina CT: 35 to 44 and 56 to 70. Q is 45 to 55 in the middle."),
+    Q("c6","Which job makes a guest NQ?","Commercial airline pilot or flight attendant",["Nurse","Police officer","Teacher"],"Pilots and crew are NQ."),
+    Q("c7","Which military guest can still qualify?","National Guard",["Active US Army","Active US Navy","Active Coast Guard"],"Active US military is NQ. National Guard is permitted."),
+    Q("c8","Guest works at a timeshare resort in Orlando. They are…","NQ",["Q","CT","Q, but half gift"],"Employees of hotel, timeshare and vacation club companies are NQ."),
+    Q("c9","Travel agents and tour operators are…","NQ",["Q","CT","Q with a manager's OK"],"Travel agents and tour operators are NQ."),
+    Q("c10","Toured Iberostar in-house within the last ___ months = NQ.","6",["3","12","24"],"In-house: 6 months. Street programs: 12 months."),
+    Q("c11","Toured an Iberostar street program within the last ___ months = NQ.","12",["6","3","24"],"Street programs: 12 months. In-house: 6 months."),
+    Q("c12","Three couples or more traveling together (Trinella / Trifecta).","NQ",["Q, 3 gifts","Q, 1 gift shared","CT for everyone"],"Trinella / Trifecta is NQ."),
+    Q("c13","Quinella: two qualified couples together. What happens?","2 invitations, 2 gifts, 1 pay. Sales decides if they tour together",["1 invitation, 1 gift","2 invitations, 1 gift, 2 pays","NQ. Groups aren't allowed"],"Quinella: 2 invitations, 2 gifts, 1 pay."),
+    Q("c14","Maximum party size?","6 people, max 4 adults (18+)",["4 people total","8 people, max 6 adults","No limit with kids"],"Max 6 people, max 4 adults 18+."),
+    Q("c15","What do guests show the hostess?","IDs and credit card",["Their hotel key card","A passport stamp","Just the invitation"],"IDs and credit card at hosting."),
+    Q("c16","Which one counts as a paid activity?","A prepaid airport transfer",["A walk on Eagle Beach","Swimming at their hotel pool","Breakfast at their hotel"],"Excursions, spa, pre-arranged transfers or anything prepaid."),
+    Q("c17","Dress code for the tour?","Shirts and shoes. No bathing suits",["Anything goes","Business casual","Bathing suit with a cover-up"],"Shirts and shoes required, no bathing suits."),
+    Q("c18","An Iberostar The Club member is staying off property.","The GI team may invite them. Q if they bring IDs and card",["Always NQ","Automatically CT","Members never tour"],"Club members off property can be invited and count as Q with IDs and card."),
+    Q("c19","An Iberostar The Club beneficiary is staying off property.","Can't be invited. NQ",["Q with IDs and card","CT, half gift","Q if they're 40 to 60"],"Beneficiaries staying off property are NQ.")
+  ]
+},
+{
+  id: "who", name: "Who qualifies?", sub: "Real couples · Q, CT or NQ",
+  gen: true, count: 15,
+  notes: [
+    { h: "Read a couple in this order", li: [
+      "Where are they from? USA & Canada, Argentina, Latin America & Caribbean, or an excluded country.",
+      "The man's age. Which band is it in?",
+      "Together? Married or living together. Singles: only USA women 40 to 65.",
+      "Work: employed, or retired (retired is OK for USA & Canada only).",
+      "Card: Discover is USA & Canada only. Debit only works for CT.",
+      "Same language, paying for their stay, 3 free hours.",
+      "Any NQ flag? Job, military, recent tour, 3+ couples." ] },
+    { h: "Age bands (the man's age)", li: [
+      "USA & Canada: under 28 NQ · 28 to 31 CT · 32 to 70 Q · 71+ CT",
+      "Latin America & Caribbean: 40 to 60 Q · anything else NQ",
+      "Argentina: 35 to 44 CT · 45 to 55 Q · 56 to 70 CT · else NQ",
+      "Aruba, Cuba, Venezuela, Haiti, Ecuador: NQ" ] }
+  ]
+},
+{
+  id: "why", name: "Remove the doubt", sub: "Why before how · the good news",
+  clips: ["01", "02", "03", "04"],
+  notes: [
+    { h: "Crawl, walk, run", li: [
+      "Crawl: you can stop people.",
+      "Walk: you can write invitations.",
+      "Run: you make solid bookings that show up." ] },
+    { h: "Give the WHY before the HOW", li: [
+      "Guests doubt three things: that it's a scam, that it's timeshare, or that you're selling water sports and activities.",
+      "Open with \"free breakfast and a gift\" and they think: it's a scam, it's not true, or it's timeshare. Let's run away.",
+      "Tell them why you're inviting them first. Then what they get makes sense." ],
+      say: "Yes folks, I'm part of the team inviting families to come see the newest hotel on the island. Once you've seen it, next time you travel you'll want to stay with us. It also helps us spread the word: you tell family and friends, maybe post a picture on Facebook or Instagram." },
+    { h: "Then the good news, in this order", li: [
+      "It's a full branding experience, not just a quick look at the hotel.",
+      "Breakfast at one of our five-star restaurants.",
+      "A personalized tour of the property: the facilities and the service.",
+      "See one of our rooms.",
+      "A reward for their time, as a way of saying thanks: IberoCash they use at the best restaurants, activity companies, dining and shopping on the island.",
+      "The flyer adds one more: their taxi is on us, both ways." ] },
+    { h: "Make it personal", li: [
+      "See a Riu bracelet? \"You're probably eating breakfast at the same place every day. This is something new and different.\"",
+      "We partner with the best (Gianni's, Screaming Eagle, Daniel's) because everybody wants to be associated with Iberostar.",
+      "We've invested in Aruba: the Tierra del Sol golf course and community, our first hotel, and two more coming." ] },
+    { h: "Ask for it", li: [
+      "Say \"Let me get you an invitation.\" Not \"Would you like one?\"",
+      "They either let you keep going, or they tell you their objections now.",
+      "Timeshare already, don't want to commit, plans tomorrow: all can be worked.",
+      "The only one you really can't beat: they leave tomorrow morning." ] }
+  ],
+  qs: [
+    Q("w1","Crawl, walk, run. What is \"run\"?","Making solid bookings",["Stopping people","Writing invitations","Handing out flyers"],"Crawl = stop people. Walk = write invitations. Run = solid bookings that show up."),
+    Q("w19","What doubts do you have to remove first?","That we're a scam, selling timeshare, or promoting water sports and activities",["That the hotel is far away","That breakfast costs extra","That they need a passport"],"Remove the doubt that we're a scam, timeshare, or an activities booth."),
+    Q("w2","You open with \"Free breakfast and a gift!\" What do guests think?","It's a scam, it's not true, or it's timeshare",["Great, sign us up","Nothing. They just say no thanks","They want a bigger gift"],"Leading with the gift creates doubt. Lead with the why."),
+    Q("w3","How do you remove that doubt?","Give the WHY before the HOW",["Talk faster","Lead with the gift","Say \"it's not timeshare\" right away"],"The why makes the offer believable."),
+    LINE("w16","If you tell them ___ first, it removes the doubt.","why",["the gift","the price","the time"],"Why before how. Once they know why you're approaching them, the offer makes sense."),
+    Q("w4","Which opener gives the why first?","\"We're inviting families to see the newest hotel on the island, so next time you travel you'll stay with us.\"",["\"Want free breakfast and a gift?\"","\"Have you been to Eagle Beach?\"","\"Do you own a timeshare?\""],"Why first: we want them to see it, love it, and stay with us."),
+    LINE("w17","Yes folks, I'm part of the team that's inviting ___ to come and see the newest hotel on the island.","families",["everyone","members","investors"],"We invite families to come and take a look, so next time they travel they stay with us."),
+    Q("w5","Besides wanting them to stay with us, why else do we invite them?","They spread the word: family, friends, Facebook, Instagram",["To sell them excursions","To fill the restaurant","To collect emails"],"Guests who see it tell people. That's good marketing for us."),
+    LINE("w20","We're actually inviting families for a full ___ experience, not just a quick look at the hotel.","branding",["sales","spa","dining"],"A full branding experience: breakfast, a personalized tour, a room, and a thank-you for their time."),
+    Q("w6","After the why, in what order do you share the good news?","Breakfast → property tour → see a room → reward for their time",["Reward → breakfast → room → tour","Room → reward → breakfast → tour","Tour → reward → room → breakfast"],"Breakfast, a personalized tour, a room, and the reward last as a thank-you."),
+    Q("w7","Guest is wearing a Riu bracelet. What do you say?","\"You're probably eating at the same place every day. This is something new and different.\"",["\"Riu is not as good as us.\"","\"Sorry, Riu guests can't come.\"","Nothing. Ignore it."],"Use what you see to make it personal: it's something new, something different for them."),
+    LINE("w18","And the best part is, we also ___ you for your time, as a way of saying thanks.","reward",["pay","charge","upgrade"],"The gift is a thank-you for their time, and it comes last."),
+    Q("w8","How do you present the gift?","As our way of saying thanks for their time",["As the main reason to come","As payment for buying","As a contest prize"],"The gift is a thank-you. The why is the reason."),
+    Q("w9","Why do the best restaurants and activity companies partner with us?","Everybody wants to be associated with Iberostar",["We pay them double","We own all of them","It's required by law"],"Partners like Gianni's, Screaming Eagle and Daniel's want to be linked to the brand."),
+    Q("w10","What shows guests we've invested in Aruba?","The Tierra del Sol golf course & community, our first hotel, two more coming",["The cruise terminal","The airport","A Palm Beach casino"],"Tierra del Sol, the new hotel, and two more on the way."),
+    Q("w11","Which words start the invitation?","\"Let me get you an invitation.\"",["\"Would you like an invitation?\"","\"Are you interested?\"","\"Can I bother you for a minute?\""],"Don't ask. Say \"Let me get you an invitation.\""),
+    Q("w12","Why say \"Let me get you an invitation\" instead of asking?","They either let you continue, or they tell you their objections right now",["It's shorter","It sounds more polite","They can't say no to it"],"It brings their doubts out so you can work them."),
+    Q("w13","\"We already own a timeshare.\" What is that?","An objection you can work with",["A reason to let them go","An automatic NQ","Only OK if they're from the USA"],"Owning timeshare is an objection we can overcome."),
+    Q("w14","Which objection really can't be overcome?","They're leaving tomorrow morning",["We already own timeshare","We don't want to commit to anything","We have plans tomorrow"],"Everything else is a chance to overcome objections."),
+    Q("w15","\"We have things planned tomorrow.\" What now?","Work the objection, like finding a time that fits",["Let them go right away","Promise it only takes 30 minutes","Offer a bigger gift"],"Plans tomorrow can be overcome. Never promise a shorter time.")
+  ]
+},
+{
+  id: "offer", name: "The Open House offer", sub: "The flyer · gifts · partners",
+  imgs: [
+    { src: "img/flyer-open-house.jpg", w: 1600, h: 900, cap: "The Open House flyer guests see",
+      alt: "Open House Promotion flyer: Five Star Breakfast, VIP Property Tour, Island Gift of IberoCash, complimentary taxi. No timeshare, no high pressure, no obligation, short and sweet." },
+    { src: "img/flyer-partners.jpg", w: 1364, h: 768, cap: "Our partners, our commitment and what to bring",
+      alt: "Our Partners sheet with 16 partner logos, plus Our Commitment and What to Bring." }
+  ],
+  notes: [
+    { h: "The offer, in the flyer's words", li: [
+      "Five Star Breakfast: the hostesses check them in at the Main Lobby, then it's off to a complimentary breakfast at one of our restaurants.",
+      "VIP Property Tour: a preview of the VIP features of the resort and suites, so they see what awaits their family when they choose Iberostar.",
+      "Island Gift: to thank them for their time, a choice of IberoCash to enjoy with Aruba's top merchants. Dining, shopping, activities, rentals.",
+      "Complimentary taxi: they arrange the taxi themselves. We pay the fare when they arrive, and again when they depart." ] },
+    { h: "Four promises", li: [
+      "No timeshare.", "No high pressure.", "No obligation.",
+      "Short & sweet: 90 minutes, including the breakfast, property tour and information on booking direct." ] },
+    { h: "Where and why", li: [
+      "The Joia by Iberostar Resort, in the heart of Aruba's world-famous Eagle Beach.",
+      "To tempt them to stay with us in the future, and to introduce Iberostar The Club, the newest and most luxurious way to travel.",
+      "The Open House Promotion is our opportunity to impress them in person with our brand." ] },
+    { h: "Our commitment", li: [
+      "We do not sell timeshare: no weeks, points or maintenance fees.",
+      "A full-service resort brand they can book through travel agents or online. We show how our Members book direct at wholesale rates through our loyalty club.",
+      "No high pressure and no obligation to book or buy. If they fall in love with the club, we're happy to show them how to get involved." ] },
+    { h: "What to bring", li: [
+      "Their exclusive invitation, so they get everything they were promised.",
+      "Every adult: 2 forms of ID, like a driver's license or passport, and a credit card, so we can register them and give them their gifts." ] },
+    { h: "Our partners", li: [
+      "At Joia: Marea, Bucatini, Gaia and the Zima rooftop bar.",
+      "Dining around the island: Gianni's, Daniel's Steak & Chop, Azzurro, Azia, Amore Mio, Screaming Eagle, Dushi Bagels & Burgers, and The Birdie at Tierra del Sol.",
+      "Golf: Tierra del Sol. Tours: Rocka Beach Tours. Shopping: Aruba Aloe. Car rental: Elixir Car Rental." ] }
+  ],
+  qs: [
+    Q("o1","What's the promotion called?","Our Open House Promotion",["The Timeshare Preview","The VIP Sales Event","The Beach Breakfast Club"],"The flyer and the trainer both call it the Open House Promotion."),
+    Q("o2","Where do guests go for the Open House?","The Joia by Iberostar Resort, on Eagle Beach",["A sales office in Oranjestad","A resort on Palm Beach","The Tierra del Sol clubhouse"],"The Joia by Iberostar Resort, in the heart of Aruba's world-famous Eagle Beach."),
+    Q("o3","Which four promises are on the flyer?","No timeshare. No high pressure. No obligation. Short & sweet.",["Free stay. Free flight. Free spa. Free golf.","Members only. Book today. Pay later. Cash only.","No ID. No card. No breakfast. No tour."],"Say them the way the flyer does."),
+    Q("o4","Where does the morning start?","In the Main Lobby, where the hostesses check them in",["At the beach bar","At a sales office downtown","At the golf course"],"Hostesses check them in at the Main Lobby, then it's off to a complimentary breakfast."),
+    Q("o5","How does the complimentary taxi work?","They take a taxi themselves. We pay the fare when they arrive and again when they leave",["We send a shuttle to their hotel","We pay one way only","Only guests staying at Iberostar get it"],"\"Your taxi is on us! Please arrange your taxi yourself: we will pay the fare when you arrive, and again when you depart!\""),
+    Q("o6","What is the VIP Property Tour?","A preview of the VIP features of the resort and its suites",["A bus tour of the island","A boat trip to an island beach","A walk around a sales office"],"So they see what awaits their family when they choose Iberostar in the future."),
+    Q("o7","What is the Island Gift?","A choice of IberoCash to enjoy with Aruba's top merchants",["A free night at the hotel","Cash at the front desk","A discount on a timeshare week"],"To thank them for their time. IberoCash works for dining, shopping, activities and rentals."),
+    Q("o8","IberoCash works for four kinds of things. Which list is right?","Dining, shopping, activities, rentals",["Flights, hotels, cruises, trains","Groceries, gas, pharmacy, phone bills","Casino chips, lottery tickets, bets, ATM cash"],"The flyer lists dining, shopping, activities and rentals."),
+    Q("o9","Which partner rents cars?","Elixir Car Rental",["Zima Rooftop Bar","Bucatini","Gaia"],"Elixir Car Rental. Zima, Bucatini and Gaia are at Joia."),
+    Q("o10","Which partner is the golf course?","Tierra del Sol",["Marea","Azia","Amore Mio"],"Iberostar Tierra del Sol is the championship golf course. The Birdie is its restaurant."),
+    Q("o11","Which partner runs the tours?","Rocka Beach Tours",["Daniel's Steak & Chop","Marea","Elixir Car Rental"],"Rocka Beach Tours: jeep tours, UTVs, karting and sailing."),
+    Q("o12","Which partner is a shop?","Aruba Aloe",["Gianni's","Screaming Eagle","Azzurro"],"Aruba Aloe: local skincare and gifts. Gianni's, Screaming Eagle and Azzurro are restaurants."),
+    Q("o13","Which three are at Joia itself?","Marea, Bucatini and Zima",["Gianni's, Daniel's and Azzurro","Rocka Beach, Elixir and Aruba Aloe","Screaming Eagle, Amore Mio and Azia"],"Marea, Bucatini, Gaia and the Zima rooftop bar are at Joia. The others are partners around the island."),
+    Q("o14","What does every adult bring?","2 forms of ID, like a driver's license or passport, and a credit card",["Just the invitation","Their hotel key card","A printed hotel receipt"],"So we can register them and give them their gifts. They also bring the invitation."),
+    LINE("o15","We'll show you how our Members book direct at ___ rates through our loyalty club.","wholesale",["retail","timeshare","weekly"],"Members book direct at wholesale rates. We don't sell timeshare: no weeks, points or maintenance fees."),
+    LINE("o16","We only ask families for 90 minutes, including the breakfast, property tour, and information on ___.","booking direct",["buying a week","points and fees","the casino"],"We know vacation time is valuable. We're not going to take up their whole day."),
+    LINE("o17","Our Open House Promotion is our opportunity to ___ you in person with our brand.","impress",["sell","sign","pressure"],"We hope they like what they see, tell family and friends, and stay with us on future vacations all over the world."),
+    Q("o18","How does the flyer describe Iberostar The Club?","The newest and most luxurious way to travel",["A timeshare with points","A members-only resort","A cruise line"],"The Open House introduces them to Iberostar The Club, the newest and most luxurious way to travel.")
+  ]
+},
+{
+  id: "solid", name: "Make it solid", sub: "Booking → show-up",
+  clips: ["05", "06", "07", "08", "09"],
+  notes: [
+    { h: "Book the time", li: [
+      "Say \"Let me put you down for 8 o'clock.\"",
+      "If 8 is too early, offer 10. If they don't object, you've got an easy booking." ] },
+    { h: "Slow down while you write", li: [
+      "Once you're writing, you've got handcuffs on them. About 1 family in 100 walks off mid-invitation. It's manners.",
+      "Keep making a friend. Ask small discovery questions. If they like you, trust you and believe you, they buy from you." ] },
+    { h: "Phone number: tell them why", li: [
+      "A manager or supervisor calls this afternoon, around 5 to 6 pm, only to check they can still make it. WhatsApp works.",
+      "Explained this way they feel like VIPs and don't give a fake number." ],
+      say: "Folks, we also do confirmation calls. If you give me your phone number, maybe you have WhatsApp, one of my managers can reach out this afternoon between 5 and 6, simply to ask if you're still able to make it. We're not allowed to solicit or anything like that." },
+    { h: "Say what it really is", li: [
+      "\"Bring this invitation with you to confirm which gift you were offered.\"",
+      "Breakfast, a quick tour, and we show how to book direct through our loyalty club.",
+      "We're not timeshare: no weeks, no points, no maintenance fees. A full-service hotel you can book through travel agents or Expedia.",
+      "No obligation to be a member to stay with us. Members get discounts and cool perks.",
+      "A real expectation gives them a spark of interest. Surprised guests close their eyes and ears." ] },
+    { h: "Talk about time the right way", li: [
+      "\"We only ask families for 90 minutes, and breakfast tends to eat about half of that.\"",
+      "Never say 45 minutes or 30 minutes, or break it into minutes. Then the hostess says 90 and they feel lied to." ] },
+    { h: "Lock it in before they walk", li: [
+      "Don't just say \"have a nice day.\" Ask: \"So we see you guys tomorrow at 8 for sure?\"",
+      "\"We'll try\" or \"we'll see\"? Go back: lots of families want to come, and we don't want to block a space.",
+      "Still unsure? Offer to give the invitation to another family. A solid no beats a fake yes.",
+      "You can tell them: \"I get a $65 bonus just for you showing up. You don't have to book or buy anything.\"",
+      "Your job isn't handing out invitations. It's getting people to the hotel." ] }
+  ],
+  qs: [
+    LINE("s1","Let me put you down for ___ o'clock.","8",["9","10","11"],"Start at 8. If it's too early for them, offer 10."),
+    Q("s3","While writing the invitation you should…","Slow down, make a friend, ask discovery questions",["Hurry before they change their mind","Stay quiet and just write","Hand them the pen to fill it in"],"This is the best moment to build the bond."),
+    Q("s4","Why is it safe to slow down while writing?","Only about 1 family in 100 walks away mid-invitation. It's manners",["They signed something","The gift is already promised","A manager is watching"],"Once you're writing, you've got handcuffs on them."),
+    LINE("s5","If they like you, ___ you and ___ you, they will buy from you.","trust · believe",["tip · thank","follow · call","hear · see"],"Like, trust, believe. Writing the invitation is your time to build that."),
+    Q("s6","What do you tell them to bring?","The invitation, to confirm which gift they were offered",["Their hotel key","Only a passport","Nothing"],"Bring the invitation. It confirms the gift."),
+    Q("s7","How do you explain what we are?","A full-service hotel. Not timeshare: no weeks, points or fees. We show how to book direct through our club",["A timeshare with great prices","A water sports company","Just a free breakfast, nothing else"],"Be clear: hotel, plus a club for booking direct with preferred rates and perks."),
+    LINE("s22","We're not selling timeshare. We don't have any weeks or ___ or maintenance fees.","points",["rooms","rates","nights"],"No weeks, no points, no maintenance fees. A full-service hotel with a club for booking direct."),
+    Q("s8","Do guests need to be members to stay at the hotel?","No. It's a full-service hotel, like Hyatt or Hilton. Members just get discounts and perks",["Yes, members only","Only on weekends","Only for all-inclusive"],"No obligation. If the membership isn't for them, we still want them staying at our hotel."),
+    Q("s9","How do you ask for a phone number?","Tell them why first: a manager calls 5 to 6 pm only to confirm they're still coming",["Just ask for it","Say we'll send them offers","Skip it"],"Give the why before you ask. They feel like VIPs and don't give a fake number."),
+    LINE("s10","One of my managers can reach out to you this afternoon between ___, simply to ask if you're still able to make it.","5 and 6",["8 and 9","noon and 1","7 and 8"],"The confirmation call is around 5 to 6 pm the same day."),
+    LINE("s12","So we see you guys tomorrow at 8 ___?","for sure",["if you can","maybe","or 10"],"Reconfirm and take their temperature before they walk away."),
+    Q("s13","They answer \"We'll try\" or \"We'll see.\" You…","Ask again: lots of families want to come to our open house promotion, and we don't want to block a space",["Say \"Great, see you!\"","Promise a bigger gift","Let it go"],"Go back and get a real answer."),
+    LINE("s14","It's better to get a solid no than a bunch of fake ___.","yeses",["maybes","numbers","bookings"],"Fake yeses don't show up. A solid no lets you find a family who will."),
+    Q("s15","Still unsure after you asked again?","Offer to give the invitation to another family",["Write it anyway","Give them two invitations","Take their card"],"\"I wouldn't want to hold a space if you're not sure you're going to make it.\""),
+    LINE("s16","This nice young man gets a little $___ bonus on his paycheck just for you showing up. You don't have to book or buy anything.","65",["20","100","200"],"Let them know it matters to you that they show up."),
+    Q("s17","Your real job is to…","Get people to come to the hotel",["Hand out as many invitations as possible","Talk to everyone on the beach","Collect phone numbers"],"This is a show-up business, not an invitation business."),
+    LINE("s18","We only ask families for ___ minutes, and breakfast tends to eat about ___ of that.","90 · half",["45 · all","60 · half","90 · 45 minutes"],"Say 90 minutes. Breakfast eats about half. Never break it into minutes."),
+    Q("s19","Why never say \"45 minutes\" or \"30 minutes\"?","They think it's short, then complain when the hostess says 90",["It sounds too long","Hostesses don't like numbers","Breakfast takes longer"],"Never mention minutes. They need to know: 90."),
+    Q("s20","Why tell them they'll learn about booking direct with the club?","They come in curious. Surprised guests close their eyes and ears",["It's a legal rule","So they don't come","It makes the tour shorter"],"A real expectation gives them a spark of interest. That means more sales."),
+    Q("s21","What can these tips do for your week?","Go from 8 bookings & 1 show to 10 bookings & 5 or 6 shows",["Double your gift budget","Cut your hours","Nothing much"],"Better booking rate, show rate, Q rate. More tours, more sales.")
+  ]
+},
+{
+  id: "map", name: "Pitch map", sub: "Put the pitch in order", map: true,
+  notes: [] // built from MAP_STEPS
+},
+{ id: "final", name: "Final run", sub: "Everything, mixed · 25 in a row", final: true, count: 25, notes: [] }
+];
+
+/* The pitch, in order. Step 6 is the agenda the trainer reconfirms "at the end", while the invitation is finished. */
+const MAP_STEPS = [
+  { t: "Why before how", line: "\"We're inviting families to come see the newest hotel on the island, so next time you travel you'll want to stay with us.\"" },
+  { t: "Share the good news", line: "\"Breakfast at one of our five-star restaurants, a personal tour, one of our rooms, and a reward for your time.\"" },
+  { t: "Ask for it", line: "\"Let me get you an invitation.\"" },
+  { t: "Book the time", line: "\"Let me put you down for 8 o'clock.\"" },
+  { t: "Write it slow, get the number", line: "\"We also do confirmation calls, between 5 and 6, just to see if you're still able to make it.\"" },
+  { t: "Reconfirm the agenda", line: "\"Between the breakfast, the property tour and a little information about the club, we only ask families for 90 minutes.\"" },
+  { t: "Lock in the show-up", line: "\"So we see you guys tomorrow at 8 for sure?\"" }
+];
+
+/* The trainer's voice notes. Segment times are in seconds. */
+const CLIPS = /*CLIPS*/[{"id":"01","t":"Crawl, walk, run","d":26.2,"s":[[1.0,"Good morning team. I'm very proud of all of my new recruits."],[6.0,"You've all gotten past the crawling phase."],[9.3,"You're able to stop people."],[11.6,"You're getting past the walking phase."],[14.8,"You're able to write the invitations."],[17.9,"But now it's time to run."],[20.1,"And how we run is by making solid bookings."]]},{"id":"02","t":"Remove the doubt: why before how","d":175.1,"s":[[2.0,"An important first stop on learning how to make a solid invitation is to remove doubt."],[13.1,"You want to remove doubt in the guest's mind that we're a scam and you want to remove doubt in their minds that we're selling timeshare or promoting water sports and activities."],[25.5,"How we do that is incredibly simple."],[28.8,"You all hear me do it every day, whether it's by giving you my pitch in person or hearing me say it to the guests."],[39.9,"It's right on the pitch map."],[42.7,"The way you remove doubt is giving them the why before the how."],[49.8,"And that comes into place in a lot of places in the inviting process."],[54.6,"First and foremost, if you just run up to people and say, have you been to Eagle Beach yet?"],[59.7,"We're promoting Iberostar."],[61.8,"We're going to give you free breakfast and $200."],[63.9,"They're immediately going to think either A, it's a scam, B, it's not true, or C, it's timeshare, let's run away."],[71.9,"So if you tell them why first, it removes the doubt."],[76.5,"Yes, folks, I'm part of the exciting team that's inviting families to the newest hotel on the island to come and take a peek, to have a nice branding experience."],[86.6,"Once you've seen it, hopefully next time you travel, you'll want to stay with us."],[91.8,"I haven't mentioned the club yet, but I also haven't lied to them."],[95.1,"We do want them to see the place."],[96.8,"We do want them to love it."],[98.0,"And we want them to come and stay with us in the future."],[100.8,"Correct? So if you tell them why we are inviting them before we tell them what they get, it removes a lot of doubt and makes the rest of the invitation process go smoother."],[114.3,"Yes, folks, we're inviting as many people as we can to come and see our beautiful hotel."],[119.1,"So next time you travel, you'll consider staying with us."],[123.2,"After you see it, we know you're going to want to stay with us."],[125.8,"And it also helps us spread the word."],[127.4,"You'll tell family and friends about it and maybe take a picture, put it on Facebook, Instagram."],[133.7,"It's all good marketing for us."],[136.3,"And from here, they understand why you're approaching them, what you're inviting them to."],[143.0,"And then you tell them, this is how we do it, or this is how we go."],[148.8,"And from that point, they understand why you're approaching them."],[161.3,"And then when you tell them what we offer, they're more apt to believe it and consider it because it makes sense why you're inviting them."],[172.3,"You've removed the doubt."]]},{"id":"03","t":"Share the good news","d":94.4,"s":[[2.1,"After you've told them why we're inviting them, you share with them all the good news."],[7.4,"It's an amazing promotion."],[8.9,"We're actually inviting families for a full branding experience, not just a quick look at the hotel."],[15.2,"When you arrive, we treat you to breakfast at one of our five-star restaurants."],[19.2,"We know you're going to love it."],[21.4,"I see you have a bracelet from Riu."],[22.9,"I'm sure you're eating breakfast at the same place every day."],[26.0,"You're going to love our place."],[27.2,"It's something new, something different for you."],[29.0,"After breakfast, they're going to give you a personalized tour of the property, so you can see for yourself the quality of the facilities and also the service."],[40.2,"And of course, they'll share with you one of our rooms, so you'll be able to anticipate the quality that you'll receive when you stay with us."],[51.9,"And the best part is, we also reward you for your time as a way of saying thanks."],[59.0,"We can offer you $100 in IberoCash that you can use at all the best restaurants and activities, companies on the island, dining and shopping activities."],[67.3,"We work with Gianni's."],[68.7,"We work with Screaming Eagle, Daniel's Steakhouse, just to name a few."],[74.0,"We partner with all the best companies on the island because everybody wants to be associated with Iberostar."],[80.3,"As I told you before, we own the Tierra del Sol golf course and community for three years."],[84.7,"We opened our first hotel a year and a half ago."],[87.6,"We have two more coming."],[88.6,"We have invested a lot in the island and we want to get the word out."]]},{"id":"04","t":"\"Let me get you an invitation\"","d":54.1,"s":[[0.7,"And then you go to the invitation."],[2.7,"You simply say the words, let me get you an invitation."],[6.0,"And that is another good place to start removing doubt, but in this case, from them."],[10.9,"When you say, let me give you an invitation, not would you like one, but let me give you an invitation, they're either going to continue to let you proceed, or they're going to start throwing on you the reasons they don't want to come."],[24.7,"Oh, no, no, no, we already own timeshare."],[27.3,"We can cover that objection."],[29.1,"Oh, no, no, we don't want to be committed to anything."],[33.3,"We can overcome that objection."],[35.2,"Oh, we have things planned tomorrow."],[37.5,"We can overcome that objection."],[39.4,"Really, the only objection that we can't overcome in reality is that they're leaving tomorrow morning."],[45.6,"The rest is all an opportunity to overcome objections."],[48.9,"We won't overcome them all, but we can at least try."]]},{"id":"05","t":"8 o'clock, write it slow, say what it is","d":151.5,"s":[[1.8,"It's always helpful to say, let me put you down for 8 o'clock, to give them the opportunity to say that's too early."],[10.2,"Then you can offer 10 o'clock."],[12.0,"If they don't say it's too early, you've got a wave-one booking, very easy."],[17.9,"So, once you're writing the invitation, this is your opportunity to slow things down."],[23.7,"There's a tendency to want to hurry through the invitation and get the people moving again because you're getting nervous that they're going to take it or not, that they're going to show up or not."],[34.7,"That is actually when you want to go easy."],[37.5,"Once you're writing the invitation, you've got handcuffs on them."],[41.7,"One family in 100 is going to run away during the invitation writing process."],[46.9,"The rest are going to stay there while you write it."],[50.4,"It's just manners. That's when you slow it down."],[54.7,"Continue making a friend."],[56.6,"Continue doing little discovery questions."],[59.7,"Continue making that bond."],[61.7,"Because if they like you, trust you, and believe you, they will buy from you."],[66.7,"So, that is the best opportunity to solidify a little friendship with them while still doing business."],[73.7,"Once the invitation is written, if it hasn't come up already in the conversation, folks, make sure to bring this invitation with you to confirm which gift you are offered."],[88.4,"And as I told you, when you get there, it's a nice breakfast at one of our restaurants, quick little tour of the property."],[97.7,"And as I mentioned, where we're not selling timeshare, we don't have any weeks or points or maintenance fees, nothing like that."],[104.7,"We're a full-service hotel that you can book direct through travel agents, through Expedia, etc."],[109.6,"But everybody who passes through, we also show you how you can book direct through our loyalty club for preferred rates and cool perks when you travel."],[118.3,"That way you know your options if you do want to stay with us in the future."],[122.3,"To be clear, there's no obligation to be a member to stay there."],[125.8,"We're just like Hyatt, just like Hilton, full-service hotel."],[128.9,"But our members do enjoy significant discounts and really cool perks when they travel."],[133.5,"So if you see something you like in the membership, they'll be happy to show you how to get involved."],[139.7,"If it's not something for you, we still love you anyways because we want you staying at our hotel, whether it's as a member or a regular hotel guest."]]},{"id":"06","t":"The phone number: tell them why","d":69.0,"s":[[0.0,"Phone number is another area where you want to remove the doubt."],[5.9,"Don't just ask for a phone number."],[8.8,"They're going to wonder why."],[10.0,"Are these people going to call us?"],[11.6,"They're going to harass us."],[12.9,"They're going to share our information."],[15.4,"If you tell them why when you ask for it, it removes the doubt."],[19.5,"Folks, we also do confirmation calls with our guests."],[23.3,"If you want to give me your phone number, maybe you have WhatsApp on your phone."],[26.7,"That way, one of my managers or supervisors can reach out to you this afternoon between like 5 and 6 o'clock simply to ask you if you're still able to make it."],[35.1,"We're not allowed to solicit or anything like that."],[37.9,"It's just to be able to see if you're still able to make it."],[41.4,"Usually when you explain them why you're asking for the phone number in a very passive, ambiguous way, very comforting way, keep everything simple, they're not going to refuse to give a phone number."],[53.3,"They're not going to wonder why you're asking for a phone number, and they're not going to give a fake phone number."],[57.1,"They want to come. They want that confirmation call."],[60.3,"It makes them feel like VIPs."],[62.1,"So if you tell them why you're asking for the phone number before they ask, you remove the doubt."]]},{"id":"07","t":"Lock in the show-up","d":146.9,"s":[[1.4,"Once the invitation is in their hand and the business appears to be done, don't just tell them have a nice day."],[10.2,"Ask them again. So we see you guys tomorrow at 8 for sure?"],[15.4,"And if you feel any doubt from the people's response, you're taking their temperature."],[20.2,"If they say something like, oh, we'll try to make it or we'll see, go back again and ask them."],[27.3,"Or, sorry if I misunderstood, but I thought you were pretty sure you were coming."],[35.6,"Well, we don't know this and that and so forth."],[37.8,"Just tell them honestly."],[39.0,"And it's true. It's not a lie."],[41.1,"You know, a lot of families are interested in coming for our open house promotion."],[45.5,"And we certainly wouldn't want to block a space for someone who's sure they want to come if you're not sure you're going to make it."],[53.5,"So tell me, guys, are we going to see you tomorrow at 8?"],[56.8,"And they say, yeah, we'll be there."],[58.2,"That's good. You let them understand we're running a business."],[60.9,"This isn't an invitation handing out business."],[63.3,"This is people showing up business."],[66.6,"And if they continue to show doubt, just tell them, you know what, guys, maybe I should give this invitation to somebody else."],[73.1,"I wouldn't want to hold up a space for another family if you're not sure you're going to make it."],[77.1,"That's very important."],[78.9,"There's no shame in getting a solid no."],[81.9,"In fact, it is better to get a solid no than a bunch of fake yeses, where the people tell you, yeah, yeah, we'll be there, and then they don't show up."],[91.4,"Okay. Granted, not every tour shows up no matter what you do."],[94.6,"We all know this. But these are all just little tricks and tips to filter out some of the guests that are just taking your invitation to be friendly and not intending on showing up whatsoever."],[107.4,"And don't be afraid to tell them."],[109.5,"And I tell this to every guest."],[111.9,"I'll be buttoning up a customer for one of our staff."],[117.3,"And I tell them, listen, this nice young man gets a little $65 bonus on his paycheck just for you showing up."],[123.4,"You don't have to book or buy anything."],[125.8,"I know he would greatly appreciate it."],[127.8,"So if you can make it, it's very appreciated."],[131.0,"We'd really appreciate it."],[132.7,"It would mean a lot to him."],[136.1,"You know, let them know it's important to you that they show up."],[139.9,"Your job isn't to just talk to people and hand out invitations."],[142.4,"Your job is to get people to come to the hotel."]]},{"id":"08","t":"90 minutes. Never say minutes.","d":83.6,"s":[[0.7,"And very good when you're reconfirming the agenda at the end to say, and guys, between the breakfast, the property tour, and a little information about the club, we only ask families for 90 minutes, and breakfast tends to eat about half of that."],[15.9,"Never say 45 minutes, never say 30 minutes, never mention any minutes whatsoever, because then they're going to think the presentation is 45 minutes if you do that."],[26.4,"If you just say breakfast tends to eat about half of that, that's very vague and ambiguous."],[31.4,"It makes it sound like the rest of the preview is going to be short and sweet, which it is, by the way."],[37.5,"But the minute you start breaking it down into minutes by saying, oh, breakfast is 45 minutes, property tour is 15 minutes, blah, blah, blah, blah, they think that the presentation is only half an hour, 45 minutes."],[51.1,"And as soon as our hostesses check them in and say, you're aware this is a 90-minute presentation, they say, oh, they told us it's only 45 minutes."],[58.8,"Never mention any minutes."],[61.3,"Folks, like I told you, between the breakfast, the property tour, and a little information on booking direct to the club, we only ask families for 90 minutes, and breakfast tends to eat about half of that, which is not a lie, but it's also very vague."],[75.4,"It's not putting a pin on any specific time."],[78.3,"You've told them 90 minutes."],[80.2,"That's what they need to know."]]},{"id":"09","t":"Why this matters","d":161.4,"s":[[0.5,"In this grand total of about 13 minutes of messages, we've covered very important points that will certainly help you increase your show rate."],[12.9,"Listen to these messages."],[15.2,"Listen to them a few times if it helps you."],[18.2,"These are the same things that we say to you at the locations, but for better or for worse, when we're on location, we're usually busy attacking the customers, so we don't always have a chance to discuss these things, especially the PM shift."],[32.0,"But guys, these are all the little sweet tricks and tips that if you listen to them, learn them, start applying them, you'll go from eight bookings a week and one show up to 10 bookings a week and five show ups, six show ups, or more."],[49.9,"Plus, when you give a real expectation why we're inviting them, which is to learn about how they can book direct through our club membership, they go in with that spark of interest."],[61.5,"And when they know they're coming in to be offered something, you have a much greater chance of them buying."],[68.1,"When we just tell them to come check out the hotel and nothing else, then when they find out it's a sales presentation, they're going to be out for the rest of the presentation."],[79.9,"They're going to have their eyes closed and their ears closed."],[85.4,"So if you apply these tips and tricks, if you learn them, if you practice them, you have a better booking rate, better show rate, better Q rate, more tours, more sales."],[97.5,"And it's all a matter of just improving."],[100.8,"Everybody every day in this business can learn more, can improve, myself included, everybody in this business included."],[109.3,"There's always room for improvement."],[112.0,"So please, none of this is criticism to anybody."],[114.8,"It is all just a way to try to help you improve."],[117.1,"It's a good 15 minutes investment to listen to these messages and maybe listen to them more than once or twice."],[124.9,"Thank you all. Have a great day."],[127.1,"If anyone would ever like more tips or tricks or more training, not only can we do it person to person at the location, but we can also set up trainings with myself, with Victor, with Glenn, down at the office on different aspects of the job, not just the basic training we all go through, but we can go through closing training, we can go through covering objections."],[147.1,"We have an awesome team right now."],[149.6,"And I want everybody who's with us right now to grow, to succeed, to make a lot of money, to love their job and to have fun."],[158.1,"So let's do it, guys."]]}]/*CLIPS-END*/;
+
+/* ---------- Scenario generator ---------- */
+const GRADE = { Q: "Q · full gift", CT: "CT · half gift", NQ: "NQ · no gift" };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+function bandUSA(a){ return a>=32&&a<=70 ? "Q" : (a>=28&&a<=31)||a>=71 ? "CT" : "NQ"; }
+function bandLat(a){ return a>=40&&a<=60 ? "Q" : "NQ"; }
+function bandArg(a){ return a>=45&&a<=55 ? "Q" : (a>=35&&a<=44)||(a>=56&&a<=70) ? "CT" : "NQ"; }
+/* Her age. When his band isn't Q, keep her in the same band so the answer never depends on whose age counts for CT. */
+function herAge(his, band){
+  const offs = shuffle([-6,-4,-3,-2,-1,0,1,2,3,5]);
+  for (const o of offs){ const h = Math.max(22, his + o); if (band(his) === "Q" || band(h) === band(his)) return h; }
+  return his;
+}
+function genScenario(){
+  const r = Math.random();
+  if (r < 0.4){
+    const from = pick(["Texas","Ohio","New Jersey","Florida","Ontario, Canada","New York","Illinois","Quebec, Canada","Pennsylvania","Alberta, Canada"]);
+    const his = pick([24,26,27,28,29,30,31,32,33,38,47,58,66,69,70,71,72,74,78]);
+    const card = pick(["Visa","Mastercard","Amex","Discover"]);
+    const job = his >= 66 ? "They're both retired" : "He works";
+    const g = bandUSA(his);
+    return { q:`Married couple from ${from}. He's ${his}, she's ${herAge(his, bandUSA)}. ${job}, they have a ${card}, and they paid for their hotel.`,
+      g, why:`USA & Canada, the man's age counts. ${his} → ${g==="Q"?"32 to 70 is Q":g==="CT"?"28 to 31 and 71+ are CT":"under 28 is NQ"}.` };
+  }
+  if (r < 0.65){
+    const from = pick(["Colombia","Mexico","Peru","Chile","Brazil","Costa Rica","Panama","the Dominican Republic","Guatemala"]);
+    const his = pick([36,38,39,40,41,48,55,59,60,61,63]);
+    const card = pick(["Visa","Mastercard","Amex"]);
+    const g = bandLat(his);
+    return { q:`Couple living together, from ${from}. He's ${his}, she's ${herAge(his, bandLat)}. Both work, they have a ${card}, paying for their hotel.`,
+      g, why:`Latin America & Caribbean: 40 to 60 is Q. There is no CT band, so ${his} is ${g}.` };
+  }
+  if (r < 0.85){
+    const his = pick([33,35,40,44,45,50,55,56,62,70,72]);
+    const g = bandArg(his);
+    return { q:`Married couple from Argentina. He's ${his}, she's ${herAge(his, bandArg)}. He works, they have a Mastercard, paying for their rental.`,
+      g, why:`Argentina: 45 to 55 Q, 35 to 44 and 56 to 70 CT, anything else NQ. ${his} → ${g}.` };
+  }
+  const from = pick(["Venezuela","Ecuador","Haiti","Cuba"]);
+  const his = pick([42,46,50,55,58]);
+  return { q:`Married couple from ${from}. He's ${his}, she's ${herAge(his, bandLat)}. Both work, Visa card, paying for their hotel.`,
+    g:"NQ", why:`${from} is left out of the Latin America & Caribbean rules, so they're NQ at any age.` };
+}
+const FIXED_SCEN = [
+  ["USA single woman, 52. She works, has a Visa, and paid for her hotel.","Q","Single women from the USA, 40 to 65, are Q."],
+  ["Canadian single woman, 52. She works, has a Visa, and paid for her hotel.","NQ","Single women qualify from the USA only."],
+  ["USA single man, 45. Works, Amex, paying for his hotel.","NQ","Only single women can qualify, and only from the USA."],
+  ["USA couple, both 45, staying free at a friend's condo.","NQ","They must be paying for their accommodation."],
+  ["USA couple, 50. He's an active-duty Marine.","NQ","Active US military is NQ."],
+  ["USA couple, 50. He's in the National Guard. Visa, paying for their hotel.","Q","National Guard is permitted."],
+  ["USA couple, 44. She's a flight attendant with a US airline.","NQ","Airline pilots and crew are NQ."],
+  ["Mexican couple, 50. Both work. Their only card is a Discover.","NQ","Latin America & Caribbean needs Visa, Mastercard or Amex."],
+  ["USA couple. He's 69, she's 72. Retired, Amex, paying for their hotel.","Q","The man's age counts: 69 is Q."],
+  ["USA couple. He's 72, she's 65. Retired, Visa, paying for their timeshare.","CT","The man's age counts: 72 is CT (71+)."],
+  ["Same-sex couple from Chicago, 45 and 52. Both work, Visa, paying for their hotel.","Q","Either partner qualifies the age. Both are in 32 to 70."],
+  ["Three couples from Boston traveling together, all in their 40s.","NQ","Trinella / Trifecta: three couples or more is NQ."],
+  ["USA couple, 40. He speaks only English, she speaks only Spanish.","NQ","Both must be fluent in the same language."],
+  ["Canadian couple, 55. Toured Iberostar in-house 4 months ago.","NQ","An in-house tour in the last 6 months is NQ."],
+  ["USA couple, 48. He works at a Marriott vacation club resort.","NQ","Hotel, timeshare and vacation club employees are NQ."],
+  ["Iberostar The Club member staying at a rental condo. Brings IDs and card.","Q","Club members off property can be invited by the GI team and count as Q."]
+];
+function scenarioQ(s, id){
+  const opts = ["Q","CT","NQ"].map(k => GRADE[k]);
+  return { id, q:s.q, a:GRADE[s.g], g:s.g, w:opts.filter(o => o !== GRADE[s.g]), why:s.why, fixed:opts, scen:true };
+}
+function fixedScen(f){ return scenarioQ({ q:f[0], g:f[1], why:f[2] }, "fx" + FIXED_SCEN.indexOf(f)); }
+function buildScenarios(n){
+  const out = shuffle(FIXED_SCEN.slice()).slice(0, Math.round(n/3)).map(fixedScen);
+  const seen = new Set(out.map(o => o.q));
+  let guard = 0;
+  while (out.length < n && guard++ < 500){ const s = genScenario(); if (seen.has(s.q)) continue; seen.add(s.q); out.push(scenarioQ(s, "gen")); }
+  return shuffle(out);
+}
+
+/* =====================================================================
+   STATE (this phone only)
+   ===================================================================== */
+const KEY = "showup.v1";
+const blank = () => ({ name:"", mastered:{}, best:{}, misses:{}, sound:true, xp:0, lightning:0, daily:{ last:"", streak:0, best:0 }, listened:{}, coach:{}, intro:false });
+let S = blank();
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e){}
+if (!S.daily || typeof S.daily !== "object") S.daily = { last:"", streak:0, best:0 };
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+function shuffle(a){ for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const app = document.getElementById("app");
+const byId = id => LEVELS.find(l => l.id === id);
+const ALL_QS = LEVELS.flatMap(l => l.qs || []);
+const QBY = Object.fromEntries(ALL_QS.map(q => [q.id, q]));
+const DAY = 864e5;
+const GAPS = [1,3,7,14,30];
+const dstr = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const today = () => dstr(new Date());
+const yesterday = () => { const d = new Date(); d.setDate(d.getDate()-1); return dstr(d); };
+const fmtT = s => { s = Math.max(0, Math.floor(s||0)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; };
+const nf = n => Number(n||0).toLocaleString("en-US");
+const plural = (n, w) => `${n} ${w}${n===1?"":"s"}`;
+let rafId = 0, view = "home", game = null;
+
+function levelTotal(L){ return L.map ? MAP_STEPS.length*2 : (L.count || (L.qs||[]).length); }
+function reviewInfo(id){
+  const m = S.mastered[id]; if (!m) return null;
+  const gap = GAPS[Math.min(m.count-1, GAPS.length-1)];
+  const days = Math.ceil((m.last + gap*DAY - Date.now())/DAY);
+  return { count:m.count, due: days <= 0, days, gap };
+}
+function unlocked(id){
+  const L = byId(id);
+  if (S.mastered[id]) return true;
+  if (L.final) return TRACKS.every(t => t.levels.every(x => S.mastered[x]));
+  const T = TRACKS.find(t => t.levels.includes(id)), k = T.levels.indexOf(id);
+  return k === 0 || !!S.mastered[T.levels[k-1]];
+}
+const masteredCount = () => LEVELS.filter(l => S.mastered[l.id]).length;
+function rank(){
+  if (S.mastered.final) return "Show-Up Pro";
+  const n = masteredCount();
+  return n >= 4 ? "Running" : n >= 2 ? "Walking" : "Crawling";
+}
+function dayStreak(){ const d = S.daily; return d.last && (d.last === today() || d.last === yesterday()) ? d.streak : 0; }
+const dailyOpen = () => LEVELS.some(l => l.qs && S.mastered[l.id]);
+const lightningOpen = () => !!S.mastered.who;
+function addXP(n){ S.xp = (S.xp||0) + n; }
+
+/* ---------- Sound, buzz, confetti, toast ---------- */
+let ac;
+function tone(kind){
+  if (!S.sound) return;
+  try {
+    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    const set = { ok:[[660,"triangle"],[880,"triangle"]], bad:[[220,"sawtooth"],[165,"sawtooth"]], win:[[523,"triangle"],[659,"triangle"],[784,"triangle"],[1047,"triangle"]], tick:[[1200,"square"]] }[kind];
+    set.forEach(([f,type],i)=>{
+      const o=ac.createOscillator(), g=ac.createGain(), t=ac.currentTime+i*0.09;
+      o.type=type; o.frequency.value=f;
+      const peak = kind==="bad"?0.06:kind==="tick"?0.03:0.11;
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(peak,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+(kind==="tick"?0.05:0.16));
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.2);
+    });
+  } catch(e){}
+}
+function buzz(p){ try { navigator.vibrate && navigator.vibrate(p); } catch(e){} }
+let fxRaf = 0;
+function confetti(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.getElementById("fx"), x = c.getContext("2d"), dpr = Math.min(2, window.devicePixelRatio||1);
+  const W = innerWidth, H = innerHeight;
+  c.width = W*dpr; c.height = H*dpr; c.hidden = false;
+  const cs = getComputedStyle(document.documentElement);
+  const cols = ["--lagoon","--sun","--good","--bad"].map(v => cs.getPropertyValue(v).trim());
+  const P = Array.from({length:150}, () => ({ x:W/2+(Math.random()-.5)*120, y:H*.32, vx:(Math.random()-.5)*10, vy:-Math.random()*12-4, r:5+Math.random()*6, a:Math.random()*6.3, va:(Math.random()-.5)*.3, c:pick(cols) }));
+  const t0 = performance.now(); let last = t0;
+  cancelAnimationFrame(fxRaf);
+  (function f(t){
+    const dt = Math.min(32, t-last)/16; last = t;
+    x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,H);
+    for (const p of P){ p.vy += .32*dt; p.vx *= .99; p.x += p.vx*dt; p.y += p.vy*dt; p.a += p.va*dt; x.save(); x.translate(p.x,p.y); x.rotate(p.a); x.fillStyle=p.c; x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2); x.restore(); }
+    if (t - t0 < 2400) fxRaf = requestAnimationFrame(f); else { x.clearRect(0,0,W,H); c.hidden = true; }
+  })(t0);
+}
+let toastT = 0;
+function toast(msg){
+  document.querySelectorAll(".toast").forEach(n => n.remove());
+  const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role","status"); t.textContent = msg;
+  document.body.appendChild(t); clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2600);
+}
+
+/* ---------- Screen switch ---------- */
+function show(html, keepAudio){
+  cancelAnimationFrame(rafId); rafId = 0;
+  if (!keepAudio) stopAudio();
+  app.innerHTML = html;
+  window.scrollTo(0,0);
+}
+const $ = sel => app.querySelector(sel);
+const on = (sel, fn) => { const el = $(sel); if (el) el.onclick = fn; };
+
+/* =====================================================================
+   HOME
+   ===================================================================== */
+const ORDER = ["q","why","ctnq","offer","who","solid","map","final"];
+function nextAction(){
+  const due = LEVELS.filter(L => reviewInfo(L.id)?.due);
+  if (due.length){
+    const L = due[0], r = reviewInfo(L.id);
+    return { h:`Review due: ${L.name}`, p:`You mastered it ${plural(r.count,"time")}. One clean run now locks it in for ${GAPS[Math.min(r.count, GAPS.length-1)]} days.`, b:"Start review run", sun:true, go:() => play(L.id) };
+  }
+  if (dailyOpen() && S.daily.last !== today())
+    return { h:"Daily 10", p: dayStreak() ? `Keep your ${dayStreak()}-day streak going. Ten questions from what you've mastered.` : "Ten questions from what you've mastered, heavy on the ones you miss.", b:"Play Daily 10", sun:true, go:startDaily };
+  for (const id of ORDER){
+    const L = byId(id);
+    if (unlocked(id) && !S.mastered[id]){
+      const studyFirst = (L.notes.length || L.map) && !S.best[id];
+      return { h:L.name, p: S.best[id] ? `Your best run: ${S.best[id]} of ${levelTotal(L)}. Go again.` : L.final ? "25 questions from everything, in a row. Pass it and you're a Show-Up Pro." : `${L.sub}. Read the cards, then play the run.`, b: studyFirst ? "Study, then play" : "Play", go:() => studyFirst ? study(id) : play(id) };
+    }
+  }
+  if (lightningOpen()) return { h:"Lightning round", p:`Your record is ${plural(S.lightning||0,"couple")} in 60 seconds. Beat it.`, b:"Play Lightning", go:lightningIntro };
+  return { h:"Listen again", p:"Everything is mastered. Keep the trainer's voice notes fresh.", b:"Open voice notes", go:listen };
+}
+
+function levelCard(id, n){
+  const L = byId(id), open = unlocked(id), r = reviewInfo(id), best = S.best[id]||0, total = levelTotal(L);
+  let chip;
+  if (!open) chip = `<span class="chip">Locked</span>`;
+  else if (r && r.due) chip = `<span class="chip due">Review due</span>`;
+  else if (r) chip = `<span class="chip ok">Mastered ×${r.count}</span><span>review in ${plural(r.days,"day")}</span>`;
+  else if (best) chip = `<span class="chip">Best ${best} / ${total}</span>`;
+  else chip = `<span class="chip">New</span>`;
+  const T = TRACKS.find(t => t.levels.includes(id)), prevId = T && T.levels[T.levels.indexOf(id)-1];
+  const lockMsg = L.final ? `Master all ${TRACKS.reduce((a,t) => a + t.levels.length, 0)} levels to unlock.` : prevId ? `Master ${byId(prevId).name} first.` : "";
+  const studyBtn = (L.notes.length || L.map) ? `<button class="btn ghost" data-study="${id}">Study</button>` : "";
+  return `<article class="level ${r?"done":""} ${open?"":"locked"} ${L.final?"final":""}">
+    <div class="num" aria-hidden="true">${L.final ? "★" : n}</div>
+    <div><p class="eyebrow">${esc(L.sub)}</p><h3>${esc(L.name)}</h3></div>
+    <div class="meta">${chip}<span>${L.map ? "7 steps × 2 rounds" : total + " questions"}</span></div>
+    <div class="actions">${open ? `${studyBtn}<button class="btn ${r&&r.due?"sun":""}" data-play="${id}">${r ? "Review run" : "Play"}</button>` : `<span class="meta">${esc(lockMsg)}</span>`}</div>
+  </article>`;
+}
+
+function renderHome(){
+  view = "home"; game = null;
+  const na = nextAction(), ds = dayStreak();
+  const heard = CLIPS.filter(c => S.listened[c.id]).length;
+  const totalMin = Math.round(CLIPS.reduce((a,c) => a + c.d, 0)/60);
+  const weak = topMisses(3);
+  const fresh = masteredCount() === 0 && !S.intro;
+  show(`
+  <header class="pass">
+    <div class="main">
+      <p class="eyebrow">OPC training · Aruba</p>
+      <h1>Show-Up Academy</h1>
+      <p class="who">${S.name ? `<span>${esc(S.name)}</span>` : ""}<span>${rank()}</span><span><b>${nf(S.xp)}</b> XP</span>${ds ? `<span><b>${ds}</b>-day streak</span>` : ""}</p>
+    </div>
+    <div class="stub" aria-hidden="true"><b>8:00</b><span>AM</span><span>ADMIT 2</span></div>
+  </header>
+
+  ${S.name ? "" : `<form class="name-row" id="nameForm"><label class="eyebrow" for="nm">Your name, for your certificate and progress report</label><input id="nm" autocomplete="given-name" placeholder="First name" maxlength="30"><button class="btn">Save</button></form>`}
+
+  ${fresh ? howItWorks(true) : ""}
+
+  <section class="today" aria-label="Next up">
+    <p class="eyebrow">Next up</p>
+    <h2>${esc(na.h)}</h2>
+    <p>${esc(na.p)}</p>
+    <button class="btn wide ${na.sun?"sun":""}" id="nextBtn">${esc(na.b)}</button>
+  </section>
+
+  ${TRACKS.map(T => `<section class="track">
+    <div class="track-h"><h2>${T.name}</h2><p class="muted small">${T.sub}</p></div>
+    ${T.levels.map((id,k) => levelCard(id, k+1)).join("")}
+  </section>`).join("")}
+
+  <section class="track">
+    <div class="track-h"><h2>Final</h2><p class="muted small">Everything, mixed</p></div>
+    ${levelCard("final")}
+  </section>
+
+  <section class="track">
+    <div class="track-h"><h2>Games</h2><p class="muted small">Speed and memory</p></div>
+    <div class="games">
+      <article class="game-card ${lightningOpen()?"":"locked"}">
+        <p class="eyebrow">60 seconds</p><h3>Lightning round</h3>
+        <p class="small muted">Qualify as many couples as you can. One mistake ends it.</p>
+        <p><span class="big">${S.lightning||0}</span> <span class="small muted">record</span></p>
+        ${lightningOpen() ? `<button class="btn" id="lgBtn">Play</button>` : `<p class="small muted">Master Who qualifies? to unlock.</p>`}
+      </article>
+      <article class="game-card ${dailyOpen()?"":"locked"}">
+        <p class="eyebrow">${S.daily.last===today() ? "Done today" : "Once a day"}</p><h3>Daily 10</h3>
+        <p class="small muted">Ten questions from what you've mastered. Your misses come back more.</p>
+        <p><span class="big">${ds}</span> <span class="small muted">day streak</span></p>
+        ${dailyOpen() ? `<button class="btn ${S.daily.last===today()?"ghost":""}" id="dyBtn">${S.daily.last===today()?"Play again":"Play"}</button>` : `<p class="small muted">Master any level to unlock.</p>`}
+      </article>
+    </div>
+  </section>
+
+  <section class="panel">
+    <p class="eyebrow">Trainer's voice notes</p>
+    <h3>${CLIPS.length} notes · ${totalMin} minutes · ${heard} of ${CLIPS.length} heard</h3>
+    <p class="small muted">The whole pitch in the trainer's own words. Listen a few times. Tap any sentence to jump to it.</p>
+    <button class="btn ghost" id="lsBtn">Listen</button>
+  </section>
+
+  ${weak.length ? `<section class="panel weak"><p class="eyebrow">Your weak spots</p><ul>${weak.map(([id,n]) => `<li>${esc(QBY[id].q)}<br><span class="ans">${esc(QBY[id].a)}</span> <span class="mono muted small">· missed ${n}×</span></li>`).join("")}</ul></section>` : ""}
+
+  <section class="panel">
+    <p class="eyebrow">For your manager</p>
+    <h3>Send my progress</h3>
+    <p class="small muted">Makes a short report you can send on WhatsApp.</p>
+    <button class="btn ghost" id="rpBtn">Make my report</button>
+  </section>
+
+  ${fresh ? "" : howItWorks(false)}
+
+  <footer class="foot">
+    <span>Source: Qualifications Aruba, 2 March 2026 · trainer's voice notes, 29 Sept 2026 · Open House flyer and partner sheet. Progress is saved on this phone.</span>
+    <span class="confirm" id="resetBox">
+      <button class="link" id="snd">Sound ${S.sound?"on":"off"}</button>
+      ${S.name ? `<button class="link" id="rename">Change name</button>` : ""}
+      <button class="link" id="coach">Coach screen</button>
+      <button class="link" id="reset">Reset my progress</button>
+    </span>
+  </footer>`);
+
+  const nfm = $("#nameForm");
+  if (nfm) nfm.addEventListener("submit", e => { e.preventDefault(); const v = $("#nm").value.trim().slice(0,30); if (v){ S.name = v; save(); renderHome(); } });
+  on("#nextBtn", na.go);
+  app.querySelectorAll("[data-study]").forEach(b => b.onclick = () => study(b.dataset.study));
+  app.querySelectorAll("[data-play]").forEach(b => b.onclick = () => play(b.dataset.play));
+  on("#lgBtn", lightningIntro); on("#dyBtn", startDaily); on("#lsBtn", listen); on("#rpBtn", report); on("#coach", coach);
+  on("#gotIt", () => { S.intro = true; save(); renderHome(); });
+  on("#snd", () => { S.sound = !S.sound; save(); renderHome(); });
+  on("#rename", () => { S.name = ""; save(); renderHome(); });
+  on("#reset", () => {
+    const box = $("#resetBox");
+    box.innerHTML = `<span>Erase all progress on this phone?</span><button class="btn ghost" id="no">Keep it</button><button class="btn danger" id="yes">Erase</button>`;
+    on("#no", renderHome);
+    on("#yes", () => { S = Object.assign(blank(), { name:S.name, sound:S.sound, coach:S.coach, intro:true }); save(); renderHome(); });
+  });
+}
+
+function howItWorks(first){
+  return `<section class="panel" aria-label="How it works">
+    <p class="eyebrow">How it works</p>
+    <ol class="method small">
+      <li><b>Study, then play.</b> Questions come in a new random order every run.</li>
+      <li><b>One wrong answer sends you back to question 1.</b> You see the right answer and why, so the next run goes further.</li>
+      <li><b>Pulling the answer out of your head is what builds memory.</b> Re-reading doesn't.</li>
+      <li><b>Come back for review runs</b> after 1, 3, 7, 14 and 30 days. Spacing it out makes it stick.</li>
+      <li><b>Daily 10</b> brings back the questions you miss most. <b>Lightning</b> trains speed: on the street you have seconds to qualify a couple.</li>
+    </ol>
+    ${first ? `<button class="btn ghost" id="gotIt">Got it</button>` : ""}
+  </section>`;
+}
+
+/* =====================================================================
+   STUDY
+   ===================================================================== */
+function study(id){
+  view = "study"; game = null;
+  const L = byId(id), n = TRACKS.find(t => t.levels.includes(id))?.levels.indexOf(id);
+  const notes = L.map
+    ? `<section class="note"><h3>The pitch map</h3><ol class="map">${MAP_STEPS.map(s => `<li class="set"><div><b>${esc(s.t)}</b><span>${esc(s.line)}</span></div></li>`).join("")}</ol>
+       <p class="small muted">Round 1: tap the step names in order. Round 2: tap the lines in order. One wrong tap and you start over.</p></section>`
+    : L.notes.map(nt => `<section class="note"><h3>${esc(nt.h)}</h3><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>${nt.say ? `<p class="say">"${esc(nt.say)}"</p>` : ""}</section>`).join("");
+  const clips = (L.clips||[]).map(cid => CLIPS.find(c => c.id === cid)).filter(Boolean);
+  show(`
+  <div class="topbar"><button class="x" id="back" aria-label="Back to levels">←</button><div class="t"><p class="eyebrow">Study${n >= 0 ? " · level " + (n+1) : ""}</p><h2>${esc(L.name)}</h2></div></div>
+  ${clips.length ? `<section class="stack"><p class="eyebrow">Hear it from the trainer</p><div class="clips">${clips.map(clipHTML).join("")}</div></section>` : ""}
+  ${(L.imgs||[]).length ? `<section class="stack"><p class="eyebrow">What the guest sees</p>${L.imgs.map(im => `<figure class="flyer"><a href="${im.src}" target="_blank" rel="noopener"><img src="${im.src}" width="${im.w}" height="${im.h}" alt="${esc(im.alt)}" loading="lazy"></a><figcaption class="small muted">${esc(im.cap)} · tap to open full size</figcaption></figure>`).join("")}</section>` : ""}
+  ${notes}
+  <button class="btn wide" id="go">I'm ready. Start the run</button>`, true);
+  on("#back", renderHome);
+  on("#go", () => play(id));
+  bindClips();
+}
+
+/* =====================================================================
+   QUESTION RUNS (levels, final, daily)
+   ===================================================================== */
+const DAILY = { id:"daily", name:"Daily 10", sub:"Spaced review", notes:[] };
+function play(id){
+  const L = byId(id);
+  if (L.map) return startMap();
+  let list;
+  if (L.gen) list = buildScenarios(L.count);
+  else if (L.final){ const pool = shuffle(ALL_QS.slice()).slice(0, L.count-6); list = shuffle(pool.concat(buildScenarios(6))); }
+  else list = shuffle(L.qs.slice());
+  startRun(L, list);
+}
+function buildDaily(){
+  const pool = LEVELS.filter(l => l.qs && S.mastered[l.id]).flatMap(l => l.qs);
+  const bag = pool.map(q => ({ q, w: 1 + 2*Math.min(3, S.misses[q.id]||0) })), picked = [];
+  const want = Math.min(S.mastered.who ? 8 : 10, bag.length);
+  while (picked.length < want && bag.length){
+    let r = Math.random() * bag.reduce((a,b) => a + b.w, 0), k = 0;
+    while (k < bag.length - 1 && (r -= bag[k].w) > 0) k++;
+    picked.push(bag.splice(k,1)[0].q);
+  }
+  const extra = S.mastered.who ? buildScenarios(10 - picked.length) : [];
+  return shuffle(picked.concat(extra));
+}
+function startDaily(){ startRun(DAILY, buildDaily()); }
+function startRun(L, list){
+  game = { kind:"run", L, list, idx:0, streak:0, locked:false, t0:Date.now() };
+  renderQuestion();
+}
+function qText(q){
+  return q.line ? esc(q.q).replace(/___/g, `<span class="blank">&nbsp;?&nbsp;</span>`) : esc(q.q);
+}
+function renderQuestion(){
+  view = "run";
+  const g = game, q = g.list[g.idx], total = g.list.length, best = S.best[g.L.id]||0;
+  g.opts = q.fixed ? q.fixed.slice() : shuffle([q.a, ...q.w]); g.locked = false;
+  const kind = q.scen ? "Q, CT or NQ?" : q.line ? "Finish the line" : "Question";
+  show(`
+  <div class="topbar"><button class="x" id="quit" aria-label="Quit to levels">×</button>
+    <div class="t"><p class="eyebrow">${esc(g.L.sub)}</p><h2>${esc(g.L.name)}</h2></div>
+    <div class="streak" id="stk"><span>Streak</span><b>${g.streak}</b></div></div>
+  <div class="bar" aria-hidden="true">${g.list.map((_,k) => `<i class="${k<g.idx?"on":k<best?"best":""}"></i>`).join("")}</div>
+  <article class="ticket" id="tk">
+    <div class="body"><p class="eyebrow">Invitation · ${kind}</p><p class="q">${qText(q)}</p></div>
+    <div class="stub" aria-label="Question ${g.idx+1} of ${total}"><b>${g.idx+1}</b><span>OF ${total}</span></div>
+  </article>
+  <div class="opts" role="group" aria-label="Answers">
+    ${g.opts.map((o,k) => `<button class="opt" data-k="${k}"><span class="k">${"ABCD"[k]}</span><span class="txt">${esc(o)}</span></button>`).join("")}
+  </div>
+  <div id="fb" aria-live="polite"></div>`);
+  on("#quit", renderHome);
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.k));
+}
+function answer(k){
+  const g = game; if (!g || g.kind !== "run" || g.locked) return; g.locked = true;
+  const q = g.list[g.idx], ok = g.opts[k] === q.a;
+  const btns = app.querySelectorAll(".opt");
+  btns.forEach((b,j) => { b.disabled = true; if (g.opts[j] === q.a) b.classList.add("right"); });
+  const fb = $("#fb");
+  if (ok){
+    g.streak++; addXP(10); save(); tone("ok"); buzz(15);
+    const stk = $("#stk"); stk.querySelector("b").textContent = g.streak; stk.classList.add("pop");
+    const last = g.idx === g.list.length-1;
+    fb.innerHTML = `<div class="feedback good"><h3>Right</h3><p class="why">${esc(q.why)}</p><button class="btn wide" id="next">${last ? "Finish" : "Next"}</button></div>`;
+    on("#next", () => { g.idx++; if (g.idx >= g.list.length) winRun(); else renderQuestion(); });
+    $("#next").focus({ preventScroll:true });
+    fb.scrollIntoView({ behavior:"smooth", block:"nearest" });
+  } else {
+    btns[k].classList.add("wrong"); tone("bad"); buzz([40,60,40]);
+    $("#tk").classList.add("shake");
+    $("#stk b").textContent = "0";
+    if (!q.scen) S.misses[q.id] = (S.misses[q.id]||0) + 1;
+    const reached = g.idx, prev = S.best[g.L.id]||0, isDaily = g.L.id === "daily";
+    if (!isDaily && reached > prev) S.best[g.L.id] = reached;
+    save();
+    fb.innerHTML = `<div class="feedback bad" role="alert"><h3>Back to the start</h3>
+      <p>Right answer: <b>${esc(q.a)}</b></p><p class="why">${esc(q.why)}</p>
+      <p class="mono small">This run: ${reached} in a row${isDaily ? "" : ` · Best: ${Math.max(reached,prev)} / ${g.list.length}`}</p>
+      <button class="btn wide" id="again">Start over (new order)</button>
+      ${g.L.notes.length ? `<button class="link" id="studyBtn">Study this level first</button>` : ""}</div>`;
+    on("#again", () => isDaily ? startDaily() : play(g.L.id));
+    on("#studyBtn", () => study(g.L.id));
+    $("#again").focus({ preventScroll:true });
+    fb.scrollIntoView({ behavior:"smooth", block:"nearest" });
+  }
+}
+function winRun(){
+  const g = game;
+  if (g.L.id === "daily"){
+    const t = today();
+    if (S.daily.last !== t){
+      S.daily.streak = S.daily.last === yesterday() ? S.daily.streak + 1 : 1;
+      S.daily.best = Math.max(S.daily.best||0, S.daily.streak);
+      S.daily.last = t; addXP(50);
+    }
+    save(); tone("win"); confetti();
+    return winScreen({ eyebrow:"Daily 10", h:"Done for today.", stats:[[g.list.length,"in a row"],[fmtT((Date.now()-g.t0)/1000),"run time"],[S.daily.streak,"day streak"]],
+      p:"Come back tomorrow to keep the streak. The questions you miss come back more often until they stick." });
+  }
+  masterLevel(g.L, g.list.length, Date.now() - g.t0);
+}
+function masterLevel(L, n, ms){
+  const first = !S.mastered[L.id], wasDue = !!reviewInfo(L.id)?.due;
+  const m = S.mastered[L.id] || { count:0, last:0 };
+  m.count++; m.last = Date.now(); S.mastered[L.id] = m; S.best[L.id] = n;
+  addXP(first ? 100 : wasDue ? 50 : 20); save();
+  tone("win"); buzz([30,40,30,40,80]); confetti();
+  const gap = GAPS[Math.min(m.count-1, GAPS.length-1)];
+  const nextId = ORDER.find(id => id !== L.id && unlocked(id) && !S.mastered[id]);
+  const date = new Date().toLocaleDateString("en-US", { year:"numeric", month:"long", day:"numeric" });
+  const N = nextId && byId(nextId);
+  winScreen({
+    eyebrow: L.sub, h: L.final ? "You know it cold." : "Level mastered.",
+    stats: [[n,"in a row"],[fmtT(ms/1000),"run time"],[gap+"d","next review"]],
+    cert: L.final ? `<div class="cert"><p class="eyebrow">Show-Up Academy · certificate</p><p class="who">${esc(S.name||"Show-Up Pro")}</p>
+      <p>Answered all ${n} questions in a row on the qualifications and the pitch, with no mistakes.</p><p class="mono small muted">${esc(date)} · passed ${plural(m.count,"time")}</p></div>
+      <p>Screenshot this and send it to your manager.</p>` : "",
+    p: `Come back in ${plural(gap,"day")} for a review run. Spacing it out is what makes it stick.${first && L.id === "who" ? " You unlocked the Lightning round." : ""}`,
+    next: N ? { label:`Next: ${N.name}`, go:() => ((N.notes.length || N.map) && !S.best[N.id]) ? study(N.id) : play(N.id) } : null
+  });
+}
+function winScreen(o){
+  view = "win"; game = null;
+  show(`<section class="win">
+    <p class="eyebrow">${esc(o.eyebrow)}</p>
+    <h2>${esc(o.h)}</h2>
+    <div class="stats">${o.stats.map(([b,s]) => `<div><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join("")}</div>
+    ${o.cert||""}
+    <p>${esc(o.p)}</p>
+    ${o.next ? `<button class="btn wide" id="nx">${esc(o.next.label)}</button>` : ""}
+    <button class="btn ghost wide" id="home">Back to levels</button>
+  </section>`);
+  if (o.next) on("#nx", o.next.go);
+  on("#home", renderHome);
+}
+
+/* =====================================================================
+   PITCH MAP (order the steps; a wrong tap starts over)
+   ===================================================================== */
+function startMap(){
+  game = { kind:"map", L:byId("map"), round:0, step:0, order:shuffle(MAP_STEPS.map((_,i) => i)), t0:Date.now(), locked:false };
+  renderMap();
+}
+function renderMap(msg){
+  view = "map";
+  const g = game, total = MAP_STEPS.length*2, done = g.round*MAP_STEPS.length + g.step, best = S.best.map||0;
+  const label = i => g.round === 0 ? esc(MAP_STEPS[i].t) : esc(MAP_STEPS[i].line);
+  show(`
+  <div class="topbar"><button class="x" id="quit" aria-label="Quit to levels">×</button>
+    <div class="t"><p class="eyebrow">Put the pitch in order</p><h2>Pitch map</h2></div>
+    <div class="streak"><span>Placed</span><b>${done}</b></div></div>
+  <div class="bar" aria-hidden="true">${Array.from({length:total},(_,k) => `<i class="${k<done?"on":k<best?"best":""}"></i>`).join("")}</div>
+  <p class="round">Round ${g.round+1} of 2 · ${g.round === 0 ? "step names" : "the lines you say"}</p>
+  ${msg ? `<p class="feedback good"><b>${esc(msg)}</b></p>` : ""}
+  ${g.step ? `<ol class="map" aria-label="Your pitch so far">${MAP_STEPS.slice(0, g.step).map(s => `<li class="set"><div><b>${esc(s.t)}</b>${g.round ? `<span>${esc(s.line)}</span>` : ""}</div></li>`).join("")}</ol>` : ""}
+  <p><b>Step ${g.step+1} of ${MAP_STEPS.length}.</b> Tap what comes ${g.step === 0 ? "first" : "next"}.</p>
+  <div class="cards" role="group" aria-label="Steps to place">${g.order.filter(i => i >= g.step).map(i => `<button class="card-btn" data-i="${i}">${label(i)}</button>`).join("")}</div>
+  <div id="fb" aria-live="polite"></div>`);
+  on("#quit", renderHome);
+  app.querySelectorAll(".card-btn").forEach(b => b.onclick = () => tapStep(+b.dataset.i, b));
+}
+function tapStep(i, btn){
+  const g = game; if (!g || g.kind !== "map" || g.locked) return;
+  if (i === g.step){
+    g.step++; addXP(5); tone("ok"); buzz(12);
+    if (g.step === MAP_STEPS.length){
+      if (g.round === 0){ g.round = 1; g.step = 0; g.order = shuffle(MAP_STEPS.map((_,k) => k)); save(); return renderMap("Round 1 done. Now the lines you actually say."); }
+      save(); return masterLevel(g.L, MAP_STEPS.length*2, Date.now() - g.t0);
+    }
+    save(); return renderMap();
+  }
+  g.locked = true; tone("bad"); buzz([40,60,40]);
+  btn.classList.add("wrong");
+  app.querySelectorAll(".card-btn").forEach(b => b.disabled = true);
+  const reached = g.round*MAP_STEPS.length + g.step, prev = S.best.map||0;
+  if (reached > prev) S.best.map = reached;
+  save();
+  const s = MAP_STEPS[g.step];
+  $("#fb").innerHTML = `<div class="feedback bad" role="alert"><h3>Back to the start</h3>
+    <p>Step ${g.step+1} is <b>${esc(s.t)}</b>: ${esc(s.line)}</p>
+    <p class="small">The whole map:</p>
+    <ol>${MAP_STEPS.map(x => `<li>${esc(x.t)}</li>`).join("")}</ol>
+    <p class="mono small">This run: ${reached} placed · Best: ${Math.max(reached, prev)} / ${MAP_STEPS.length*2}</p>
+    <button class="btn wide" id="again">Start over (new order)</button></div>`;
+  on("#again", startMap);
+  $("#again").focus({ preventScroll:true });
+  $("#fb").scrollIntoView({ behavior:"smooth", block:"nearest" });
+}
+
+/* =====================================================================
+   LIGHTNING ROUND (60 s, one mistake ends it)
+   ===================================================================== */
+const LG_MS = 60000;
+function lightningIntro(){
+  view = "lightning-intro"; game = null;
+  show(`
+  <div class="topbar"><button class="x" id="back" aria-label="Back to levels">←</button><div class="t"><p class="eyebrow">Game</p><h2>Lightning round</h2></div></div>
+  <section class="ticket"><div class="body">
+    <p class="eyebrow">Your record</p><p class="score">${S.lightning||0}</p>
+    <p>Qualify as many couples as you can in 60 seconds: <b>Q</b> full gift, <b>CT</b> half gift or <b>NQ</b> no gift.</p>
+    <p class="muted small">One mistake ends the round. On a keyboard, press 1, 2 or 3.</p>
+  </div><div class="stub" aria-hidden="true"><b>60</b><span>SEC</span></div></section>
+  <button class="btn wide sun" id="go">Start</button>`);
+  on("#back", renderHome);
+  on("#go", startLightning);
+  $("#go").focus({ preventScroll:true });
+}
+function nextCouple(seen){
+  for (let k = 0; k < 60; k++){
+    const s = Math.random() < 0.3 ? (f => ({ q:f[0], g:f[1], why:f[2] }))(pick(FIXED_SCEN)) : genScenario();
+    if (!seen.has(s.q)){ seen.add(s.q); return s; }
+  }
+  return genScenario();
+}
+function startLightning(){
+  const seen = new Set();
+  game = { kind:"lightning", score:0, end:Date.now()+LG_MS, seen, cur:nextCouple(seen), over:false, lastSec:60 };
+  view = "lightning";
+  show(`
+  <div class="topbar"><button class="x" id="quit" aria-label="Stop and go back">×</button><div class="t"><p class="eyebrow">Record ${S.lightning||0}</p><h2>Lightning round</h2></div>
+    <div class="streak"><span>Score</span><b id="sc">0</b></div></div>
+  <div class="clock" aria-hidden="true"><div class="track-bar"><div class="fill" id="fill"></div></div><b id="secs">60</b></div>
+  <article class="ticket" id="tk"><div class="body"><p class="eyebrow">Couple</p><p class="q" id="cq"></p></div><div class="stub" aria-hidden="true"><b id="cn">1</b><span>COUPLE</span></div></article>
+  <div class="gq" role="group" aria-label="Q, CT or NQ">
+    <button data-g="Q"><b>Q</b><span>full gift</span></button>
+    <button data-g="CT"><b>CT</b><span>half gift</span></button>
+    <button data-g="NQ"><b>NQ</b><span>no gift</span></button>
+  </div>`);
+  $("#cq").textContent = game.cur.q;
+  on("#quit", () => { game.over = true; renderHome(); });
+  app.querySelectorAll(".gq button").forEach(b => b.onclick = () => answerL(b.dataset.g, b));
+  const fill = $("#fill"), secs = $("#secs");
+  (function tick(){
+    const g = game; if (!g || g.kind !== "lightning" || g.over) return;
+    const left = g.end - Date.now();
+    if (left <= 0) return endLightning(null);
+    fill.style.transform = `scaleX(${left/LG_MS})`;
+    const s = Math.ceil(left/1000);
+    if (s !== g.lastSec){ g.lastSec = s; secs.textContent = s; if (s <= 10){ fill.classList.add("low"); tone("tick"); } }
+    rafId = requestAnimationFrame(tick);
+  })();
+}
+function answerL(choice, btn){
+  const g = game; if (!g || g.kind !== "lightning" || g.over) return;
+  if (choice === g.cur.g){
+    g.score++; addXP(5); tone("ok"); buzz(10);
+    $("#sc").textContent = g.score; $("#cn").textContent = g.score + 1;
+    g.cur = nextCouple(g.seen); $("#cq").textContent = g.cur.q;
+    const tk = $("#tk"); tk.classList.remove("flash"); void tk.offsetWidth; tk.classList.add("flash");
+  } else {
+    if (btn) btn.classList.add("wrong");
+    endLightning(choice);
+  }
+}
+function endLightning(wrongChoice){
+  const g = game; g.over = true; cancelAnimationFrame(rafId); rafId = 0;
+  const record = g.score > (S.lightning||0);
+  if (record) S.lightning = g.score;
+  save();
+  if (wrongChoice){ tone("bad"); buzz([40,60,40]); } else tone("win");
+  if (record) confetti();
+  view = "lightning-end";
+  show(`
+  <section class="win">
+    <p class="eyebrow">Lightning round · ${wrongChoice ? "one mistake" : "time's up"}</p>
+    <h2>${record ? "New record!" : plural(g.score, "couple")}</h2>
+    <div class="stats"><div><b>${g.score}</b><span>this round</span></div><div><b>${S.lightning}</b><span>your record</span></div><div><b>${nf(S.xp)}</b><span>XP</span></div></div>
+    ${wrongChoice ? `<div class="feedback bad"><p class="eyebrow">The couple</p><p>${esc(g.cur.q)}</p><p>You said <b>${esc(GRADE[wrongChoice])}</b>. Right answer: <b>${esc(GRADE[g.cur.g])}</b></p><p class="why">${esc(g.cur.why)}</p></div>` : ""}
+    <button class="btn wide sun" id="again">Play again</button>
+    <button class="btn ghost wide" id="home">Back to levels</button>
+  </section>`);
+  game = null;
+  on("#again", startLightning); on("#home", renderHome);
+  $("#again").focus({ preventScroll:true });
+}
+
+/* =====================================================================
+   LISTEN (trainer's voice notes, synced transcript)
+   ===================================================================== */
+const AUD = new Audio();
+AUD.preload = "none";
+let curClip = null, lastSeg = -1;
+const triedBlob = {};
+const ICON_PLAY = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>`;
+const ICON_PAUSE = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>`;
+const clipById = id => CLIPS.find(c => c.id === id);
+function clipHTML(c){
+  const heard = S.listened[c.id];
+  return `<article class="clip" data-clip="${c.id}">
+    <div class="clip-h">
+      <button class="play" data-play-clip="${c.id}" aria-label="Play ${esc(c.t)}">${ICON_PLAY}</button>
+      <div><h3>${esc(c.t)}</h3><p class="meta">${fmtT(c.d)}${heard ? ` · <span class="heard">heard</span>` : ""}</p></div>
+      <button class="speed" data-speed aria-label="Playback speed" hidden>${AUD.playbackRate}×</button>
+    </div>
+    <input class="seek" type="range" min="0" max="${Math.ceil(c.d)}" step="0.5" value="0" aria-label="Position in ${esc(c.t)}" data-seek="${c.id}" hidden>
+    <div class="tx" data-tx="${c.id}" hidden>${c.s.map(([t,txt],k) => `<button class="seg" data-t="${t}" data-k="${k}"><time>${fmtT(t)}</time>${esc(txt)}</button>`).join("")}</div>
+  </article>`;
+}
+function bindClips(){
+  app.querySelectorAll("[data-play-clip]").forEach(b => b.onclick = () => toggleClip(b.dataset.playClip));
+  app.querySelectorAll("[data-speed]").forEach(b => b.onclick = () => {
+    const r = { 1:1.25, 1.25:1.5, 1.5:0.75, 0.75:1 }[AUD.playbackRate] || 1;
+    AUD.playbackRate = r; AUD.defaultPlaybackRate = r;
+    app.querySelectorAll("[data-speed]").forEach(x => x.textContent = r + "×");
+  });
+  app.querySelectorAll("[data-seek]").forEach(r => r.oninput = () => { if (curClip === r.dataset.seek) AUD.currentTime = +r.value; });
+  app.querySelectorAll(".seg").forEach(b => b.onclick = () => {
+    const id = b.closest("[data-clip]").dataset.clip;
+    if (curClip !== id) loadClip(id);
+    const t = +b.dataset.t;
+    const go = () => { try { AUD.currentTime = t; } catch(e){} };
+    if (AUD.readyState >= 1) go(); else AUD.addEventListener("loadedmetadata", go, { once:true });
+    AUD.play().catch(audioFail); syncClipUI();
+  });
+  if (curClip) syncClipUI();
+}
+function loadClip(id){
+  curClip = id; lastSeg = -1; AUD.src = `audio/${id}.mp3`; AUD.playbackRate = AUD.defaultPlaybackRate || 1;
+  const c = clipById(id);
+  try { if ("mediaSession" in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title:c.t, artist:"Show-Up Academy", album:"Trainer's voice notes" }); } catch(e){}
+}
+function toggleClip(id){
+  if (curClip === id && !AUD.paused){ AUD.pause(); return; }
+  if (curClip !== id) loadClip(id);
+  AUD.play().catch(audioFail);
+  syncClipUI();
+}
+let failedClip = null;
+async function audioFail(e){
+  if (view !== "listen" && view !== "study") return;
+  if (e && e.name === "AbortError") return;
+  if (e && e.name === "NotAllowedError"){ toast("Tap play again to start the audio."); return; }
+  const id = curClip; if (!id || failedClip === id) return;
+  if (!triedBlob[id]){
+    triedBlob[id] = true;
+    try {
+      const res = await fetch(`audio/${id}.mp3`); if (!res.ok) throw new Error(String(res.status));
+      AUD.src = URL.createObjectURL(await res.blob()); await AUD.play(); return;
+    } catch(err){}
+  }
+  failedClip = id;
+  if (view !== "listen" && view !== "study") return;
+  toast("This voice note won't play here. Its words are in the transcript.");
+  const tx = app.querySelector(`[data-tx="${id}"]`); if (tx) tx.hidden = false;
+}
+AUD.addEventListener("error", () => { if (AUD.src) audioFail({ name:"MediaError" }); });
+function syncClipUI(){
+  app.querySelectorAll("[data-clip]").forEach(el => {
+    const id = el.dataset.clip, active = id === curClip, playing = active && !AUD.paused;
+    el.classList.toggle("on", active);
+    const b = el.querySelector("[data-play-clip]");
+    b.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+    b.setAttribute("aria-label", (playing ? "Pause " : "Play ") + clipById(id).t);
+    el.querySelector("[data-seek]").hidden = !active;
+    el.querySelector("[data-speed]").hidden = !active;
+    if (active) el.querySelector("[data-tx]").hidden = false;
+  });
+}
+AUD.addEventListener("play", syncClipUI);
+AUD.addEventListener("pause", syncClipUI);
+AUD.addEventListener("timeupdate", () => {
+  if (!curClip) return;
+  const c = clipById(curClip), t = AUD.currentTime;
+  const el = app.querySelector(`[data-clip="${curClip}"]`);
+  if (!S.listened[curClip] && AUD.duration && t / AUD.duration > 0.9){
+    S.listened[curClip] = true; addXP(20); save();
+    const m = el && el.querySelector(".meta"); if (m && !m.querySelector(".heard")) m.insertAdjacentHTML("beforeend", ` · <span class="heard">heard</span>`);
+  }
+  if (!el) return;
+  const seek = el.querySelector("[data-seek]"); if (seek && document.activeElement !== seek) seek.value = t;
+  let k = -1; for (let i = 0; i < c.s.length; i++){ if (c.s[i][0] <= t + 0.15) k = i; else break; }
+  if (k !== lastSeg){
+    lastSeg = k;
+    el.querySelectorAll(".seg.now").forEach(s => s.classList.remove("now"));
+    const s = el.querySelector(`.seg[data-k="${k}"]`);
+    if (s){ s.classList.add("now"); const box = s.parentElement; box.scrollTop = s.offsetTop - box.offsetTop - 48; }
+  }
+});
+AUD.addEventListener("ended", () => {
+  if (view !== "listen") return syncClipUI();
+  const k = CLIPS.findIndex(c => c.id === curClip);
+  if (k > -1 && k < CLIPS.length - 1){
+    loadClip(CLIPS[k+1].id); AUD.play().catch(audioFail); syncClipUI();
+    const el = app.querySelector(`[data-clip="${curClip}"]`); if (el) el.scrollIntoView({ behavior:"smooth", block:"start" });
+  } else syncClipUI();
+});
+function stopAudio(){ try { if (!AUD.paused) AUD.pause(); } catch(e){} }
+function listen(){
+  view = "listen"; game = null;
+  const heard = CLIPS.filter(c => S.listened[c.id]).length;
+  show(`
+  <div class="topbar"><button class="x" id="back" aria-label="Back to levels">←</button><div class="t"><p class="eyebrow">${heard} of ${CLIPS.length} heard</p><h2>Trainer's voice notes</h2></div></div>
+  <p>The trainer recorded these for the whole team. They play one after another. Listen a few times, and tap any sentence to jump to it.</p>
+  <div class="clips">${CLIPS.map(clipHTML).join("")}</div>`, true);
+  on("#back", renderHome);
+  bindClips();
+}
+
+/* =====================================================================
+   PROGRESS REPORT (for WhatsApp) and COACH SCREEN
+   ===================================================================== */
+const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","map","final"];
+const b64e = s => { const b = new TextEncoder().encode(s); let bin = ""; b.forEach(c => bin += String.fromCharCode(c)); return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); };
+const b64d = s => { s = s.replace(/-/g,"+").replace(/_/g,"/"); while (s.length % 4) s += "="; const bin = atob(s); return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))); };
+function topMisses(n){ return Object.entries(S.misses).filter(([id]) => QBY[id]).sort((a,b) => b[1]-a[1]).slice(0,n); }
+function reportText(){
+  const lv = id => { const L = byId(id); return S.mastered[id] ? `${L.name} ✔` : S.best[id] ? `${L.name} ${S.best[id]}/${levelTotal(L)}` : `${L.name} –`; };
+  const heard = CLIPS.filter(c => S.listened[c.id]).length;
+  const payload = { v:1, n:(S.name||"").slice(0,30), x:S.xp||0, m:Object.fromEntries(LEVEL_IDS.map(id => [id, S.mastered[id]?.count||0])), l:S.lightning||0, d:dayStreak(), h:heard, w:topMisses(8), t:Date.now() };
+  const miss = topMisses(3).map(([id,n]) => `"${QBY[id].q.length > 60 ? QBY[id].q.slice(0,58) + "…" : QBY[id].q}" (${n}×)`);
+  return [
+    `Show-Up Academy progress`,
+    `Name: ${S.name || "(no name set)"}`,
+    `Rank: ${rank()} · ${nf(S.xp)} XP`,
+    `Qualify: ${TRACKS[0].levels.map(lv).join(" · ")}`,
+    `The pitch: ${TRACKS[1].levels.map(lv).join(" · ")}`,
+    `Final run: ${S.mastered.final ? "passed ✔" : "not yet"}`,
+    `Lightning record: ${plural(S.lightning||0,"couple")}`,
+    `Daily streak: ${plural(dayStreak(),"day")}`,
+    `Voice notes heard: ${heard} of ${CLIPS.length}`,
+    miss.length ? `Needs work: ${miss.join("; ")}` : `Needs work: nothing missed yet`,
+    `#SUA1-${b64e(JSON.stringify(payload))}`
+  ].join("\n");
+}
+function report(){
+  view = "report"; game = null;
+  const txt = reportText();
+  show(`
+  <div class="topbar"><button class="x" id="back" aria-label="Back to levels">←</button><div class="t"><p class="eyebrow">For your manager</p><h2>My progress report</h2></div></div>
+  ${S.name ? "" : `<p class="feedback bad">Add your name on the home screen first, so your manager knows it's you.</p>`}
+  <p>Send this to your manager on WhatsApp. The code on the last line lets the coach screen read it.</p>
+  <textarea class="report" id="rt" readonly aria-label="Progress report">${esc(txt)}</textarea>
+  <div class="row">
+    <a class="btn sun" id="wa" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">Send on WhatsApp</a>
+    <button class="btn ghost" id="cp">Copy</button>
+  </div>
+  <p class="small muted">If WhatsApp doesn't open, tap Copy and paste it into your chat.</p>`);
+  on("#back", renderHome);
+  on("#cp", () => {
+    const ta = $("#rt");
+    const fallback = () => { ta.focus(); ta.select(); toast("Selected. Press and hold to copy."); };
+    try { navigator.clipboard.writeText(txt).then(() => toast("Copied. Paste it into WhatsApp."), fallback); } catch(e){ fallback(); }
+  });
+}
+/* Reports are pasted from chats: treat every field as untrusted. */
+function parseReports(text){
+  const out = [], re = /#SUA1-([A-Za-z0-9_-]{8,6000})/g; let m;
+  while ((m = re.exec(text))){
+    try {
+      const p = JSON.parse(b64d(m[1]));
+      if (!p || typeof p !== "object" || Array.isArray(p)) continue;
+      const num = (v, max) => Number.isFinite(+v) ? Math.max(0, Math.min(max, Math.round(+v))) : 0;
+      const name = String(p.n||"").replace(/[\u0000-\u001f\u007f]/g,"").trim().slice(0,30) || "No name";
+      const lv = o => Object.fromEntries(LEVEL_IDS.map(id => [id, num(o && typeof o === "object" ? o[id] : 0, 999)]));
+      const w = Array.isArray(p.w) ? p.w.filter(x => Array.isArray(x) && typeof x[0] === "string" && QBY[x[0]]).slice(0,8).map(x => [x[0], num(x[1], 9999)]) : [];
+      out.push({ n:name, x:num(p.x, 1e7), m:lv(p.m), l:num(p.l, 999), d:num(p.d, 9999), h:num(p.h, CLIPS.length), w, t:num(p.t, 4e12) });
+    } catch(e){}
+  }
+  return out;
+}
+function coach(){
+  view = "coach"; game = null;
+  const done = r => LEVEL_IDS.filter(id => r.m[id]).length;
+  const R = Object.values(S.coach||{}).sort((a,b) => done(b) - done(a) || b.x - a.x);
+  const agg = {};
+  R.forEach(r => r.w.forEach(([id,n]) => agg[id] = (agg[id]||0) + n));
+  const teamWeak = Object.entries(agg).sort((a,b) => b[1]-a[1]).slice(0,8);
+  show(`
+  <div class="topbar"><button class="x" id="back" aria-label="Back to levels">←</button><div class="t"><p class="eyebrow">For managers</p><h2>Coach screen</h2></div></div>
+  <p>Ask your team to tap <b>Make my report</b> and send it to you on WhatsApp. Paste their messages here, one or many at once. The reports stay on this phone.</p>
+  <label class="eyebrow" for="paste">Paste reports</label>
+  <textarea class="report" id="paste" placeholder="Paste WhatsApp messages that end with a #SUA1- code"></textarea>
+  <div class="row"><button class="btn" id="add">Add reports</button><span class="small muted" id="addMsg" role="status"></span></div>
+  ${R.length ? `
+  <section class="stack">
+    <p class="eyebrow">Team · ${R.length === 1 ? "1 person" : R.length + " people"}</p>
+    <ul class="roster">${R.map(r => `<li>
+      <div class="r1"><b>${esc(r.n)}</b>${r.m.final ? `<span class="chip ok">Show-Up Pro</span>` : ""}<span class="mono small muted">${esc(new Date(r.t).toLocaleDateString("en-US",{month:"short",day:"numeric"}))}</span></div>
+      <div class="r2"><span class="dots" role="img" aria-label="${done(r)} of ${LEVEL_IDS.length} levels mastered">${LEVEL_IDS.map(id => `<i class="${r.m[id]?"on":""}"></i>`).join("")}</span><span class="mono">${done(r)}/${LEVEL_IDS.length}</span><span>Lightning <b class="mono">${r.l}</b></span><span>Streak <b class="mono">${r.d}d</b></span><span>Notes <b class="mono">${r.h}/${CLIPS.length}</b></span></div>
+    </li>`).join("")}</ul>
+    <p class="small muted">Dots in order: ${LEVEL_IDS.map(id => byId(id).name).join(" · ")}.</p>
+  </section>
+  ${teamWeak.length ? `<section class="panel weak"><p class="eyebrow">What the team misses most</p><p class="small muted">Coach these at the next meeting.</p><ul>${teamWeak.map(([id,n]) => `<li>${esc(QBY[id].q)}<br><span class="ans">${esc(QBY[id].a)}</span> <span class="mono muted small">· missed ${n}×</span></li>`).join("")}</ul></section>` : ""}
+  <span class="confirm" id="clrBox"><button class="link" id="clr">Clear coach data</button></span>` : `<p class="panel small muted">No reports yet. When you paste the first one, your team shows up here with levels mastered, Lightning records and what they miss most.</p>`}`);
+  on("#back", renderHome);
+  on("#add", () => {
+    const got = parseReports($("#paste").value);
+    if (!got.length){ $("#addMsg").textContent = "No report codes found. Each report ends with a line that starts with #SUA1-."; return; }
+    S.coach = S.coach || {};
+    got.forEach(r => { const k = r.n.toLowerCase(); if (!S.coach[k] || S.coach[k].t <= r.t) S.coach[k] = r; });
+    save(); toast(`Added ${plural(got.length,"report")}.`); coach();
+  });
+  on("#clr", () => {
+    $("#clrBox").innerHTML = `<span>Remove all pasted reports from this phone?</span><button class="btn ghost" id="no">Keep</button><button class="btn danger" id="yes">Clear</button>`;
+    on("#no", coach); on("#yes", () => { S.coach = {}; save(); coach(); });
+  });
+}
+
+/* =====================================================================
+   KEYBOARD
+   ===================================================================== */
+document.addEventListener("keydown", e => {
+  if (!game || /INPUT|TEXTAREA/.test(e.target.tagName) || e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (game.kind === "run" && !game.locked){
+    const n = {"1":0,"2":1,"3":2,"4":3,"a":0,"b":1,"c":2,"d":3}[k];
+    if (n !== undefined && n < game.opts.length){ e.preventDefault(); answer(n); }
+  } else if (game.kind === "lightning" && !game.over){
+    const g = {"1":"Q","2":"CT","3":"NQ","q":"Q","c":"CT","n":"NQ"}[k];
+    if (g){ e.preventDefault(); answerL(g, app.querySelector(`.gq [data-g="${g}"]`)); }
+  } else if (game.kind === "map" && !game.locked){
+    const n = parseInt(k, 10), cards = app.querySelectorAll(".card-btn");
+    if (n >= 1 && n <= cards.length){ e.preventDefault(); cards[n-1].click(); }
+  }
+});
+
+/* =====================================================================
+   BOOT (and keep a run going if the page is updated while it's open)
+   ===================================================================== */
+renderHome();
+try {
+  const hot = window.claude && window.claude.hot;
+  if (hot && typeof hot.snapshot === "function")
+    hot.snapshot(() => game && game.kind === "run" ? { run:{ L:game.L.id, list:game.list, idx:game.idx, streak:game.streak, t0:game.t0 } } : {});
+  const resume = d => {
+    const r = d && d.run; if (!r || !Array.isArray(r.list) || !r.list.length) return;
+    const L = r.L === "daily" ? DAILY : byId(r.L); if (!L || L.map) return;
+    game = { kind:"run", L, list:r.list, idx:Math.min(r.idx|0, r.list.length-1), streak:r.streak|0, locked:false, t0:r.t0||Date.now() };
+    renderQuestion();
+  };
+  if (hot && typeof hot.ready === "function") hot.ready(resume); else if (hot && hot.data) resume(hot.data);
+} catch(e){}
+</script>
+</body>
+</html>
