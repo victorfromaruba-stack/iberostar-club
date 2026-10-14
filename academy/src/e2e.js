@@ -190,9 +190,11 @@ const EVIL = [
       let want;
       if (/Venezuela|Ecuador|Haiti|Cuba/.test(s.q)) want = "NQ";
       else if (/Argentina/.test(s.q)) want = bandArg(his);
-      else if (/Colombia|Mexico|Peru|Chile|Brazil|Costa Rica|Panama|Dominican|Guatemala/.test(s.q)) want = bandLat(his);
+      else if (/Colombia|Peru|Chile|Uruguay|Costa Rica|Panama|Dominican|Guatemala|Bolivia/.test(s.q)) want = bandLat(his);
       else want = bandUSA(his);
       if (want !== s.g) errs.push(s.q + " → " + s.g);
+      // The PDF doesn't say which rules Mexico follows, and Brazil or Quebec cards leave the language in doubt.
+      if (/Mexico|Brazil|Quebec/.test(s.q)) errs.push("region or language in doubt " + s.q);
       if (/Argentina/.test(s.q) && bandArg(his) !== "Q" && bandArg(her) !== bandArg(his)) errs.push("mixed band " + s.q);
     }
     return errs.slice(0, 3);
@@ -211,7 +213,7 @@ const EVIL = [
   ok("NLP opens after Remove the doubt", await p.evaluate(() => !document.querySelector('[data-node="nlp1"]').classList.contains("locked")));
   await p.evaluate(() => guidebook("nlp2"));
   ok("NLP guidebook has voice-note buttons and practice lines", await p.evaluate(() => document.querySelectorAll(".note [data-seg]").length >= 4 && document.querySelectorAll('.note [data-say]').length === 2));
-  await p.evaluate(() => { window.__sayText = "is 8 or 10 o'clock better for you guys"; });
+  await p.evaluate(() => { window.__sayText = "is whatsapp or a regular call better for you guys"; });
   await p.click('[data-say="n2b"]'); await p.waitForTimeout(400);
   ok("NLP practice line scores with Say it", await p.evaluate(() => S.said.n2b >= 0.99 && /practiced/i.test(document.querySelector('[data-said="n2b"]').textContent)));
   await p.evaluate(() => play("nlp1"));
@@ -308,7 +310,7 @@ const EVIL = [
   await p.waitForSelector(".summary");
   await p.evaluate(() => document.querySelectorAll("[data-person]").forEach(b => b.click()));
   await p.waitForTimeout(300);
-  ok("manager: hostile fields render as text", await p.evaluate(() => !window.__xss && !document.querySelector(".person img, .person svg[onload], .person i:not(.on):not([class=''])")) && await p.evaluate(() => [...document.querySelectorAll(".pname")].some(n => n.textContent.startsWith("<img src=x"))));
+  ok("manager: hostile fields render as text", await p.evaluate(() => !window.__xss && !document.querySelector(".person img, .person svg[onload], .person i:not(.on):not([class='']):not(.mini-bar i)")) && await p.evaluate(() => [...document.querySelectorAll(".pname")].some(n => n.textContent.startsWith("<img src=x"))));
   ok("manager: bad numbers become 0", await p.evaluate(() => [...document.querySelectorAll(".person")].find(a => /Eve/.test(a.textContent)).querySelector(".pstreak b").textContent === "0"));
   ok("manager: knows-it-all group first", await p.evaluate(() => /Knows it all · 1/.test(document.querySelector(".group-h")?.textContent || "")));
   ok("manager: same names kept apart, with a note", await p.evaluate(() => [...document.querySelectorAll(".pname")].filter(n => n.textContent === "Maria G.").length === 2 && /same name/.test(document.body.textContent)));

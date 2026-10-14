@@ -6,7 +6,7 @@
 const Q = (id, q, a, w, why) => ({ id, q, a, w, why });
 const LINE = (id, q, a, w, why, hear) => ({ id, q, a, w, why, line: true, ...(hear ? { hear: { clip: hear[0], from: hear[1], to: hear[2] } } : {}) });
 const PIC = (id, img, alt, q, a, w, why) => ({ id, img, alt, q, a, w, why, pic: true });
-const BUILD = (id, q, text, extra, why) => ({ id, type: "build", q, text, extra, why, a: text });
+const BUILD = (id, q, text, extra, why, alts) => ({ id, type: "build", q, text, extra, why, a: text, alts: alts || [] });
 const MATCH = (id, q, pairs, why) => ({ id, type: "match", q, pairs, why, a: pairs.map(p => `${p[0]}: ${p[1]}`).join("; ") });
 const LISTEN = (id, clip, from, to, q, a, w, why) => ({ id, type: "listen", clip, from, to, q, a, w, why });
 

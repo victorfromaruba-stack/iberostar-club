@@ -4,7 +4,7 @@
     python3 src/build.py --page          full page for GitHub Pages (noindex, manifest, icons) -> ../index.html
     python3 src/build.py --out FILE      write somewhere else
 
-The trainer's timed transcripts (CLIPS) come from clips.json, made by build_clips.py from the
+The voice notes' timed transcripts (CLIPS) come from clips.json, made by build_clips.py from the
 Whisper transcript. Every Script line is checked against the sentences it points at, so a wrong
 clip/from/to fails the build instead of playing the wrong words.
 """
@@ -51,7 +51,7 @@ page = f"""<title>Show-Up Academy</title>
 {(SRC / "style.css").read_text(encoding="utf-8").strip()}
 </style>
 {"</head>" + chr(10) + "<body>" if PAGE else ""}
-<div id="app"></div>
+<main id="app"></main>
 <canvas id="fx" aria-hidden="true" hidden></canvas>
 <script>
 "use strict";

@@ -11,7 +11,7 @@ const errors = [], warns = [];
 const clip = id => CLIPS.find(c => c.id === id);
 const seg = (where, c, a, b) => { const k = clip(c); if (!k || !(a >= 0) || !(b >= a) || b >= k.s.length) errors.push(`${where}: bad voice note range ${c}:${a}-${b}`); };
 const ids = new Set();
-let n = 0;
+let n = 0, opts = 0, longest = 0;
 for (const L of LEVELS) {
   for (const nt of L.notes || []) {
     if (nt.hear) seg(`${L.id} note "${nt.h}"`, nt.hear.clip, nt.hear.from, nt.hear.to);
@@ -31,8 +31,9 @@ for (const L of LEVELS) {
       continue;
     }
     if (it.type === "build") {
-      const toks = it.text.split(" ");
+      const toks = it.text.split(" "), same = t => t.split(" ").sort().join(" ") === toks.slice().sort().join(" ");
       if (it.extra.some(x => toks.includes(x))) errors.push(`${it.id}: an extra tile is also in the answer`);
+      for (const alt of it.alts || []) if (!same(alt)) errors.push(`${it.id}: the other accepted order "${alt}" uses different tiles`);
       continue;
     }
     if (!Array.isArray(it.w) || it.w.length < 2) { errors.push(`${it.id}: needs wrong options`); continue; }
@@ -47,13 +48,46 @@ for (const L of LEVELS) {
       const miss = line.filter(w => !heard.has(w));
       if (miss.length) warns.push(`${it.id}: words not in the voice note: ${miss.join(", ")}`);
     }
-    const avg = it.w.reduce((s, x) => s + x.length, 0) / it.w.length;
-    if (it.a.length > 12 && it.a.length > avg * 1.45) warns.push(`${it.id}: right answer stands out by length (${it.a.length} vs ${Math.round(avg)})`);
+    // Length must never give the answer away: workers spotted it when the right option was the long one.
+    const lens = it.w.map(x => x.length), avg = lens.reduce((s, x) => s + x, 0) / lens.length, mx = Math.max(...lens), mn = Math.min(...lens), a = it.a.length;
+    if (!it.scen) { opts++; if (a > mx) longest++; }
+    if (a >= 12 && a - mx > 5) errors.push(`${it.id}: right answer is the longest by ${a - mx} characters`);
+    if (a >= 12 && a > avg * 1.3) errors.push(`${it.id}: right answer is ${Math.round(a / avg * 100)}% of the average wrong one`);
+    if (a >= 12 && mn < a * 0.5) errors.push(`${it.id}: a wrong option is less than half as long as the right one`);
+    if (a >= 12 && a > avg * 1.2) warns.push(`${it.id}: right answer is a bit long (${a} vs ${Math.round(avg)})`);
   }
 }
 for (const st of SCRIPT) { for (const l of st.lines) seg(`script ${l.id}`, l.clip, l.from, l.to); if (st.dont) seg(`script ${st.step} don't`, st.dont.clip, st.dont.from, st.dont.to); if (st.extra) seg(`script ${st.step} extra`, st.extra.clip, st.extra.from, st.extra.to); }
 if (SCRIPT.length !== MAP_STEPS.length || SCRIPT.some((s, i) => s.step !== MAP_STEPS[i].t)) errors.push("Script steps don't match the pitch map steps");
-console.log(`${n} lesson items checked: ${errors.length} errors, ${warns.length} warnings`);
+// Writing checks over everything a worker reads (not the voice note transcripts, which are the team's own words),
+// including 300 generated guest cards.
+const gen = code.slice(code.indexOf("/* ---------- Scenario generator"), code.indexOf("/* =====================================================================\n   CONFIG"));
+vm.runInContext("function shuffle(a){ for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }\n" + gen.replace(/^const /gm, "var "), ctx);
+const texts = [];
+const add = (where, t) => { if (typeof t === "string" && t) texts.push([where, t]); };
+for (const L of LEVELS) {
+  add(L.id, L.name); add(L.id, L.sub);
+  for (const nt of L.notes || []) { add(L.id, nt.h); (nt.li || []).forEach(x => add(L.id, x)); add(L.id, nt.say); }
+  for (const it of L.qs || []) { add(it.id, it.q); add(it.id, it.why); add(it.id, it.a); add(it.id, it.text); (it.w || []).forEach(x => add(it.id, x)); (it.pairs || []).forEach(pr => { add(it.id, pr[0]); add(it.id, pr[1]); }); }
+}
+for (const st of SCRIPT) { add(st.step, st.tip); st.lines.forEach(l => { add(l.id, l.text); add(l.id, l.note); }); if (st.dont) { add(st.step, st.dont.text); add(st.step, st.dont.why); } }
+MAP_STEPS.forEach(m => { add("map", m.t); add("map", m.line); });
+ctx.FIXED_SCEN.forEach((f, i) => { add("fx" + i, f[0]); add("fx" + i, f[2]); });
+for (let i = 0; i < 300; i++) { const g = ctx.genScenario(); add("generated card", g.q); add("generated card", g.why); }
+const WRITING = [
+  [/\b[Aa] (?!US\b|one\b|uni|use|usu|Euro)[AEIOUaeiou]/, "use \"an\" before a vowel sound"],
+  [/\b[Aa]n (?!hour|hono|honest)[^AEIOUaeiou\W_\d]/, "use \"a\" before a consonant sound"],
+  [/\S  +\S/, "double space"],
+  [/\s[,.!?;:](\s|$)/, "space before punctuation"],
+  [/\b(\w+)\s+\1\b/i, "word repeated"]
+];
+const seenW = new Set();
+for (const [where, t] of texts) for (const [re, msg] of WRITING) {
+  const m = t.match(re);
+  if (m && !(msg === "word repeated" && /^(that|had)$/i.test(m[1])) && !seenW.has(msg + t)) { seenW.add(msg + t); errors.push(`${where}: ${msg}: "${t.slice(0, 80)}"`); }
+}
+if (longest / opts > 0.35) errors.push(`the right answer is the longest option in ${Math.round(longest / opts * 100)}% of questions (keep it under 35%)`);
+console.log(`${n} lesson items and ${texts.length} strings checked: ${errors.length} errors, ${warns.length} warnings. Right answer is the longest option in ${longest} of ${opts} questions (${Math.round(longest / opts * 100)}%).`);
 warns.forEach(w => console.log("  warn  " + w));
 errors.forEach(e => console.log("  ERROR " + e));
 process.exit(errors.length ? 1 : 0);

@@ -42,8 +42,10 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   the burrowing owl), and `clips.json` (the nine voice notes, transcribed with timings). Rebuild
   with `python3 academy/src/build.py --page`; the build fails if a Script line doesn't match the
   words in the voice note it plays, and `lint_content.js` fails it on content errors (repeated ids,
-  bad voice-note ranges, a "Word for word" answer that isn't in its recording) and warns when a
-  right answer stands out by length. Test with
+  bad voice-note ranges, a "Word for word" answer that isn't in its recording, a/an and other
+  grammar slips, including in 300 generated guest cards) and whenever answer length would give
+  the right option away (it may not be the longest by more than 5 characters, and may be the
+  longest option in at most 35% of questions). Test with
   `node academy/src/e2e.js <url> <outdir>` (Playwright; serve `academy/` with Range support, e.g.
   `npx http-server academy`). Media: `academy/audio/` (voice notes, MP3), `academy/img/` (two slides
   from the Open House pitch deck, `photos/`), `academy/video/` (golf loop, H.264 MP4). It has `noindex`. Progress is
