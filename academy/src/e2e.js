@@ -88,7 +88,7 @@ const EVIL = [
   await p.fill("#nm", "Maria <b>G.</b>"); await p.keyboard.press("Enter");
   ok("name shows, escaped", (await p.textContent(".say-row .bubble")).includes("Hi Maria <b>G.</b>"));
   ok("saving a name syncs the phone", await p.waitForFunction(() => S.sync.ok === true, null, { timeout: 5000 }).then(() => true, () => false));
-  ok("sync sends name and progress only", p.rpc.some(r => r.fn === "sua_save" && r.body.p_name === "Maria <b>G.</b>" && r.body.p_stats.v === 2 && !("mgr" in r.body.p_stats)));
+  ok("sync sends name and progress only", p.rpc.some(r => r.fn === "sua_save" && r.body.p_name === "Maria <b>G.</b>" && r.body.p_stats.v === 3 && !("mgr" in r.body.p_stats)));
 
   // 2. Popover and guidebook
   await p.click('[data-node="q"]');
@@ -101,6 +101,8 @@ const EVIL = [
 
   // 3. Lesson: select, Check, right sheet, then a wrong answer sends you back
   await p.click('[data-node="q"]'); await p.click('[data-start="q"]');
+  // The order is random; make sure the first question has options (a match item has no Check button).
+  await p.evaluate(() => { if (game.list[0].type){ const k = game.list.findIndex(q => !q.type); [game.list[0], game.list[k]] = [game.list[k], game.list[0]]; renderItem(); } });
   ok("lesson opens full screen without tabs", await p.evaluate(() => document.body.classList.contains("full") && document.querySelector("nav.tabs").hidden));
   ok("Check is off until you pick", await p.isDisabled("#check"));
   await p.keyboard.press("1");
@@ -290,42 +292,40 @@ const EVIL = [
   await noOverflow("offer guidebook");
   await shot("e2e-10-offer");
 
-  // 11. Me tab and the WhatsApp report
+  // 11. Me tab: progress reaches the manager by itself, no WhatsApp report
   await p.evaluate(() => tab("me"));
   ok("me: stats and week", await p.isVisible("text=This week") && await p.isVisible("text=Lightning record"));
-  await p.click("#rp");
-  const rep = await p.inputValue("#rt");
-  ok("report has a code line", /#SUA1-[A-Za-z0-9_-]+$/.test(rep));
-  const back = await p.evaluate(t => parseReports(t)[0], rep);
-  const mc = await p.evaluate(() => masteredCount());
-  ok("report code reads back", back && back.name === "Maria <b>G.</b>" && back.mastered === mc && back.stats.l === 3, back && `${back.name} ${back.mastered}/${mc}`);
-  await p.click("#back");
+  ok("me: no WhatsApp report", await p.evaluate(() => !document.querySelector("#rp") && !/WhatsApp/.test(document.querySelector("#app").textContent)));
+  const pl = await p.evaluate(() => payload()), plSize = JSON.stringify(pl).length;
+  ok("payload v3: answers per level, lesson log and days", pl.v === 3 && pl.a.q[0] > 0 && pl.lg.some(e => e[1] === "m") && pl.lg.some(e => e[1] === "f") && pl.dd.length > 0 && plSize < 16000, `${plSize} bytes`);
 
-  // 12. Manager view (mocked team list with hostile data)
+  // 12. Manager panel (mocked team list with hostile data)
   await p.click("#mgr");
   await p.fill("#code", "nope"); await p.click("#codeForm button");
   await p.waitForSelector("text=That code didn't work");
   ok("manager: wrong code refused", await p.evaluate(() => S.mgr === ""));
   await p.fill("#code", "GOOD-CODE"); await p.click("#codeForm button");
-  await p.waitForSelector(".summary");
-  await p.evaluate(() => document.querySelectorAll("[data-person]").forEach(b => b.click()));
-  await p.waitForTimeout(300);
-  ok("manager: hostile fields render as text", await p.evaluate(() => !window.__xss && !document.querySelector(".person img, .person svg[onload], .person i:not(.on):not([class='']):not(.mini-bar i)")) && await p.evaluate(() => [...document.querySelectorAll(".pname")].some(n => n.textContent.startsWith("<img src=x"))));
-  ok("manager: bad numbers become 0", await p.evaluate(() => [...document.querySelectorAll(".person")].find(a => /Eve/.test(a.textContent)).querySelector(".pstreak b").textContent === "0"));
-  ok("manager: knows-it-all group first", await p.evaluate(() => /Knows it all · 1/.test(document.querySelector(".group-h")?.textContent || "")));
-  ok("manager: same names kept apart, with a note", await p.evaluate(() => [...document.querySelectorAll(".pname")].filter(n => n.textContent === "Maria G.").length === 2 && /same name/.test(document.body.textContent)));
-  ok("manager: team misses summed", await p.evaluate(() => /missed 4×/.test(document.querySelector(".card.weak")?.textContent || "")));
-  await noOverflow("manager view");
+  await p.waitForSelector(".kw");
+  const rowNames = () => p.evaluate(() => [...document.querySelectorAll(".kw tbody .pname")].map(n => n.textContent));
+  ok("manager: hostile fields render as text", await p.evaluate(() => !window.__xss && !document.querySelector(".kw img, .kw svg[onload], .tp-card img")) && (await rowNames()).some(n => n.startsWith("<img src=x")));
+  ok("manager: one row per person, ready person first", (await rowNames()).length === 4 && (await rowNames())[0] === "Maria G." && await p.evaluate(() => document.querySelector(".kw tbody tr").querySelectorAll(".kc.done").length === 8));
+  ok("manager: bad numbers become 0", await p.evaluate(() => [...document.querySelectorAll(".kw tbody tr")].find(r => /Eve/.test(r.textContent)).querySelectorAll(".kc.done").length === 0));
+  ok("manager: same names kept apart", (await rowNames()).filter(n => n === "Maria G.").length === 2);
+  ok("manager: team misses summed", await p.evaluate(() => /Missed 4 times by 2 people/.test(document.querySelector("#wmH").closest("section").textContent)));
+  ok("manager: summary counts", await p.evaluate(() => /1\s*of 4/.test(document.querySelector(".t-sun b").textContent)));
+  await noOverflow("manager panel");
   await shot("e2e-12-team");
-  await p.click("summary:has-text('Add a report')");
-  await p.fill("#paste", "hi\n" + rep.replace("Maria <b>G.</b>", "x"));
-  await p.click("#add");
-  await p.waitForSelector("text=from WhatsApp");
-  ok("manager: pasted report shows up", true);
-  const hb = '[data-hide="44444444-4444-4444-8444-444444444444"]';
-  await p.evaluate(() => document.querySelectorAll("[data-person]").forEach(b => b.click()));
-  await p.click(hb); await p.click(hb); await p.waitForTimeout(300);
+  await p.click('[data-sort="name"]');
+  const byName = await rowNames();
+  ok("manager: sort by name", JSON.stringify(byName) === JSON.stringify(byName.slice().sort((a, b) => a.localeCompare(b))));
+  await p.click('.kw-name[data-open="44444444-4444-4444-8444-444444444444"]');
+  await p.waitForSelector("#lvH");
+  ok("manager: person page shows levels, needs work, practice and activity", await p.evaluate(() => ["#lvH", "#nwH", "#prH", "#acH"].every(s => document.querySelector(s)) && /Luis/.test(document.querySelector("h1").textContent)));
+  await noOverflow("manager person page");
+  await shot("e2e-12-person");
+  await p.click("#hide"); await p.click("#hide"); await p.waitForTimeout(300);
   ok("manager: hide calls the server with the code", p.rpc.some(r => r.fn === "sua_hide" && r.body.p_device.startsWith("4444") && r.body.p_code === "GOOD-CODE"));
+  ok("manager: hidden person leaves the list", (await rowNames()).length === 3);
   await p.click("#forget");
   ok("manager: forget clears the code", await p.evaluate(() => S.mgr === "") && await p.isVisible("#code"));
   await p.click("#back");

@@ -51,7 +51,8 @@ function levelTotal(L){ return L.map ? MAP_STEPS.length*2 : (L.count || (L.qs||[
    ===================================================================== */
 const KEY = "showup.v1";
 const blank = () => ({ name:"", mastered:{}, best:{}, misses:{}, sound:true, xp:0, lightning:0, daily:{ last:"", streak:0, best:0 },
-  listened:{}, coach:{}, intro:false, days:[], today:{ d:"", xp:0 }, said:{}, sync:{ device:"", secret:"", last:0, ok:null }, mgr:"", tab:"learn" });
+  listened:{}, intro:false, days:[], today:{ d:"", xp:0 }, said:{}, sync:{ device:"", secret:"", last:0, ok:null }, mgr:"", tab:"learn",
+  lv:{}, log:[] });
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e){}
 for (const [k, v] of Object.entries(blank())) if (typeof S[k] !== typeof v || (Array.isArray(v) && !Array.isArray(S[k]))) S[k] = v;
@@ -59,6 +60,13 @@ if (S.daily.last && !S.days.includes(S.daily.last)) S.days.push(S.daily.last);
 /* Levels can get shorter between versions: a saved best run never shows more than the level has. */
 for (const id of Object.keys(S.best)){ const L = LEVELS.find(l => l.id === id); if (L) S.best[id] = Math.min(S.best[id], levelTotal(L)); }
 function save(sync = true){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} if (sync) queueSync(); }
+
+/* For the manager panel: right and wrong answers and tries per level, and a log of recent lessons.
+   Log entries are [time, kind, level, value, total]. Kinds: m mastered, r review done, p practice,
+   f a run that ended on a mistake (value = how many in a row), d Daily 10, lg Lightning round. */
+const QLEVEL = Object.fromEntries(LEVELS.flatMap(l => (l.qs || []).map(q => [q.id, l.id])));
+function lvOf(id){ return S.lv[id] && typeof S.lv[id] === "object" ? S.lv[id] : (S.lv[id] = { r:0, w:0, t:0 }); }
+function logEvent(k, id, v = 0, n = 0){ S.log.push([Date.now(), k, id, v, n]); S.log = S.log.slice(-25); }
 
 function reviewInfo(id){
   const m = S.mastered[id]; if (!m) return null;
@@ -351,11 +359,13 @@ function ident(){
   save(false);
 }
 function payload(){
-  return { v:2, x:S.xp||0, mc:masteredCount(), fp:!!S.mastered.final,
+  return { v:3, x:S.xp||0, mc:masteredCount(), fp:!!S.mastered.final,
     m:Object.fromEntries(LEVEL_IDS.map(id => [id, S.mastered[id]?.count||0])),
+    ml:Object.fromEntries(LEVEL_IDS.map(id => [id, S.mastered[id]?.last||0])),
     b:Object.fromEntries(LEVEL_IDS.map(id => [id, S.best[id]||0])),
+    a:Object.fromEntries(LEVEL_IDS.map(id => { const v = S.lv[id] || {}; return [id, [v.r||0, v.w||0, v.t||0]]; })),
     l:S.lightning||0, d:streakDays(), h:CLIPS.filter(c => S.listened[c.id]).length,
-    sl:linesPracticed(), w:topMisses(10), t:Date.now(), ld:S.days[S.days.length-1] || "" };
+    sl:linesPracticed(), w:topMisses(20), lg:S.log.slice(-20), dd:S.days.slice(-30), t:Date.now(), ld:S.days[S.days.length-1] || "" };
 }
 async function rpc(fn, body){
   const r = await fetch(`${SB.url}/rest/v1/rpc/${fn}`, { method:"POST", keepalive: fn === "sua_save", headers:{ "apikey": SB.key, "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -381,7 +391,7 @@ function syncLine(){
   const st = !S.name ? "" : S.sync.ok ? "ok" : S.sync.ok === false ? "err" : "";
   const txt = !S.name ? "Add your name and your manager will see your progress."
     : S.sync.ok ? `Your manager sees your progress. Updated ${ago(S.sync.last)}.`
-    : S.sync.ok === false ? (TEAM_HOST ? "Couldn't reach the team list. It tries again after your next lesson." : "Your manager sees your progress when you use the team link. Here, send your report on WhatsApp.")
+    : S.sync.ok === false ? (TEAM_HOST ? "Couldn't reach the team list. It tries again after your next lesson." : `Your manager sees your progress when you use the team link: ${TEAM_URL}`)
     : "Your progress will be shared with your manager.";
   return `<p class="sync" id="syncLine"><i class="dot ${st}"></i><span>${esc(txt)}</span></p>`;
 }
@@ -399,6 +409,7 @@ function show(html, opts = {}){
   document.querySelectorAll(".combo,.plus").forEach(n => n.remove());
   app.innerHTML = html;
   document.body.classList.toggle("full", !!opts.full);
+  document.body.classList.toggle("wide", !!opts.wide);
   tabsEl.hidden = !!opts.full;
   if (!opts.keepScroll) window.scrollTo(0,0);
 }
@@ -560,7 +571,7 @@ function buildDaily(){
   return shuffle(picked.concat(S.mastered.who ? buildScenarios(10 - picked.length) : []));
 }
 function startDaily(missed){ startRun(DAILY, retryEarly(buildDaily(), missed)); }
-function startRun(L, list){ game = { kind:"run", L, list, idx:0, streak:0, xp:0, t0:Date.now() }; renderItem(); }
+function startRun(L, list){ if (LEVEL_IDS.includes(L.id)) lvOf(L.id).t++; game = { kind:"run", L, list, idx:0, streak:0, xp:0, t0:Date.now() }; renderItem(); }
 function lessonTop(pct){
   return `<div class="l-top"><button class="icon-btn" id="quit" aria-label="Quit">${icon("x")}</button>
     <div class="l-bar" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><i style="width:${pct}%"></i></div>
@@ -672,6 +683,9 @@ function verdict(ok){
   app.querySelectorAll(".opt").forEach(b => { const j = +b.dataset.k; b.disabled = true; if (g.opts && g.opts[j] === it.a) b.classList.add("right"); else if (j === g.sel && !ok) b.classList.add("wrong"); });
   if (it.type === "build") $("#ans")?.querySelectorAll(".wtile").forEach(b => b.classList.add(ok ? "right" : "wrong"));
   const m = app.querySelector(".lm"); if (m) m.dataset.mood = ok ? "happy" : "sad";
+  const lid = QLEVEL[it.id] || (it.scen ? "who" : g.L.id);
+  if (LEVEL_IDS.includes(lid)) lvOf(lid)[ok ? "r" : "w"]++;
+  if (!ok) logEvent("f", g.L.id, g.idx, g.list.length);
   if (ok){
     g.streak++; g.xp += 10; addXP(10); sfx("ok"); buzz(15);
     const bar = app.querySelector(".l-bar i"); if (bar) bar.style.width = ((g.idx + 1) / g.list.length * 100) + "%";
@@ -713,9 +727,10 @@ function quitRun(){
 function complete(){
   const g = game, L = g.L;
   let bonus, title = "Lesson complete!";
-  if (L.id === "daily"){ bonus = S.daily.last === today() ? 0 : 30; S.daily.last = today(); }
+  if (L.id === "daily"){ bonus = S.daily.last === today() ? 0 : 30; S.daily.last = today(); logEvent("d", "daily", g.list.length, g.list.length); }
   else {
     const first = !S.mastered[L.id], wasDue = !!reviewInfo(L.id)?.due;
+    logEvent(first ? "m" : wasDue ? "r" : "p", L.id, g.list.length, g.list.length);
     const m = S.mastered[L.id] || { count:0, last:0 }; m.count++; m.last = Date.now(); S.mastered[L.id] = m; S.best[L.id] = g.list.length;
     bonus = first ? 50 : wasDue ? 30 : 10; title = first ? "Level mastered!" : wasDue ? "Review done!" : "Practice done!";
   }
@@ -761,7 +776,7 @@ function streakScreen(){
 }
 
 /* ---------- Pitch map (order the steps; a wrong tap starts over) ---------- */
-function startMap(){ game = { kind:"map", L:byId("map"), round:0, step:0, order:shuffle(MAP_STEPS.map((_, i) => i)), t0:Date.now(), xp:0, locked:false }; renderMap(); }
+function startMap(){ lvOf("map").t++; game = { kind:"map", L:byId("map"), round:0, step:0, order:shuffle(MAP_STEPS.map((_, i) => i)), t0:Date.now(), xp:0, locked:false }; renderMap(); }
 function renderMap(msg){
   view = "lesson";
   const g = game, total = MAP_STEPS.length*2, done = g.round*MAP_STEPS.length + g.step;
@@ -779,6 +794,7 @@ function renderMap(msg){
 function tapStep(i, btn){
   const g = game; if (!g || g.kind !== "map" || g.locked) return;
   if (i === g.step){
+    lvOf("map").r++;
     g.step++; g.xp += 5; addXP(5); sfx("ok"); buzz(12);
     if (g.step === MAP_STEPS.length){
       if (g.round === 0){ g.round = 1; g.step = 0; g.order = shuffle(MAP_STEPS.map((_, k) => k)); save(); return renderMap("Round 1 done. Now the lines you actually say."); }
@@ -788,7 +804,8 @@ function tapStep(i, btn){
   }
   g.locked = true; sfx("bad"); buzz([40,60,40]); btn.classList.add("wrong");
   const h = $("#heart"); if (h){ h.classList.add("broken"); h.querySelector("b").textContent = "0"; }
-  const reached = g.round*MAP_STEPS.length + g.step; if (reached > (S.best.map||0)) S.best.map = reached; save();
+  const reached = g.round*MAP_STEPS.length + g.step; if (reached > (S.best.map||0)) S.best.map = reached;
+  lvOf("map").w++; logEvent("f", "map", reached, MAP_STEPS.length*2); save();
   const s = MAP_STEPS[g.step], m = app.querySelector(".lm"); if (m) m.dataset.mood = "sad";
   const sheet = $("#sheet"); sheet.className = "sheet bad";
   sheet.innerHTML = `<div class="sheet-in"><div class="sh-head"><span class="badge">${icon("x")}</span><h2>Back to the start</h2></div>
@@ -800,6 +817,7 @@ function tapStep(i, btn){
 }
 function completeMap(){
   const g = game, first = !S.mastered.map, wasDue = !!reviewInfo("map")?.due;
+  logEvent(first ? "m" : wasDue ? "r" : "p", "map", MAP_STEPS.length*2, MAP_STEPS.length*2);
   const m = S.mastered.map || { count:0, last:0 }; m.count++; m.last = Date.now(); S.mastered.map = m; S.best.map = MAP_STEPS.length*2;
   const bonus = first ? 50 : wasDue ? 30 : 10; addXP(bonus); g.xp += bonus;
   const extended = markActive(); save();
@@ -876,6 +894,7 @@ function endLightning(wrong){
   const g = game; g.over = true; cancelAnimationFrame(rafId); rafId = 0;
   const record = g.score > (S.lightning||0);
   if (record) S.lightning = g.score;
+  logEvent("lg", "lightning", g.score, 0);
   const extended = g.score >= 3 ? markActive() : false;
   save();
   if (wrong){ sfx("bad"); buzz([40,60,40]); } else sfx("win");
@@ -954,7 +973,6 @@ function renderMe(){
   </section>
   <section class="card"><p class="eyebrow">This week</p><div class="week">${days.map(d => { const on = S.days.includes(dstr(d)); return `<span>${"SMTWTFS"[d.getDay()]}<i class="${on ? "on" : ""}">${on ? icon("check") : ""}</i></span>`; }).join("")}</div></section>
   ${weak.length ? `<section class="card weak"><p class="eyebrow">Your weak spots</p><ul>${weak.map(([id, n]) => `<li>${esc(QBY[id].q)}<br><span class="ans">${esc(answerText(QBY[id]))}</span> <span class="small muted nowrap">· missed ${n}×</span></li>`).join("")}</ul></section>` : ""}
-  <section class="card"><h2>Send my progress</h2><p class="small muted">Your manager already sees your progress when you're online. You can also send it on WhatsApp.</p><button class="btn ghost" id="rp">${icon("share")} Make my report</button></section>
   <section class="card"><h2>How this works</h2>
     <ul class="small" style="padding-left:20px;display:flex;flex-direction:column;gap:6px">
       <li>Short lessons in a new random order every time. One mistake and you start over, with the right answer and why.</li>
@@ -965,162 +983,19 @@ function renderMe(){
   <section class="row">
     <button class="btn small ghost" id="snd">${icon(S.sound ? "sound" : "mute")} Sound ${S.sound ? "on" : "off"}</button>
     ${S.name ? `<button class="btn small ghost" id="rename">Change name</button>` : ""}
-    <button class="btn small ghost" id="mgr">${icon("chart")} Manager view</button>
+    <button class="btn small ghost" id="mgr">${icon("chart")} Manager panel</button>
   </section>
   <p class="foot" id="resetBox"><button class="link" id="reset">Reset my progress on this phone</button></p>`);
   const nfm = $("#nameForm");
   if (nfm) nfm.addEventListener("submit", e => { e.preventDefault(); const v = $("#nm").value.trim().slice(0,30); if (v){ S.name = v; save(false); pushSync(); renderMe(); } });
-  on("#rp", report); on("#mgr", coach);
+  on("#mgr", coach);
   on("#snd", () => { S.sound = !S.sound; save(false); sfx("tap"); renderMe(); });
   on("#rename", () => { S.name = ""; save(false); renderMe(); });
   on("#reset", () => {
     $("#resetBox").innerHTML = `<span>Erase all progress on this phone?</span> <button class="btn small ghost" id="no">Keep it</button> <button class="btn small bad" id="yes">Erase</button>`;
     on("#no", renderMe);
-    on("#yes", () => { const keep = { name:S.name, sound:S.sound, coach:S.coach, sync:S.sync, mgr:S.mgr }; S = Object.assign(blank(), keep); save(); renderMe(); });
+    on("#yes", () => { const keep = { name:S.name, sound:S.sound, sync:S.sync, mgr:S.mgr }; S = Object.assign(blank(), keep); save(); renderMe(); });
   });
-}
-
-/* ---------- WhatsApp report ---------- */
-const b64e = s => { const b = new TextEncoder().encode(s); let bin = ""; b.forEach(c => bin += String.fromCharCode(c)); return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); };
-const b64d = s => { s = s.replace(/-/g,"+").replace(/_/g,"/"); while (s.length % 4) s += "="; const bin = atob(s); return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))); };
-function reportText(){
-  const lv = id => { const L = byId(id); return S.mastered[id] ? `✔ ${L.name}` : S.best[id] ? `○ ${L.name}, best run ${S.best[id]} of ${levelTotal(L)}` : `○ ${L.name}`; };
-  const p = payload(); p.n = (S.name||"").slice(0,30);
-  const miss = topMisses(3).map(([id, n]) => { let q = QBY[id].q; q = q.length > 60 ? q.slice(0,58) + "…" : q; return `- ${/^"/.test(q) ? q : `"${q}"`} (missed ${n}×)`; });
-  return [
-    `Show-Up Academy progress`,
-    `Name: ${S.name || "(no name set)"}`,
-    `Rank: ${rank()}, ${nf(S.xp)} XP, ${masteredCount()} of ${LEVEL_IDS.length} levels mastered`,
-    ...TRACKS.flatMap(t => ["", t.title, ...t.levels.map(lv)]),
-    "",
-    `Final: ${S.mastered.final ? "passed ✔" : "not yet"}`,
-    `Script lines said: ${linesPracticed()} of ${Object.keys(SCRIPT_LINES).length}`,
-    `Lightning record: ${plural(S.lightning||0,"couple")}`,
-    `Streak: ${plural(streakDays(),"day")}`,
-    ...(miss.length ? ["Needs work:", ...miss] : ["Needs work: nothing missed yet"]),
-    "",
-    `#SUA1-${b64e(JSON.stringify(p))}`
-  ].join("\n");
-}
-function report(){
-  view = "report"; game = null;
-  const txt = reportText();
-  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">For your manager</p><h1>My progress report</h1></div><span></span></div>
-  <p>Send this on WhatsApp. The code on the last line lets the manager view read it.</p>
-  <textarea class="report" id="rt" readonly aria-label="Progress report">${esc(txt)}</textarea>
-  <div class="row"><a class="btn sun" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">${icon("share")} WhatsApp</a><button class="btn ghost" id="cp">Copy</button></div>`, { full: true });
-  on("#back", () => tab("me"));
-  on("#cp", () => { const ta = $("#rt"); const fb = () => { ta.focus(); ta.select(); toast("Selected. Press and hold to copy."); };
-    try { navigator.clipboard.writeText(txt).then(() => toast("Copied. Paste it into WhatsApp."), fb); } catch(e){ fb(); } });
-}
-/* Everything about other people comes from their phones (the team list, pasted reports),
-   so none of it is trusted: names are cut to plain text and every number is clamped. */
-const num = (v, max) => Number.isFinite(+v) ? Math.max(0, Math.min(max, Math.round(+v))) : 0;
-const cleanName = v => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 40) || "No name";
-function cleanStats(p){
-  p = p && typeof p === "object" && !Array.isArray(p) ? p : {};
-  const lv = o => Object.fromEntries(LEVEL_IDS.map(id => [id, num(o && typeof o === "object" ? o[id] : 0, 999)]));
-  const w = Array.isArray(p.w) ? p.w.filter(x => Array.isArray(x) && typeof x[0] === "string" && QBY[x[0]]).slice(0, 10).map(x => [x[0], num(x[1], 9999)]) : [];
-  return { x:num(p.x,1e7), m:lv(p.m), b:lv(p.b), l:num(p.l,999), d:num(p.d,9999), h:num(p.h,CLIPS.length), sl:num(p.sl,999), w, t:num(p.t,4e12) };
-}
-function person(name, stats, extra){
-  const mastered = LEVEL_IDS.filter(id => stats.m[id]).length;
-  return Object.assign({ name: cleanName(name), stats, xp: stats.x, mastered, final: !!stats.m.final }, extra);
-}
-function teamRows(rows){
-  return (Array.isArray(rows) ? rows : []).filter(r => r && typeof r === "object")
-    .map(r => person(r.name, cleanStats(r.stats), { device: String(r.device || ""), updated: typeof r.updated === "string" ? r.updated : "" }));
-}
-function parseReports(text){
-  const out = [], re = /#SUA1-([A-Za-z0-9_-]{8,6000})/g; let m;
-  while ((m = re.exec(text))){
-    try {
-      const p = JSON.parse(b64d(m[1]));
-      if (!p || typeof p !== "object" || Array.isArray(p)) continue;
-      const stats = cleanStats(p), name = cleanName(p.n);
-      out.push(person(name, stats, { device: "report:" + name.toLowerCase(), updated: stats.t, pasted: true }));
-    } catch(e){}
-  }
-  return out;
-}
-
-/* ---------- Manager view ---------- */
-function coachLogin(msg){
-  view = "coach"; game = null;
-  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h1>Team view</h1></div><span></span></div>
-  <div class="say-row">${shoco("think")}<div class="bubble">Enter the manager code to see who knows it all.</div></div>
-  <form class="name-form" id="codeForm"><label for="code" class="eyebrow" style="flex-basis:100%">Manager code</label><input class="field" id="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX"><button class="btn">Open</button></form>
-  ${msg ? `<p class="small" style="color:var(--bad-ink)">${esc(msg)}</p>` : ""}
-  <p class="small muted">The code stays on this phone so you don't have to type it again.</p>`, { full: true });
-  on("#back", () => tab("me"));
-  $("#codeForm").addEventListener("submit", e => { e.preventDefault(); const v = $("#code").value.trim(); if (v){ S.mgr = v; save(false); coach(); } });
-}
-async function coach(){
-  if (!S.mgr) return coachLogin();
-  view = "coach"; game = null;
-  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h1>Team view</h1></div><span></span></div>
-  <div class="say-row">${shoco("think")}<div class="bubble">Loading the team…</div></div>`, { full: true });
-  on("#back", () => tab("me"));
-  try {
-    const rows = await rpc("sua_team", { p_code: S.mgr });
-    if (view === "coach") renderTeam(Array.isArray(rows) ? rows : []);
-  } catch(e){
-    if (view !== "coach") return;
-    if (/wrong code/.test(e.message)){ S.mgr = ""; save(false); coachLogin("That code didn't work. Check it and try again."); }
-    else renderTeam(null, TEAM_HOST ? "Couldn't reach the team list. Check the internet and refresh. Pasted WhatsApp reports still work below."
-      : `The team list opens on the team link: ${TEAM_URL} Pasted WhatsApp reports work here too.`);
-  }
-}
-const AV = ["#00737a","#b8325a","#11709f","#8f6600","#2b7a1f","#a12a4d","#00636a"];
-function avatarColor(name){ let h = 0; for (const c of name) h = (h*31 + c.charCodeAt(0)) >>> 0; return AV[h % AV.length]; }
-function renderTeam(rows, err){
-  const pasted = Object.values(S.coach || {}).filter(r => r && typeof r === "object")
-    .map(r => person(r.name, cleanStats(r.stats), { device: "report:" + cleanName(r.name).toLowerCase(), updated: num(r.stats && r.stats.t, 4e12), pasted: true }));
-  const people = teamRows(rows).concat(pasted).sort((a, b) => (b.final - a.final) || (b.mastered - a.mastered) || (b.xp - a.xp));
-  const names = {}; people.forEach(p => { const k = p.name.toLowerCase(); names[k] = (names[k] || 0) + 1; });
-  people.forEach(p => p.dupe = names[p.name.toLowerCase()] > 1);
-  const know = people.filter(p => p.final), almost = people.filter(p => !p.final && p.mastered >= 8), learning = people.filter(p => !p.final && p.mastered >= 1 && p.mastered < 8), fresh = people.filter(p => !p.final && !p.mastered);
-  const week = people.filter(p => p.updated && Date.now() - new Date(p.updated).getTime() < 7*DAY).length;
-  const agg = {}; people.forEach(p => (p.stats && Array.isArray(p.stats.w) ? p.stats.w : []).forEach(([id, n]) => { if (QBY[id]) agg[id] = (agg[id]||0) + (+n||0); }));
-  const teamWeak = Object.entries(agg).sort((a,b) => b[1]-a[1]).slice(0,6);
-  const group = (title, ic, color, list) => list.length ? `<div class="group-h" style="color:${color}">${icon(ic)}<h2>${title} · ${list.length}</h2></div>${list.map(personHTML).join("")}` : "";
-  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h1>Team view</h1></div><button class="icon-btn" id="refresh" aria-label="Refresh">${icon("refresh")}</button></div>
-  ${err ? `<p class="card small" style="color:var(--bad-ink)">${esc(err)}</p>` : ""}
-  <section class="summary"><div><b>${people.length}</b><span>people</span></div><div><b style="color:var(--sun-ink)">${know.length}</b><span>know it all</span></div><div><b style="color:var(--sea-ink)">${week}</b><span>active this week</span></div></section>
-  ${people.length ? "" : `<div class="say-row">${shoco("idle")}<div class="bubble">Nobody yet. When your team opens the app and saves their name, they show up here with their progress.</div></div>`}
-  ${group("Knows it all", "crown", "var(--sun-ink)", know)}
-  ${group("Almost there", "flame", "var(--fire-ink)", almost)}
-  ${group("Learning", "book", "var(--sea-ink)", learning)}
-  ${group("Not started", "user", "var(--muted)", fresh)}
-  ${teamWeak.length ? `<section class="card weak"><p class="eyebrow">What the team misses most</p><p class="small muted">Coach these at the next meeting.</p><ul>${teamWeak.map(([id, n]) => `<li>${esc(QBY[id].q)}<br><span class="ans">${esc(answerText(QBY[id]))}</span> <span class="small muted nowrap">· missed ${n}×</span></li>`).join("")}</ul></section>` : ""}
-  <details class="card"><summary>Add a report from WhatsApp</summary><p class="small muted">For people who sent their report by message.</p><textarea class="report" id="paste" placeholder="Paste messages that end with #SUA1-"></textarea><button class="btn small" id="add">Add reports</button></details>
-  <details class="card"><summary>Change the manager code</summary><form class="name-form" id="newCode"><input class="field" id="nc" autocomplete="off" autocapitalize="characters" placeholder="New code, 6+ letters or numbers"><button class="btn small">Save</button></form><p class="small muted">Everyone using the old code will need the new one.</p></details>
-  <p class="foot"><button class="link" id="forget">Forget the code on this phone</button></p>`, { full: true });
-  on("#back", () => tab("me")); on("#refresh", coach);
-  on("#forget", () => { S.mgr = ""; save(false); coachLogin(); });
-  on("#add", () => { const got = parseReports($("#paste").value); if (!got.length){ toast("No report codes found. Each report ends with #SUA1-."); return; } S.coach = S.coach || {}; got.forEach(r => S.coach[r.device] = r); save(false); toast(`Added ${plural(got.length, "report")}.`); coach(); });
-  $("#newCode").addEventListener("submit", async e => { e.preventDefault(); const v = $("#nc").value.trim(); try { await rpc("sua_set_code", { p_code: S.mgr, p_new: v }); S.mgr = v; save(false); toast("Code changed."); } catch(err){ toast(/too short/.test(err.message) ? "Use at least 6 letters or numbers." : "Couldn't change the code."); } });
-  app.querySelectorAll("[data-person]").forEach(b => b.onclick = () => { const d = b.parentElement.querySelector(".pdetail"); d.hidden = !d.hidden; b.setAttribute("aria-expanded", String(!d.hidden)); });
-  app.querySelectorAll("[data-hide]").forEach(b => b.onclick = async () => {
-    if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "Tap again to hide"; return; }
-    try { await rpc("sua_hide", { p_code: S.mgr, p_device: b.dataset.hide }); toast("Hidden. If that phone plays again, it comes back."); coach(); } catch(e){ toast("Couldn't hide that entry."); }
-  });
-}
-function personHTML(p){
-  const st = p.stats || {}, m = st.m || {}, name = String(p.name || "No name");
-  const done = LEVEL_IDS.filter(id => m[id]).length;
-  return `<article class="person">
-    <button data-person aria-expanded="false"><span class="avatar" style="background:${avatarColor(name)}">${esc(name.slice(0,1).toUpperCase())}</span>
-      <span class="pmid"><span class="pname">${esc(name)}</span><span class="psub prow"><span class="mini-bar" aria-hidden="true"><i style="width:${Math.round(done / LEVEL_IDS.length * 100)}%"></i></span>${done}/${LEVEL_IDS.length}<span class="sr-only"> levels mastered</span></span><span class="psub">${p.pasted ? "From WhatsApp" : ago(p.updated) === "never" ? "No activity yet" : "Active " + esc(ago(p.updated))}</span></span>
-      <span class="pstreak${st.d ? "" : " off"}" title="Day streak">${icon("flame")}<b>${num(st.d, 9999)}</b></span></button>
-    <div class="pdetail" hidden>
-      <div class="grid2"><div class="statbox" style="color:var(--sun-2)">${icon("star")}<b style="color:var(--ink)">${nf(st.x||p.xp||0)}</b><span>XP</span></div><div class="statbox" style="color:var(--fire)">${icon("flame")}<b style="color:var(--ink)">${num(st.d, 9999)}</b><span>day streak</span></div><div class="statbox" style="color:var(--sea)">${icon("bolt")}<b style="color:var(--ink)">${num(st.l, 999)}</b><span>Lightning record</span></div><div class="statbox" style="color:var(--flamingo)">${icon("mic")}<b style="color:var(--ink)">${num(st.sl, 999)}/${Object.keys(SCRIPT_LINES).length}</b><span>script lines said</span></div></div>
-      <ul class="lvl-list">${LEVEL_IDS.map(id => `<li><span>${esc(byId(id).name)}</span>${m[id] ? `<span class="ok-t">mastered${m[id] > 1 ? ` ×${num(m[id], 999)}` : ""}</span>` : `<span class="no-t">${st.b && st.b[id] ? `best ${Math.min(num(st.b[id], 999), levelTotal(byId(id)))}/${levelTotal(byId(id))}` : "not yet"}</span>`}</li>`).join("")}</ul>
-      ${Array.isArray(st.w) && st.w.length ? `<div><p class="eyebrow">Misses most</p><ul class="weak" style="padding-left:18px">${st.w.filter(([id]) => QBY[id]).slice(0,5).map(([id, n]) => `<li>${esc(QBY[id].q)} <span class="small muted nowrap">· ${num(n, 9999)}×</span><br><span class="ans">${esc(answerText(QBY[id]))}</span></li>`).join("")}</ul></div>` : ""}
-      ${p.dupe ? `<p class="small muted">Another entry has the same name. If it's the same person on a new phone, hide the older one.</p>` : ""}
-      ${p.pasted ? "" : `<button class="btn small ghost" data-hide="${esc(p.device)}">Hide this entry</button>`}
-    </div>
-  </article>`;
 }
 
 /* =====================================================================
@@ -1146,10 +1021,3 @@ document.addEventListener("keydown", e => {
     if (n >= 1 && n <= cards.length){ e.preventDefault(); cards[n - 1].click(); }
   }
 });
-
-/* =====================================================================
-   BOOT
-   ===================================================================== */
-buildTabs();
-tab(S.tab);
-if (S.name) queueSync();

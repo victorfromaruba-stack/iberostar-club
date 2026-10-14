@@ -17,7 +17,7 @@ ARGS = sys.argv[1:]
 PAGE = "--page" in ARGS
 OUT = Path(ARGS[ARGS.index("--out") + 1]) if "--out" in ARGS else ROOT / "index.html"
 CLIPS = SRC / "clips.json"
-JS = ["icons.js", "mascot.js", "content-pre.js", "levels.js", "content-post.js", "app.js"]
+JS = ["icons.js", "mascot.js", "content-pre.js", "levels.js", "content-post.js", "app.js", "team.js", "boot.js"]
 FONTS = ("https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800"
          "&family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,700&display=swap")
 

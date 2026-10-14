@@ -397,33 +397,113 @@ a{color:var(--sea-ink)}
 .nowrap{white-space:nowrap}
 .ans{color:var(--good-ink);font-weight:900}
 
-/* Coach */
-.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.summary div{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px;text-align:center}
-.summary b{display:block;font:800 26px/1 var(--f-display)}
-.summary span{font-size:12px;color:var(--muted)}
-.group-h{display:flex;align-items:center;gap:8px;margin-top:6px}
-.group-h .ic{width:22px;height:22px}
-.group-h h2{font-size:19px}
-.person{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);overflow:hidden}
-.person>button{width:100%;display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:12px;background:none;border:0;text-align:left}
-.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:800 19px/1 var(--f-display);color:#fff}
-.person .pname{font-weight:900;font-size:17px;overflow-wrap:anywhere}
-.person .psub{font-size:13px;color:var(--muted)}
-.person>button:active{background:var(--sunk)}
-.pstreak{display:inline-flex;align-items:center;gap:4px;color:var(--fire);font:800 18px/1 var(--f-display)}
-.pstreak b{color:var(--ink)}
-.pstreak.off{color:var(--line-2)}
-.pstreak .ic{width:22px;height:22px}
-.pmid{display:flex;flex-direction:column;gap:3px;min-width:0}
-.prow{display:flex;align-items:center;gap:8px}
-.mini-bar{flex:1;max-width:150px;height:8px;border-radius:999px;background:var(--line);overflow:hidden}
-.mini-bar i{display:block;height:100%;background:var(--sun);border-radius:999px}
-.pdetail{border-top:2px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:10px;font-size:15px}
-.lvl-list{list-style:none;padding:0;display:grid;gap:6px}
-.lvl-list li{display:flex;justify-content:space-between;gap:8px}
-.ok-t{color:var(--good-ink);font-weight:900} .no-t{color:var(--muted)}
-.report{width:100%;min-height:200px;font:700 14px/1.5 ui-monospace,Menlo,Consolas,monospace;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);resize:vertical}
+/* Manager panel: one column on phones, two on laptops. */
+body.wide #app{max-width:1080px}
+.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font:800 19px/1 var(--f-display);color:#fff;flex:none}
+.tp-meta{color:var(--muted);font-size:14px;margin-top:-10px}
+.tp-tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:760px){.tp-tiles:not(.two){grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tp-tile{--k:var(--ink);background:var(--surface);border:2px solid var(--line);border-bottom-width:4px;border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tp-tile .lbl{display:flex;align-items:center;gap:6px;font-weight:900;font-size:14px}
+.tp-tile .lbl .ic{width:20px;height:20px;color:var(--k)}
+.tp-tile b{font:800 34px/1.05 var(--f-display);font-variant-numeric:tabular-nums}
+.tp-tile b small{font-size:15px;color:var(--muted);margin-left:3px}
+.tp-tile .exp{font-size:13px;color:var(--muted)}
+.t-sun{--k:var(--sun-2)} .t-good{--k:var(--good)} .t-fire{--k:var(--fire)} .t-sea{--k:var(--sea)}
+.tp-card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.tp-card h2{font-size:21px}
+.tp-card-h{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tp-cols{display:grid;gap:18px}
+@media (min-width:900px){.tp-cols{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
+.tp-sort{display:inline-flex;background:var(--sunk);border-radius:12px;padding:3px;gap:2px}
+.tp-sort button{border:0;background:none;border-radius:9px;padding:8px 12px;font:800 13px/1 var(--f-body);color:var(--muted);min-height:40px}
+.tp-sort button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 2px 0 var(--line-2)}
+
+/* Who knows what: one row per person, one square per level. Fixed layout, so it always fits. */
+.kw-wrap{position:relative}
+.kw{border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed}
+.kw col.cn{width:31%}
+.kw col.cg{width:8px}
+.kw th,.kw td{padding:0;vertical-align:middle}
+.kw td{padding:0 1px}
+.kw thead .u{font:900 11px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink);text-align:left;padding:0 0 6px;border-bottom:4px solid var(--c);white-space:nowrap}
+.kw thead .u .fin{width:16px;height:16px;color:var(--sun-2);display:block}
+.kw-units{display:none}
+@media (max-width:559px){.kw thead .u span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.kw-units{display:flex}}
+.kw-lv{display:none}
+@media (min-width:760px){
+  .kw col.cn{width:200px}
+  .kw col.cg{width:14px}
+  .kw-lv{display:table-row}
+  .kw-lv th{vertical-align:bottom;text-align:center;padding-top:8px}
+  .kw-lv th span{writing-mode:vertical-rl;transform:rotate(180deg);font:800 12px/1.2 var(--f-body);color:var(--muted);white-space:nowrap;display:inline-block;max-height:150px;overflow:hidden;text-overflow:ellipsis}}
+.kw tbody th,.kw tbody td{border-top:1px solid var(--line)}
+.kw tbody tr:hover{background:var(--sunk)}
+.kw-name{display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:none;border:0;padding:8px 8px 8px 0;text-align:left;min-height:52px;width:100%;min-width:0}
+.kw-name .pname{font-weight:900;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.kw-name .psub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.kw-name:hover .pname{text-decoration:underline}
+.kc{display:block;width:100%;max-width:26px;aspect-ratio:1;border-radius:25%;background:var(--line);margin:4px auto}
+.kc.done{background:var(--c)}
+.kc.started{background:linear-gradient(to top,var(--c) var(--p),var(--surface) var(--p));box-shadow:inset 0 0 0 2px var(--c)}
+.kw-key{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;font-weight:800;color:var(--muted)}
+.kw-key span{display:inline-flex;align-items:center;gap:6px}
+.kw-key .kc{margin:0;display:inline-block;width:16px}
+
+/* Lists */
+.tp-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.tp-list li{padding:12px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.tp-list li:first-child{border-top:0;padding-top:0}
+.tp-list .q{font-weight:800}
+.tp-list .ans{color:var(--good-ink);font-weight:900}
+.tp-list .who>summary{min-height:44px;font-size:13px}
+.tp-list .who p{font-size:14px}
+.utag{font:800 11px/1 var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-left:6px;white-space:nowrap}
+.tp-bar{height:10px;border-radius:999px;background:var(--sunk);overflow:hidden}
+.tp-bar i{display:block;height:100%;background:var(--c,var(--good));border-radius:999px}
+.tp-people{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.tp-people button{width:100%;display:grid;grid-template-columns:44px 1fr 20px;gap:12px;align-items:center;padding:10px 0;background:none;border:0;border-top:1px solid var(--line);text-align:left;min-height:56px}
+.tp-people li:first-child button{border-top:0;padding-top:0}
+.tp-people .pname{display:block;font-weight:900;overflow-wrap:anywhere}
+.tp-people .psub{display:block;font-size:13px;color:var(--muted)}
+.tp-people .go{width:16px;height:16px;color:var(--line-2)}
+.tp-help{padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.tp-hide{align-items:center;text-align:center}
+
+/* One person */
+.tp-who{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+.tp-who .avatar{width:56px;height:56px;font-size:24px}
+.tp-next{display:flex;gap:10px;align-items:flex-start;background:var(--sea-soft);border-radius:var(--r);padding:12px 14px;font-weight:800}
+.tp-next .ic{color:var(--sea-ink);margin-top:1px}
+.tp-unit{display:flex;flex-direction:column;gap:8px}
+.tp-unit+.tp-unit{border-top:1px solid var(--line);padding-top:14px}
+.tp-unit-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tp-unit-h h3{font-size:17px}
+.tp-lv{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+.tp-lv li{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+@media (min-width:560px){.tp-lv li{flex-direction:row;justify-content:space-between;align-items:center;gap:10px}}
+.tp-lv .nm{font-weight:800}
+.tp-lv .sts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.st{display:inline-flex;align-items:center;gap:4px;font:900 12px/1 var(--f-body);padding:6px 9px;border-radius:999px}
+.st .ic{width:14px;height:14px}
+.st.done{background:var(--sun-soft);color:var(--ink)} .st.done .ic{color:var(--sun-2)}
+.st.started{background:var(--sea-soft);color:var(--sea-ink)}
+.st.none{background:var(--sunk);color:var(--muted)}
+.tp-facts{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.tp-facts li{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:center}
+.tp-facts .ic{color:var(--sea)}
+.tp-days{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;max-width:420px}
+.tp-days i{aspect-ratio:1;border-radius:5px;background:var(--sunk)}
+.tp-days i.on{background:var(--fire)}
+.tp-log{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.tp-log li{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.tp-log li:first-child{border-top:0;padding-top:0}
+.tp-log span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:9px;background:var(--line-2);vertical-align:1px}
+.tp-log .k-m span::before,.tp-log .k-r span::before{background:var(--sun)}
+.tp-log .k-p span::before,.tp-log .k-d span::before{background:var(--good)}
+.tp-log .k-f span::before{background:var(--bad)}
+.tp-log .k-lg span::before{background:var(--sea)}
+.tp-log time{color:var(--muted);font-size:13px;white-space:nowrap}
 
 /* Tab bar */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:2px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
@@ -1246,7 +1326,8 @@ function levelTotal(L){ return L.map ? MAP_STEPS.length*2 : (L.count || (L.qs||[
    ===================================================================== */
 const KEY = "showup.v1";
 const blank = () => ({ name:"", mastered:{}, best:{}, misses:{}, sound:true, xp:0, lightning:0, daily:{ last:"", streak:0, best:0 },
-  listened:{}, coach:{}, intro:false, days:[], today:{ d:"", xp:0 }, said:{}, sync:{ device:"", secret:"", last:0, ok:null }, mgr:"", tab:"learn" });
+  listened:{}, intro:false, days:[], today:{ d:"", xp:0 }, said:{}, sync:{ device:"", secret:"", last:0, ok:null }, mgr:"", tab:"learn",
+  lv:{}, log:[] });
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e){}
 for (const [k, v] of Object.entries(blank())) if (typeof S[k] !== typeof v || (Array.isArray(v) && !Array.isArray(S[k]))) S[k] = v;
@@ -1254,6 +1335,13 @@ if (S.daily.last && !S.days.includes(S.daily.last)) S.days.push(S.daily.last);
 /* Levels can get shorter between versions: a saved best run never shows more than the level has. */
 for (const id of Object.keys(S.best)){ const L = LEVELS.find(l => l.id === id); if (L) S.best[id] = Math.min(S.best[id], levelTotal(L)); }
 function save(sync = true){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} if (sync) queueSync(); }
+
+/* For the manager panel: right and wrong answers and tries per level, and a log of recent lessons.
+   Log entries are [time, kind, level, value, total]. Kinds: m mastered, r review done, p practice,
+   f a run that ended on a mistake (value = how many in a row), d Daily 10, lg Lightning round. */
+const QLEVEL = Object.fromEntries(LEVELS.flatMap(l => (l.qs || []).map(q => [q.id, l.id])));
+function lvOf(id){ return S.lv[id] && typeof S.lv[id] === "object" ? S.lv[id] : (S.lv[id] = { r:0, w:0, t:0 }); }
+function logEvent(k, id, v = 0, n = 0){ S.log.push([Date.now(), k, id, v, n]); S.log = S.log.slice(-25); }
 
 function reviewInfo(id){
   const m = S.mastered[id]; if (!m) return null;
@@ -1546,11 +1634,13 @@ function ident(){
   save(false);
 }
 function payload(){
-  return { v:2, x:S.xp||0, mc:masteredCount(), fp:!!S.mastered.final,
+  return { v:3, x:S.xp||0, mc:masteredCount(), fp:!!S.mastered.final,
     m:Object.fromEntries(LEVEL_IDS.map(id => [id, S.mastered[id]?.count||0])),
+    ml:Object.fromEntries(LEVEL_IDS.map(id => [id, S.mastered[id]?.last||0])),
     b:Object.fromEntries(LEVEL_IDS.map(id => [id, S.best[id]||0])),
+    a:Object.fromEntries(LEVEL_IDS.map(id => { const v = S.lv[id] || {}; return [id, [v.r||0, v.w||0, v.t||0]]; })),
     l:S.lightning||0, d:streakDays(), h:CLIPS.filter(c => S.listened[c.id]).length,
-    sl:linesPracticed(), w:topMisses(10), t:Date.now(), ld:S.days[S.days.length-1] || "" };
+    sl:linesPracticed(), w:topMisses(20), lg:S.log.slice(-20), dd:S.days.slice(-30), t:Date.now(), ld:S.days[S.days.length-1] || "" };
 }
 async function rpc(fn, body){
   const r = await fetch(`${SB.url}/rest/v1/rpc/${fn}`, { method:"POST", keepalive: fn === "sua_save", headers:{ "apikey": SB.key, "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -1576,7 +1666,7 @@ function syncLine(){
   const st = !S.name ? "" : S.sync.ok ? "ok" : S.sync.ok === false ? "err" : "";
   const txt = !S.name ? "Add your name and your manager will see your progress."
     : S.sync.ok ? `Your manager sees your progress. Updated ${ago(S.sync.last)}.`
-    : S.sync.ok === false ? (TEAM_HOST ? "Couldn't reach the team list. It tries again after your next lesson." : "Your manager sees your progress when you use the team link. Here, send your report on WhatsApp.")
+    : S.sync.ok === false ? (TEAM_HOST ? "Couldn't reach the team list. It tries again after your next lesson." : `Your manager sees your progress when you use the team link: ${TEAM_URL}`)
     : "Your progress will be shared with your manager.";
   return `<p class="sync" id="syncLine"><i class="dot ${st}"></i><span>${esc(txt)}</span></p>`;
 }
@@ -1594,6 +1684,7 @@ function show(html, opts = {}){
   document.querySelectorAll(".combo,.plus").forEach(n => n.remove());
   app.innerHTML = html;
   document.body.classList.toggle("full", !!opts.full);
+  document.body.classList.toggle("wide", !!opts.wide);
   tabsEl.hidden = !!opts.full;
   if (!opts.keepScroll) window.scrollTo(0,0);
 }
@@ -1755,7 +1846,7 @@ function buildDaily(){
   return shuffle(picked.concat(S.mastered.who ? buildScenarios(10 - picked.length) : []));
 }
 function startDaily(missed){ startRun(DAILY, retryEarly(buildDaily(), missed)); }
-function startRun(L, list){ game = { kind:"run", L, list, idx:0, streak:0, xp:0, t0:Date.now() }; renderItem(); }
+function startRun(L, list){ if (LEVEL_IDS.includes(L.id)) lvOf(L.id).t++; game = { kind:"run", L, list, idx:0, streak:0, xp:0, t0:Date.now() }; renderItem(); }
 function lessonTop(pct){
   return `<div class="l-top"><button class="icon-btn" id="quit" aria-label="Quit">${icon("x")}</button>
     <div class="l-bar" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><i style="width:${pct}%"></i></div>
@@ -1867,6 +1958,9 @@ function verdict(ok){
   app.querySelectorAll(".opt").forEach(b => { const j = +b.dataset.k; b.disabled = true; if (g.opts && g.opts[j] === it.a) b.classList.add("right"); else if (j === g.sel && !ok) b.classList.add("wrong"); });
   if (it.type === "build") $("#ans")?.querySelectorAll(".wtile").forEach(b => b.classList.add(ok ? "right" : "wrong"));
   const m = app.querySelector(".lm"); if (m) m.dataset.mood = ok ? "happy" : "sad";
+  const lid = QLEVEL[it.id] || (it.scen ? "who" : g.L.id);
+  if (LEVEL_IDS.includes(lid)) lvOf(lid)[ok ? "r" : "w"]++;
+  if (!ok) logEvent("f", g.L.id, g.idx, g.list.length);
   if (ok){
     g.streak++; g.xp += 10; addXP(10); sfx("ok"); buzz(15);
     const bar = app.querySelector(".l-bar i"); if (bar) bar.style.width = ((g.idx + 1) / g.list.length * 100) + "%";
@@ -1908,9 +2002,10 @@ function quitRun(){
 function complete(){
   const g = game, L = g.L;
   let bonus, title = "Lesson complete!";
-  if (L.id === "daily"){ bonus = S.daily.last === today() ? 0 : 30; S.daily.last = today(); }
+  if (L.id === "daily"){ bonus = S.daily.last === today() ? 0 : 30; S.daily.last = today(); logEvent("d", "daily", g.list.length, g.list.length); }
   else {
     const first = !S.mastered[L.id], wasDue = !!reviewInfo(L.id)?.due;
+    logEvent(first ? "m" : wasDue ? "r" : "p", L.id, g.list.length, g.list.length);
     const m = S.mastered[L.id] || { count:0, last:0 }; m.count++; m.last = Date.now(); S.mastered[L.id] = m; S.best[L.id] = g.list.length;
     bonus = first ? 50 : wasDue ? 30 : 10; title = first ? "Level mastered!" : wasDue ? "Review done!" : "Practice done!";
   }
@@ -1956,7 +2051,7 @@ function streakScreen(){
 }
 
 /* ---------- Pitch map (order the steps; a wrong tap starts over) ---------- */
-function startMap(){ game = { kind:"map", L:byId("map"), round:0, step:0, order:shuffle(MAP_STEPS.map((_, i) => i)), t0:Date.now(), xp:0, locked:false }; renderMap(); }
+function startMap(){ lvOf("map").t++; game = { kind:"map", L:byId("map"), round:0, step:0, order:shuffle(MAP_STEPS.map((_, i) => i)), t0:Date.now(), xp:0, locked:false }; renderMap(); }
 function renderMap(msg){
   view = "lesson";
   const g = game, total = MAP_STEPS.length*2, done = g.round*MAP_STEPS.length + g.step;
@@ -1974,6 +2069,7 @@ function renderMap(msg){
 function tapStep(i, btn){
   const g = game; if (!g || g.kind !== "map" || g.locked) return;
   if (i === g.step){
+    lvOf("map").r++;
     g.step++; g.xp += 5; addXP(5); sfx("ok"); buzz(12);
     if (g.step === MAP_STEPS.length){
       if (g.round === 0){ g.round = 1; g.step = 0; g.order = shuffle(MAP_STEPS.map((_, k) => k)); save(); return renderMap("Round 1 done. Now the lines you actually say."); }
@@ -1983,7 +2079,8 @@ function tapStep(i, btn){
   }
   g.locked = true; sfx("bad"); buzz([40,60,40]); btn.classList.add("wrong");
   const h = $("#heart"); if (h){ h.classList.add("broken"); h.querySelector("b").textContent = "0"; }
-  const reached = g.round*MAP_STEPS.length + g.step; if (reached > (S.best.map||0)) S.best.map = reached; save();
+  const reached = g.round*MAP_STEPS.length + g.step; if (reached > (S.best.map||0)) S.best.map = reached;
+  lvOf("map").w++; logEvent("f", "map", reached, MAP_STEPS.length*2); save();
   const s = MAP_STEPS[g.step], m = app.querySelector(".lm"); if (m) m.dataset.mood = "sad";
   const sheet = $("#sheet"); sheet.className = "sheet bad";
   sheet.innerHTML = `<div class="sheet-in"><div class="sh-head"><span class="badge">${icon("x")}</span><h2>Back to the start</h2></div>
@@ -1995,6 +2092,7 @@ function tapStep(i, btn){
 }
 function completeMap(){
   const g = game, first = !S.mastered.map, wasDue = !!reviewInfo("map")?.due;
+  logEvent(first ? "m" : wasDue ? "r" : "p", "map", MAP_STEPS.length*2, MAP_STEPS.length*2);
   const m = S.mastered.map || { count:0, last:0 }; m.count++; m.last = Date.now(); S.mastered.map = m; S.best.map = MAP_STEPS.length*2;
   const bonus = first ? 50 : wasDue ? 30 : 10; addXP(bonus); g.xp += bonus;
   const extended = markActive(); save();
@@ -2071,6 +2169,7 @@ function endLightning(wrong){
   const g = game; g.over = true; cancelAnimationFrame(rafId); rafId = 0;
   const record = g.score > (S.lightning||0);
   if (record) S.lightning = g.score;
+  logEvent("lg", "lightning", g.score, 0);
   const extended = g.score >= 3 ? markActive() : false;
   save();
   if (wrong){ sfx("bad"); buzz([40,60,40]); } else sfx("win");
@@ -2149,7 +2248,6 @@ function renderMe(){
   </section>
   <section class="card"><p class="eyebrow">This week</p><div class="week">${days.map(d => { const on = S.days.includes(dstr(d)); return `<span>${"SMTWTFS"[d.getDay()]}<i class="${on ? "on" : ""}">${on ? icon("check") : ""}</i></span>`; }).join("")}</div></section>
   ${weak.length ? `<section class="card weak"><p class="eyebrow">Your weak spots</p><ul>${weak.map(([id, n]) => `<li>${esc(QBY[id].q)}<br><span class="ans">${esc(answerText(QBY[id]))}</span> <span class="small muted nowrap">· missed ${n}×</span></li>`).join("")}</ul></section>` : ""}
-  <section class="card"><h2>Send my progress</h2><p class="small muted">Your manager already sees your progress when you're online. You can also send it on WhatsApp.</p><button class="btn ghost" id="rp">${icon("share")} Make my report</button></section>
   <section class="card"><h2>How this works</h2>
     <ul class="small" style="padding-left:20px;display:flex;flex-direction:column;gap:6px">
       <li>Short lessons in a new random order every time. One mistake and you start over, with the right answer and why.</li>
@@ -2160,162 +2258,19 @@ function renderMe(){
   <section class="row">
     <button class="btn small ghost" id="snd">${icon(S.sound ? "sound" : "mute")} Sound ${S.sound ? "on" : "off"}</button>
     ${S.name ? `<button class="btn small ghost" id="rename">Change name</button>` : ""}
-    <button class="btn small ghost" id="mgr">${icon("chart")} Manager view</button>
+    <button class="btn small ghost" id="mgr">${icon("chart")} Manager panel</button>
   </section>
   <p class="foot" id="resetBox"><button class="link" id="reset">Reset my progress on this phone</button></p>`);
   const nfm = $("#nameForm");
   if (nfm) nfm.addEventListener("submit", e => { e.preventDefault(); const v = $("#nm").value.trim().slice(0,30); if (v){ S.name = v; save(false); pushSync(); renderMe(); } });
-  on("#rp", report); on("#mgr", coach);
+  on("#mgr", coach);
   on("#snd", () => { S.sound = !S.sound; save(false); sfx("tap"); renderMe(); });
   on("#rename", () => { S.name = ""; save(false); renderMe(); });
   on("#reset", () => {
     $("#resetBox").innerHTML = `<span>Erase all progress on this phone?</span> <button class="btn small ghost" id="no">Keep it</button> <button class="btn small bad" id="yes">Erase</button>`;
     on("#no", renderMe);
-    on("#yes", () => { const keep = { name:S.name, sound:S.sound, coach:S.coach, sync:S.sync, mgr:S.mgr }; S = Object.assign(blank(), keep); save(); renderMe(); });
+    on("#yes", () => { const keep = { name:S.name, sound:S.sound, sync:S.sync, mgr:S.mgr }; S = Object.assign(blank(), keep); save(); renderMe(); });
   });
-}
-
-/* ---------- WhatsApp report ---------- */
-const b64e = s => { const b = new TextEncoder().encode(s); let bin = ""; b.forEach(c => bin += String.fromCharCode(c)); return btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); };
-const b64d = s => { s = s.replace(/-/g,"+").replace(/_/g,"/"); while (s.length % 4) s += "="; const bin = atob(s); return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))); };
-function reportText(){
-  const lv = id => { const L = byId(id); return S.mastered[id] ? `✔ ${L.name}` : S.best[id] ? `○ ${L.name}, best run ${S.best[id]} of ${levelTotal(L)}` : `○ ${L.name}`; };
-  const p = payload(); p.n = (S.name||"").slice(0,30);
-  const miss = topMisses(3).map(([id, n]) => { let q = QBY[id].q; q = q.length > 60 ? q.slice(0,58) + "…" : q; return `- ${/^"/.test(q) ? q : `"${q}"`} (missed ${n}×)`; });
-  return [
-    `Show-Up Academy progress`,
-    `Name: ${S.name || "(no name set)"}`,
-    `Rank: ${rank()}, ${nf(S.xp)} XP, ${masteredCount()} of ${LEVEL_IDS.length} levels mastered`,
-    ...TRACKS.flatMap(t => ["", t.title, ...t.levels.map(lv)]),
-    "",
-    `Final: ${S.mastered.final ? "passed ✔" : "not yet"}`,
-    `Script lines said: ${linesPracticed()} of ${Object.keys(SCRIPT_LINES).length}`,
-    `Lightning record: ${plural(S.lightning||0,"couple")}`,
-    `Streak: ${plural(streakDays(),"day")}`,
-    ...(miss.length ? ["Needs work:", ...miss] : ["Needs work: nothing missed yet"]),
-    "",
-    `#SUA1-${b64e(JSON.stringify(p))}`
-  ].join("\n");
-}
-function report(){
-  view = "report"; game = null;
-  const txt = reportText();
-  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">For your manager</p><h1>My progress report</h1></div><span></span></div>
-  <p>Send this on WhatsApp. The code on the last line lets the manager view read it.</p>
-  <textarea class="report" id="rt" readonly aria-label="Progress report">${esc(txt)}</textarea>
-  <div class="row"><a class="btn sun" href="https://wa.me/?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">${icon("share")} WhatsApp</a><button class="btn ghost" id="cp">Copy</button></div>`, { full: true });
-  on("#back", () => tab("me"));
-  on("#cp", () => { const ta = $("#rt"); const fb = () => { ta.focus(); ta.select(); toast("Selected. Press and hold to copy."); };
-    try { navigator.clipboard.writeText(txt).then(() => toast("Copied. Paste it into WhatsApp."), fb); } catch(e){ fb(); } });
-}
-/* Everything about other people comes from their phones (the team list, pasted reports),
-   so none of it is trusted: names are cut to plain text and every number is clamped. */
-const num = (v, max) => Number.isFinite(+v) ? Math.max(0, Math.min(max, Math.round(+v))) : 0;
-const cleanName = v => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 40) || "No name";
-function cleanStats(p){
-  p = p && typeof p === "object" && !Array.isArray(p) ? p : {};
-  const lv = o => Object.fromEntries(LEVEL_IDS.map(id => [id, num(o && typeof o === "object" ? o[id] : 0, 999)]));
-  const w = Array.isArray(p.w) ? p.w.filter(x => Array.isArray(x) && typeof x[0] === "string" && QBY[x[0]]).slice(0, 10).map(x => [x[0], num(x[1], 9999)]) : [];
-  return { x:num(p.x,1e7), m:lv(p.m), b:lv(p.b), l:num(p.l,999), d:num(p.d,9999), h:num(p.h,CLIPS.length), sl:num(p.sl,999), w, t:num(p.t,4e12) };
-}
-function person(name, stats, extra){
-  const mastered = LEVEL_IDS.filter(id => stats.m[id]).length;
-  return Object.assign({ name: cleanName(name), stats, xp: stats.x, mastered, final: !!stats.m.final }, extra);
-}
-function teamRows(rows){
-  return (Array.isArray(rows) ? rows : []).filter(r => r && typeof r === "object")
-    .map(r => person(r.name, cleanStats(r.stats), { device: String(r.device || ""), updated: typeof r.updated === "string" ? r.updated : "" }));
-}
-function parseReports(text){
-  const out = [], re = /#SUA1-([A-Za-z0-9_-]{8,6000})/g; let m;
-  while ((m = re.exec(text))){
-    try {
-      const p = JSON.parse(b64d(m[1]));
-      if (!p || typeof p !== "object" || Array.isArray(p)) continue;
-      const stats = cleanStats(p), name = cleanName(p.n);
-      out.push(person(name, stats, { device: "report:" + name.toLowerCase(), updated: stats.t, pasted: true }));
-    } catch(e){}
-  }
-  return out;
-}
-
-/* ---------- Manager view ---------- */
-function coachLogin(msg){
-  view = "coach"; game = null;
-  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h1>Team view</h1></div><span></span></div>
-  <div class="say-row">${shoco("think")}<div class="bubble">Enter the manager code to see who knows it all.</div></div>
-  <form class="name-form" id="codeForm"><label for="code" class="eyebrow" style="flex-basis:100%">Manager code</label><input class="field" id="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX"><button class="btn">Open</button></form>
-  ${msg ? `<p class="small" style="color:var(--bad-ink)">${esc(msg)}</p>` : ""}
-  <p class="small muted">The code stays on this phone so you don't have to type it again.</p>`, { full: true });
-  on("#back", () => tab("me"));
-  $("#codeForm").addEventListener("submit", e => { e.preventDefault(); const v = $("#code").value.trim(); if (v){ S.mgr = v; save(false); coach(); } });
-}
-async function coach(){
-  if (!S.mgr) return coachLogin();
-  view = "coach"; game = null;
-  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h1>Team view</h1></div><span></span></div>
-  <div class="say-row">${shoco("think")}<div class="bubble">Loading the team…</div></div>`, { full: true });
-  on("#back", () => tab("me"));
-  try {
-    const rows = await rpc("sua_team", { p_code: S.mgr });
-    if (view === "coach") renderTeam(Array.isArray(rows) ? rows : []);
-  } catch(e){
-    if (view !== "coach") return;
-    if (/wrong code/.test(e.message)){ S.mgr = ""; save(false); coachLogin("That code didn't work. Check it and try again."); }
-    else renderTeam(null, TEAM_HOST ? "Couldn't reach the team list. Check the internet and refresh. Pasted WhatsApp reports still work below."
-      : `The team list opens on the team link: ${TEAM_URL} Pasted WhatsApp reports work here too.`);
-  }
-}
-const AV = ["#00737a","#b8325a","#11709f","#8f6600","#2b7a1f","#a12a4d","#00636a"];
-function avatarColor(name){ let h = 0; for (const c of name) h = (h*31 + c.charCodeAt(0)) >>> 0; return AV[h % AV.length]; }
-function renderTeam(rows, err){
-  const pasted = Object.values(S.coach || {}).filter(r => r && typeof r === "object")
-    .map(r => person(r.name, cleanStats(r.stats), { device: "report:" + cleanName(r.name).toLowerCase(), updated: num(r.stats && r.stats.t, 4e12), pasted: true }));
-  const people = teamRows(rows).concat(pasted).sort((a, b) => (b.final - a.final) || (b.mastered - a.mastered) || (b.xp - a.xp));
-  const names = {}; people.forEach(p => { const k = p.name.toLowerCase(); names[k] = (names[k] || 0) + 1; });
-  people.forEach(p => p.dupe = names[p.name.toLowerCase()] > 1);
-  const know = people.filter(p => p.final), almost = people.filter(p => !p.final && p.mastered >= 8), learning = people.filter(p => !p.final && p.mastered >= 1 && p.mastered < 8), fresh = people.filter(p => !p.final && !p.mastered);
-  const week = people.filter(p => p.updated && Date.now() - new Date(p.updated).getTime() < 7*DAY).length;
-  const agg = {}; people.forEach(p => (p.stats && Array.isArray(p.stats.w) ? p.stats.w : []).forEach(([id, n]) => { if (QBY[id]) agg[id] = (agg[id]||0) + (+n||0); }));
-  const teamWeak = Object.entries(agg).sort((a,b) => b[1]-a[1]).slice(0,6);
-  const group = (title, ic, color, list) => list.length ? `<div class="group-h" style="color:${color}">${icon(ic)}<h2>${title} · ${list.length}</h2></div>${list.map(personHTML).join("")}` : "";
-  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h1>Team view</h1></div><button class="icon-btn" id="refresh" aria-label="Refresh">${icon("refresh")}</button></div>
-  ${err ? `<p class="card small" style="color:var(--bad-ink)">${esc(err)}</p>` : ""}
-  <section class="summary"><div><b>${people.length}</b><span>people</span></div><div><b style="color:var(--sun-ink)">${know.length}</b><span>know it all</span></div><div><b style="color:var(--sea-ink)">${week}</b><span>active this week</span></div></section>
-  ${people.length ? "" : `<div class="say-row">${shoco("idle")}<div class="bubble">Nobody yet. When your team opens the app and saves their name, they show up here with their progress.</div></div>`}
-  ${group("Knows it all", "crown", "var(--sun-ink)", know)}
-  ${group("Almost there", "flame", "var(--fire-ink)", almost)}
-  ${group("Learning", "book", "var(--sea-ink)", learning)}
-  ${group("Not started", "user", "var(--muted)", fresh)}
-  ${teamWeak.length ? `<section class="card weak"><p class="eyebrow">What the team misses most</p><p class="small muted">Coach these at the next meeting.</p><ul>${teamWeak.map(([id, n]) => `<li>${esc(QBY[id].q)}<br><span class="ans">${esc(answerText(QBY[id]))}</span> <span class="small muted nowrap">· missed ${n}×</span></li>`).join("")}</ul></section>` : ""}
-  <details class="card"><summary>Add a report from WhatsApp</summary><p class="small muted">For people who sent their report by message.</p><textarea class="report" id="paste" placeholder="Paste messages that end with #SUA1-"></textarea><button class="btn small" id="add">Add reports</button></details>
-  <details class="card"><summary>Change the manager code</summary><form class="name-form" id="newCode"><input class="field" id="nc" autocomplete="off" autocapitalize="characters" placeholder="New code, 6+ letters or numbers"><button class="btn small">Save</button></form><p class="small muted">Everyone using the old code will need the new one.</p></details>
-  <p class="foot"><button class="link" id="forget">Forget the code on this phone</button></p>`, { full: true });
-  on("#back", () => tab("me")); on("#refresh", coach);
-  on("#forget", () => { S.mgr = ""; save(false); coachLogin(); });
-  on("#add", () => { const got = parseReports($("#paste").value); if (!got.length){ toast("No report codes found. Each report ends with #SUA1-."); return; } S.coach = S.coach || {}; got.forEach(r => S.coach[r.device] = r); save(false); toast(`Added ${plural(got.length, "report")}.`); coach(); });
-  $("#newCode").addEventListener("submit", async e => { e.preventDefault(); const v = $("#nc").value.trim(); try { await rpc("sua_set_code", { p_code: S.mgr, p_new: v }); S.mgr = v; save(false); toast("Code changed."); } catch(err){ toast(/too short/.test(err.message) ? "Use at least 6 letters or numbers." : "Couldn't change the code."); } });
-  app.querySelectorAll("[data-person]").forEach(b => b.onclick = () => { const d = b.parentElement.querySelector(".pdetail"); d.hidden = !d.hidden; b.setAttribute("aria-expanded", String(!d.hidden)); });
-  app.querySelectorAll("[data-hide]").forEach(b => b.onclick = async () => {
-    if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "Tap again to hide"; return; }
-    try { await rpc("sua_hide", { p_code: S.mgr, p_device: b.dataset.hide }); toast("Hidden. If that phone plays again, it comes back."); coach(); } catch(e){ toast("Couldn't hide that entry."); }
-  });
-}
-function personHTML(p){
-  const st = p.stats || {}, m = st.m || {}, name = String(p.name || "No name");
-  const done = LEVEL_IDS.filter(id => m[id]).length;
-  return `<article class="person">
-    <button data-person aria-expanded="false"><span class="avatar" style="background:${avatarColor(name)}">${esc(name.slice(0,1).toUpperCase())}</span>
-      <span class="pmid"><span class="pname">${esc(name)}</span><span class="psub prow"><span class="mini-bar" aria-hidden="true"><i style="width:${Math.round(done / LEVEL_IDS.length * 100)}%"></i></span>${done}/${LEVEL_IDS.length}<span class="sr-only"> levels mastered</span></span><span class="psub">${p.pasted ? "From WhatsApp" : ago(p.updated) === "never" ? "No activity yet" : "Active " + esc(ago(p.updated))}</span></span>
-      <span class="pstreak${st.d ? "" : " off"}" title="Day streak">${icon("flame")}<b>${num(st.d, 9999)}</b></span></button>
-    <div class="pdetail" hidden>
-      <div class="grid2"><div class="statbox" style="color:var(--sun-2)">${icon("star")}<b style="color:var(--ink)">${nf(st.x||p.xp||0)}</b><span>XP</span></div><div class="statbox" style="color:var(--fire)">${icon("flame")}<b style="color:var(--ink)">${num(st.d, 9999)}</b><span>day streak</span></div><div class="statbox" style="color:var(--sea)">${icon("bolt")}<b style="color:var(--ink)">${num(st.l, 999)}</b><span>Lightning record</span></div><div class="statbox" style="color:var(--flamingo)">${icon("mic")}<b style="color:var(--ink)">${num(st.sl, 999)}/${Object.keys(SCRIPT_LINES).length}</b><span>script lines said</span></div></div>
-      <ul class="lvl-list">${LEVEL_IDS.map(id => `<li><span>${esc(byId(id).name)}</span>${m[id] ? `<span class="ok-t">mastered${m[id] > 1 ? ` ×${num(m[id], 999)}` : ""}</span>` : `<span class="no-t">${st.b && st.b[id] ? `best ${Math.min(num(st.b[id], 999), levelTotal(byId(id)))}/${levelTotal(byId(id))}` : "not yet"}</span>`}</li>`).join("")}</ul>
-      ${Array.isArray(st.w) && st.w.length ? `<div><p class="eyebrow">Misses most</p><ul class="weak" style="padding-left:18px">${st.w.filter(([id]) => QBY[id]).slice(0,5).map(([id, n]) => `<li>${esc(QBY[id].q)} <span class="small muted nowrap">· ${num(n, 9999)}×</span><br><span class="ans">${esc(answerText(QBY[id]))}</span></li>`).join("")}</ul></div>` : ""}
-      ${p.dupe ? `<p class="small muted">Another entry has the same name. If it's the same person on a new phone, hide the older one.</p>` : ""}
-      ${p.pasted ? "" : `<button class="btn small ghost" data-hide="${esc(p.device)}">Hide this entry</button>`}
-    </div>
-  </article>`;
 }
 
 /* =====================================================================
@@ -2341,12 +2296,283 @@ document.addEventListener("keydown", e => {
     if (n >= 1 && n <= cards.length){ e.preventDefault(); cards[n - 1].click(); }
   }
 });
+/* =====================================================================
+   MANAGER PANEL
+   Who knows what, what each worker has done, and what the team should work on.
+   Open it from Me > Manager panel, or with the team link plus #team.
+   Everything here comes from other people's phones (sua_team), so none of it is
+   trusted: names are cut to plain text, every number is clamped, and only known
+   level and question ids are used.
+   ===================================================================== */
+const num = (v, max) => Number.isFinite(+v) ? Math.max(0, Math.min(max, Math.round(+v))) : 0;
+const cleanName = v => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 40) || "No name";
+const LOG_KINDS = ["m", "r", "p", "f", "d", "lg"];
+const LOG_IDS = new Set([...LEVEL_IDS, "daily", "lightning"]);
+const NUDGE_DAYS = 3;
+const AV = ["#00737a", "#b8325a", "#11709f", "#8f6600", "#2b7a1f", "#a12a4d", "#00636a"];
+function avatarColor(name){ let h = 0; for (const c of name) h = (h*31 + c.charCodeAt(0)) >>> 0; return AV[h % AV.length]; }
+const dueAt = (count, last) => last + GAPS[Math.min(count - 1, GAPS.length - 1)] * DAY;
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+let TEAM = { people: [], sort: "progress", at: 0, err: "", open: "" };
+const tries = n => n === 1 ? "1 try" : `${n} tries`;
+const ppl = n => n === 1 ? "1 person" : `${n} people`;
+const times = n => n === 1 ? "once" : `${n} times`;
+function shortAgo(t){ const m = Math.floor((Date.now() - t) / 60000); return m < 2 ? "now" : m < 60 ? `${m}m` : m < 1440 ? `${Math.floor(m / 60)}h` : `${Math.floor(m / 1440)}d`; }
 
+function cleanStats(p){
+  const obj = o => o && typeof o === "object" && !Array.isArray(o) ? o : {};
+  p = obj(p);
+  const maxT = Date.now() + DAY;
+  const perLevel = (o, max) => Object.fromEntries(LEVEL_IDS.map(id => [id, num(obj(o)[id], max)]));
+  const a = Object.fromEntries(LEVEL_IDS.map(id => { const v = obj(p.a)[id]; return [id, Array.isArray(v) ? [num(v[0], 1e6), num(v[1], 1e6), num(v[2], 1e6)] : [0, 0, 0]]; }));
+  const w = Array.isArray(p.w) ? p.w.filter(x => Array.isArray(x) && typeof x[0] === "string" && QBY[x[0]]).map(x => [x[0], num(x[1], 9999)]).filter(x => x[1] > 0).slice(0, 20) : [];
+  const lg = Array.isArray(p.lg) ? p.lg.filter(e => Array.isArray(e) && LOG_KINDS.includes(e[1]) && LOG_IDS.has(e[2])).slice(-25)
+    .map(e => [num(e[0], maxT), e[1], e[2], num(e[3], 999), num(e[4], 999)]) : [];
+  const dd = Array.isArray(p.dd) ? [...new Set(p.dd.filter(s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s)))].slice(-60) : [];
+  return { v: num(p.v, 99), x: num(p.x, 1e7), m: perLevel(p.m, 999), ml: perLevel(p.ml, maxT), b: perLevel(p.b, 999), a,
+    l: num(p.l, 999), d: num(p.d, 9999), h: num(p.h, CLIPS.length), sl: num(p.sl, 999), w, lg, dd };
+}
+function person(r){
+  const st = cleanStats(r && r.stats), name = cleanName(r && r.name);
+  const updated = r && typeof r.updated === "string" && Number.isFinite(Date.parse(r.updated)) ? Date.parse(r.updated) : 0;
+  const right = LEVEL_IDS.reduce((s, id) => s + st.a[id][0], 0), wrong = LEVEL_IDS.reduce((s, id) => s + st.a[id][1], 0);
+  const mastered = LEVEL_IDS.filter(id => st.m[id]).length;
+  return { device: String((r && r.device) || ""), name, st, updated, mastered, ready: !!st.m.final, right, answers: right + wrong,
+    due: LEVEL_IDS.filter(id => st.m[id] && st.ml[id] && dueAt(st.m[id], st.ml[id]) <= Date.now()),
+    started: mastered > 0 || LEVEL_IDS.some(id => st.b[id] || st.a[id][2]) || st.lg.length > 0,
+    idle: updated ? Math.floor((Date.now() - updated) / DAY) : Infinity };
+}
+function teamRows(rows){
+  const people = (Array.isArray(rows) ? rows : []).filter(r => r && typeof r === "object").map(person);
+  const seen = {}; people.forEach(p => { const k = p.name.toLowerCase(); seen[k] = (seen[k] || 0) + 1; });
+  people.forEach(p => p.dupe = seen[p.name.toLowerCase()] > 1);
+  return people;
+}
+function levelState(p, id){
+  const st = p.st, total = levelTotal(byId(id));
+  if (st.m[id]) return { k: "done", count: st.m[id], due: p.due.includes(id), next: st.ml[id] ? dueAt(st.m[id], st.ml[id]) : 0 };
+  const best = Math.min(st.b[id], total), tries = st.a[id][2];
+  return best || tries ? { k: "started", best, total, tries } : { k: "none" };
+}
+function nextFor(p){
+  const done = id => !!p.st.m[id];
+  const open = id => {
+    if (byId(id).final) return TRACKS.every(t => t.levels.every(done));
+    const T = TRACKS.find(t => t.levels.includes(id)), k = T.levels.indexOf(id);
+    return k === 0 ? (!T.after || done(T.after)) : done(T.levels[k - 1]);
+  };
+  return ORDER.find(id => !done(id) && open(id)) || null;
+}
+function rankOf(p){ return p.ready ? "Show-Up Pro" : p.mastered >= 8 ? "Running" : p.mastered >= 3 ? "Walking" : "Crawling"; }
+function lastSeen(p){ return p.updated ? `Last active ${ago(p.updated)}` : "No activity yet"; }
+function nextStep(p){
+  if (!p.started) return "Saved a name, no lessons yet";
+  const reviews = p.due.length ? `${p.due.length === 1 ? "1 review" : `${p.due.length} reviews`} waiting` : "";
+  if (p.ready) return ["Passed the Final, ready to invite", reviews].filter(Boolean).join(" · ");
+  const id = nextFor(p), s = id ? levelState(p, id) : null;
+  const next = !id ? "" : s.k === "started" ? `Working on "${byId(id).name}", best run ${s.best} of ${s.total}` : `Next up: "${byId(id).name}"`;
+  return [next, reviews].filter(Boolean).join(" · ");
+}
+function sortPeople(list, how){
+  const by = {
+    progress: (a, b) => (b.ready - a.ready) || (b.mastered - a.mastered) || (b.right - a.right) || (b.st.x - a.st.x),
+    active: (a, b) => b.updated - a.updated,
+    name: (a, b) => a.name.localeCompare(b.name)
+  }[how] || (() => 0);
+  return list.slice().sort(by);
+}
+
+/* ---------- Team totals ---------- */
+function teamMisses(people){
+  const agg = {};
+  people.forEach(p => p.st.w.forEach(([id, n]) => { const x = agg[id] || (agg[id] = { id, n: 0, who: [] }); x.n += n; x.who.push(p.name); }));
+  return Object.values(agg).sort((a, b) => (b.who.length - a.who.length) || (b.n - a.n)).slice(0, 6);
+}
+function levelsToCoach(people){
+  return LEVEL_IDS.map(id => {
+    const states = people.map(p => levelState(p, id));
+    const trying = states.filter(s => s.k === "started").length, done = states.filter(s => s.k === "done").length;
+    const r = people.reduce((s, p) => s + p.st.a[id][0], 0), w = people.reduce((s, p) => s + p.st.a[id][1], 0);
+    return { id, trying, done, right: r, answers: r + w };
+  }).filter(x => x.trying > 0).sort((a, b) => (b.trying - a.trying) || (pct(a.right, a.answers) - pct(b.right, b.answers))).slice(0, 5);
+}
+
+/* ---------- Screens ---------- */
+function teamTop(title, eyebrow, backId, extra = ""){
+  return `<div class="l-top"><button class="icon-btn" id="${backId}" aria-label="${backId === "back" ? "Close the manager panel" : "Back to the team"}">${icon("x")}</button>
+    <div><p class="eyebrow">${esc(eyebrow)}</p><h1>${esc(title)}</h1></div>${extra || "<span></span>"}</div>`;
+}
+function closePanel(){ if (location.hash === "#team") history.replaceState(null, "", location.pathname + location.search); tab("me"); }
+function coachLogin(msg){
+  view = "coach"; game = null;
+  show(`${teamTop("Team panel", "Managers", "back")}
+  <div class="say-row">${shoco("think")}<div class="bubble">Enter the manager code to see your team: who knows what, and what to work on.</div></div>
+  <form class="name-form" id="codeForm"><label for="code" class="eyebrow" style="flex-basis:100%">Manager code</label><input class="field" id="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX"><button class="btn">Open</button></form>
+  ${msg ? `<p class="small" style="color:var(--bad-ink)">${esc(msg)}</p>` : ""}
+  <p class="small muted">The code stays on this phone, so you only type it once. Share it with managers only.</p>`, { full: true });
+  on("#back", closePanel);
+  $("#codeForm").addEventListener("submit", e => { e.preventDefault(); const v = $("#code").value.trim(); if (v){ S.mgr = v; save(false); coach(); } });
+}
+async function coach(){
+  if (!S.mgr) return coachLogin();
+  view = "coach"; game = null;
+  if (TEAM.at) TEAM.open ? renderWorker(TEAM.open, true) : renderPanel(true);
+  else { show(`${teamTop("Your team", "Managers", "back")}<div class="say-row">${shoco("think")}<div class="bubble">Loading the team…</div></div>`, { full: true, wide: true }); on("#back", closePanel); }
+  try {
+    const rows = await rpc("sua_team", { p_code: S.mgr });
+    Object.assign(TEAM, { people: teamRows(rows), at: Date.now(), err: "" });
+  } catch(e){
+    if (view !== "coach") return;
+    if (/wrong code/.test(e.message)){ S.mgr = ""; save(false); Object.assign(TEAM, { people: [], at: 0, err: "", open: "" }); return coachLogin("That code didn't work. Check it and try again."); }
+    TEAM.err = TEAM_HOST ? "Couldn't reach the team list. Check the internet, then tap refresh." : `The team list only opens on the team link: ${TEAM_URL}#team`;
+  }
+  if (view === "coach") TEAM.open ? renderWorker(TEAM.open, true) : renderPanel(true);
+}
+function renderPanel(keepScroll){
+  view = "coach"; game = null; TEAM.open = "";
+  const people = sortPeople(TEAM.people, TEAM.sort), n = people.length;
+  const ready = people.filter(p => p.ready).length, week = people.filter(p => p.idle < 7).length;
+  const nudge = people.filter(p => !p.ready && (!p.started || p.idle >= NUDGE_DAYS));
+  const right = people.reduce((s, p) => s + p.right, 0), answers = people.reduce((s, p) => s + p.answers, 0);
+  const misses = teamMisses(people), coachLv = levelsToCoach(people);
+  const tile = (ic, cls, value, label, exp) => `<div class="tp-tile ${cls}"><p class="lbl">${icon(ic)}${label}</p><b>${value}</b><p class="exp">${exp}</p></div>`;
+  show(`${teamTop("Your team", "Managers", "back", `<button class="icon-btn" id="refresh" aria-label="Refresh">${icon("refresh")}</button>`)}
+  <p class="tp-meta">${ppl(n)} · updated ${TEAM.at ? ago(TEAM.at) : "never"}</p>
+  ${TEAM.err ? `<p class="card small" role="alert" style="color:var(--bad-ink)">${esc(TEAM.err)}</p>` : ""}
+  ${n ? `
+  <section class="tp-tiles" aria-label="Team summary">
+    ${tile("crown", "t-sun", `${ready}<small> of ${n}</small>`, "Ready", "Passed the Final")}
+    ${tile("flame", "t-good", `${week}<small> of ${n}</small>`, "Active this week", "Did a lesson in the last 7 days")}
+    ${tile("user", "t-fire", nudge.length, "Need a nudge", `No lesson in ${NUDGE_DAYS}+ days, not ready yet`)}
+    ${tile("check", "t-sea", answers >= 20 ? `${pct(right, answers)}%` : "–", "Right answers", answers >= 20 ? `${nf(answers)} answers in lessons` : "Shows once they've answered 20")}
+  </section>
+  <section class="tp-card" aria-labelledby="kwH">
+    <div class="tp-card-h"><h2 id="kwH">Who knows what</h2>
+      <div class="tp-sort" role="group" aria-label="Sort the team">${[["progress", "Progress"], ["active", "Last active"], ["name", "Name"]].map(([k, l]) => `<button data-sort="${k}" aria-pressed="${TEAM.sort === k}">${l}</button>`).join("")}</div></div>
+    ${matrixHTML(people)}
+    <p class="kw-key kw-units">${UNITS.map(u => `<span class="c-${u.color}"><i class="kc done"></i>${esc(u.title)}</span>`).join("")}</p>
+    <p class="kw-key"><span class="c-lagoon"><i class="kc done"></i>Mastered</span><span class="c-lagoon"><i class="kc started" style="--p:50%"></i>Started (fill = best run)</span><span><i class="kc"></i>Not started</span><span>Tap a name for details.</span></p>
+  </section>
+  <div class="tp-cols">
+    <section class="tp-card" aria-labelledby="wmH"><h2 id="wmH">Questions the team misses</h2>
+      ${misses.length ? `<ol class="tp-list">${misses.map(x => `<li><p class="q">${esc(QBY[x.id].q)}</p><p class="ans">${esc(answerText(QBY[x.id]))}</p>
+        <details class="who"><summary>Missed ${times(x.n)} by ${ppl(x.who.length)}</summary><p>${x.who.map(esc).join(", ")}</p></details></li>`).join("")}</ol>
+        <p class="small muted">Go over these at the next meeting.</p>` : `<p class="muted">No misses yet.</p>`}
+    </section>
+    <section class="tp-card" aria-labelledby="lcH"><h2 id="lcH">Levels to coach</h2>
+      ${coachLv.length ? `<ul class="tp-list">${coachLv.map(x => { const u = unitOf(x.id); return `<li class="lvc c-${u.color}"><p class="q">${esc(byId(x.id).name)} <span class="utag">${esc(u.title)}</span></p>
+        <div class="tp-bar" role="img" aria-label="${x.done} mastered, ${x.trying} still trying"><i style="width:${pct(x.done, x.done + x.trying)}%"></i></div>
+        <p class="small muted">${x.trying} still trying · ${x.done} mastered${x.answers >= 10 ? ` · ${pct(x.right, x.answers)}% right` : ""}</p></li>`; }).join("")}</ul>` : `<p class="muted">Nobody is stuck right now.</p>`}
+    </section>
+  </div>
+  <section class="tp-card" aria-labelledby="ndH"><h2 id="ndH">Need a nudge</h2>
+    ${nudge.length ? `<ul class="tp-people">${nudge.map(p => `<li><button data-open="${esc(p.device)}">${avatarHTML(p)}<span><span class="pname">${esc(p.name)}</span><span class="psub">${esc(p.started ? `${lastSeen(p)} · ${nextStep(p)}` : nextStep(p))}</span></span>${icon("play", "go")}</button></li>`).join("")}</ul>`
+      : `<p class="muted">Everyone has done a lesson in the last ${NUDGE_DAYS} days.</p>`}
+  </section>` : `<div class="say-row">${shoco("idle")}<div class="bubble">Nobody yet. When your team opens the app and saves their name, they show up here with their progress.</div></div>`}
+  <details class="card"><summary>How these numbers work</summary><ul class="small tp-help">
+    <li>Mastered: they finished the level with no mistakes. It comes back for review after 1, 3, 7, 14 and 30 days.</li>
+    <li>Started: they tried it but haven't done a clean run yet. The fill shows their best run.</li>
+    <li>Ready: they passed the Final, 20 questions in a row.</li>
+    <li>Right answers: every answer they gave in lessons since this update.</li>
+    <li>Progress arrives from each phone after every answer, when it has internet.</li></ul></details>
+  <details class="card"><summary>Change the manager code</summary><form class="name-form" id="newCode"><input class="field" id="nc" autocomplete="off" autocapitalize="characters" placeholder="New code, 6+ letters or numbers" aria-label="New manager code"><button class="btn small">Save</button></form><p class="small muted">Every manager will need the new code.</p></details>
+  <p class="foot"><button class="link" id="forget">Forget the code on this phone</button></p>`, { full: true, wide: true, keepScroll });
+  on("#back", closePanel); on("#refresh", coach);
+  on("#forget", () => { S.mgr = ""; save(false); Object.assign(TEAM, { people: [], at: 0, err: "", open: "" }); coachLogin(); });
+  app.querySelectorAll("[data-sort]").forEach(b => b.onclick = () => { TEAM.sort = b.dataset.sort; renderPanel(true); });
+  app.querySelectorAll("[data-open]").forEach(b => b.onclick = () => renderWorker(b.dataset.open));
+  $("#newCode")?.addEventListener("submit", async e => { e.preventDefault(); const v = $("#nc").value.trim();
+    try { await rpc("sua_set_code", { p_code: S.mgr, p_new: v }); S.mgr = v; save(false); toast("Code changed."); $("#nc").value = ""; }
+    catch(err){ toast(/too short/.test(err.message) ? "Use at least 6 letters or numbers." : "Couldn't change the code."); } });
+}
+function avatarHTML(p){ return `<span class="avatar" style="background:${avatarColor(p.name)}" aria-hidden="true">${esc(p.name.slice(0, 1).toUpperCase())}</span>`; }
+function matrixHTML(people){
+  const cell = (p, id) => {
+    const u = unitOf(id), s = levelState(p, id), L = byId(id);
+    const label = s.k === "done" ? `${L.name}: mastered` : s.k === "started" ? `${L.name}: best run ${s.best} of ${s.total}` : `${L.name}: not started`;
+    const fill = s.k === "started" ? ` style="--p:${Math.max(12, pct(s.best, s.total))}%"` : "";
+    return `<td class="c-${u.color}"><i class="kc ${s.k}"${fill} role="img" aria-label="${esc(label)}" title="${esc(label)}"></i></td>`;
+  };
+  // Unit groups with a thin spacer column between them; the squares shrink to fit any phone.
+  const groups = (f, gap) => UNITS.map((u, i) => (i ? gap : "") + f(u)).join("");
+  const sub = p => `${p.mastered}/${LEVEL_IDS.length} · ${p.updated ? shortAgo(p.updated) : "new"}`;
+  return `<div class="kw-wrap"><table class="kw"><caption class="sr-only">Levels each person has mastered or started</caption>
+    <colgroup><col class="cn">${groups(u => `<col span="${u.levels.length}">`, `<col class="cg">`)}</colgroup>
+    <thead><tr><th scope="col"><span class="sr-only">Person</span></th>${groups(u => `<th scope="colgroup" colspan="${u.levels.length}" class="u c-${u.color}">${u.id === "final" ? `${icon("crown", "fin")}<span class="sr-only">Final</span>` : `<span>${esc(u.id === "pitch" ? "Pitch" : u.title)}</span>`}</th>`, `<th aria-hidden="true"></th>`)}</tr>
+    <tr class="kw-lv"><th></th>${groups(u => u.levels.map(id => `<th scope="col"><span>${esc(byId(id).name)}</span></th>`).join(""), `<th aria-hidden="true"></th>`)}</tr></thead>
+    <tbody>${people.map(p => `<tr><th scope="row"><button class="kw-name" data-open="${esc(p.device)}"><span class="pname">${esc(p.name)}</span><span class="psub">${esc(sub(p))}</span></button></th>${groups(u => u.levels.map(id => cell(p, id)).join(""), `<td aria-hidden="true"></td>`)}</tr>`).join("")}</tbody></table></div>`;
+}
+function logText(e){
+  const [, k, id, v, n] = e, name = id === "daily" ? "Daily 10" : id === "lightning" ? "Lightning round" : `"${byId(id).name}"`;
+  return { m: `Mastered ${name}`, r: `Review done: ${name}`, p: `Practiced ${name}`, d: "Finished a Daily 10",
+    f: `${name}: ${v} of ${n} in a row, then a mistake`, lg: `Lightning round: ${plural(v, "couple")}` }[k];
+}
+function renderWorker(device, keepScroll){
+  const p = TEAM.people.find(x => x.device === device); if (!p) return renderPanel();
+  view = "coach"; game = null; TEAM.open = device;
+  const st = p.st, total = LEVEL_IDS.length;
+  const days = [...Array(14)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - (13 - i)); return dstr(d); });
+  const activeDays = days.filter(d => st.dd.includes(d)).length;
+  const status = id => {
+    const s = levelState(p, id), a = st.a[id], acc = a[0] + a[1] >= 5 ? `${pct(a[0], a[0] + a[1])}% right` : "";
+    const notes = [s.due ? "review due" : "", acc].filter(Boolean).join(" · ");
+    if (s.k === "done") return `<span class="st done">${icon("crown")}Mastered${s.count > 1 ? ` ×${s.count}` : ""}</span>${notes ? `<span class="small muted">${notes}</span>` : ""}`;
+    if (s.k === "started") return `<span class="st started">Best ${s.best} of ${s.total}</span><span class="small muted">${[s.tries ? tries(s.tries) : "", acc].filter(Boolean).join(" · ")}</span>`;
+    return `<span class="st none">Not started</span>`;
+  };
+  const log = st.lg.slice().sort((a, b) => b[0] - a[0]).slice(0, 8);
+  show(`${teamTop(p.name, "Team", "toTeam")}
+  <div class="tp-who">${avatarHTML(p)}<div><p><b>${esc(rankOf(p))}</b> · ${esc(lastSeen(p))}</p>
+    <p class="small muted">${st.d ? `${plural(st.d, "day")} in a row` : "No streak"} · ${nf(st.x)} XP</p></div></div>
+  ${nextStep(p) ? `<p class="tp-next">${icon("steps")}<span>${esc(nextStep(p))}</span></p>` : ""}
+  <div class="tp-cols">
+    <div class="stack" style="gap:18px">
+      <section class="tp-tiles two" aria-label="Summary">
+        <div class="tp-tile t-sun"><p class="lbl">${icon("crown")}Levels mastered</p><b>${p.mastered}<small> of ${total}</small></b><p class="exp">${p.ready ? "Passed the Final" : "Final not passed yet"}</p></div>
+        <div class="tp-tile t-sea"><p class="lbl">${icon("check")}Right answers</p><b>${p.answers >= 10 ? `${pct(p.right, p.answers)}%` : "–"}</b><p class="exp">${p.answers >= 10 ? `${nf(p.answers)} answers in lessons` : "Shows after 10 answers"}</p></div>
+      </section>
+      <section class="tp-card" aria-labelledby="lvH"><h2 id="lvH">Levels</h2>
+        ${UNITS.map(u => { const done = u.levels.filter(id => st.m[id]).length; return `<div class="tp-unit c-${u.color}">
+          <div class="tp-unit-h"><h3>${esc(u.title)}</h3><span class="small muted">${done} of ${u.levels.length}</span></div>
+          <div class="tp-bar" role="img" aria-label="${done} of ${u.levels.length} mastered"><i style="width:${pct(done, u.levels.length)}%"></i></div>
+          <ul class="tp-lv">${u.levels.map(id => `<li><span class="nm">${esc(byId(id).name)}</span><span class="sts">${status(id)}</span></li>`).join("")}</ul></div>`; }).join("")}
+      </section>
+    </div>
+    <div class="stack" style="gap:18px">
+      <section class="tp-card" aria-labelledby="nwH"><h2 id="nwH">Needs work</h2>
+        ${st.w.length ? `<ol class="tp-list">${st.w.slice(0, 6).map(([id, n]) => `<li><p class="q">${esc(QBY[id].q)}</p><p class="ans">${esc(answerText(QBY[id]))}</p><p class="small muted">Missed ${times(n)}</p></li>`).join("")}</ol>` : `<p class="muted">Nothing missed yet.</p>`}
+      </section>
+      <section class="tp-card" aria-labelledby="prH"><h2 id="prH">Practice</h2>
+        <ul class="tp-facts">
+          <li>${icon("mic")}<span><b>${st.sl} of ${Object.keys(SCRIPT_LINES).length}</b> script lines said out loud</span></li>
+          <li>${icon("headphones")}<span><b>${st.h} of ${CLIPS.length}</b> voice notes heard</span></li>
+          <li>${icon("bolt")}<span><b>${plural(st.l, "couple")}</b> Lightning record</span></li></ul>
+      </section>
+      <section class="tp-card" aria-labelledby="acH"><h2 id="acH">Activity</h2>
+        ${st.dd.length ? `<div class="tp-days" role="img" aria-label="Active ${activeDays} of the last 14 days">${days.map(d => `<i class="${st.dd.includes(d) ? "on" : ""}"></i>`).join("")}</div>
+          <p class="small muted">${activeDays} of the last 14 days. Today is on the right.</p>` : ""}
+        ${log.length ? `<ul class="tp-log">${log.map(e => `<li class="k-${e[1]}"><span>${esc(logText(e))}</span><time>${esc(ago(e[0]))}</time></li>`).join("")}</ul>`
+          : `<p class="muted">${p.started ? "Their lesson history shows after their next lesson." : "No lessons yet."}</p>`}
+      </section>
+    </div>
+  </div>
+  ${p.dupe ? `<p class="small muted">Another entry has the same name. If it's the same person on a new phone, hide the older one.</p>` : ""}
+  <p class="foot tp-hide"><button class="link" id="hide" data-hide="${esc(p.device)}">Hide ${esc(p.name)} from the team list</button><span>For test entries and old phones. If they do a lesson again, they come back.</span></p>`, { full: true, wide: true, keepScroll });
+  on("#toTeam", () => renderPanel());
+  on("#hide", async () => {
+    const b = $("#hide");
+    if (b.dataset.armed !== "1"){ b.dataset.armed = "1"; b.textContent = "Tap again to hide"; return; }
+    try { await rpc("sua_hide", { p_code: S.mgr, p_device: b.dataset.hide }); toast("Hidden."); TEAM.people = TEAM.people.filter(x => x.device !== b.dataset.hide); renderPanel(); }
+    catch(e){ toast("Couldn't hide that entry."); }
+  });
+}
 /* =====================================================================
    BOOT
+   The team link with #team at the end opens the manager panel.
    ===================================================================== */
 buildTabs();
-tab(S.tab);
+if (location.hash === "#team") coach(); else tab(S.tab);
+addEventListener("hashchange", () => { if (location.hash === "#team") coach(); });
 if (S.name) queueSync();
 </script>
 </body>
