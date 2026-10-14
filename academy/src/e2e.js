@@ -1,4 +1,4 @@
-// End-to-end run of Show-Up Academy in headless Chromium, like a player on a phone (about 110 checks).
+// End-to-end run of Show-Up Academy in headless Chromium, like a player on a phone (about 125 checks).
 // Usage: node academy/src/e2e.js <pageUrl> <outDir>   (needs Playwright; serve academy/ with Range support, e.g. npx http-server academy)
 // The team database is mocked here, so the test never writes to it.
 const { chromium } = require("playwright");
@@ -79,19 +79,21 @@ const EVIL = [
   ok("loads with no errors", p.errors.length === 0, p.errors.join(" | "));
   ok("9 voice notes loaded", await p.evaluate(() => CLIPS.length === 9 && CLIPS.every(c => c.s.length > 3)));
   ok("Learn tab with name form", await p.isVisible("#nm"));
-  ok("8 level nodes on the path", await p.evaluate(() => document.querySelectorAll("[data-node]").length) === 8);
+  ok("13 level nodes on the path", await p.evaluate(() => document.querySelectorAll("[data-node]").length) === 13);
   ok("start node is Qualified guests", await p.evaluate(() => document.querySelector(".node.current")?.dataset.node) === "q");
   ok("both tracks open at the start", await p.evaluate(() => !document.querySelector('[data-node="why"]').classList.contains("locked") && document.querySelector('[data-node="ctnq"]').classList.contains("locked")));
   ok("final locked", await p.evaluate(() => document.querySelector('[data-node="final"]').classList.contains("locked")));
+  ok("NLP waits for Remove the doubt", await p.evaluate(() => document.querySelector('[data-node="nlp1"]').classList.contains("locked")));
   await noOverflow("learn, fresh");
   await p.fill("#nm", "Maria <b>G.</b>"); await p.keyboard.press("Enter");
-  ok("name shows, escaped", (await p.textContent(".say-row .bubble")).includes("Hi Maria <b>G.</b>."));
+  ok("name shows, escaped", (await p.textContent(".say-row .bubble")).includes("Hi Maria <b>G.</b>"));
   ok("saving a name syncs the phone", await p.waitForFunction(() => S.sync.ok === true, null, { timeout: 5000 }).then(() => true, () => false));
   ok("sync sends name and progress only", p.rpc.some(r => r.fn === "sua_save" && r.body.p_name === "Maria <b>G.</b>" && r.body.p_stats.v === 2 && !("mgr" in r.body.p_stats)));
 
   // 2. Popover and guidebook
   await p.click('[data-node="q"]');
   ok("node opens a popover with Start", await p.isVisible('[data-start="q"]'));
+  ok("a new level offers Learn first", /Learn first/.test(await p.textContent('[data-guide="q"]')));
   await p.click('[data-guide="q"]');
   ok("guidebook opens", await p.isVisible("text=Guidebook"));
   await noOverflow("guidebook q");
@@ -111,6 +113,7 @@ const EVIL = [
   await p.keyboard.press("Enter");
   ok("Enter continues to item 2", await p.evaluate(() => game.idx === 1));
   const firstOrder = await p.evaluate(() => game.list.map(q => q.id).join());
+  const missedId = await p.evaluate(() => game.list[game.idx].id);
   await answer(p, false); await sheetUp(p);
   ok("wrong answer: red sheet, back to the start", await p.evaluate(() => document.querySelector("#sheet").classList.contains("bad") && /Back to the start/.test(document.querySelector("#sheet").textContent)));
   ok("heart breaks", await p.evaluate(() => document.querySelector("#heart").classList.contains("broken") && document.querySelector("#heart b").textContent === "0"));
@@ -121,6 +124,7 @@ const EVIL = [
   await p.click("#sheet #cont");
   ok("start over from item 1", await p.evaluate(() => game.idx === 0));
   ok("new random order", await p.evaluate(o => game.list.map(q => q.id).join() !== o, firstOrder));
+  ok("the missed question comes back second", await p.evaluate(id => game.list[1].id === id && game.list.filter(q => q.id === id).length === 1, missedId));
   await p.click("#quit");
   ok("quit asks first", await p.isVisible("#stay"));
   await p.click("#stay");
@@ -169,7 +173,7 @@ const EVIL = [
   }
   // scenario items
   await p.evaluate(() => { S.mastered.ctnq = { count: 1, last: Date.now() }; save(false); play("who"); });
-  ok("who: 15 couples", await p.evaluate(() => game.list.length === 15 && game.list.every(q => q.scen)));
+  ok("who: 12 couples", await p.evaluate(() => game.list.length === 12 && game.list.every(q => q.scen)));
   ok("scenario shows guest chips or text", await p.isVisible(".guest-tag"));
   await answer(p, true); await sheetUp(p);
   ok("scenario: right grade accepted", await p.evaluate(() => document.querySelector("#sheet").classList.contains("good")));
@@ -195,8 +199,29 @@ const EVIL = [
   });
   ok("3000 generated couples graded by the PDF rules", bandErr.length === 0, bandErr.join(" | "));
 
+  // 5a. Word for word: answer, then hear the real line
+  await p.evaluate(() => { const L = byId("words"); startRun(L, [L.qs.find(q => q.id === "k8"), ...L.qs.filter(q => q.id !== "k8")]); AUD.muted = true; });
+  await answer(p, true); await sheetUp(p);
+  ok("word-for-word sheet offers Hear the line", await p.isVisible("#sheet [data-seg]"));
+  await p.click("#sheet [data-seg]"); await p.waitForTimeout(900);
+  ok("Hear the line plays the voice note", await p.evaluate(() => AUD.src.endsWith("04.mp3") && AUD.currentTime > 2));
+
+  // 5b. NLP unit
+  await p.evaluate(() => { S.mastered.why = { count: 1, last: Date.now() }; save(false); tab("learn"); });
+  ok("NLP opens after Remove the doubt", await p.evaluate(() => !document.querySelector('[data-node="nlp1"]').classList.contains("locked")));
+  await p.evaluate(() => guidebook("nlp2"));
+  ok("NLP guidebook has voice-note buttons and practice lines", await p.evaluate(() => document.querySelectorAll(".note [data-seg]").length >= 4 && document.querySelectorAll('.note [data-say]').length === 2));
+  await p.evaluate(() => { window.__sayText = "is 8 or 10 o'clock better for you guys"; });
+  await p.click('[data-say="n2b"]'); await p.waitForTimeout(400);
+  ok("NLP practice line scores with Say it", await p.evaluate(() => S.said.n2b >= 0.99 && /practiced/i.test(document.querySelector('[data-said="n2b"]').textContent)));
+  await p.evaluate(() => play("nlp1"));
+  const kn = await clearRun(p);
+  ok("NLP level masters through the UI", await p.evaluate(() => !!S.mastered.nlp1), [...kn].join(","));
+  await p.click("#cont");
+  if (await p.isVisible("text=day streak")) await p.click("#cont");
+
   // 6. Pitch map
-  await p.evaluate(() => { ["why", "offer", "solid"].forEach(id => S.mastered[id] = { count: 1, last: Date.now() }); save(false); tab("games"); });
+  await p.evaluate(() => { ["why", "offer", "solid", "words"].forEach(id => S.mastered[id] = { count: 1, last: Date.now() }); save(false); tab("games"); });
   ok("games: map and lightning open", await p.isVisible("#mp") && await p.isVisible("#lg"));
   await p.click("#mp");
   await p.evaluate(() => document.querySelector(`.cardbtn[data-i="${game.step + 1}"]`).click());
@@ -227,6 +252,7 @@ const EVIL = [
   // 9. Script tab: lines in the trainer's voice and Say it
   await p.evaluate(() => tab("script"));
   ok("script: 22 lines", await p.evaluate(() => document.querySelectorAll(".line[data-line]").length === 22));
+  ok("script lines show their NLP move", await p.evaluate(() => document.querySelectorAll(".nlp-tag").length >= 10));
   await noOverflow("script");
   await p.evaluate(() => { AUD.muted = true; });
   await p.click('[data-key="s3a"]');
@@ -305,9 +331,11 @@ const EVIL = [
   // 13. Review due, final run, certificate
   await p.evaluate(() => { S.mastered.q.last = Date.now() - 2 * DAY; save(false); tab("learn"); });
   ok("review due shows on the path", await p.evaluate(() => document.querySelector('[data-node="q"]').classList.contains("due") && /Review time/.test(document.querySelector(".say-row .bubble").textContent)));
-  ok("final unlocked after all 7", await p.evaluate(() => !document.querySelector('[data-node="final"]').classList.contains("locked")));
+  ok("final still locked until NLP is done", await p.evaluate(() => document.querySelector('[data-node="final"]').classList.contains("locked")));
+  await p.evaluate(() => { ["words", "nlp2", "nlp3", "nlp4"].forEach(id => S.mastered[id] = { count: 1, last: Date.now() }); save(false); tab("learn"); });
+  ok("final unlocked after all 12", await p.evaluate(() => !document.querySelector('[data-node="final"]').classList.contains("locked")));
   await p.evaluate(() => play("final"));
-  ok("final: 25 mixed items", await p.evaluate(() => game.list.length === 25));
+  ok("final: 20 mixed items", await p.evaluate(() => game.list.length === 20));
   await clearRun(p);
   ok("final: certificate with the name", await p.isVisible(".cert") && (await p.textContent(".cert .who")) === "Maria <b>G.</b>");
   ok("final: rank Show-Up Pro", await p.evaluate(() => rank() === "Show-Up Pro"));
@@ -338,7 +366,7 @@ const EVIL = [
   await pn.fill("#nm", "Ana"); await pn.keyboard.press("Enter");
   await pn.evaluate(() => { const L = byId("q"); const q = L.qs.find(q => q.type === "match"); startRun(L, [q]); });
   await noOverflow("match at 320px", pn);
-  await pn.evaluate(() => { S.mastered = Object.fromEntries(LEVEL_IDS.slice(0, 7).map(id => [id, { count: 1, last: Date.now() }])); play("who"); });
+  await pn.evaluate(() => { S.mastered = Object.fromEntries(LEVEL_IDS.slice(0, 12).map(id => [id, { count: 1, last: Date.now() }])); play("who"); });
   await noOverflow("scenario at 320px", pn);
   await pn.evaluate(() => tab("script")); await noOverflow("script at 320px", pn);
   await pn.evaluate(() => tab("me")); await noOverflow("me at 320px", pn);

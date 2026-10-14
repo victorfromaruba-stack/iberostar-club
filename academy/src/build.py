@@ -94,4 +94,8 @@ print(r.stdout.strip() or r.stderr.strip())
 if r.returncode:
     print(r.stderr.strip()[-2000:])
     sys.exit("build check failed")
+lint = subprocess.run(["node", str(SRC / "lint_content.js"), str(out)], capture_output=True, text=True)
+print(lint.stdout.strip())
+if lint.returncode:
+    sys.exit("content check failed")
 print(f"wrote {out} ({out.stat().st_size:,} bytes)")

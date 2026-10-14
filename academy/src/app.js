@@ -9,8 +9,8 @@ const SB = { url: "https://cdkopyphjvfxjqhasrae.supabase.co", key: "sb_publishab
 const TEAM_URL = "https://victorfromaruba-stack.github.io/iberostar-club/academy/";
 const TEAM_HOST = /github\.io$/.test(location.hostname) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 const GOAL = 50;
-const ORDER = ["q","why","ctnq","offer","who","solid","map","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","map","final"];
+const ORDER = ["q","why","ctnq","offer","nlp1","who","solid","words","nlp2","map","nlp3","nlp4","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","words","map","nlp1","nlp2","nlp3","nlp4","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];
@@ -69,13 +69,15 @@ function unlocked(id){
   const L = byId(id);
   if (L.final) return TRACKS.every(t => t.levels.every(x => S.mastered[x]));
   const T = TRACKS.find(t => t.levels.includes(id)), k = T.levels.indexOf(id);
-  return k === 0 || !!S.mastered[T.levels[k-1]];
+  return k === 0 ? (!T.after || !!S.mastered[T.after]) : !!S.mastered[T.levels[k-1]];
 }
+/* The level you must finish before this one opens. */
+function before(id){ const T = TRACKS.find(t => t.levels.includes(id)); if (!T) return null; const k = T.levels.indexOf(id); return k > 0 ? T.levels[k-1] : T.after || null; }
 const masteredCount = () => LEVEL_IDS.filter(id => S.mastered[id]).length;
 function rank(){
   if (S.mastered.final) return "Show-Up Pro";
   const n = masteredCount();
-  return n >= 5 ? "Running" : n >= 2 ? "Walking" : "Crawling";
+  return n >= 8 ? "Running" : n >= 3 ? "Walking" : "Crawling";
 }
 function streakDays(){
   const set = new Set(S.days), d = new Date();
@@ -238,7 +240,7 @@ async function playFull(id, at){
     loadClip(id); await whenReady();
     if (at != null) AUD.currentTime = at;
     await AUD.play();
-    try { if ("mediaSession" in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title: clipById(id).t, artist: "Show-Up Academy", album: "Trainer's voice notes" }); } catch(e){}
+    try { if ("mediaSession" in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title: clipById(id).t, artist: "Show-Up Academy", album: "Voice notes" }); } catch(e){}
   } catch(e){ toast("This voice note won't play here. Its words are in the transcript."); const tx = app.querySelector(`[data-tx="${id}"]`); if (tx) tx.hidden = false; }
   syncClipUI();
 }
@@ -304,7 +306,7 @@ function scoreSay(target, said){
 }
 function sayIt(id, btn){
   if (REC){ stopRec(); btn.classList.remove("listening"); return; }
-  const L = SCRIPT_LINES[id]; stopAudio();
+  const L = SCRIPT_LINES[id] || NLP_LINES[id]; stopAudio();
   const out = app.querySelector(`[data-heard="${id}"]`), sc = app.querySelector(`[data-score="${id}"]`);
   let said = "";
   try { REC = new SR(); } catch(e){ toast("This browser can't listen. Say it out loud, then tap Hear it to compare."); return; }
@@ -326,7 +328,7 @@ function sayIt(id, btn){
     const total = Object.keys(SCRIPT_LINES).length, done = linesPracticed();
     const cnt = $("#saidCount"); if (cnt) cnt.textContent = `${done} of ${total} lines practiced`;
     const bar = $("#saidBar i"); if (bar) bar.style.width = (done / total * 100) + "%";
-    const lbl = app.querySelector(`[data-line="${id}"] .lbl`); if (lbl && (S.said[id]||0) >= .7) lbl.innerHTML = `You say <span class="said-check">· practiced</span>`;
+    const lbl = app.querySelector(`[data-said="${id}"]`); if (lbl) lbl.innerHTML = saidLabel(L);
   };
   try { REC.start(); sfx("tap"); } catch(e){ btn.classList.remove("listening"); REC = null; toast("Couldn't start the microphone."); }
 }
@@ -376,7 +378,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 function syncLine(){
   const st = !S.name ? "" : S.sync.ok ? "ok" : S.sync.ok === false ? "err" : "";
   const txt = !S.name ? "Add your name and your manager will see your progress."
-    : S.sync.ok ? `Your manager sees your progress · updated ${ago(S.sync.last)}`
+    : S.sync.ok ? `Your manager sees your progress. Updated ${ago(S.sync.last)}.`
     : S.sync.ok === false ? (TEAM_HOST ? "Couldn't reach the team list. It tries again after your next lesson." : "Your manager sees your progress when you use the team link. Here, send your report on WhatsApp.")
     : "Your progress will be shared with your manager.";
   return `<p class="sync" id="syncLine"><i class="dot ${st}"></i><span>${esc(txt)}</span></p>`;
@@ -439,9 +441,9 @@ function renderLearn(){
     <span class="pill bolt" title="Lightning record">${icon("bolt")}<b>${S.lightning||0}</b></span>
     <span class="pill" title="Daily goal">${ring(tx/GOAL)}<b>${Math.min(tx, GOAL)}/${GOAL}</b></span>
   </header>
-  ${S.name ? `<section class="say-row">${mingo("idle")}<div class="bubble">Hi ${esc(S.name)}. ${esc(nextUp())}</div></section>`
+  ${S.name ? `<section class="say-row">${shoco("idle")}<div class="bubble">Hi ${esc(S.name)}${/[.!?]$/.test(S.name) ? "" : "."} ${esc(nextUp())}</div></section>`
     : `<section class="card">
-        <div class="say-row">${mingo("happy")}<div class="bubble">Hi, I'm Mingo. I'll help you learn the qualifications and the pitch, one short lesson at a time. What's your name?</div></div>
+        <div class="say-row">${shoco("happy")}<div class="bubble">Hi, I'm Shoco, Aruba's burrowing owl. I'll help you learn the qualifications, the pitch and NLP, one short lesson at a time. What's your name?</div></div>
         <form class="name-form" id="nameForm"><label for="nm" class="eyebrow" style="flex-basis:100%">Your name</label><input class="field" id="nm" autocomplete="name" maxlength="30" placeholder="First name + last initial"><button class="btn">Save</button></form>
         <p class="small muted">Your manager sees your progress, so use the name they know you by, like Maria G.</p>
       </section>`}
@@ -453,7 +455,7 @@ function renderLearn(){
       </div>
       <div class="path">${u.levels.map(id => nodeHTML(id, u, OFFS[(k++) % OFFS.length])).join("")}</div>
     </section>`).join("")}
-  <p class="foot">Sources: Qualifications Aruba (2 March 2026), the trainer's voice notes (29 Sept 2026), the Open House flyer and partner sheet.</p>`);
+  <p class="foot">Sources: Qualifications Aruba (2 March 2026), the team's voice notes (29 Sept 2026), and the Open House pitch deck.</p>`);
   const nfm = $("#nameForm");
   if (nfm) nfm.addEventListener("submit", e => { e.preventDefault(); const v = $("#nm").value.trim().slice(0,30); if (v){ S.name = v; save(false); pushSync(); sfx("ok"); renderLearn(); } });
   on("#toScript", () => tab("script"));
@@ -467,7 +469,7 @@ function nodeHTML(id, u, off){
   return `<div class="node-row" style="--off:${off}px">
     ${st === "current" ? `<span class="start-tag c-${u.color}">START</span>` : ""}
     <button class="node ${st} c-${u.color}" data-node="${id}" aria-label="${esc(L.name)}, ${label}" aria-expanded="false">${icon(ic)}${st === "due" ? `<span class="due-dot">${icon("bolt")}</span>` : ""}</button>
-    ${st === "current" && S.name ? `<span class="path-mingo" style="${off > 0 ? "left" : "right"}:calc(50% - ${off > 0 ? 170 : 170}px)">${mingo("idle")}</span>` : ""}
+    ${st === "current" && S.name ? `<span class="path-mascot" style="${off > 0 ? "left" : "right"}:calc(50% - ${off > 0 ? 170 : 170}px)">${shoco("idle")}</span>` : ""}
   </div><div data-pop="${id}"></div>`;
 }
 function togglePop(id){
@@ -478,16 +480,19 @@ function togglePop(id){
   if (open) return;
   sfx("tap");
   const L = byId(id), u = unitOf(id), st = nodeState(id), r = reviewInfo(id), off = btn.closest(".node-row").style.getPropertyValue("--off");
-  const T = TRACKS.find(t => t.levels.includes(id)), prev = T ? T.levels[T.levels.indexOf(id)-1] : null;
+  const prev = before(id);
   const size = L.map ? "7 steps, 2 rounds" : `${levelTotal(L)} exercises`;
   let status, actions;
   if (st === "locked"){
-    status = L.final ? "Opens when you master the other 7 levels." : `Finish \u201c${byId(prev).name}\u201d first.`;
+    status = L.final ? `Opens when you master the other ${LEVEL_IDS.length - 1} levels.` : `Finish \u201c${byId(prev).name}\u201d first.`;
     actions = `<button class="btn wide" disabled>${icon("lock")} Locked</button>`;
   } else {
     status = st === "due" ? `Review due. Mastered ${plural(r.count,"time")}.` : st === "done" ? `Mastered ${plural(r.count,"time")}. Review in ${plural(r.days,"day")}.` : S.best[id] ? `Best run: ${S.best[id]} of ${levelTotal(L)}.` : size + ". One mistake and you start over.";
     const hasGuide = (L.notes && L.notes.length) || L.map || L.script;
-    actions = `<button class="btn wide" data-start="${id}">${st === "due" ? "Review" : st === "done" ? "Practice +XP" : "Start"}</button>${hasGuide ? `<button class="btn wide ghost" data-guide="${id}">${icon("book")} Guidebook</button>` : ""}`;
+    const fresh = !S.mastered[id] && !S.best[id];
+    actions = hasGuide && fresh
+      ? `<button class="btn wide" data-guide="${id}">${icon("book")} Learn first</button><button class="btn wide ghost" data-start="${id}">Start the lesson</button>`
+      : `<button class="btn wide" data-start="${id}">${st === "due" ? "Review" : st === "done" ? "Practice +XP" : "Start"}</button>${hasGuide ? `<button class="btn wide ghost" data-guide="${id}">${icon("book")} Guidebook</button>` : ""}`;
   }
   slot.innerHTML = `<div class="popover c-${u.color} ${st === "locked" ? "locked" : ""}" style="--off:${off}"><h3>${esc(L.name)}</h3><p>${esc(L.sub)}</p><p>${esc(status)}</p><div class="stack" style="margin-top:6px">${actions}</div></div>`;
   btn.setAttribute("aria-expanded","true");
@@ -497,19 +502,23 @@ function togglePop(id){
 }
 
 /* ---------- Guidebook ---------- */
-function noteHTML(nt){ return `<section class="note"><h3>${esc(nt.h)}</h3><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>${nt.say ? `<p class="line"><span class="quote">"${esc(nt.say)}"</span></p>` : ""}</section>`; }
+function noteHTML(nt){
+  return `<section class="note"><h3>${esc(nt.h)}</h3><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    ${nt.hear ? `<div class="acts"><button class="btn small ghost" data-seg="${nt.hear.clip}:${nt.hear.from}:${nt.hear.to}">${icon("play")} ${esc(nt.hear.label || "Hear it in the voice notes")}</button></div>` : ""}
+    ${nt.sayId ? lineHTML(NLP_LINES[nt.sayId]) : nt.say ? `<p class="line"><span class="quote">"${esc(nt.say)}"</span></p>` : ""}</section>`;
+}
 function guidebook(id){
   view = "guide"; game = null;
   const L = byId(id), u = unitOf(id);
   const hero = id === "offer" ? `<figure class="photo kb"><img src="img/photos/joia-beach.jpg" alt="Joia by Iberostar on Eagle Beach"><figcaption>Joia by Iberostar, Eagle Beach</figcaption></figure>` : "";
   const steps = L.script ? `<h2>What to say</h2>${L.script.map(i => stepHTML(SCRIPT[i], i)).join("")}` : "";
-  const flyers = (L.imgs||[]).map(im => `<figure class="flyer"><a href="${im.src}" target="_blank" rel="noopener"><img src="${im.src}" width="${im.w}" height="${im.h}" alt="${esc(im.alt)}" loading="lazy"></a><figcaption>${esc(im.cap)} · tap to open full size</figcaption></figure>`).join("");
+  const slides = (L.imgs||[]).map(im => `<figure class="deck-slide"><a href="${im.src}" target="_blank" rel="noopener"><img src="${im.src}" width="${im.w}" height="${im.h}" alt="${esc(im.alt)}" loading="lazy"></a><figcaption>${esc(im.cap)} · tap to open full size</figcaption></figure>`).join("");
   const photos = id === "offer" ? `<div class="grid2"><figure class="photo"><img src="img/photos/joia-suite.jpg" alt="A Joia suite" loading="lazy"><figcaption>A suite on the VIP tour</figcaption></figure><figure class="photo"><img src="img/photos/zima.jpg" alt="Zima rooftop bar at Joia" loading="lazy"><figcaption>Zima, Joia's rooftop bar</figcaption></figure></div>` : "";
   const video = L.video ? `<figure class="photo"><video src="${L.video}" poster="${L.poster}" autoplay muted loop playsinline preload="metadata" aria-label="Aerial view of the Tierra del Sol golf course"></video><figcaption>Tierra del Sol, Iberostar's golf course</figcaption></figure>` : "";
   const mapList = L.map ? `<section class="note"><h3>The pitch map</h3><ol class="placed">${MAP_STEPS.map(s => `<li><div>${esc(s.t)}<span>${esc(s.line)}</span></div></li>`).join("")}</ol><p class="small muted">Round 1: tap the steps in order. Round 2: tap the lines in order. One wrong tap and you start over.</p></section>` : "";
   show(`
   <div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Guidebook · Unit ${u.n}</p><h2>${esc(L.name)}</h2></div><span></span></div>
-  <div class="gb-hero">${hero}${flyers}${photos}${video}</div>
+  <div class="gb-hero">${hero}${slides}${photos}${video}</div>
   ${steps}${mapList}${(L.notes||[]).map(noteHTML).join("")}
   <button class="btn wide" id="go">${S.mastered[id] ? "Practice" : "Start the lesson"}</button>`, { full: true });
   on("#back", () => tab("learn"));
@@ -519,14 +528,22 @@ function guidebook(id){
 
 /* ---------- Lessons (levels, final, Daily 10) ---------- */
 const DAILY = { id:"daily", name:"Daily 10", sub:"Spaced review", notes:[] };
-function play(id){
+function play(id, missed){
   const L = byId(id);
   if (L.map) return startMap();
   let list;
   if (L.gen) list = buildScenarios(L.count);
   else if (L.final){ const pool = shuffle(ALL_QS.slice()).slice(0, L.count - 6); list = shuffle(pool.concat(buildScenarios(6))); }
   else list = shuffle(L.qs.slice());
-  startRun(L, list);
+  startRun(L, retryEarly(list, missed));
+}
+/* After a mistake, the missed question comes back second in the new run: a quick retest
+   right after seeing the answer is what makes it stick. */
+function retryEarly(list, missed){
+  if (!missed || typeof missed.q !== "string" || list.length < 3) return list;
+  const rest = list.filter(q => q !== missed && q.q !== missed.q && (missed.id === "gen" || q.id !== missed.id));
+  rest.splice(1, 0, missed);
+  return rest.slice(0, list.length);
 }
 function buildDaily(){
   const pool = LEVELS.filter(l => l.qs && S.mastered[l.id]).flatMap(l => l.qs);
@@ -539,7 +556,7 @@ function buildDaily(){
   }
   return shuffle(picked.concat(S.mastered.who ? buildScenarios(10 - picked.length) : []));
 }
-function startDaily(){ startRun(DAILY, buildDaily()); }
+function startDaily(missed){ startRun(DAILY, retryEarly(buildDaily(), missed)); }
 function startRun(L, list){ game = { kind:"run", L, list, idx:0, streak:0, xp:0, t0:Date.now() }; renderItem(); }
 function lessonTop(pct){
   return `<div class="l-top"><button class="icon-btn" id="quit" aria-label="Quit">${icon("x")}</button>
@@ -550,7 +567,7 @@ function renderItem(){
   view = "lesson";
   const g = game, it = g.list[g.idx], n = g.list.length;
   g.sel = null; g.checked = false; g.opts = null;
-  const kind = it.type === "build" ? "Build the line" : it.type === "match" ? "Match the pairs" : it.type === "listen" ? "Listen" : it.scen ? "Q, CT or NQ?" : it.line ? "Finish the line" : it.pic ? "Look and answer" : "Choose the answer";
+  const kind = it.type === "build" ? "Put the words in order" : it.type === "match" ? "Match the pairs" : it.type === "listen" ? "Listen" : it.scen ? "Which gift?" : it.line ? "Fill in the blank" : it.pic ? "Look and answer" : "Choose the answer";
   show(`<div class="lesson">
     ${lessonTop(g.idx / n * 100)}
     <p class="l-kind">${kind}</p>
@@ -562,19 +579,19 @@ function renderItem(){
   bindItem(it);
   if (it.type === "listen") timers.push(setTimeout(() => hearItem(1), 350));
 }
-function bubbleRow(inner, mood){ return `<div class="say-row">${mingo(mood, "lm")}<div class="bubble q">${inner}</div></div>`; }
+function bubbleRow(inner, mood){ return `<div class="say-row">${shoco(mood, "lm")}<div class="bubble q">${inner}</div></div>`; }
 function itemBody(it){
   if (it.type === "build"){
     const toks = it.text.split(" ");
     game.tokens = toks; game.tiles = shuffle(toks.concat(it.extra || [])); game.built = [];
-    return bubbleRow(`Build what you say: <b>${esc(it.ctx)}</b>`, "think") + `<div class="bank-answer" id="ans" aria-label="Your line" aria-live="polite"></div><div class="bank" id="bank">${game.tiles.map((t,i) => `<button class="wtile" data-t="${i}">${esc(t)}</button>`).join("")}</div>`;
+    return bubbleRow(esc(it.q), "think") + `<div class="bank-answer" id="ans" aria-label="Your line" aria-live="polite"></div><div class="bank" id="bank">${game.tiles.map((t,i) => `<button class="wtile" data-t="${i}">${esc(t)}</button>`).join("")}</div>`;
   }
   if (it.type === "match"){
     const left = shuffle(it.pairs.map((p,i) => ({ i, t:p[0] }))), right = shuffle(it.pairs.map((p,i) => ({ i, t:p[1] })));
     return bubbleRow(esc(it.q), "think") + `<div class="match"><div class="col">${left.map(x => `<button class="mt" data-side="l" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div><div class="col">${right.map(x => `<button class="mt" data-side="r" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div></div>`;
   }
   if (it.type === "listen")
-    return `<div class="listen"><button class="speak" id="hear" data-key="item" aria-label="Play the trainer">${icon("speaker")}</button><button class="speak slow" id="hearSlow" data-key="item-slow" aria-label="Play slower">0.75×</button></div><p class="read-it" id="readIt" hidden></p>` + bubbleRow(esc(it.q), "idle") + optionsHTML(it);
+    return `<div class="listen"><button class="speak" id="hear" data-key="item" aria-label="Play the voice note">${icon("speaker")}</button><button class="speak slow" id="hearSlow" data-key="item-slow" aria-label="Play slower">0.75×</button></div><p class="read-it" id="readIt" hidden></p>` + bubbleRow(esc(it.q), "idle") + optionsHTML(it);
   if (it.scen) return scenarioHTML(it) + optionsHTML(it);
   if (it.pic) return `<figure class="photo kb"><img src="${it.img}" alt="${esc(it.alt)}"></figure>` + bubbleRow(qText(it), "idle") + optionsHTML(it);
   return bubbleRow(qText(it), "idle") + optionsHTML(it);
@@ -585,7 +602,7 @@ function scenarioHTML(it){
 }
 function optionsHTML(it){
   game.opts = it.fixed ? it.fixed.slice() : shuffle([it.a, ...it.w]);
-  if (it.scen) return `<div class="opts grid3" role="group" aria-label="Answers">${game.opts.map((o,k) => { const [code, ...rest] = o.split(" · "); return `<button class="opt grade" data-k="${k}" aria-pressed="false"><b>${esc(code)}</b><span>${esc(rest.join(" · "))}</span></button>`; }).join("")}</div>`;
+  if (it.scen) return `<div class="opts grid3" role="group" aria-label="Answers">${game.opts.map((o,k) => { const m = o.match(/^(\w+) \((.+)\)$/) || [o, o, ""], code = m[1], rest = [m[2]]; return `<button class="opt grade" data-k="${k}" aria-pressed="false"><b>${esc(code)}</b><span>${esc(rest.join(" · "))}</span></button>`; }).join("")}</div>`;
   return `<div class="opts" role="group" aria-label="Answers">${game.opts.map((o,k) => `<button class="opt" data-k="${k}" aria-pressed="false"><span class="k">${k+1}</span><span>${esc(o)}</span></button>`).join("")}</div>`;
 }
 function bindItem(it){
@@ -629,7 +646,7 @@ function bindItem(it){
 async function hearItem(rate){
   const it = game && game.list[game.idx]; if (!it || it.type !== "listen") return;
   const ok = await playSeg(it.clip, it.from, it.to, rate === 1 ? "item" : "item-slow", rate);
-  if (!ok){ const r = $("#readIt"); if (r){ r.hidden = false; r.textContent = `Audio won't play here. The trainer says: "${segText(it.clip, it.from, it.to)}"`; } }
+  if (!ok){ const r = $("#readIt"); if (r){ r.hidden = false; r.textContent = `Audio won't play here. The voice note says: "${segText(it.clip, it.from, it.to)}"`; } }
 }
 function select(k){
   const g = game; if (!g || g.checked) return;
@@ -669,19 +686,21 @@ function verdict(ok){
     <div class="sh-head"><span class="badge">${icon(ok ? "check" : "x")}</span><h3>${ok ? pick(PRAISE) : "Back to the start"}</h3></div>
     ${ok ? "" : `<p class="sh-ans">Correct answer: <b>${esc(answerText(it))}</b></p>`}
     <p class="sh-why">${esc(it.why || "")}</p>
-    ${ok ? "" : `<p class="small">${g.L.id === "daily" ? `You got ${g.idx} in a row.` : `You got ${g.idx} in a row. Your best: ${best} of ${g.list.length}.`} New order next time.</p>`}
+    ${it.hear ? `<div class="acts"><button class="btn small ghost" data-seg="${it.hear.clip}:${it.hear.from}:${it.hear.to}" data-key="hear-${it.id}">${icon("play")} Hear the line</button></div>` : ""}
+    ${ok ? "" : `<p class="small">${g.L.id === "daily" ? `You got ${g.idx} in a row.` : `You got ${g.idx} in a row. Your best: ${best} of ${g.list.length}.`} New order next time, and this one comes back early.</p>`}
     <button class="btn wide ${ok ? "good" : "bad"}" id="cont">${ok ? (last ? "Finish" : "Continue") : "Start over"}</button>
     ${!ok && g.L.id !== "daily" && ((g.L.notes && g.L.notes.length) || g.L.script) ? `<button class="link" id="gb">${icon("book")} Open the guidebook first</button>` : ""}
   </div>`;
   requestAnimationFrame(() => sheet.classList.add("show"));
-  on("#cont", () => { sfx("tap"); ok ? (last ? complete() : (g.idx++, renderItem())) : (g.L.id === "daily" ? startDaily() : play(g.L.id)); });
+  bindSegButtons(sheet);
+  on("#cont", () => { sfx("tap"); ok ? (last ? complete() : (g.idx++, renderItem())) : (g.L.id === "daily" ? startDaily(it) : play(g.L.id, it)); });
   on("#gb", () => guidebook(g.L.id));
   timers.push(setTimeout(() => $("#cont")?.focus({ preventScroll: true }), 80));
 }
 function quitRun(){
   const sheet = $("#sheet"); if (!sheet) return tab("learn");
   sheet.className = "sheet bad";
-  sheet.innerHTML = `<div class="sheet-in"><div class="say-row">${mingo("sad")}<div class="bubble">Leaving now loses this run. Stay a little longer?</div></div>
+  sheet.innerHTML = `<div class="sheet-in"><div class="say-row">${shoco("sad")}<div class="bubble">Leaving now loses this run. Stay a little longer?</div></div>
     <button class="btn wide" id="stay">Keep going</button><button class="btn wide ghost" id="leave">Quit the lesson</button></div>`;
   requestAnimationFrame(() => sheet.classList.add("show"));
   on("#stay", () => sheet.classList.remove("show"));
@@ -706,7 +725,7 @@ function celebrate(o){
   const goalJust = todayXP() >= GOAL && todayXP() - o.xp < GOAL;
   const date = new Date().toLocaleDateString("en-US", { year:"numeric", month:"long", day:"numeric" });
   show(`<section class="celebrate">
-    ${mingo("cheer")}
+    ${shoco("cheer")}
     <h1>${esc(o.title)}</h1>
     ${goalJust ? `<p class="eyebrow" style="color:var(--fire)">Daily goal reached</p>` : ""}
     <div class="stats">
@@ -714,7 +733,7 @@ function celebrate(o){
       <div class="stat c-lagoon"><div class="h">Time</div><div class="v">${icon("bolt")}${fmtT(o.time/1000)}</div></div>
       <div class="stat" style="--c:var(--good);--t:#fff"><div class="h">In a row</div><div class="v">${icon("check")}${o.row}</div></div>
     </div>
-    ${o.L && o.L.final ? `<div class="cert"><p class="eyebrow">Show-Up Academy certificate</p><p class="who">${esc(S.name || "Show-Up Pro")}</p><p>Passed the final: ${o.row} questions in a row on the qualifications and the pitch, with no mistakes.</p><p class="small muted">${esc(date)}</p></div><p class="small muted">Your manager sees this on the team view too.</p>` : ""}
+    ${o.L && o.L.final ? `<div class="cert"><p class="eyebrow">Show-Up Academy certificate</p><p class="who">${esc(S.name || "Show-Up Pro")}</p><p>Passed the final: ${o.row} questions in a row on the qualifications, the pitch and NLP, with no mistakes.</p><p class="small muted">${esc(date)}</p></div><p class="small muted">Your manager sees this on the team view too.</p>` : ""}
     ${gap ? `<p class="muted">Come back in ${plural(gap,"day")} for a quick review. Spacing it out makes it stick.</p>` : ""}
     <button class="btn wide" id="cont">Continue</button>
   </section>`, { full: true });
@@ -744,8 +763,8 @@ function renderMap(msg){
   const g = game, total = MAP_STEPS.length*2, done = g.round*MAP_STEPS.length + g.step;
   show(`<div class="lesson">
     ${lessonTop(done / total * 100)}
-    <p class="l-kind">Pitch map · round ${g.round + 1} of 2 · ${g.round ? "the lines" : "the steps"}</p>
-    <div class="say-row">${mingo(msg ? "happy" : "think", "lm")}<div class="bubble q">${esc(msg || (g.step ? "What comes next?" : "What do you say first?"))}</div></div>
+    <p class="l-kind">Pitch map, round ${g.round + 1} of 2: ${g.round ? "the lines" : "the steps"}</p>
+    <div class="say-row">${shoco(msg ? "happy" : "think", "lm")}<div class="bubble q">${esc(msg || (g.step ? "What comes next?" : "What do you say first?"))}</div></div>
     ${g.step ? `<ol class="placed">${MAP_STEPS.slice(0, g.step).map(s => `<li><div>${esc(s.t)}${g.round ? `<span>${esc(s.line)}</span>` : ""}</div></li>`).join("")}</ol>` : ""}
     <div class="mapq" role="group" aria-label="Steps">${g.order.filter(i => i >= g.step).map(i => `<button class="cardbtn" data-i="${i}">${esc(g.round ? MAP_STEPS[i].line : MAP_STEPS[i].t)}</button>`).join("")}</div>
   </div><div class="sheet" id="sheet"></div>`, { full: true });
@@ -788,7 +807,7 @@ function lightningIntro(){
   view = "lightning"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><span></span><span></span></div>
   <section class="celebrate">
-    ${mingo("think")}
+    ${shoco("think")}
     <h1 style="color:var(--sea)">Lightning round</h1>
     <p>Qualify as many couples as you can in 60 seconds. One mistake ends it.</p>
     <div class="stats"><div class="stat c-sun"><div class="h">Record</div><div class="v">${icon("bolt")}${S.lightning||0}</div></div><div class="stat c-lagoon"><div class="h">Time</div><div class="v">60s</div></div><div class="stat" style="--c:var(--bad);--t:#fff"><div class="h">Mistakes</div><div class="v">${icon("heart")}1</div></div></div>
@@ -857,7 +876,7 @@ function endLightning(wrong){
   view = "lightning"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><span></span><span></span></div>
   <section class="celebrate">
-    ${mingo(record ? "cheer" : wrong ? "sad" : "happy")}
+    ${shoco(record ? "cheer" : wrong ? "sad" : "happy")}
     <h1 style="color:var(--sea)">${record ? "New record!" : plural(g.score, "couple")}</h1>
     <p class="muted">${wrong ? "One mistake ends the round." : "Time's up."}</p>
     <div class="stats"><div class="stat c-lagoon"><div class="h">This round</div><div class="v">${g.score}</div></div><div class="stat c-sun"><div class="h">Record</div><div class="v">${icon("bolt")}${S.lightning}</div></div><div class="stat"><div class="h">XP</div><div class="v">${icon("star")}${g.score*5}</div></div></div>
@@ -871,23 +890,23 @@ function endLightning(wrong){
 }
 
 /* ---------- Script tab: what to say, from the voice notes ---------- */
+function saidLabel(l){ return `You say${(S.said[l.id] || 0) >= .7 ? ` <span class="said-check">${icon("check")}practiced</span>` : ""}`; }
 function lineHTML(l){
-  const sc = S.said[l.id] || 0;
   return `<div class="line" data-line="${l.id}">
-    <p class="lbl">You say${sc >= .7 ? ` <span class="said-check">· practiced</span>` : ""}</p>
+    <p class="lbl"><span data-said="${l.id}">${saidLabel(l)}</span>${l.nlp ? `<span class="nlp-tag">NLP: ${esc(l.nlp)}</span>` : ""}</p>
     <p class="quote">"${esc(l.text)}"</p>
     ${l.note ? `<p class="note">${esc(l.note)}</p>` : ""}
-    <div class="acts"><button class="btn small sea" data-seg="${l.clip}:${l.from}:${l.to}" data-key="${l.id}">${icon("play")} Hear it</button>${SR ? `<button class="btn small ghost" data-say="${l.id}">${icon("mic")} Say it</button>` : ""}<span class="score" data-score="${l.id}"></span></div>
+    <div class="acts">${l.clip ? `<button class="btn small sea" data-seg="${l.clip}:${l.from}:${l.to}" data-key="${l.id}">${icon("play")} Hear it</button>` : ""}${SR ? `<button class="btn small ghost" data-say="${l.id}">${icon("mic")} Say it</button>` : ""}<span class="score" data-score="${l.id}"></span></div>
     <p class="heard-text" data-heard="${l.id}" hidden></p>
   </div>`;
 }
 function stepHTML(s, i){
   return `<article class="step" id="step-${i}">
     <div class="step-h"><span class="n">${i + 1}</span><h2>${esc(s.step)}</h2></div>
-    <div class="tip">${mingo("idle")}<p>${esc(s.tip)}</p></div>
+    <div class="tip">${shoco("idle")}<p>${esc(s.tip)}</p></div>
     ${s.lines.map(lineHTML).join("")}
-    ${s.dont ? `<div class="line dont"><p class="lbl">Don't say</p><p class="quote">"${esc(s.dont.text)}"</p><p class="note">${esc(s.dont.why)}</p><div class="acts"><button class="btn small ghost" data-seg="${s.dont.clip}:${s.dont.from}:${s.dont.to}">${icon("play")} Hear the trainer</button></div></div>` : ""}
-    ${s.extra ? `<div class="line" style="border-left-color:var(--sea);background:var(--sea-soft)"><p class="lbl" style="color:var(--sea-2)">From the trainer</p><p class="note" style="color:var(--ink)">${esc(s.extra.text)}</p><div class="acts"><button class="btn small ghost" data-seg="${s.extra.clip}:${s.extra.from}:${s.extra.to}">${icon("play")} ${esc(s.extra.label)}</button></div></div>` : ""}
+    ${s.dont ? `<div class="line dont"><p class="lbl">Don't say</p><p class="quote">"${esc(s.dont.text)}"</p><p class="note">${esc(s.dont.why)}</p><div class="acts"><button class="btn small ghost" data-seg="${s.dont.clip}:${s.dont.from}:${s.dont.to}">${icon("play")} Hear it in the voice notes</button></div></div>` : ""}
+    ${s.extra ? `<div class="line" style="border-left-color:var(--sea);background:var(--sea-soft)"><p class="lbl" style="color:var(--sea-2)">From the voice notes</p><p class="note" style="color:var(--ink)">${esc(s.extra.text)}</p><div class="acts"><button class="btn small ghost" data-seg="${s.extra.clip}:${s.extra.from}:${s.extra.to}">${icon("play")} ${esc(s.extra.label)}</button></div></div>` : ""}
   </article>`;
 }
 function bindSayButtons(){ app.querySelectorAll("[data-say]").forEach(b => b.onclick = () => sayIt(b.dataset.say, b)); }
@@ -895,10 +914,10 @@ function renderScript(){
   const total = Object.keys(SCRIPT_LINES).length, done = linesPracticed();
   const mins = Math.round(CLIPS.reduce((a, c) => a + c.d, 0) / 60);
   show(`
-  <header class="stack" style="padding-top:12px"><h1>What to say</h1><p class="muted">Your trainer's own words from the voice notes, step by step. Hear each line, then say it out loud.</p></header>
+  <header class="stack" style="padding-top:12px"><h1>What to say</h1><p class="muted">The exact lines from the voice notes, step by step. Hear each one, then say it out loud.</p></header>
   <section class="card"><div class="row" style="justify-content:space-between"><b id="saidCount">${done} of ${total} lines practiced</b>${SR ? "" : `<span class="small muted">Say it needs Chrome or Safari</span>`}</div><div class="l-bar" id="saidBar"><i style="width:${done/total*100}%"></i></div></section>
   ${SCRIPT.map(stepHTML).join("")}
-  <section class="stack" id="notes"><h2>All ${CLIPS.length} voice notes</h2><p class="muted">${mins} minutes in the trainer's voice. They play one after another. Tap any sentence to jump to it.</p><div class="stack">${CLIPS.map(clipHTML).join("")}</div></section>`, { keepAudio: true });
+  <section class="stack" id="notes"><h2>All ${CLIPS.length} voice notes</h2><p class="muted">${mins} minutes of recordings. They play one after another. Tap any sentence to jump to it.</p><div class="stack">${CLIPS.map(clipHTML).join("")}</div></section>`, { keepAudio: true });
   bindSegButtons(app); bindSayButtons(); bindClips();
 }
 
@@ -910,7 +929,7 @@ function renderGames(){
   <article class="tile-card c-sun"><div class="ico">${icon("calendar")}</div><div><h3>Daily 10</h3><p class="small muted">${dailyOpen() ? (S.daily.last === today() ? "Done today. Play again for practice." : "Ten questions. Your misses come back more.") : "Opens after your first mastered level."}</p></div>${dailyOpen() ? `<button class="btn small sun" id="dy">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-flamingo"><div class="ico">${icon("route")}</div><div><h3>Pitch map</h3><p class="small muted">${unlocked("map") ? "Put the pitch in order, then the lines." : "Opens after \u201cMake it solid\u201d"}</p></div>${unlocked("map") ? `<button class="btn small flamingo" id="mp">Play</button>` : icon("lock")}</article>
   <article class="tile-card"><div class="ico">${icon("headphones")}</div><div><h3>Voice notes</h3><p class="small muted">${CLIPS.filter(c => S.listened[c.id]).length} of ${CLIPS.length} heard</p></div><button class="btn small ghost" id="vn">Listen</button></article>`);
-  on("#lg", lightningIntro); on("#dy", startDaily); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
+  on("#lg", lightningIntro); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
 }
 
 /* ---------- Me tab ---------- */
@@ -918,7 +937,7 @@ function renderMe(){
   const weak = topMisses(3);
   const days = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return d; });
   show(`
-  <header class="me-head" style="padding-top:12px">${mingo("happy")}<div><h1>${esc(S.name || "You")}</h1><p class="muted">${rank()} · ${masteredCount()} of ${LEVEL_IDS.length} levels mastered</p></div></header>
+  <header class="me-head" style="padding-top:12px">${shoco("happy")}<div><h1>${esc(S.name || "You")}</h1><p class="muted">${rank()}: ${masteredCount()} of ${LEVEL_IDS.length} levels mastered</p><p class="small muted">Crawl, walk, run. Each level you master moves you up.</p></div></header>
   ${S.name ? "" : `<form class="name-form" id="nameForm"><label for="nm" class="eyebrow" style="flex-basis:100%">Your name</label><input class="field" id="nm" autocomplete="name" maxlength="30" placeholder="First name + last initial"><button class="btn">Save</button></form>`}
   ${syncLine()}
   <section class="grid2">
@@ -935,7 +954,7 @@ function renderMe(){
       <li>Short lessons in a new random order every time. One mistake and you start over, with the right answer and why.</li>
       <li>Pulling the answer out of your head is what builds memory. Re-reading doesn't.</li>
       <li>Levels come back for review after 1, 3, 7, 14 and 30 days. Spacing it out makes it stick.</li>
-      <li>Hear the trainer's lines, then say them out loud in the Script tab.</li>
+      <li>Hear the lines from the voice notes, then say them out loud in the Script tab.</li>
     </ul></section>
   <section class="row">
     <button class="btn small ghost" id="snd">${icon(S.sound ? "sound" : "mute")} Sound ${S.sound ? "on" : "off"}</button>
@@ -966,8 +985,7 @@ function reportText(){
     `Show-Up Academy progress`,
     `Name: ${S.name || "(no name set)"}`,
     `Rank: ${rank()} · ${nf(S.xp)} XP`,
-    `Qualify: ${TRACKS[0].levels.map(lv).join(" · ")}`,
-    `The pitch: ${TRACKS[1].levels.map(lv).join(" · ")}`,
+    ...TRACKS.map(t => `${t.title}: ${t.levels.map(lv).join(" · ")}`),
     `Final run: ${S.mastered.final ? "passed ✔" : "not yet"}`,
     `Script lines said: ${linesPracticed()} of ${Object.keys(SCRIPT_LINES).length}`,
     `Lightning record: ${plural(S.lightning||0,"couple")} · streak ${plural(streakDays(),"day")}`,
@@ -1021,7 +1039,7 @@ function parseReports(text){
 function coachLogin(msg){
   view = "coach"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h2>Team view</h2></div><span></span></div>
-  <div class="say-row">${mingo("think")}<div class="bubble">Enter the manager code to see who knows it all.</div></div>
+  <div class="say-row">${shoco("think")}<div class="bubble">Enter the manager code to see who knows it all.</div></div>
   <form class="name-form" id="codeForm"><label for="code" class="eyebrow" style="flex-basis:100%">Manager code</label><input class="field" id="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX"><button class="btn">Open</button></form>
   ${msg ? `<p class="small" style="color:var(--bad-ink)">${esc(msg)}</p>` : ""}
   <p class="small muted">The code stays on this phone so you don't have to type it again.</p>`, { full: true });
@@ -1032,7 +1050,7 @@ async function coach(){
   if (!S.mgr) return coachLogin();
   view = "coach"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h2>Team view</h2></div><span></span></div>
-  <div class="say-row">${mingo("think")}<div class="bubble">Loading the team…</div></div>`, { full: true });
+  <div class="say-row">${shoco("think")}<div class="bubble">Loading the team…</div></div>`, { full: true });
   on("#back", () => tab("me"));
   try {
     const rows = await rpc("sua_team", { p_code: S.mgr });
@@ -1052,7 +1070,7 @@ function renderTeam(rows, err){
   const people = teamRows(rows).concat(pasted).sort((a, b) => (b.final - a.final) || (b.mastered - a.mastered) || (b.xp - a.xp));
   const names = {}; people.forEach(p => { const k = p.name.toLowerCase(); names[k] = (names[k] || 0) + 1; });
   people.forEach(p => p.dupe = names[p.name.toLowerCase()] > 1);
-  const know = people.filter(p => p.final), almost = people.filter(p => !p.final && p.mastered >= 5), learning = people.filter(p => !p.final && p.mastered >= 1 && p.mastered < 5), fresh = people.filter(p => !p.final && !p.mastered);
+  const know = people.filter(p => p.final), almost = people.filter(p => !p.final && p.mastered >= 8), learning = people.filter(p => !p.final && p.mastered >= 1 && p.mastered < 8), fresh = people.filter(p => !p.final && !p.mastered);
   const week = people.filter(p => p.updated && Date.now() - new Date(p.updated).getTime() < 7*DAY).length;
   const agg = {}; people.forEach(p => (p.stats && Array.isArray(p.stats.w) ? p.stats.w : []).forEach(([id, n]) => { if (QBY[id]) agg[id] = (agg[id]||0) + (+n||0); }));
   const teamWeak = Object.entries(agg).sort((a,b) => b[1]-a[1]).slice(0,6);
@@ -1060,7 +1078,7 @@ function renderTeam(rows, err){
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h2>Team view</h2></div><button class="icon-btn" id="refresh" aria-label="Refresh">${icon("refresh")}</button></div>
   ${err ? `<p class="card small" style="color:var(--bad-ink)">${esc(err)}</p>` : ""}
   <section class="summary"><div><b>${people.length}</b><span>people</span></div><div><b style="color:var(--sun-2)">${know.length}</b><span>know it all</span></div><div><b style="color:var(--sea)">${week}</b><span>active this week</span></div></section>
-  ${people.length ? "" : `<div class="say-row">${mingo("idle")}<div class="bubble">Nobody yet. When your team opens the app and saves their name, they show up here with their progress.</div></div>`}
+  ${people.length ? "" : `<div class="say-row">${shoco("idle")}<div class="bubble">Nobody yet. When your team opens the app and saves their name, they show up here with their progress.</div></div>`}
   ${group("Knows it all", "crown", "var(--sun-2)", know)}
   ${group("Almost there", "flame", "var(--fire)", almost)}
   ${group("Learning", "book", "var(--sea)", learning)}

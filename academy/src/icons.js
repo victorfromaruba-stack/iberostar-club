@@ -36,6 +36,9 @@ const ICONS = {
   mute: '<path d="M3 9.5h3.8L12 5v14l-5.2-4.5H3z"/><path d="M15.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
   eye: '<path d="M12 5c5.2 0 9 4.6 10 7-1 2.4-4.8 7-10 7S3 14.4 2 12c1-2.4 4.8-7 10-7zm0 3.3a3.7 3.7 0 1 0 0 7.4 3.7 3.7 0 0 0 0-7.4z"/>',
   refresh: '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M20.5 3.5v6.2h-6.2z"/>',
+  smile: '<path fill-rule="evenodd" d="M12 2.5a9.5 9.5 0 1 1 0 19 9.5 9.5 0 0 1 0-19zM8.9 8.3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6.2 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM7.4 13.4a4.8 4.8 0 0 0 9.2 0z"/>',
+  quote: '<path d="M3.5 6.5h7v6.4c0 3.6-2 5.8-5.6 6.5l-.8-2c1.9-.7 2.9-1.8 3-3.4H3.5zm10 0h7v6.4c0 3.6-2 5.8-5.6 6.5l-.8-2c1.9-.7 2.9-1.8 3-3.4h-3.6z"/>',
+  steps: '<ellipse cx="7.5" cy="13.6" rx="3" ry="4.4"/><ellipse cx="7.5" cy="20.2" rx="2.1" ry="1.5"/><ellipse cx="16.5" cy="6.6" rx="3" ry="4.4"/><ellipse cx="16.5" cy="13.2" rx="2.1" ry="1.5"/>',
   crown: '<path d="M3 7.5l4.5 3.8L12 4.5l4.5 6.8L21 7.5l-1.8 10H4.8zM4.8 19h14.4v2H4.8z"/>'
 };
 const icon = (n, cls = "") => `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">${ICONS[n] || ""}</svg>`;

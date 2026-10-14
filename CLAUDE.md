@@ -33,17 +33,20 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   `Spa/`, `Golf/`, `Activities/`, `Logos/`, each with per-property subfolders below that.
   `assets/fonts/` holds the self-hosted Inter/Playfair Display woff2 files (see Fonts below).
 - `academy/` — **staff-only**, unlinked from the guest app (like `admin.html`): "Show-Up Academy",
-  a Duolingo-style training game for OPCs on guest qualifications and the Open House invitation
-  pitch. Served at `https://victorfromaruba-stack.github.io/iberostar-club/academy/`. It shares
+  a Duolingo-style training game for OPCs on guest qualifications, the Open House invitation
+  pitch and NLP (rapport, wording, reading guests). Served at `https://victorfromaruba-stack.github.io/iberostar-club/academy/`. It shares
   nothing with the guest app. **`academy/index.html` is built; don't edit it by hand.** The source
-  is `academy/src/`: `levels.js` and `content-pre.js` (lessons and units), `content-post.js`
-  (`MAP_STEPS`, the Script tab's lines `SCRIPT`, the couple generator), `app.js` (engine),
-  `style.css`, `icons.js`, `mascot.js` (Mingo), and `clips.json` (the trainer's nine voice notes,
-  transcribed with timings). Rebuild with `python3 academy/src/build.py --page`; the build fails if
-  a Script line doesn't match the words in the voice note it plays. Test with
+  is `academy/src/`: `levels.js` and `content-pre.js` (lessons and units; the writing rules for
+  questions are at the top of `levels.js`), `content-post.js` (`MAP_STEPS`, the Script tab's lines
+  `SCRIPT`, the couple generator), `app.js` (engine), `style.css`, `icons.js`, `mascot.js` (Shoco,
+  the burrowing owl), and `clips.json` (the nine voice notes, transcribed with timings). Rebuild
+  with `python3 academy/src/build.py --page`; the build fails if a Script line doesn't match the
+  words in the voice note it plays, and `lint_content.js` fails it on content errors (repeated ids,
+  bad voice-note ranges, a "Word for word" answer that isn't in its recording) and warns when a
+  right answer stands out by length. Test with
   `node academy/src/e2e.js <url> <outdir>` (Playwright; serve `academy/` with Range support, e.g.
-  `npx http-server academy`). Media: `academy/audio/` (voice notes, MP3), `academy/img/` (flyer,
-  partner sheet, `photos/`), `academy/video/` (golf loop, H.264 MP4). It has `noindex`. Progress is
+  `npx http-server academy`). Media: `academy/audio/` (voice notes, MP3), `academy/img/` (two slides
+  from the Open House pitch deck, `photos/`), `academy/video/` (golf loop, H.264 MP4). It has `noindex`. Progress is
   per device in `localStorage['showup.v1']`. Once a worker saves a name, the phone also sends its
   progress to Supabase project `cdkopyphjvfxjqhasrae` (tables `sua_people` and `sua_config`, closed
   to the public key and reachable only through the `sua_save`, `sua_team`, `sua_hide` and

@@ -22,13 +22,15 @@
 :root{
   --bg:#fbfaf6; --surface:#ffffff; --sunk:#f1eee6; --line:#e6e0d4; --line-2:#d3cbbb; --ink:#22323a; --muted:#617278;
   --lagoon:#00838a; --lagoon-2:#00636a; --lagoon-soft:#ddf1f1; --on-lagoon:#ffffff;
-  --flamingo:#e0436f; --flamingo-2:#ad2c52; --flamingo-soft:#fde6ee; --on-flamingo:#ffffff;
+  --flamingo:#cf3a64; --flamingo-2:#a12a4d; --flamingo-soft:#fde6ee; --on-flamingo:#ffffff;
   --sun:#ffbf2e; --sun-2:#d39700; --sun-soft:#fff3d4; --on-sun:#4a3500;
   --good:#3fa52a; --good-2:#2e7f1d; --good-soft:#e6f7dc; --good-ink:#23691a;
   --bad:#e5484d; --bad-2:#b3313a; --bad-soft:#fde8e8; --bad-ink:#b0242a;
-  --sea:#1a92cf; --sea-2:#11709f; --sea-soft:#e0f2fb; --on-sea:#ffffff;
+  --sea:#1a92cf; --sea-2:#11709f; --sea-soft:#e0f2fb; --on-sea:#ffffff; --sea-ink:#11709f;
+  --nlp:#11709f; --nlp-2:#0b5378; --nlp-soft:#e0f2fb; --on-nlp:#ffffff;
   --fire:#ff8a00;
-  --m-pink:#ff7aa8; --m-pink-2:#f0507f; --m-beak:#fff1e2; --m-ink:#2a2230; --m-cheek:#ffb3c9;
+  --m-body:#9a6a40; --m-body-2:#74502f; --m-belly:#f3e6cc; --m-bar:#a8794c; --m-spot:#fbf5e8; --m-face:#d2ad80; --m-rim:#7e5532;
+  --m-speck:#ead8b8; --m-brow:#fdf9f0; --m-eye:#f5d02a; --m-beak:#e3d3ad; --m-leg:#e2cfa6; --m-ink:#241b14;
   --f-display:"Baloo 2", ui-rounded, "Nunito", system-ui, sans-serif;
   --f-body:"Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
   --r:16px;
@@ -40,7 +42,8 @@
   --sun:#ffc93c; --sun-2:#c9930a; --sun-soft:#3a2f12; --on-sun:#2b1e00;
   --good:#5ccc3f; --good-2:#3a9a24; --good-soft:#17301a; --good-ink:#8fe073;
   --bad:#ff6b6b; --bad-2:#c43c3c; --bad-soft:#3a1c1e; --bad-ink:#ffa3a3;
-  --sea:#3cb4ef; --sea-2:#1f86b9; --sea-soft:#12303d; --on-sea:#04202e;
+  --sea:#3cb4ef; --sea-2:#1f86b9; --sea-soft:#12303d; --on-sea:#04202e; --sea-ink:#7fd0f7;
+  --nlp:#3cb4ef; --nlp-2:#1f86b9; --nlp-soft:#12303d; --on-nlp:#04202e;
   --fire:#ff9f1a; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0f1a1d; --surface:#172529; --sunk:#132024; --line:#26383d; --line-2:#364b51; --ink:#ecf3f4; --muted:#9db1b5;
@@ -49,7 +52,8 @@
   --sun:#ffc93c; --sun-2:#c9930a; --sun-soft:#3a2f12; --on-sun:#2b1e00;
   --good:#5ccc3f; --good-2:#3a9a24; --good-soft:#17301a; --good-ink:#8fe073;
   --bad:#ff6b6b; --bad-2:#c43c3c; --bad-soft:#3a1c1e; --bad-ink:#ffa3a3;
-  --sea:#3cb4ef; --sea-2:#1f86b9; --sea-soft:#12303d; --on-sea:#04202e;
+  --sea:#3cb4ef; --sea-2:#1f86b9; --sea-soft:#12303d; --on-sea:#04202e; --sea-ink:#7fd0f7;
+  --nlp:#3cb4ef; --nlp-2:#1f86b9; --nlp-soft:#12303d; --on-nlp:#04202e;
   --fire:#ff9f1a; color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -110,30 +114,34 @@ a{color:var(--sea)}
 .ring{width:26px;height:26px}
 
 /* Mascot */
-.mingo{display:block;overflow:visible}
-.mingo .m-eye{display:none}
-.mingo[data-mood=idle] .m-eye-open,.mingo[data-mood=think] .m-eye-open{display:inline}
-.mingo[data-mood=happy] .m-eye-happy,.mingo[data-mood=cheer] .m-eye-happy{display:inline}
-.mingo[data-mood=sad] .m-eye-sad{display:inline}
-.mingo .m-body{transform-origin:57px 145px}
-.mingo .m-head{transform-origin:78px 52px;transition:transform .3s ease}
-.mingo .m-wing{transform-box:fill-box;transform-origin:20% 30%;transition:transform .2s ease}
-.mingo[data-mood=idle] .m-body{animation:bob 2.8s ease-in-out infinite}
-.mingo[data-mood=idle] .m-eye-open{transform-box:fill-box;transform-origin:center;animation:blink 4.2s infinite}
-.mingo[data-mood=happy] .m-body{animation:hop .55s ease 2}
-.mingo[data-mood=cheer] .m-body{animation:hop .5s ease infinite}
-.mingo[data-mood=cheer] .m-wing{animation:flap .25s ease-in-out infinite alternate}
-.mingo[data-mood=sad] .m-head{transform:rotate(14deg)}
-.mingo[data-mood=think] .m-head{transform:rotate(-8deg)}
-.mingo[data-mood=think] .m-pupil{transform:translate(1px,-1.6px)}
+.shoco{display:block;overflow:visible}
+.shoco .m-eye{display:none}
+.shoco[data-mood=idle] .m-eye-open,.shoco[data-mood=think] .m-eye-open{display:inline}
+.shoco[data-mood=happy] .m-eye-happy,.shoco[data-mood=cheer] .m-eye-happy{display:inline}
+.shoco[data-mood=sad] .m-eye-sad{display:inline}
+.shoco .m-body{transform-origin:60px 145px}
+.shoco .m-head{transform-origin:60px 70px;transition:transform .3s ease}
+.shoco .m-wing{transform-box:fill-box;transition:transform .2s ease}
+.shoco .m-wing-l{transform-origin:70% 5%}
+.shoco .m-wing-r{transform-origin:30% 5%}
+.shoco[data-mood=idle] .m-body{animation:bob 2.8s ease-in-out infinite}
+.shoco[data-mood=idle] .m-eye-open{transform-box:fill-box;transform-origin:center;animation:blink 4.2s infinite}
+.shoco[data-mood=happy] .m-body{animation:hop .55s ease 2}
+.shoco[data-mood=cheer] .m-body{animation:hop .5s ease infinite}
+.shoco[data-mood=cheer] .m-wing-l{animation:flapl .25s ease-in-out infinite alternate}
+.shoco[data-mood=cheer] .m-wing-r{animation:flapr .25s ease-in-out infinite alternate}
+.shoco[data-mood=sad] .m-head{transform:rotate(-8deg) translateY(2px)}
+.shoco[data-mood=think] .m-head{transform:rotate(-12deg)}
+.shoco[data-mood=think] .m-pupil{transform:translate(1.2px,-1.6px)}
 @keyframes bob{50%{transform:translateY(-2.5px)}}
 @keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
 @keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-12px)}}
-@keyframes flap{from{transform:rotate(-20deg)}to{transform:rotate(-48deg)}}
+@keyframes flapl{from{transform:rotate(8deg)}to{transform:rotate(32deg)}}
+@keyframes flapr{from{transform:rotate(-8deg)}to{transform:rotate(-32deg)}}
 
 /* Speech bubble next to the mascot */
 .say-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:end}
-.say-row .mingo{width:78px;height:98px}
+.say-row .shoco{width:78px;height:98px}
 .bubble{position:relative;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:12px 14px;font-weight:800;min-width:0}
 .bubble::before{content:"";position:absolute;left:-9px;bottom:22px;width:14px;height:14px;background:var(--surface);border-left:2px solid var(--line);border-bottom:2px solid var(--line);transform:rotate(45deg)}
 .bubble.q{font:800 20px/1.3 var(--f-body)}
@@ -152,6 +160,7 @@ a{color:var(--sea)}
 .c-lagoon{--c:var(--lagoon);--c2:var(--lagoon-2);--t:var(--on-lagoon);--soft:var(--lagoon-soft)}
 .c-flamingo{--c:var(--flamingo);--c2:var(--flamingo-2);--t:var(--on-flamingo);--soft:var(--flamingo-soft)}
 .c-sun{--c:var(--sun);--c2:var(--sun-2);--t:var(--on-sun);--soft:var(--sun-soft)}
+.c-sea{--c:var(--nlp);--c2:var(--nlp-2);--t:var(--on-nlp);--soft:var(--nlp-soft)}
 .path{display:flex;flex-direction:column;align-items:center;padding-block:14px 6px;gap:6px}
 .node-row{position:relative;display:flex;justify-content:center;width:100%;height:96px;align-items:center}
 .node{position:relative;transform:translateX(var(--off,0px));width:74px;height:68px;border-radius:50%;border:0;display:grid;place-items:center;
@@ -167,7 +176,7 @@ a{color:var(--sea)}
 .start-tag{position:absolute;top:-16px;left:50%;transform:translateX(calc(-50% + var(--off,0px)));background:var(--surface);color:var(--c);border:2px solid var(--line);border-radius:12px;padding:6px 12px;font:900 14px/1 var(--f-body);letter-spacing:.06em;white-space:nowrap;animation:tagbob 1.6s ease-in-out infinite;z-index:2}
 .start-tag::after{content:"";position:absolute;left:50%;bottom:-8px;width:12px;height:12px;background:var(--surface);border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:translateX(-50%) rotate(45deg)}
 @keyframes tagbob{50%{transform:translateX(calc(-50% + var(--off,0px))) translateY(-4px)}}
-.path-mingo{position:absolute;width:70px;height:88px;bottom:0}
+.path-mascot{position:absolute;width:70px;height:88px;bottom:0}
 .popover{--c:var(--lagoon);width:100%;background:var(--c);color:var(--t);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:6px;position:relative;margin-top:4px;animation:popin .18s ease}
 .popover::before{content:"";position:absolute;top:-8px;left:calc(50% + var(--off,0px));width:16px;height:16px;background:var(--c);transform:translateX(-50%) rotate(45deg)}
 .popover h3{font-size:21px}
@@ -195,7 +204,7 @@ a{color:var(--sea)}
 .l-bar i::after{content:"";position:absolute;left:8px;right:8px;top:4px;height:4px;border-radius:999px;background:rgba(255,255,255,.4)}
 .heart{display:flex;align-items:center;gap:4px;color:var(--bad);font:800 18px/1 var(--f-display)}
 .heart.broken{color:var(--muted);animation:shake .4s ease}
-.l-kind{font:900 14px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--sea)}
+.l-kind{font:900 14px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--sea-ink)}
 .l-kind .secs{text-transform:none;color:var(--muted);font-variant-numeric:tabular-nums}
 .l-body{display:flex;flex-direction:column;gap:16px;flex:1}
 .l-foot{position:sticky;bottom:0;background:var(--bg);padding-block:12px calc(14px + env(safe-area-inset-bottom,0px));border-top:2px solid var(--line);margin-inline:-16px;padding-inline:16px;z-index:4}
@@ -287,7 +296,7 @@ a{color:var(--sea)}
 
 /* Celebrations */
 .celebrate{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding-top:8px}
-.celebrate .mingo{width:160px;height:200px}
+.celebrate .shoco{width:160px;height:200px}
 .celebrate h1{font-size:36px;color:var(--sun-2)}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
 .stat{border:2px solid var(--c,var(--line));border-radius:var(--r);overflow:hidden;background:var(--surface);text-align:center}
@@ -330,19 +339,21 @@ a{color:var(--sea)}
 .step-h .n{width:38px;height:38px;border-radius:50%;background:var(--flamingo);color:var(--on-flamingo);display:grid;place-items:center;font:800 19px/1 var(--f-display);flex:none}
 .step-h h2{font-size:22px}
 .tip{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;color:var(--muted);font-weight:800}
-.tip .mingo{width:44px;height:56px}
+.tip .shoco{width:44px;height:56px}
 .line{border-left:5px solid var(--good);background:var(--good-soft);border-radius:0 14px 14px 0;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .line.dont{border-left-color:var(--bad);background:var(--bad-soft)}
-.line .lbl{font:900 12px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--good-ink)}
+.line .lbl{font:900 12px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--good-ink);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.nlp-tag{background:var(--sea-soft);color:var(--sea-ink);border-radius:999px;padding:4px 9px;letter-spacing:.04em}
 .line.dont .lbl{color:var(--bad-ink)}
 .line .quote{font:800 17px/1.45 var(--f-body);color:var(--ink)}
-.line .note{font-size:14px;color:var(--muted)}
+.line .note{font-size:14px;color:var(--muted);background:none;border:0;padding:0;border-radius:0}
 .line .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .line .heard-text{font-size:14px;color:var(--muted);font-style:italic}
 .line .score{font-weight:900}
 .line .score.ok{color:var(--good-ink)} .line .score.meh{color:var(--sun-2)}
 .btn.listening{animation:pulseb .8s ease-in-out infinite}
-.said-check{color:var(--good)}
+.said-check{display:inline-flex;align-items:center;gap:3px;color:var(--good-ink)}
+.said-check .ic{width:14px;height:14px}
 
 /* Full voice notes */
 .clip{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:10px}
@@ -365,13 +376,13 @@ a{color:var(--sea)}
 .note{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px}
 .note h3{font-size:19px}
 .note ul{padding-left:20px;display:flex;flex-direction:column;gap:5px;font-weight:700}
-.flyer{margin:0;display:flex;flex-direction:column;gap:6px}
-.flyer img{display:block;width:100%;height:auto;border-radius:14px;border:2px solid var(--line);background:var(--sunk)}
-.flyer figcaption{font-size:14px;color:var(--muted)}
+.deck-slide{margin:0;display:flex;flex-direction:column;gap:6px}
+.deck-slide img{display:block;width:100%;height:auto;border-radius:14px;border:2px solid var(--line);background:var(--sunk)}
+.deck-slide figcaption{font-size:14px;color:var(--muted)}
 
 /* Me */
 .me-head{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
-.me-head .mingo{width:80px;height:100px}
+.me-head .shoco{width:80px;height:100px}
 .me-head h1{font-size:30px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .statbox{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:12px;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center}
@@ -476,402 +487,630 @@ const ICONS = {
   mute: '<path d="M3 9.5h3.8L12 5v14l-5.2-4.5H3z"/><path d="M15.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
   eye: '<path d="M12 5c5.2 0 9 4.6 10 7-1 2.4-4.8 7-10 7S3 14.4 2 12c1-2.4 4.8-7 10-7zm0 3.3a3.7 3.7 0 1 0 0 7.4 3.7 3.7 0 0 0 0-7.4z"/>',
   refresh: '<path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M20.5 3.5v6.2h-6.2z"/>',
+  smile: '<path fill-rule="evenodd" d="M12 2.5a9.5 9.5 0 1 1 0 19 9.5 9.5 0 0 1 0-19zM8.9 8.3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6.2 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM7.4 13.4a4.8 4.8 0 0 0 9.2 0z"/>',
+  quote: '<path d="M3.5 6.5h7v6.4c0 3.6-2 5.8-5.6 6.5l-.8-2c1.9-.7 2.9-1.8 3-3.4H3.5zm10 0h7v6.4c0 3.6-2 5.8-5.6 6.5l-.8-2c1.9-.7 2.9-1.8 3-3.4h-3.6z"/>',
+  steps: '<ellipse cx="7.5" cy="13.6" rx="3" ry="4.4"/><ellipse cx="7.5" cy="20.2" rx="2.1" ry="1.5"/><ellipse cx="16.5" cy="6.6" rx="3" ry="4.4"/><ellipse cx="16.5" cy="13.2" rx="2.1" ry="1.5"/>',
   crown: '<path d="M3 7.5l4.5 3.8L12 4.5l4.5 6.8L21 7.5l-1.8 10H4.8zM4.8 19h14.4v2H4.8z"/>'
 };
 const icon = (n, cls = "") => `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">${ICONS[n] || ""}</svg>`;
-// Mingo the flamingo. Moods: idle, happy, sad, cheer, think. One style: flat shapes, token colors.
-let MINGO_N = 0;
-function mingo(mood = "idle", cls = "") {
-  const id = "mb" + (++MINGO_N);
-  return `<svg class="mingo ${cls}" data-mood="${mood}" viewBox="0 0 120 150" role="img" aria-label="Mingo the flamingo">
- <defs><clipPath id="${id}"><path d="M83 26.5 C 96 24, 105 32, 101.5 46.5 C 98 41, 93 39.5, 83 40.5 Z"/></clipPath></defs>
- <g class="m-legs" fill="none" stroke="var(--m-pink-2)" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">
-  <path d="M57 112 L57 145"/><path d="M50 145 L63 145"/><path d="M64 111 L73 127 L60 133"/>
+// Shoco, Aruba's burrowing owl. Moods: idle, happy, sad, cheer, think.
+// Drawn from photos of the real bird: a wide, flat-topped head that sits right on the shoulders,
+// a pale heart-shaped face, big yellow eyes, white brows that meet in a V above the beak,
+// a white chin, fine speckles on the crown, a barred chest and long pale legs.
+// One style: flat shapes and a few curves, colors from the --m-* tokens.
+function shoco(mood = "idle", cls = "") {
+  const dots = (pts, r) => pts.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${r}"/>`).join("");
+  // Brows: tapered white crescents from the top of the beak out over each eye.
+  // lift moves the outer ends up (happy) or down (sad); inner moves the inner ends up.
+  // iy: where the two brows meet above the beak; oy: height of the outer ends.
+  const brows = (iy = 47.5, oy = 37.5) => {
+    const half = (m) => `M60 ${iy} C ${60 + m * 2.5} ${iy - 11.5}, ${60 + m * 13} ${oy - 10}, ${60 + m * 24} ${oy} C ${60 + m * 13} ${oy - 3}, ${60 + m * 4.5} ${iy - 10}, 60 ${iy} Z`;
+    return `<path d="${half(-1)} ${half(1)}" fill="var(--m-brow)"/>`;
+  };
+  const eyeRing = (cx, cy, r) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="var(--m-eye)" stroke="var(--m-ink)" stroke-width="1.8"/>`;
+  return `<svg class="shoco ${cls}" data-mood="${mood}" viewBox="0 0 120 150" role="img" aria-label="Shoco the burrowing owl">
+ <g class="m-legs" fill="none" stroke="var(--m-leg)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M51 116 L49 142 M43 145 L49 141 L49 146 M49 141 L55 145"/>
+  <path d="M69 116 L71 142 M65 145 L71 141 L71 146 M71 141 L77 145"/>
  </g>
  <g class="m-body">
-  <path d="M33 96 L18 90 L25 103 Z" fill="var(--m-pink-2)"/>
-  <ellipse cx="58" cy="98" rx="29" ry="19" fill="var(--m-pink)"/>
-  <path class="m-wing" d="M42 94 C 52 82, 72 84, 77 97 C 66 104, 50 105, 42 94 Z" fill="var(--m-pink-2)"/>
-  <path d="M80 94 C 100 74, 66 66, 74 42" fill="none" stroke="var(--m-pink)" stroke-width="10" stroke-linecap="round"/>
+  <path d="M52 118 L60 131 L68 118 Z" fill="var(--m-body-2)"/>
+  <path d="M33 58 C 31 64, 29.5 74, 30 90 C 30.5 110, 42 125, 60 125 C 78 125, 89.5 110, 90 90 C 90.5 74, 89 64, 87 58 C 80 50, 40 50, 33 58 Z" fill="var(--m-body)"/>
+  <ellipse cx="60" cy="99" rx="20" ry="24" fill="var(--m-belly)"/>
+  <g fill="none" stroke="var(--m-bar)" stroke-width="2.4" stroke-linecap="round">
+   <path d="M46 86 q4 2.4 8 0 M57 84 q4 2.4 8 0 M67 87 q3.5 2.2 7 0"/>
+   <path d="M44 95 q4 2.4 8 0 M55 93 q4 2.4 8 0 M66 95 q4 2.4 8 0"/>
+   <path d="M47 104 q4 2.2 8 0 M58 103 q4 2.2 8 0"/>
+  </g>
+  <g class="m-wing m-wing-l">
+   <path d="M31 78 C 24 98, 28 116, 43 121 C 41 106, 39 92, 37 80 Z" fill="var(--m-body-2)"/>
+   <g fill="var(--m-spot)">${dots([[33, 92], [35, 102], [38, 111], [32, 84]], 1.7)}</g>
+  </g>
+  <g class="m-wing m-wing-r">
+   <path d="M89 78 C 96 98, 92 116, 77 121 C 79 106, 81 92, 83 80 Z" fill="var(--m-body-2)"/>
+   <g fill="var(--m-spot)">${dots([[87, 92], [85, 102], [82, 111], [88, 84]], 1.7)}</g>
+  </g>
   <g class="m-head">
-   <path d="M83 26.5 C 96 24, 105 32, 101.5 46.5 C 98 41, 93 39.5, 83 40.5 Z" fill="var(--m-beak)"/>
-   <circle cx="101" cy="45" r="7.5" fill="var(--m-ink)" clip-path="url(#${id})"/>
-   <circle cx="74" cy="34" r="14" fill="var(--m-pink)"/>
-   <ellipse cx="70" cy="41" rx="3.6" ry="2.2" fill="var(--m-cheek)"/>
-   <g class="m-eye m-eye-open"><circle cx="77" cy="30" r="5.2" fill="#fff"/><g class="m-pupil"><circle cx="78.4" cy="30.6" r="2.9" fill="var(--m-ink)"/><circle cx="79.3" cy="29.4" r="1" fill="#fff"/></g></g>
-   <path class="m-eye m-eye-happy" d="M72 32 Q 77 25.5 82 32" fill="none" stroke="var(--m-ink)" stroke-width="2.6" stroke-linecap="round"/>
-   <g class="m-eye m-eye-sad"><circle cx="77" cy="32" r="4.6" fill="#fff"/><circle cx="77.4" cy="33.6" r="2.5" fill="var(--m-ink)"/><path d="M71.5 27 Q 76 23.5 81.5 23.8" fill="none" stroke="var(--m-ink)" stroke-width="2.4" stroke-linecap="round"/></g>
+   <ellipse cx="60" cy="47" rx="29.5" ry="25" fill="var(--m-body)"/>
+   <g fill="var(--m-speck)">${dots([[47, 27.5], [53.5, 25.2], [60, 24.4], [66.5, 25.2], [73, 27.5], [42, 32], [50, 30], [57, 29], [63, 29], [70, 30], [78, 32], [37.5, 38], [82.5, 38], [36, 46], [84, 46]], 1.15)}</g>
+   <path d="M60 37 C 52 30.5, 35.5 32, 34.5 45 C 33.5 57, 46 64, 60 63 C 74 64, 86.5 57, 85.5 45 C 84.5 32, 68 30.5, 60 37 Z" fill="var(--m-face)" stroke="var(--m-rim)" stroke-width="1.6"/>
+   <path d="M48.5 60.5 Q60 73 71.5 60.5 Q60 64 48.5 60.5 Z" fill="var(--m-spot)"/>
+   <path d="M57 51.5 Q60 50 63 51.5 L60 57.5 Z" fill="var(--m-beak)"/>
+   <g class="m-eye m-eye-open">
+    ${eyeRing(47.5, 46.5, 8.6)}${eyeRing(72.5, 46.5, 8.6)}
+    <g class="m-pupil"><circle cx="48.1" cy="47.1" r="4.3" fill="var(--m-ink)"/><circle cx="73.1" cy="47.1" r="4.3" fill="var(--m-ink)"/>
+     <circle cx="49.5" cy="45.4" r="1.4" fill="#fff"/><circle cx="74.5" cy="45.4" r="1.4" fill="#fff"/></g>
+    ${brows()}
+   </g>
+   <g class="m-eye m-eye-happy">
+    <path d="M40 48.5 Q47.5 40.5 55 48.5 M65 48.5 Q72.5 40.5 80 48.5" fill="none" stroke="var(--m-ink)" stroke-width="3.2" stroke-linecap="round"/>
+    ${brows(46.5, 34.5)}
+   </g>
+   <g class="m-eye m-eye-sad">
+    ${eyeRing(47.5, 47.5, 8)}${eyeRing(72.5, 47.5, 8)}
+    <circle cx="47.5" cy="50" r="3.7" fill="var(--m-ink)"/><circle cx="72.5" cy="50" r="3.7" fill="var(--m-ink)"/>
+    <path d="M38.5 46.5 Q47.5 41.8 56.5 46.5 L56.5 38 L38.5 38 Z M63.5 46.5 Q72.5 41.8 81.5 46.5 L81.5 38 L63.5 38 Z" fill="var(--m-face)"/>
+    <path d="M39 46.5 Q47.5 42.2 56 46.5 M64 46.5 Q72.5 42.2 81 46.5" fill="none" stroke="var(--m-ink)" stroke-width="1.8" stroke-linecap="round"/>
+    ${brows(45, 41)}
+   </g>
   </g>
  </g>
 </svg>`;
 }
 /* =====================================================================
    CONTENT
-   Sources: "Qualifications Aruba, 2 March 2026" (PDF), the trainer's nine
-   voice notes of 29 Sept 2026, the Open House flyer and the partner sheet.
+   Sources: "Qualifications Aruba, 2 March 2026" (PDF), the nine voice notes
+   of 29 Sept 2026, and the Open House pitch deck.
    ===================================================================== */
 const Q = (id, q, a, w, why) => ({ id, q, a, w, why });
-const LINE = (id, q, a, w, why) => ({ id, q, a, w, why, line: true });
+const LINE = (id, q, a, w, why, hear) => ({ id, q, a, w, why, line: true, ...(hear ? { hear: { clip: hear[0], from: hear[1], to: hear[2] } } : {}) });
 const PIC = (id, img, alt, q, a, w, why) => ({ id, img, alt, q, a, w, why, pic: true });
-const BUILD = (id, ctx, text, extra, why) => ({ id, type: "build", ctx, text, extra, why, q: `Build the line: ${ctx}`, a: text });
-const MATCH = (id, q, pairs, why) => ({ id, type: "match", q, pairs, why, a: pairs.map(p => `${p[0]}: ${p[1]}`).join(" · ") });
+const BUILD = (id, q, text, extra, why) => ({ id, type: "build", q, text, extra, why, a: text });
+const MATCH = (id, q, pairs, why) => ({ id, type: "match", q, pairs, why, a: pairs.map(p => `${p[0]}: ${p[1]}`).join("; ") });
 const LISTEN = (id, clip, from, to, q, a, w, why) => ({ id, type: "listen", clip, from, to, q, a, w, why });
 
 const UNITS = [
   { id: "qualify", n: 1, title: "Qualify", sub: "Who gets which gift", color: "lagoon", levels: ["q", "ctnq", "who"] },
-  { id: "pitch", n: 2, title: "The pitch", sub: "Solid bookings that show up", color: "flamingo", levels: ["why", "offer", "solid", "map"] },
-  { id: "final", n: 3, title: "Final", sub: "Everything, mixed", color: "sun", levels: ["final"] }
+  { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "solid", "words", "map"] },
+  { id: "nlp", n: 3, title: "NLP", sub: "Rapport, words that lead, reading people", color: "sea", levels: ["nlp1", "nlp2", "nlp3", "nlp4"], after: "why" },
+  { id: "final", n: 4, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
 ];
 const TRACKS = UNITS.filter(u => u.id !== "final");
+/* Lessons. Writing rules for every item:
+   - Situation first, then one clear question. Short, plain words.
+   - Answer options match in length and shape, so the right one doesn't stand out.
+   - "why" is one or two short sentences with the rule.
+   Facts come from the qualifications PDF (2 March 2026), the nine voice notes and the Open House pitch deck. */
 const LEVELS = [
 {
-  id: "q", name: "Qualified guests", sub: "Q · full gift", icon: "usercheck",
+  id: "q", name: "Full gift (Q)", sub: "Who gets the full gift", icon: "usercheck",
   notes: [
-    { h: "USA & Canada · Q (full gift)", li: [
-      "Ages 32 to 70. The man's age counts. In a same-sex couple, either one.",
+    { h: "USA and Canada: full gift (Q)", li: [
+      "Ages 32 to 70. The man's age counts. In a same-sex couple, either partner's age counts.",
       "Married or living together.",
       "Single women: USA only, ages 40 to 65.",
-      "One of them employed or retired.",
-      "Visa, Mastercard, American Express or Discover.",
+      "One of them works or is retired.",
+      "Credit card: Visa, Mastercard, American Express or Discover.",
       "Both fluent in English, or both fluent in Spanish.",
       "Staying at a hotel, timeshare or rental, and paying for it." ] },
-    { h: "Latin America & Caribbean · Q", li: [
+    { h: "Latin America and Caribbean: full gift (Q)", li: [
       "Not Aruba, Cuba, Venezuela, Haiti or Ecuador.",
       "Ages 40 to 60. The man's age counts.",
       "Married or living together. No singles.",
-      "One must be employed. No retirees.",
-      "Visa, Mastercard or Amex. No Discover.",
-      "Same language and paid-accommodation rules." ] },
-    { h: "Argentina · Q", li: [ "Ages 45 to 55. The man's age counts." ] },
+      "One of them must work. No retirees.",
+      "Credit card: Visa, Mastercard or American Express. No Discover.",
+      "Same language and paid-stay rules as above." ] },
+    { h: "Argentina: full gift (Q)", li: [ "Ages 45 to 55. The man's age counts." ] },
     { h: "Time they need", li: [
-      "Presentation: 90 minutes, breakfast included.",
+      "The presentation is 90 minutes, breakfast included.",
       "They need 3 free hours that morning, with no paid activities.",
-      "Departure day: 4 hours before airport pickup, or 5 hours before the flight if they rent a car." ] }
+      "Departure day: at least 4 hours before airport pickup, or 5 hours before the flight if they have a rental car." ] }
   ],
   qs: [
-    Q("q1","USA or Canada couple. What ages get the full gift (Q)?","32 to 70",["28 to 70","35 to 65","40 to 60"],"USA & Canada Q is 32 to 70. Ages 28 to 31 and 71+ are CT, half gift."),
-    Q("q2","In a couple, whose age decides if they qualify?","The man's age",["The woman's age","Whoever is older","The average of both"],"The man qualifies the age."),
-    Q("q3","Same-sex couple. Whose age counts?","Either one of them",["Only the oldest","Only the youngest","Same-sex couples can't qualify"],"In a same-sex couple, either partner can qualify the age."),
-    Q("q4","Which single guests can be Q?","Single women from the USA, 40 to 65",["Any single from USA or Canada, 32 to 70","Single men from the USA, 40 to 65","No singles ever qualify"],"Only single women, only from the USA, only ages 40 to 65."),
-    Q("q5","USA or Canada Q. What's the work rule?","One of them employed or retired",["Both must be employed","No retirees allowed","Work doesn't matter"],"USA & Canada: one must be gainfully employed or retired."),
-    Q("q6","Which cards work for a USA or Canada Q?","Visa, Mastercard, Amex or Discover",["Visa or Mastercard only","Any debit card","A cash deposit"],"USA & Canada Q: Visa, Mastercard, American Express or Discover."),
-    Q("q7","What's the language rule?","Both fluent in English, or both fluent in Spanish",["One of them speaks English","Any language with a translator","English only"],"Both must speak the same language fluently: English or Spanish."),
-    Q("q8","What's the accommodation rule?","Staying at a hotel, timeshare or rental, and paying for it",["Anywhere, even free at a friend's place","Only guests of Iberostar hotels","Only all-inclusive guests"],"They must be paying for where they stay."),
-    Q("q9","How long is the presentation?","90 minutes, breakfast included",["45 minutes","60 minutes plus breakfast","2 hours"],"90 minutes including breakfast."),
-    Q("q10","How much free time do guests need that morning?","3 hours, with no paid activities",["90 minutes","2 hours","Until noon"],"3 hours total with no paid activities."),
-    Q("q11","Day of departure. What's the latest they can tour?","4 hours before airport pickup (5 before the flight with a rental car)",["2 hours before the flight","Any time before checkout","They can't tour on departure day"],"4 hours before pickup, or 5 hours before flight time if they're renting a car."),
-    Q("q12","Latin America & Caribbean couple. Q ages?","40 to 60",["32 to 70","45 to 55","35 to 65"],"Latin America & Caribbean Q is 40 to 60, the man's age."),
-    Q("q13","Which countries are left out of the Latin America & Caribbean rules?","Aruba, Cuba, Venezuela, Haiti & Ecuador",["Argentina, Brazil & Chile","Mexico, Colombia & Peru","Costa Rica, Panama & Jamaica"],"Aruba, Cuba, Venezuela, Haiti and Ecuador are excluded."),
-    Q("q14","Colombian couple, both 55, both retired. What are they?","NQ. Latin America needs one of them working",["Q. Retirees are fine everywhere","CT, half gift","Q if they show a Visa"],"Latin America & Caribbean: one must be employed. No retirees."),
-    Q("q15","Which card does NOT work for a Latin America Q?","Discover",["Visa","Mastercard","American Express"],"Latin America & Caribbean: Visa, Mastercard or Amex only."),
-    Q("q16","Argentinian couple. Q ages?","45 to 55",["40 to 60","32 to 70","35 to 70"],"Argentina Q is 45 to 55, the man's age."),
-    Q("q17","Can single guests from Latin America qualify?","No. Married or living together only",["Yes, single women 40 to 65","Yes, anyone 40 to 60","Only if retired"],"No singles from Latin America & Caribbean."),
-    MATCH("mq","Match each group to its full-gift (Q) ages",[["USA & Canada couple","32 to 70"],["Latin America couple","40 to 60"],["Argentinian couple","45 to 55"],["USA single woman","40 to 65"]],"Q ages: USA & Canada 32 to 70, Latin America 40 to 60, Argentina 45 to 55, USA single women 40 to 65.")
+    Q("q1","A couple from the USA or Canada. What ages get the full gift (Q)?","32 to 70",["28 to 70","35 to 65","40 to 60"],"USA and Canada: 32 to 70 is Q. 28 to 31 and 71+ get the half gift (CT)."),
+    Q("q2","In a couple, whose age counts?","The man's",["The woman's","The older one's","Both, averaged"],"The man's age decides. In a same-sex couple, either partner's age counts."),
+    Q("q4","Which single guests can get the full gift?","Women from the USA, 40 to 65",["Men from the USA, 40 to 65","Anyone from Canada, 32 to 70","No single guests at all"],"Only single women, only from the USA, only ages 40 to 65."),
+    Q("q5","USA or Canada. What's the work rule?","One of them works or is retired",["Both of them must work","Retired guests can't qualify","Work doesn't matter at all"],"One of them employed or retired is enough."),
+    Q("q6","USA or Canada. Which cards work for the full gift?","Visa, Mastercard, Amex or Discover",["Visa or Mastercard, nothing else","Any debit card from their bank","A cash deposit at the hotel"],"Any of those four credit cards. A debit card only works for the half gift (CT)."),
+    Q("q7","What's the language rule?","Both fluent in English, or both in Spanish",["One fluent in English is enough","Any language, with a translator","English only, Spanish doesn't count"],"Both must speak the same language fluently: English or Spanish."),
+    Q("q8","Where must guests be staying?","A hotel, timeshare or rental they pay for",["Anywhere, even free with friends","Only at an Iberostar hotel","Only at an all-inclusive resort"],"They must be paying for where they stay."),
+    Q("q9","How long is the presentation?","90 minutes, breakfast included",["45 minutes, plus breakfast","60 minutes, no breakfast","2 hours, breakfast included"],"90 minutes, and that includes breakfast."),
+    Q("q10","How much free time do they need that morning?","3 hours, with no paid activities",["90 minutes, nothing more","2 hours, plans after are fine","Only until breakfast ends"],"The presentation is 90 minutes, but they need 3 free hours with nothing paid booked."),
+    Q("q11","It's their departure day. When can they still tour?","4 hours before pickup, 5 before the flight with a rental car",["1 hour before pickup, 2 before the flight with a rental car","Any time before they check out of their hotel","They can't tour at all on departure day"],"At least 4 hours before airport pickup, or 5 hours before the flight if they drive a rental car."),
+    Q("q12","A couple from Latin America or the Caribbean. What ages get the full gift?","40 to 60",["32 to 70","45 to 55","35 to 65"],"Latin America and Caribbean: 40 to 60, the man's age."),
+    Q("q13","Which countries are NOT covered by the Latin America rules?","Aruba, Cuba, Venezuela, Haiti, Ecuador",["Argentina, Brazil, Chile, Peru, Uruguay","Mexico, Colombia, Peru, Panama, Chile","Costa Rica, Panama, Jamaica, Belize, Bahamas"],"Guests from Aruba, Cuba, Venezuela, Haiti and Ecuador get no gift (NQ)."),
+    Q("q14","A couple from Colombia, both 55, both retired. Which gift?","No gift (NQ): one must be working",["Full gift (Q): retired is fine","Half gift (CT): they're retired","Full gift (Q), if they show a Visa"],"Latin America and Caribbean: one of them must work. No retirees."),
+    Q("q15","Latin America or Caribbean. Which card does NOT work?","Discover",["Visa","Mastercard","American Express"],"Latin America and Caribbean: Visa, Mastercard or American Express only."),
+    Q("q16","A couple from Argentina. What ages get the full gift?","45 to 55",["40 to 60","32 to 70","35 to 70"],"Argentina: 45 to 55, the man's age."),
+    MATCH("mq","Match each guest to their full-gift (Q) ages",[["USA or Canada couple","32 to 70"],["Latin America couple","40 to 60"],["Argentinian couple","45 to 55"],["USA single woman","40 to 65"]],"Full gift: USA and Canada 32 to 70, Latin America 40 to 60, Argentina 45 to 55, USA single women 40 to 65.")
   ]
 },
 {
-  id: "ctnq", name: "Half gift & no gift", sub: "CT · NQ · extra rules", icon: "gift",
+  id: "ctnq", name: "Half gift and no gift", sub: "CT, NQ and the extra rules", icon: "gift",
   notes: [
-    { h: "Courtesy Tour (CT) · half gift · USA & Canada", li: [
+    { h: "Half gift (CT): USA and Canada", li: [
+      "CT means courtesy tour.",
       "Ages 28 to 31, or 71 and up.",
-      "Married or living together. One employed or retired.",
-      "A debit card is OK, or Visa, Mastercard, Amex, Discover.",
-      "Same language and paid-accommodation rules.",
-      "Presentation: minimum 60 minutes." ] },
-    { h: "Courtesy Tour (CT) · Argentina", li: [
-      "Ages 35 to 44 and 56 to 70 (the man's age).",
-      "No singles. No retirees. Visa, Mastercard or Amex.",
-      "90-minute presentation with breakfast, 3 free hours." ] },
-    { h: "Non-Qualified (NQ) · no gift", li: [
-      "Anyone who doesn't meet Q or CT, plus:",
+      "Married or living together. One of them works or is retired.",
+      "A debit card is OK, or Visa, Mastercard, American Express or Discover.",
+      "Same language and paid-stay rules.",
+      "Presentation: at least 60 minutes." ] },
+    { h: "Half gift (CT): Argentina", li: [
+      "Ages 35 to 44, and 56 to 70 (the man's age).",
+      "No singles. No retirees. Visa, Mastercard or American Express.",
+      "90-minute presentation with breakfast, and 3 free hours." ] },
+    { h: "No gift (NQ)", li: [
+      "Anyone who doesn't meet the Q or CT rules, plus:",
       "Travel agents and tour operators.",
-      "Commercial airline pilots and crew (flight attendants).",
+      "Commercial airline pilots and crew, like flight attendants.",
       "Active US military: Army, Air Force, Marines, Navy, Coast Guard. National Guard is OK.",
-      "Employees of hotel, timeshare and vacation club companies.",
+      "People who work for hotel, timeshare or vacation club companies.",
       "Toured Iberostar in-house in the last 6 months, or a street program in the last 12 months.",
-      "Trinella / Trifecta: three couples or more traveling together." ] },
+      "Three couples or more traveling together (Trinella or Trifecta)." ] },
     { h: "Extra rules", li: [
-      "Guests show IDs and credit card to the hostess.",
-      "Max party: 6 people, max 4 adults (18+).",
-      "Quinella: two qualified couples together. 2 invitations, 2 gifts, 1 pay. Sales decides if they tour together.",
+      "Guests show IDs and a credit card to the hostess.",
+      "Biggest party: 6 people, at most 4 adults (18+).",
+      "Two qualified couples together (Quinella): 2 invitations, 2 gifts, 1 pay. Sales decides if they tour together.",
       "Paid activities: excursions, spa, pre-arranged transfers, anything prepaid.",
       "Shirts and shoes. No bathing suits.",
-      "The Club members staying off property: the GI team may invite them. Q if they bring IDs and card.",
-      "The Club beneficiaries staying off property: can't be invited. NQ." ] }
+      "Iberostar The Club members staying off property: the GI team may invite them. Q if they bring IDs and a card.",
+      "Iberostar The Club beneficiaries staying off property: can't be invited. NQ." ] }
   ],
   qs: [
-    Q("c1","What does a CT guest get?","Half gift",["Full gift","No gift","Double gift"],"Q = full gift, CT = half gift, NQ = no gift."),
-    Q("c2","USA or Canada CT ages?","28 to 31, or 71 and up",["25 to 31","18 to 31, or 65 and up","71 and up only"],"CT for USA & Canada: 28 to 31 or 71+."),
-    Q("c3","Which card can a USA or Canada CT show?","A debit card, or Visa / Mastercard / Amex / Discover",["Credit card only","Amex only","No card needed"],"CT is the only group where a debit card is OK."),
-    Q("c4","Minimum presentation for a USA or Canada CT?","60 minutes",["30 minutes","90 minutes","2 hours"],"CT USA & Canada: minimum 60 minutes."),
-    Q("c5","Argentinian couple. CT ages?","35 to 44 and 56 to 70",["28 to 31 and 71+","30 to 44 and 56+","40 to 60"],"Argentina CT: 35 to 44 and 56 to 70. Q is 45 to 55 in the middle."),
-    Q("c6","Which job makes a guest NQ?","Commercial airline pilot or flight attendant",["Nurse","Police officer","Teacher"],"Pilots and crew are NQ."),
-    Q("c7","Which military guest can still qualify?","National Guard",["Active US Army","Active US Navy","Active Coast Guard"],"Active US military is NQ. National Guard is permitted."),
-    Q("c8","Guest works at a timeshare resort in Orlando. They are…","NQ",["Q","CT","Q, but half gift"],"Employees of hotel, timeshare and vacation club companies are NQ."),
-    Q("c9","Travel agents and tour operators are…","NQ",["Q","CT","Q with a manager's OK"],"Travel agents and tour operators are NQ."),
-    Q("c10","Toured Iberostar in-house within the last ___ months = NQ.","6",["3","12","24"],"In-house: 6 months. Street programs: 12 months."),
-    Q("c11","Toured an Iberostar street program within the last ___ months = NQ.","12",["6","3","24"],"Street programs: 12 months. In-house: 6 months."),
-    Q("c12","Three couples or more traveling together (Trinella / Trifecta).","NQ",["Q, 3 gifts","Q, 1 gift shared","CT for everyone"],"Trinella / Trifecta is NQ."),
-    Q("c13","Quinella: two qualified couples together. What happens?","2 invitations, 2 gifts, 1 pay. Sales decides if they tour together",["1 invitation, 1 gift","2 invitations, 1 gift, 2 pays","NQ. Groups aren't allowed"],"Quinella: 2 invitations, 2 gifts, 1 pay."),
-    Q("c14","Maximum party size?","6 people, max 4 adults (18+)",["4 people total","8 people, max 6 adults","No limit with kids"],"Max 6 people, max 4 adults 18+."),
-    Q("c15","What do guests show the hostess?","IDs and credit card",["Their hotel key card","A passport stamp","Just the invitation"],"IDs and credit card at hosting."),
-    Q("c16","Which one counts as a paid activity?","A prepaid airport transfer",["A walk on Eagle Beach","Swimming at their hotel pool","Breakfast at their hotel"],"Excursions, spa, pre-arranged transfers or anything prepaid."),
-    Q("c17","Dress code for the tour?","Shirts and shoes. No bathing suits",["Anything goes","Business casual","Bathing suit with a cover-up"],"Shirts and shoes required, no bathing suits."),
-    Q("c18","An Iberostar The Club member is staying off property.","The GI team may invite them. Q if they bring IDs and card",["Always NQ","Automatically CT","Members never tour"],"Club members off property can be invited and count as Q with IDs and card."),
-    Q("c19","An Iberostar The Club beneficiary is staying off property.","Can't be invited. NQ",["Q with IDs and card","CT, half gift","Q if they're 40 to 60"],"Beneficiaries staying off property are NQ."),
-    MATCH("mc","Match each rule to its number",[["Toured Iberostar in-house","6 months"],["Toured a street program","12 months"],["Most people in one party","6"],["Most adults in one party","4"]],"In-house tour in the last 6 months, or a street program in the last 12 months, is NQ. A party is at most 6 people and 4 adults.")
+    Q("c1","What does a CT guest get?","The half gift",["The full gift","No gift","Two gifts"],"Q = full gift. CT (courtesy tour) = half gift. NQ (not qualified) = no gift."),
+    Q("c2","A couple from the USA or Canada. What ages get the half gift (CT)?","28 to 31, or 71 and up",["25 to 31, or 65 and up","18 to 31, or 70 and up","Only 71 and up"],"USA and Canada: 28 to 31, or 71 and up, get the half gift."),
+    Q("c3","USA or Canada, half gift (CT). Which card can they show?","A debit card or a credit card",["Only a credit card, never debit","Only an American Express card","No card at all, just an ID"],"CT is the only group where a debit card is OK."),
+    Q("c4","USA or Canada, half gift (CT). What's the shortest presentation?","60 minutes",["30 minutes","45 minutes","90 minutes"],"At least 60 minutes."),
+    Q("c5","A couple from Argentina. What ages get the half gift (CT)?","35 to 44, or 56 to 70",["28 to 31, or 71 and up","30 to 44, or 56 and up","40 to 60 only"],"Argentina: 35 to 44 and 56 to 70 get the half gift. 45 to 55 get the full gift."),
+    Q("c6","Which job means no gift (NQ)?","Airline pilot or flight attendant",["Nurse or hospital doctor","Police officer or firefighter","School teacher or principal"],"Commercial airline pilots and crew get no gift."),
+    Q("c7","Which military guest can still qualify?","National Guard",["Active Army","Active Navy","Active Coast Guard"],"Active US military gets no gift. The National Guard is OK."),
+    Q("c8","Which guest gets no gift (NQ)?","A travel agent on vacation",["A nurse on vacation","A retired teacher","A National Guard member"],"Travel agents, tour operators, and people who work for hotels, timeshares or vacation clubs get no gift."),
+    Q("c12","Three couples traveling together. Which gift?","No gift (NQ)",["Three full gifts","One shared gift","Three half gifts"],"Three couples or more together (Trinella or Trifecta) get no gift."),
+    Q("c13","Two qualified couples traveling together (Quinella). What do they get?","2 invitations, 2 gifts, 1 pay",["1 invitation, 1 gift, 1 pay","2 invitations, 1 gift, 2 pays","No gift: groups can't tour"],"Quinella: 2 invitations, 2 gifts, 1 pay. Sales decides if they tour together."),
+    Q("c15","What do guests show the hostess?","Their IDs and a credit card",["Their hotel key card and receipt","Their flight tickets home","Only the invitation, nothing else"],"IDs and a credit card at check-in."),
+    Q("c16","Which one counts as a paid activity?","A prepaid airport transfer",["A walk on Eagle Beach","A swim in their hotel pool","Breakfast at their hotel"],"Excursions, spa, pre-arranged transfers or anything prepaid."),
+    Q("c17","What's the dress code for the tour?","Shirts and shoes, no bathing suits",["Anything goes, they're on vacation","Business casual, jackets for men","Swimwear is fine with a cover-up"],"Shirts and shoes required. No bathing suits."),
+    Q("c18","An Iberostar The Club member is staying off property. Can they come?","Yes: the GI team can invite them, as Q",["No: members always get no gift","Yes, but only with a half gift","No: members never take the tour"],"The GI team may invite them. They're Q if they bring IDs and a card."),
+    Q("c19","An Iberostar The Club beneficiary is staying off property. Can they come?","No: they can't be invited (NQ)",["Yes, as Q with IDs and a card","Yes, with a half gift (CT)","Yes, if they're 40 to 60"],"Beneficiaries staying off property can't be invited."),
+    MATCH("mc","Match each rule to its number",[["Wait after an in-house tour","6 months"],["Wait after a street tour","12 months"],["Most people in one party","6"],["Most adults in one party","4"]],"An in-house tour in the last 6 months, or a street program in the last 12, means no gift. A party is at most 6 people and 4 adults.")
   ]
 },
 {
-  id: "who", name: "Who qualifies?", sub: "Real couples · Q, CT or NQ", icon: "couple",
-  gen: true, count: 15,
+  id: "who", name: "Who qualifies?", sub: "Real couples: Q, CT or NQ", icon: "couple",
+  gen: true, count: 12,
   notes: [
-    { h: "Read a couple in this order", li: [
-      "Where are they from? USA & Canada, Argentina, Latin America & Caribbean, or an excluded country.",
-      "The man's age. Which band is it in?",
-      "Together? Married or living together. Singles: only USA women 40 to 65.",
-      "Work: employed, or retired (retired is OK for USA & Canada only).",
-      "Card: Discover is USA & Canada only. Debit only works for CT.",
+    { h: "Check a couple in this order", li: [
+      "Where are they from? USA and Canada, Argentina, Latin America and Caribbean, or a country that's left out.",
+      "How old is the man? Which age band is that?",
+      "Are they a couple? Singles: only USA women, 40 to 65.",
+      "Do they work? Retired is OK for USA and Canada only.",
+      "Which card? Discover is USA and Canada only. Debit only works for the half gift.",
       "Same language, paying for their stay, 3 free hours.",
-      "Any NQ flag? Job, military, recent tour, 3+ couples." ] },
+      "Any reason for no gift? Their job, the military, a recent tour, 3 or more couples." ] },
     { h: "Age bands (the man's age)", li: [
-      "USA & Canada: under 28 NQ · 28 to 31 CT · 32 to 70 Q · 71+ CT",
-      "Latin America & Caribbean: 40 to 60 Q · anything else NQ",
-      "Argentina: 35 to 44 CT · 45 to 55 Q · 56 to 70 CT · else NQ",
-      "Aruba, Cuba, Venezuela, Haiti, Ecuador: NQ" ] }
+      "USA and Canada: under 28 NQ, 28 to 31 CT, 32 to 70 Q, 71+ CT.",
+      "Latin America and Caribbean: 40 to 60 Q, any other age NQ.",
+      "Argentina: 35 to 44 CT, 45 to 55 Q, 56 to 70 CT, any other age NQ.",
+      "Aruba, Cuba, Venezuela, Haiti, Ecuador: NQ at any age." ] }
   ]
 },
 {
-  id: "why", name: "Remove the doubt", sub: "Why before how · the good news", icon: "chat", script: [0, 1, 2],
-  clips: ["01", "02", "03", "04"],
+  id: "why", name: "Remove the doubt", sub: "Say why first, then the good news", icon: "chat", script: [0, 1, 2],
   notes: [
     { h: "Crawl, walk, run", li: [
       "Crawl: you can stop people.",
       "Walk: you can write invitations.",
       "Run: you make solid bookings that show up." ] },
-    { h: "Give the WHY before the HOW", li: [
+    { h: "Say why before how", li: [
       "Guests doubt three things: that it's a scam, that it's timeshare, or that you're selling water sports and activities.",
-      "Open with \"free breakfast and a gift\" and they think: it's a scam, it's not true, or it's timeshare. Let's run away.",
+      "Open with \"free breakfast and a gift\" and they think: it's a scam, it's not true, or it's timeshare. They walk away.",
       "Tell them why you're inviting them first. Then what they get makes sense." ],
       say: "Yes folks, I'm part of the team inviting families to come see the newest hotel on the island. Once you've seen it, next time you travel you'll want to stay with us. It also helps us spread the word: you tell family and friends, maybe post a picture on Facebook or Instagram." },
     { h: "Then the good news, in this order", li: [
       "It's a full branding experience, not just a quick look at the hotel.",
       "Breakfast at one of our five-star restaurants.",
-      "A personalized tour of the property: the facilities and the service.",
+      "A personal tour of the property: the facilities and the service.",
       "See one of our rooms.",
-      "A reward for their time, as a way of saying thanks: IberoCash they use at the best restaurants, activity companies, dining and shopping on the island.",
-      "The flyer adds one more: their taxi is on us, both ways." ] },
+      "A thank-you for their time: IberoCash for the best restaurants, activities and shopping on the island.",
+      "The pitch deck adds one more: their taxi is on us, both ways." ] },
     { h: "Make it personal", li: [
       "See a Riu bracelet? \"You're probably eating breakfast at the same place every day. This is something new and different.\"",
-      "We partner with the best (Gianni's, Screaming Eagle, Daniel's) because everybody wants to be associated with Iberostar.",
+      "We partner with the best (Gianni's, Screaming Eagle, Daniel's) because everybody wants to be linked to Iberostar.",
       "We've invested in Aruba: the Tierra del Sol golf course and community, our first hotel, and two more coming." ] },
-    { h: "Ask for it", li: [
-      "Say \"Let me get you an invitation.\" Not \"Would you like one?\"",
+    { h: "Offer the invitation", li: [
+      "Say \"Let me get you an invitation.\" Don't ask \"Would you like one?\"",
       "They either let you keep going, or they tell you their objections now.",
-      "Timeshare already, don't want to commit, plans tomorrow: all can be worked.",
-      "The only one you really can't beat: they leave tomorrow morning." ] }
+      "Already own timeshare, don't want to commit, plans tomorrow: all of these can be worked.",
+      "The only one you really can't work: they leave tomorrow morning." ] }
   ],
   qs: [
-    Q("w1","Crawl, walk, run. What is \"run\"?","Making solid bookings",["Stopping people","Writing invitations","Handing out flyers"],"Crawl = stop people. Walk = write invitations. Run = solid bookings that show up."),
-    Q("w19","What doubts do you have to remove first?","That we're a scam, selling timeshare, or promoting water sports and activities",["That the hotel is far away","That breakfast costs extra","That they need a passport"],"Remove the doubt that we're a scam, timeshare, or an activities booth."),
-    Q("w2","You open with \"Free breakfast and a gift!\" What do guests think?","It's a scam, it's not true, or it's timeshare",["Great, sign us up","Nothing. They just say no thanks","They want a bigger gift"],"Leading with the gift creates doubt. Lead with the why."),
-    Q("w3","How do you remove that doubt?","Give the WHY before the HOW",["Talk faster","Lead with the gift","Say \"it's not timeshare\" right away"],"The why makes the offer believable."),
-    LINE("w16","If you tell them ___ first, it removes the doubt.","why",["the gift","the price","the time"],"Why before how. Once they know why you're approaching them, the offer makes sense."),
-    Q("w4","Which opener gives the why first?","\"We're inviting families to see the newest hotel on the island, so next time you travel you'll stay with us.\"",["\"Want free breakfast and a gift?\"","\"Have you been to Eagle Beach?\"","\"Do you own a timeshare?\""],"Why first: we want them to see it, love it, and stay with us."),
-    Q("w5","Besides wanting them to stay with us, why else do we invite them?","They spread the word: family, friends, Facebook, Instagram",["To sell them excursions","To fill the restaurant","To collect emails"],"Guests who see it tell people. That's good marketing for us."),
-    LINE("w20","We're actually inviting families for a full ___ experience, not just a quick look at the hotel.","branding",["sales","spa","dining"],"A full branding experience: breakfast, a personalized tour, a room, and a thank-you for their time."),
-    Q("w6","After the why, in what order do you share the good news?","Breakfast → property tour → see a room → reward for their time",["Reward → breakfast → room → tour","Room → reward → breakfast → tour","Tour → reward → room → breakfast"],"Breakfast, a personalized tour, a room, and the reward last as a thank-you."),
-    Q("w7","Guest is wearing a Riu bracelet. What do you say?","\"You're probably eating at the same place every day. This is something new and different.\"",["\"Riu is not as good as us.\"","\"Sorry, Riu guests can't come.\"","Nothing. Ignore it."],"Use what you see to make it personal: it's something new, something different for them."),
-    LINE("w18","And the best part is, we also ___ you for your time, as a way of saying thanks.","reward",["pay","charge","upgrade"],"The gift is a thank-you for their time, and it comes last."),
-    Q("w8","How do you present the gift?","As our way of saying thanks for their time",["As the main reason to come","As payment for buying","As a contest prize"],"The gift is a thank-you. The why is the reason."),
-    Q("w9","Why do the best restaurants and activity companies partner with us?","Everybody wants to be associated with Iberostar",["We pay them double","We own all of them","It's required by law"],"Partners like Gianni's, Screaming Eagle and Daniel's want to be linked to the brand."),
-    Q("w10","What shows guests we've invested in Aruba?","The Tierra del Sol golf course & community, our first hotel, two more coming",["The cruise terminal","The airport","A Palm Beach casino"],"Tierra del Sol, the new hotel, and two more on the way."),
-    Q("w12","Why say \"Let me get you an invitation\" instead of asking?","They either let you continue, or they tell you their objections right now",["It's shorter","It sounds more polite","They can't say no to it"],"It brings their doubts out so you can work them."),
-    Q("w13","\"We already own a timeshare.\" What is that?","An objection you can work with",["A reason to let them go","An automatic NQ","Only OK if they're from the USA"],"Owning timeshare is an objection we can overcome."),
-    Q("w15","\"We have things planned tomorrow.\" What now?","Work the objection, like finding a time that fits",["Let them go right away","Promise it only takes 30 minutes","Offer a bigger gift"],"Plans tomorrow can be overcome. Never promise a shorter time."),
-    BUILD("bw1","Ask for it, the trainer's way","Let me get you an invitation.",["Would","like"],"Don't ask if they want one. Say it: Let me get you an invitation."),
-    LISTEN("lw1","02",7,9,"Listen to this opener. What's wrong with it?","It leads with the gift, so guests think scam or timeshare",["It's too long","It forgets the breakfast","It names the wrong beach"],"Lead with the why. Free breakfast and $200 up front sounds like a scam, not true, or timeshare."),
-    LISTEN("lw2","04",10,10,"Listen. Which objection can't you overcome?","They're leaving tomorrow morning",["They already own timeshare","They don't want to commit","They have plans tomorrow"],"Everything else is a chance to overcome objections.")
+    Q("w1","Crawl, walk, run. What does \"run\" mean?","Making solid bookings",["Stopping people","Writing invitations","Handing out flyers"],"Crawl: stop people. Walk: write invitations. Run: solid bookings that show up."),
+    Q("w19","Which three doubts do you remove first?","A scam, timeshare, or selling activities",["The price, the distance, the weather","The breakfast, parking, dress code","Their language, their ID, their card"],"Guests worry it's a scam, timeshare, or an activities booth. Remove those doubts first."),
+    Q("w2","You open with \"Free breakfast and a gift!\" What do guests think?","It's a scam, not true, or timeshare",["Great, where do we sign up?","They want a bigger gift","They need more details first"],"Leading with the gift creates doubt. Lead with why."),
+    LINE("w16","If you tell them ___ first, it removes the doubt.","why",["the gift","the price","the time"],"Why before how. Once they know why you stopped them, the offer makes sense."),
+    Q("w4","Which opener says why first?","\"We're inviting families to see the newest hotel on the island.\"",["\"Do you guys want a free breakfast and a gift today?\"","\"Hey folks, have you been to Eagle Beach yet today?\"","\"Quick question, do you two own a timeshare at home?\""],"Why first: we want them to see the hotel, love it, and stay with us."),
+    Q("w5","Besides wanting them to stay with us, why do we invite them?","So they tell family and friends about it",["So we can sell them excursions","So the restaurant looks full","So we can collect their emails"],"Guests who see it tell people and post pictures. That's good marketing."),
+    LINE("w20","We're inviting families for a full ___ experience, not just a quick look at the hotel.","branding",["sales","spa","dining"],"A full branding experience: breakfast, a personal tour, a room, and a thank-you for their time."),
+    Q("w6","In what order do you share the good news?","Breakfast, tour, room, then the gift",["Gift, breakfast, room, then the tour","Room, gift, breakfast, then the tour","Tour, gift, room, then the breakfast"],"Breakfast, a personal tour, a room, and the gift last, as a thank-you."),
+    Q("w7","The guest wears a Riu bracelet. What do you say?","\"Same breakfast every day? This is something new.\"",["\"Riu isn't as nice as our hotel, you know.\"","\"Sorry, guests from Riu can't come with us.\"","Nothing. Where they stay doesn't matter."],"Use what you see to make it personal: something new, something different."),
+    LINE("w18","The best part is, we also ___ you for your time, as a way of saying thanks.","reward",["pay","charge","upgrade"],"The gift is a thank-you for their time, and it comes last."),
+    Q("w10","What shows guests we've invested in Aruba?","Tierra del Sol, our first hotel, two more coming",["The cruise terminal and the airport","A casino and two nightclubs downtown","A water park and the new mall"],"We own the Tierra del Sol golf course and community, opened our first hotel, and have two more coming."),
+    Q("w12","Why say \"Let me get you an invitation\" instead of asking?","It brings out their objections now",["It's shorter and easier to say","It sounds more polite to guests","Guests can't say no to it"],"They either let you keep going, or tell you their objections now, so you can work them."),
+    Q("w13","\"We already own a timeshare.\" What is that?","An objection you can work with",["A reason to let them go","An automatic no gift (NQ)","A problem only for USA guests"],"Owning a timeshare can be worked. See the NLP unit for how."),
+    BUILD("bw1","How do you offer the invitation?","Let me get you an invitation.",["Would","like"],"Don't ask if they want one. Say it: Let me get you an invitation."),
+    LISTEN("lw1","02",7,9,"Listen to this opener. What's wrong with it?","It leads with the gift",["It's much too long","It forgets the breakfast","It names the wrong beach"],"Free breakfast and $200 up front sounds like a scam, not true, or timeshare. Lead with why."),
+    LISTEN("lw2","04",10,10,"Listen. Which objection can't you work?","They're leaving tomorrow morning",["They already own a timeshare","They don't want to commit","They have plans tomorrow"],"Every other objection is a chance to turn it around.")
   ]
 },
 {
-  id: "offer", name: "The Open House offer", sub: "The flyer · gifts · partners", icon: "ticket", video: "video/golf-loop.mp4", poster: "video/golf-loop.jpg",
+  id: "offer", name: "The Open House offer", sub: "The pitch deck, the gifts, the partners", icon: "ticket", video: "video/golf-loop.mp4", poster: "video/golf-loop.jpg",
   imgs: [
-    { src: "img/flyer-open-house.jpg", w: 1600, h: 900, cap: "The Open House flyer guests see",
-      alt: "Open House Promotion flyer: Five Star Breakfast, VIP Property Tour, Island Gift of IberoCash, complimentary taxi. No timeshare, no high pressure, no obligation, short and sweet." },
-    { src: "img/flyer-partners.jpg", w: 1364, h: 768, cap: "Our partners, our commitment and what to bring",
-      alt: "Our Partners sheet with 16 partner logos, plus Our Commitment and What to Bring." }
+    { src: "img/deck-open-house.jpg", w: 1600, h: 900, cap: "The Open House pitch deck",
+      alt: "Open House Promotion pitch deck slide: Five Star Breakfast, VIP Property Tour, Island Gift of IberoCash, complimentary taxi. No timeshare, no high pressure, no obligation, short and sweet." },
+    { src: "img/deck-partners.jpg", w: 1364, h: 768, cap: "Pitch deck: our partners, our commitment and what to bring",
+      alt: "Pitch deck slide with 16 partner logos, plus Our Commitment and What to Bring." }
   ],
   notes: [
-    { h: "The offer, in the flyer's words", li: [
-      "Five Star Breakfast: the hostesses check them in at the Main Lobby, then it's off to a complimentary breakfast at one of our restaurants.",
+    { h: "The offer, in the pitch deck's words", li: [
+      "Five Star Breakfast: the hostesses check them in at the Main Lobby, then it's off to a free breakfast at one of our restaurants.",
       "VIP Property Tour: a preview of the VIP features of the resort and suites, so they see what awaits their family when they choose Iberostar.",
-      "Island Gift: to thank them for their time, a choice of IberoCash to enjoy with Aruba's top merchants. Dining, shopping, activities, rentals.",
-      "Complimentary taxi: they arrange the taxi themselves. We pay the fare when they arrive, and again when they depart." ] },
+      "Island Gift: to thank them for their time, a choice of IberoCash to use with Aruba's top merchants. Dining, shopping, activities, rentals.",
+      "Free taxi: they arrange the taxi themselves. We pay the fare when they arrive, and again when they leave." ] },
     { h: "Four promises", li: [
       "No timeshare.", "No high pressure.", "No obligation.",
-      "Short & sweet: 90 minutes, including the breakfast, property tour and information on booking direct." ] },
+      "Short and sweet: 90 minutes, including the breakfast, the property tour and information on booking direct." ] },
     { h: "Where and why", li: [
-      "The Joia by Iberostar Resort, in the heart of Aruba's world-famous Eagle Beach.",
-      "To tempt them to stay with us in the future, and to introduce Iberostar The Club, the newest and most luxurious way to travel.",
-      "The Open House Promotion is our opportunity to impress them in person with our brand." ] },
+      "The Joia by Iberostar Resort, in the heart of Aruba's famous Eagle Beach.",
+      "To tempt them to stay with us in the future, and to introduce Iberostar The Club, the newest and most luxurious way to travel." ] },
     { h: "Our commitment", li: [
-      "We do not sell timeshare: no weeks, points or maintenance fees.",
-      "A full-service resort brand they can book through travel agents or online. We show how our Members book direct at wholesale rates through our loyalty club.",
-      "No high pressure and no obligation to book or buy. If they fall in love with the club, we're happy to show them how to get involved." ] },
+      "We don't sell timeshare: no weeks, points or maintenance fees.",
+      "A full-service resort brand they can book through travel agents or online. We show how our members book direct at wholesale rates through our loyalty club.",
+      "No high pressure and no obligation to book or buy." ] },
     { h: "What to bring", li: [
-      "Their exclusive invitation, so they get everything they were promised.",
-      "Every adult: 2 forms of ID, like a driver's license or passport, and a credit card, so we can register them and give them their gifts." ] },
+      "Their invitation, so they get everything they were promised.",
+      "Every adult: 2 forms of ID, like a driver's license or passport, and a credit card." ] },
     { h: "Our partners", li: [
       "At Joia: Marea, Bucatini, Gaia and the Zima rooftop bar.",
       "Dining around the island: Gianni's, Daniel's Steak & Chop, Azzurro, Azia, Amore Mio, Screaming Eagle, Dushi Bagels & Burgers, and The Birdie at Tierra del Sol.",
       "Golf: Tierra del Sol. Tours: Rocka Beach Tours. Shopping: Aruba Aloe. Car rental: Elixir Car Rental." ] }
   ],
   qs: [
-    Q("o1","What's the promotion called?","Our Open House Promotion",["The Timeshare Preview","The VIP Sales Event","The Beach Breakfast Club"],"The flyer and the trainer both call it the Open House Promotion."),
-    Q("o3","Which four promises are on the flyer?","No timeshare. No high pressure. No obligation. Short & sweet.",["Free stay. Free flight. Free spa. Free golf.","Members only. Book today. Pay later. Cash only.","No ID. No card. No breakfast. No tour."],"Say them the way the flyer does."),
-    Q("o4","Where does the morning start?","In the Main Lobby, where the hostesses check them in",["At the beach bar","At a sales office downtown","At the golf course"],"Hostesses check them in at the Main Lobby, then it's off to a complimentary breakfast."),
-    Q("o5","How does the complimentary taxi work?","They take a taxi themselves. We pay the fare when they arrive and again when they leave",["We send a shuttle to their hotel","We pay one way only","Only guests staying at Iberostar get it"],"\"Your taxi is on us! Please arrange your taxi yourself: we will pay the fare when you arrive, and again when you depart!\""),
-    Q("o7","What is the Island Gift?","A choice of IberoCash to enjoy with Aruba's top merchants",["A free night at the hotel","Cash at the front desk","A discount on a timeshare week"],"To thank them for their time. IberoCash works for dining, shopping, activities and rentals."),
-    Q("o8","IberoCash works for four kinds of things. Which list is right?","Dining, shopping, activities, rentals",["Flights, hotels, cruises, trains","Groceries, gas, pharmacy, phone bills","Casino chips, lottery tickets, bets, ATM cash"],"The flyer lists dining, shopping, activities and rentals."),
-    Q("o14","What does every adult bring?","2 forms of ID, like a driver's license or passport, and a credit card",["Just the invitation","Their hotel key card","A printed hotel receipt"],"So we can register them and give them their gifts. They also bring the invitation."),
-    LINE("o15","We'll show you how our Members book direct at ___ rates through our loyalty club.","wholesale",["retail","timeshare","weekly"],"Members book direct at wholesale rates. We don't sell timeshare: no weeks, points or maintenance fees."),
-    LINE("o16","We only ask families for 90 minutes, including the breakfast, property tour, and information on ___.","booking direct",["buying a week","points and fees","the casino"],"We know vacation time is valuable. We're not going to take up their whole day."),
-    LINE("o17","Our Open House Promotion is our opportunity to ___ you in person with our brand.","impress",["sell","sign","pressure"],"We hope they like what they see, tell family and friends, and stay with us on future vacations all over the world."),
-    Q("o18","How does the flyer describe Iberostar The Club?","The newest and most luxurious way to travel",["A timeshare with points","A members-only resort","A cruise line"],"The Open House introduces them to Iberostar The Club, the newest and most luxurious way to travel."),
-    PIC("pj","img/photos/joia-beach.jpg","The Joia by Iberostar resort on its beach","Where do guests go for the Open House?","The Joia by Iberostar Resort, on Eagle Beach",["A sales office in Oranjestad","A resort on Palm Beach","The Tierra del Sol clubhouse"],"The Joia by Iberostar Resort, in the heart of Aruba's world-famous Eagle Beach."),
-    PIC("ps","img/photos/joia-suite.jpg","A Joia suite living room","On the VIP Property Tour, guests see…","The VIP features of the resort and its suites",["A timeshare sales office","An airport lounge","A model home for sale"],"So they see what awaits their family when they choose Iberostar in the future."),
-    PIC("pm","img/photos/marea.jpg","A dish at Marea","Marea is…","A Caribbean restaurant at Joia",["A car rental partner","A golf course","A tour company"],"Marea, Bucatini, Gaia and the Zima rooftop bar are at Joia."),
-    PIC("pg","img/photos/golf.jpg","The Tierra del Sol golf course","Tierra del Sol is…","The golf course and community Iberostar owns",["A beach club on Palm Beach","A car rental company","A cruise terminal"],"In the trainer's words: we own the Tierra del Sol golf course and community. The Birdie is its restaurant."),
-    PIC("pr","img/photos/rocka.jpg","A Rocka Beach Tours jeep","Rocka Beach Tours offers…","Jeep tours, UTVs, karting and sailing",["Car rentals only","Fine dining","Spa treatments"],"Rocka Beach Tours is the tours partner."),
+    Q("o1","What's the promotion called?","Our Open House Promotion",["The Timeshare Preview","The VIP Sales Event","The Beach Breakfast Club"],"The pitch deck and the voice notes both call it the Open House Promotion."),
+    Q("o3","Which four promises are in the pitch deck?","No timeshare, no pressure, no obligation, short and sweet",["Free stay, free flight, free spa, free golf","Members only, book today, pay later, cash only","No ID, no card, no breakfast, no tour"],"No timeshare. No high pressure. No obligation. Short and sweet."),
+    Q("o4","Where does the morning start?","In the Main Lobby, with the hostesses",["At the beach bar by the pool","At an office in Oranjestad","At the golf course clubhouse"],"The hostesses check them in at the Main Lobby, then it's off to breakfast."),
+    Q("o5","How does the free taxi work?","They take a taxi, and we pay both ways",["We send a shuttle to their hotel","We pay for the ride there only","Only Iberostar guests get a taxi"],"They arrange the taxi. We pay the fare when they arrive and again when they leave."),
+    Q("o7","What is the Island Gift?","IberoCash for Aruba's top places",["A free night at the Joia hotel","Cash handed out at the front desk","A discount on a timeshare week"],"A thank-you for their time, to use for dining, shopping, activities and rentals."),
+    Q("o8","Where can guests use IberoCash?","Dining, shopping, activities, rentals",["Flights, hotels, cruises, trains","Groceries, gas, pharmacy, phone bills","Casino, lottery, bets, ATM cash"],"The pitch deck lists dining, shopping, activities and rentals."),
+    Q("o14","What does every adult bring?","2 forms of ID and a credit card",["Only the invitation, nothing more","Their hotel key card and receipt","One ID for the whole couple"],"Two IDs, like a driver's license or passport, and a credit card. Plus the invitation."),
+    LINE("o15","Members book direct at ___ rates through our loyalty club.","wholesale",["retail","timeshare","weekly"],"Members book direct at wholesale rates. We don't sell timeshare: no weeks, points or maintenance fees."),
+    LINE("o16","We ask for 90 minutes, including breakfast, the tour and information on ___.","booking direct",["buying a week","points and fees","the casino"],"Short and sweet: 90 minutes, including the breakfast, the property tour and information on booking direct."),
+    Q("o18","How does the pitch deck describe Iberostar The Club?","The newest, most luxurious way to travel",["A timeshare with weeks and points","A members-only resort in Aruba","A cruise line's travel club"],"The pitch deck calls Iberostar The Club the newest and most luxurious way to travel."),
+    PIC("pj","img/photos/joia-beach.jpg","The Joia by Iberostar resort on its beach","Where do guests go for the Open House?","The Joia by Iberostar, on Eagle Beach",["A sales office in downtown Oranjestad","A partner resort on Palm Beach","The clubhouse at Tierra del Sol"],"The Joia by Iberostar Resort, in the heart of Eagle Beach."),
+    PIC("ps","img/photos/joia-suite.jpg","A Joia suite living room","What do guests see on the VIP Property Tour?","The resort's VIP features and suites",["A timeshare sales office and contracts","The airport's VIP lounge","Model homes for sale nearby"],"So they see what awaits their family when they choose Iberostar."),
+    PIC("pm","img/photos/marea.jpg","A dish at Marea","What is Marea?","A restaurant at Joia",["A car rental partner","A golf course","A tour company"],"Marea, Bucatini, Gaia and the Zima rooftop bar are all at Joia."),
+    PIC("pg","img/photos/golf.jpg","The Tierra del Sol golf course","What is Tierra del Sol?","Iberostar's golf course and community",["A beach club on Palm Beach","A car rental company downtown","The island's cruise ship terminal"],"We own the Tierra del Sol golf course and community. The Birdie is its restaurant."),
+    PIC("pr","img/photos/rocka.jpg","A Rocka Beach Tours jeep","What does Rocka Beach Tours offer?","Off-road tours, karting and sailing",["Car rentals and taxis only","Fine dining at the beach","Spa and massage treatments"],"Rocka Beach Tours is our tours partner."),
     MATCH("mo","Match each partner to what it is",[["Elixir","Car rental"],["Rocka Beach","Tours"],["Aruba Aloe","Shopping"],["Tierra del Sol","Golf"],["Zima","Rooftop bar at Joia"]],"Elixir rents cars, Rocka Beach runs tours, Aruba Aloe is shopping, Tierra del Sol is golf, Zima is the rooftop bar at Joia.")
   ]
 },
 {
-  id: "solid", name: "Make it solid", sub: "Booking → show-up", icon: "calendar", script: [3, 4, 5, 6],
-  clips: ["05", "06", "07", "08", "09"],
+  id: "solid", name: "Make it solid", sub: "From booking to show-up", icon: "calendar", script: [3, 4, 5, 6],
   notes: [
     { h: "Book the time", li: [
       "Say \"Let me put you down for 8 o'clock.\"",
-      "If 8 is too early, offer 10. If they don't object, you've got an easy booking." ] },
+      "If 8 is too early, offer 10. If they don't say it's too early, you have an easy booking." ] },
     { h: "Slow down while you write", li: [
-      "Once you're writing, you've got handcuffs on them. About 1 family in 100 walks off mid-invitation. It's manners.",
-      "Keep making a friend. Ask small discovery questions. If they like you, trust you and believe you, they buy from you." ] },
-    { h: "Phone number: tell them why", li: [
-      "A manager or supervisor calls this afternoon, around 5 to 6 pm, only to check they can still make it. WhatsApp works.",
-      "Explained this way they feel like VIPs and don't give a fake number." ],
+      "While you write, they stay. About 1 family in 100 walks away during the invitation. It's manners.",
+      "Keep making a friend. Ask small questions about them. If they like you, trust you and believe you, they buy from you." ] },
+    { h: "Phone number: say why", li: [
+      "A manager or supervisor calls this afternoon, around 5 to 6, only to check they can still make it. WhatsApp works.",
+      "Said this way, they feel like VIPs and don't give a fake number." ],
       say: "Folks, we also do confirmation calls. If you give me your phone number, maybe you have WhatsApp, one of my managers can reach out this afternoon between 5 and 6, simply to ask if you're still able to make it. We're not allowed to solicit or anything like that." },
     { h: "Say what it really is", li: [
       "\"Bring this invitation with you to confirm which gift you were offered.\"",
       "Breakfast, a quick tour, and we show how to book direct through our loyalty club.",
       "We're not timeshare: no weeks, no points, no maintenance fees. A full-service hotel you can book through travel agents or Expedia.",
-      "No obligation to be a member to stay with us. Members get discounts and cool perks.",
-      "A real expectation gives them a spark of interest. Surprised guests close their eyes and ears." ] },
+      "No one has to be a member to stay with us. Members get discounts and great perks.",
+      "Guests who know what's coming arrive curious. Surprised guests close their eyes and ears." ] },
     { h: "Talk about time the right way", li: [
       "\"We only ask families for 90 minutes, and breakfast tends to eat about half of that.\"",
-      "Never say 45 minutes or 30 minutes, or break it into minutes. Then the hostess says 90 and they feel lied to." ] },
+      "Never say 45 or 30 minutes, and never break it into minutes. When the hostess says 90, they feel misled." ] },
     { h: "Lock it in before they walk", li: [
       "Don't just say \"have a nice day.\" Ask: \"So we see you guys tomorrow at 8 for sure?\"",
-      "\"We'll try\" or \"we'll see\"? Go back: lots of families want to come, and we don't want to block a space.",
-      "Still unsure? Offer to give the invitation to another family. A solid no beats a fake yes.",
+      "They say \"we'll try\" or \"we'll see\"? Ask again: lots of families want to come, and we don't want to hold a space.",
+      "Still unsure? Offer the invitation to another family. A solid no beats a fake yes.",
       "You can tell them: \"I get a $65 bonus just for you showing up. You don't have to book or buy anything.\"",
       "Your job isn't handing out invitations. It's getting people to the hotel." ] }
   ],
   qs: [
-    Q("s3","While writing the invitation you should…","Slow down, make a friend, ask discovery questions",["Hurry before they change their mind","Stay quiet and just write","Hand them the pen to fill it in"],"This is the best moment to build the bond."),
-    Q("s4","Why is it safe to slow down while writing?","Only about 1 family in 100 walks away mid-invitation. It's manners",["They signed something","The gift is already promised","A manager is watching"],"Once you're writing, you've got handcuffs on them."),
-    LINE("s5","If they like you, ___ you and ___ you, they will buy from you.","trust · believe",["tip · thank","follow · call","hear · see"],"Like, trust, believe. Writing the invitation is your time to build that."),
-    Q("s6","What do you tell them to bring?","The invitation, to confirm which gift they were offered",["Their hotel key","Only a passport","Nothing"],"Bring the invitation. It confirms the gift."),
-    Q("s7","How do you explain what we are?","A full-service hotel. Not timeshare: no weeks, points or fees. We show how to book direct through our club",["A timeshare with great prices","A water sports company","Just a free breakfast, nothing else"],"Be clear: hotel, plus a club for booking direct with preferred rates and perks."),
-    LINE("s22","We're not selling timeshare. We don't have any weeks or ___ or maintenance fees.","points",["rooms","rates","nights"],"No weeks, no points, no maintenance fees. A full-service hotel with a club for booking direct."),
-    Q("s8","Do guests need to be members to stay at the hotel?","No. It's a full-service hotel, like Hyatt or Hilton. Members just get discounts and perks",["Yes, members only","Only on weekends","Only for all-inclusive"],"No obligation. If the membership isn't for them, we still want them staying at our hotel."),
-    Q("s9","How do you ask for a phone number?","Tell them why first: a manager calls 5 to 6 pm only to confirm they're still coming",["Just ask for it","Say we'll send them offers","Skip it"],"Give the why before you ask. They feel like VIPs and don't give a fake number."),
-    Q("s13","They answer \"We'll try\" or \"We'll see.\" You…","Ask again: lots of families want to come to our open house promotion, and we don't want to block a space",["Say \"Great, see you!\"","Promise a bigger gift","Let it go"],"Go back and get a real answer."),
-    LINE("s14","It's better to get a solid no than a bunch of fake ___.","yeses",["maybes","numbers","bookings"],"Fake yeses don't show up. A solid no lets you find a family who will."),
-    Q("s15","Still unsure after you asked again?","Offer to give the invitation to another family",["Write it anyway","Give them two invitations","Take their card"],"\"I wouldn't want to hold a space if you're not sure you're going to make it.\""),
-    Q("s17","Your real job is to…","Get people to come to the hotel",["Hand out as many invitations as possible","Talk to everyone on the beach","Collect phone numbers"],"This is a show-up business, not an invitation business."),
-    LINE("s18","We only ask families for ___ minutes, and breakfast tends to eat about ___ of that.","90 · half",["45 · all","60 · half","90 · 45 minutes"],"Say 90 minutes. Breakfast eats about half. Never break it into minutes."),
-    Q("s19","Why never say \"45 minutes\" or \"30 minutes\"?","They think it's short, then complain when the hostess says 90",["It sounds too long","Hostesses don't like numbers","Breakfast takes longer"],"Never mention minutes. They need to know: 90."),
-    Q("s20","Why tell them they'll learn about booking direct with the club?","They come in curious. Surprised guests close their eyes and ears",["It's a legal rule","So they don't come","It makes the tour shorter"],"A real expectation gives them a spark of interest. That means more sales."),
-    BUILD("bs1","Book the time","Let me put you down for 8 o'clock.",["maybe","10"],"Start at 8. If it's too early for them, offer 10."),
-    BUILD("bs2","Lock in the show-up","So we see you guys tomorrow at 8 for sure?",["maybe","try"],"Reconfirm before they walk away, and take their temperature."),
-    LISTEN("ls1","06",9,9,"Listen. When does the manager call?","This afternoon, between 5 and 6",["Tomorrow at 7 am","Right before the tour","Tonight at 9"],"A short confirmation call, only to see if they can still make it."),
-    LISTEN("ls2","07",25,25,"Listen. How much is the show-up bonus?","$65",["$20","$100","$200"],"Let them know it matters to you that they show up. They don't have to book or buy anything."),
-    LISTEN("ls3","09",4,4,"Listen. What can these tips do for your week?","Go from 8 bookings & 1 show to 10 bookings & 5 or 6 shows",["Double your gift budget","Cut your hours in half","Nothing much"],"Better booking rate, show rate, Q rate. More tours, more sales.")
+    Q("s3","What should you do while you write the invitation?","Slow down and keep making a friend",["Hurry before they change their mind","Stay quiet and just write","Let them fill it in themselves"],"This is the best time to build the bond."),
+    Q("s4","Why is it safe to slow down while you write?","Only about 1 family in 100 walks away",["They already signed something","The gift is already promised","A manager is watching them"],"Once you're writing, they stay. It's manners."),
+    Q("s7","How do you explain what we are?","A full-service hotel with a club for booking direct",["A timeshare with great prices and weeks","A water sports and excursions company","Just a free breakfast, nothing else"],"A hotel like Hyatt or Hilton, plus a club to book direct with preferred rates and perks."),
+    Q("s8","Do guests have to be members to stay at the hotel?","No, it's a hotel like Hyatt or Hilton",["Yes, the hotel is members only","Only on weekends and holidays","Only for all-inclusive stays"],"No obligation. Members just get discounts and perks."),
+    Q("s9","How do you ask for their phone number?","Say why first: a short call between 5 and 6",["Just ask for it and keep writing","Say we'll send them special offers","Skip it, it scares people off"],"Give the reason first. They feel like VIPs and don't give a fake number."),
+    Q("s13","They say \"We'll try\" or \"We'll see.\" What do you do?","Ask again: other families want this spot",["Say \"Great, see you tomorrow!\" and go","Promise them a bigger gift to come","Let it go and wish them a nice day"],"Go back and get a real answer. Lots of families want to come."),
+    LINE("s14","It's better to get a solid no than a bunch of fake ___.","yeses",["maybes","numbers","bookings"],"Fake yeses don't show up. A solid no frees you to find a family who will."),
+    Q("s15","They're still unsure after you asked again. Now what?","Offer the invitation to another family",["Write it for them anyway and hope","Give them two invitations, just in case","Ask for their credit card to hold it"],"\"I wouldn't want to hold a space if you're not sure you can make it.\""),
+    Q("s17","What is your real job?","Getting people to the hotel",["Handing out invitations","Talking to everyone you see","Collecting phone numbers"],"This is a show-up business, not an invitation business."),
+    LINE("s18","We only ask families for ___ minutes, and breakfast tends to eat about half of that.","90",["45","60","30"],"Say 90 minutes. Breakfast eats about half. Never break it into minutes."),
+    Q("s19","Why never say \"45 minutes\"?","They feel misled when the hostess says 90",["It sounds too long to guests","The hostesses don't like numbers","Breakfast takes even longer"],"Never mention minutes. All they need to know is 90."),
+    Q("s20","Why tell them they'll hear about booking direct with the club?","So they arrive curious, not surprised",["It's a legal rule for the tour","So fewer families show up","It makes the tour shorter"],"Guests who know what's coming are open to it. Surprised guests close their eyes and ears."),
+    BUILD("bs1","How do you book the time?","Let me put you down for 8 o'clock.",["maybe","10"],"Start with 8. If it's too early for them, offer 10."),
+    BUILD("bs2","How do you lock in the show-up?","So we see you guys tomorrow at 8 for sure?",["maybe","try"],"Ask again before they walk away, and watch how they answer."),
+    LISTEN("ls1","06",9,9,"Listen. When does the manager call?","This afternoon, between 5 and 6",["Tomorrow at 7 in the morning","Right before the tour starts","Tonight at 9 at their hotel"],"A short call, only to see if they can still make it."),
+    LISTEN("ls2","07",25,25,"Listen. How much is the show-up bonus?","$65",["$20","$100","$200"],"Let them know it matters to you. They don't have to book or buy anything.")
+  ]
+},
+{
+  id: "words", name: "Word for word", sub: "The exact lines from the voice notes", icon: "mic", script: [0, 1, 2, 3, 4, 5, 6],
+  notes: [
+    { h: "How this level works", li: [
+      "Each question is a real line from the voice notes with one key word missing.",
+      "Pick the word, then tap Hear the line to hear it said.",
+      "Say the whole line out loud once. Saying it is what makes it yours." ] }
+  ],
+  qs: [
+    LINE("k1","\"I'm part of the exciting team that's inviting families to the newest ___ on the island.\"","hotel",["timeshare","golf course","restaurant"],"Say why first: we want families to come see the newest hotel on the island.",["02",12,12]),
+    LINE("k2","\"Once you've seen it, hopefully next time you ___, you'll want to stay with us.\"","travel",["retire","book a cruise","buy a home"],"The why: see it, love it, stay with us next time you travel.",["02",13,13]),
+    LINE("k3","\"And it also helps us spread the ___.\"","word",["news","flyers","love"],"Guests who see the hotel tell family and friends. That's good marketing.",["02",22,22]),
+    LINE("k4","\"When you arrive, we treat you to breakfast at one of our ___ restaurants.\"","five-star",["beachside","partner","all-inclusive"],"Breakfast at one of our five-star restaurants comes first in the good news.",["03",3,3]),
+    LINE("k5","\"After breakfast, they're going to give you a ___ tour of the property.\"","personalized",["sales","group","golf"],"A personalized tour, so they see the facilities and the service for themselves.",["03",9,9]),
+    LINE("k6","\"So you'll be able to ___ the quality that you'll receive when you stay with us.\"","anticipate",["pay for","rate","rent"],"Seeing a room lets them picture their future stay.",["03",10,10]),
+    LINE("k7","\"Everybody wants to be ___ with Iberostar.\"","associated",["partners","working","staying"],"That's why the best companies on the island partner with us.",["03",15,15]),
+    LINE("k8","\"Let me get you an ___.\"","invitation",["upgrade","appointment","offer"],"Say it. Don't ask if they'd like one.",["04",1,1]),
+    LINE("k9","\"Let me put you down for ___ o'clock.\"","8",["7","9","11"],"Start with 8. If it's too early for them, offer 10.",["05",0,0]),
+    LINE("k10","\"Make sure to bring this invitation with you to confirm which ___ you are offered.\"","gift",["room","time","tour"],"The invitation confirms their gift.",["05",15,15]),
+    LINE("k11","\"We don't have any weeks or points or ___ fees.\"","maintenance",["booking","cleaning","resort"],"We're not selling timeshare: no weeks, no points, no maintenance fees.",["05",17,17]),
+    LINE("k12","\"One of my managers… can reach out to you this afternoon… simply to ask you if you're still able to ___ it.\"","make",["miss","book","sell"],"The call is only to check they can still make it.",["06",9,9]),
+    LINE("k13","\"Sorry if I ___, but I thought you were pretty sure you were coming.\"","misunderstood",["was rude","bothered you","rushed you"],"Calm and honest. It brings out the real answer.",["07",4,4]),
+    LINE("k14","\"We certainly wouldn't want to ___ a space for someone who's sure they want to come.\"","block",["sell","waste","clean"],"Lots of families want to come. A space shouldn't go to a maybe.",["07",9,9]),
+    LINE("k15","\"You know what, guys, maybe I should give this invitation to ___.\"","somebody else",["the manager","your kids","the hostess"],"Still unsure after you asked again? Offer it to another family.",["07",15,15]),
+    LINE("k16","\"This nice young man gets a little $65 bonus on his paycheck just for you ___.\"","showing up",["buying","booking","signing up"],"They don't have to book or buy anything. Showing up is enough.",["07",25,25])
   ]
 },
 {
   id: "map", name: "Pitch map", sub: "Put the pitch in order", icon: "route", map: true,
   notes: [] // built from MAP_STEPS
 },
-{ id: "final", name: "Final run", sub: "Everything, mixed · 25 in a row", icon: "trophy", final: true, count: 25, notes: [] }
+{
+  id: "nlp1", name: "Rapport", sub: "Match, mirror, make a friend", icon: "smile",
+  notes: [
+    { h: "What NLP is", li: [
+      "NLP (neuro-linguistic programming) is a set of habits for talking with people: how you match them, the words you choose, and how you read their reactions.",
+      "Use it so guests feel understood and decide for real. Never to trick or pressure anyone: our pitch deck promises no high pressure and no obligation." ] },
+    { h: "Rapport comes first", li: [
+      "People say yes to people they like and trust.",
+      "The voice notes put it simply: if they like you, trust you and believe you, they will buy from you." ],
+      hear: { clip: "05", from: 13, to: 13 } },
+    { h: "Match and mirror", li: [
+      "Match their energy: excited couple, bring energy. Quiet couple, lower your voice and slow down.",
+      "Mirror their posture, softly and a moment later. If they relax and lean back, relax too. Don't copy every move.",
+      "Match their pace: in a hurry, keep it short. Taking it easy, take your time." ] },
+    { h: "Use their words", li: [
+      "Repeat the words they use. They say \"relax\", you say \"relax\". They say \"the kids\", you say \"the kids\".",
+      "Repeat key details back, and use their names once you know them." ],
+      say: "Ohio! How's your first week in Aruba going?", sayId: "n1a" },
+    { h: "Make a friend while you write", li: [
+      "Ask easy, open questions and really listen: where they're from, first time in Aruba, what they've liked so far.",
+      "Talk less than they do. Smile. Nod." ],
+      say: "Where are you guys from? First time in Aruba?", sayId: "n1b",
+      hear: { clip: "05", from: 10, to: 12 } },
+    { h: "Check that it's working", li: [
+      "Rapport: they smile, lean in, ask questions and tell you things.",
+      "Not yet: short answers, arms crossed, looking away. Slow down, match them, ask something easy." ] }
+  ],
+  qs: [
+    Q("n1","What is NLP?","Habits for matching, wording and reading people",["A script you read word for word","A list of the free gifts we offer","A rule from the qualifications PDF"],"Neuro-linguistic programming: match people, choose your words, read their reactions."),
+    Q("n2","When is it wrong to use NLP?","To trick or pressure a guest",["To match a guest's mood","To give a clear choice","To make a guest feel heard"],"Use it so people decide for real. The pitch deck promises no high pressure and no obligation."),
+    LISTEN("n3","05",13,13,"Listen. When do guests buy from you?","When they like, trust and believe you",["When the gift is big enough","When you talk fast enough","When you show them the price"],"Rapport first: like, trust, believe."),
+    Q("n4","A couple talks slowly and quietly. How do you talk?","Slower and quieter, like them",["Faster, to bring the energy","Louder, so they hear you","The same as with everyone"],"Match their pace and volume. People relax with people like them."),
+    Q("n5","What is mirroring?","Matching their posture, softly and a bit later",["Copying every move they make, right away","Repeating every word they say, exactly","Standing very close and staring at them"],"Soft and a little later. Copying every move feels strange."),
+    Q("n6","The guest says: \"We just want to relax this trip.\" Which reply uses their words?","\"Then you'll love it: a relaxed breakfast, no rush.\"",["\"Then you need our jeep tour, it's a blast!\"","\"OK, but first listen to this offer, folks.\"","\"Relaxing gets boring after a day, trust me.\""],"Use their word back: relax. It shows you listened."),
+    Q("n7","Which question builds rapport while you write?","\"First time in Aruba?\"",["\"Can you sign right here?\"","\"How much do you earn?\"","\"What's your room number?\""],"Easy, open, friendly. Ask, then listen."),
+    Q("n8","Which sign shows you have rapport?","They smile, lean in and ask questions",["They keep checking their phones","They answer in one word","They keep walking slowly"],"Watch for it. No rapport yet? Slow down and match them."),
+    Q("n9","Short answers, arms crossed, looking away. What do you do?","Slow down, match them, ask something easy",["Talk faster so they don't walk away","Go straight to the gift and the cash","Hand them the invitation right now"],"Build rapport first. Then lead."),
+    Q("n10","Why repeat details back, like \"Ohio! How's the trip?\"","It shows you listened, so they open up",["It fills the silence while you write","It tests their memory a little","It makes the talk last longer"],"Repeating their words is one of the fastest ways to build rapport."),
+    MATCH("n11","Match the couple to how you talk",[["Excited couple","Bring your energy up"],["Quiet couple","Lower your voice"],["Couple in a hurry","Keep it short"],["Curious couple","Answer, then ask back"]],"Match them first. Then lead."),
+    BUILD("n12","Ask a friendly question while you write.","Where are you guys from?",["sign","card"],"Open questions make a friend. Ask, then listen.")
+  ]
+},
+{
+  id: "nlp2", name: "Words that lead", sub: "Assume the yes, two choices, say because", icon: "quote",
+  notes: [
+    { h: "Assume the yes (presupposition)", li: [
+      "Use words that take the yes for granted.",
+      "Say \"Let me get you an invitation\", not \"Would you like one?\"",
+      "Say \"When you come tomorrow\", not \"If you come\"." ],
+      hear: { clip: "04", from: 1, to: 1 },
+      say: "When you come to breakfast tomorrow, bring this invitation.", sayId: "n2a" },
+    { h: "Give a choice of two yeses", li: [
+      "Offer two good options. Either answer is a yes. NLP calls it a double bind.",
+      "The voice notes do it: put them down for 8, and if that's too early, offer 10." ],
+      hear: { clip: "05", from: 0, to: 1 },
+      say: "Is 8 or 10 o'clock better for you guys?", sayId: "n2b" },
+    { h: "Say because", li: [
+      "A reason makes a request feel fair, so more people say yes.",
+      "Give the reason when you ask: \"We do confirmation calls, so can I get your number?\"" ],
+      hear: { clip: "06", from: 6, to: 6 } },
+    { h: "Tag questions", li: [
+      "End with a small question that invites a yes: \"right?\", \"for sure?\"",
+      "\"You guys love a good breakfast, right?\" \"So we see you tomorrow at 8 for sure?\"" ],
+      hear: { clip: "07", from: 1, to: 1 } },
+    { h: "Small words that matter", li: [
+      "Say \"and\", not \"but\". \"But\" cancels what came before it.",
+      "Drop \"try\" and \"maybe\". They sound unsure.",
+      "Embedded command: put the action you want inside a normal sentence, and say it a little slower: \"When you come see the hotel tomorrow...\"" ] }
+  ],
+  qs: [
+    Q("n13","\"Let me get you an invitation.\" Which NLP move is that?","Assuming the yes (presupposition)",["Asking for a yes (tag question)","Changing the meaning (reframe)","Copying the guest (mirroring)"],"It takes the yes for granted, so doubts come out now."),
+    Q("n14","Which line assumes they're coming?","\"When you come tomorrow, ask for Marea.\"",["\"If you want, maybe you could come.\"","\"Would you be interested in a tour?\"","\"Do you guys even like breakfast?\""],"\"When\" assumes it's happening. \"If\" and \"would\" invite a no."),
+    LISTEN("n15","05",0,1,"Listen. Why offer 8, then 10?","Either answer books them",["It shows the hotel is busy","It tests if they're awake","It makes the talk longer"],"A choice of two yeses. NLP calls it a double bind."),
+    Q("n16","Which question offers two yeses?","\"Is 8 or 10 better for you guys?\"",["\"Do you want to come or not?\"","\"Are you free at all tomorrow?\"","\"Could you maybe come by later?\""],"Both answers book them."),
+    LINE("n17","Can I get your number, ___ we do confirmation calls this afternoon?","because",["unless","although","before"],"A reason makes the request feel fair."),
+    Q("n18","Why does saying \"because\" work?","A reason makes the request feel fair",["It makes the line longer and slower","It sounds more formal and official","Guests like hearing long words"],"Give the reason and more people say yes. The voice notes: say why when you ask."),
+    Q("n19","Which line is a tag question?","\"You guys love a good breakfast, right?\"",["\"What do you eat for breakfast, guys?\"","\"Breakfast starts at 8 in the morning.\"","\"Do you guys even like breakfast?\""],"A small \"right?\" at the end invites a yes."),
+    Q("n20","\"It's 90 minutes, but breakfast eats about half.\" Which word should replace \"but\"?","and",["or","so","except"],"\"But\" cancels what came before. \"And\" keeps both parts."),
+    Q("n22","What is an embedded command?","The action you want, inside a sentence",["A direct order you give the guest","The fine print on the invitation","A secret code word for the hostess"],"\"When you come see the hotel tomorrow...\" Say the action a little slower."),
+    LISTEN("n25","07",1,1,"Listen. What does \"for sure?\" at the end ask for?","A clear yes that they'll come",["Their phone number and name","Bringing a bigger group along","Moving to a later time"],"A tag question asks for commitment. Then watch how they answer."),
+    MATCH("n23","Match each move to its line",[["Assume the yes","\"When you come tomorrow...\""],["Two yeses","\"8 or 10 o'clock?\""],["Because","\"...because we do confirmation calls\""],["Tag question","\"...great breakfast, right?\""]],"Four word moves that lead to a real yes."),
+    BUILD("n24","Offer two times.","Is 8 or 10 better for you guys?",["maybe","if"],"Two yeses: either answer books them.")
+  ]
+},
+{
+  id: "nlp3", name: "Pace and lead", sub: "Agree first, picture it, then lead", icon: "steps",
+  notes: [
+    { h: "Pace, then lead", li: [
+      "Pace: say two or three things that are true for them right now. Each one is a small yes.",
+      "Lead: then take them to the next step." ],
+      say: "Beautiful day on Eagle Beach, right? Let me get you an invitation.", sayId: "n3a" },
+    { h: "The voice notes do it", li: [
+      "\"I see you have a bracelet from Riu. I'm sure you're eating breakfast at the same place every day.\" That's pacing.",
+      "\"You're going to love our place. It's something new, something different for you.\" That's leading." ],
+      hear: { clip: "03", from: 5, to: 8 } },
+    { h: "Help them picture it (future pacing)", li: [
+      "Help them see the good moment that's coming: the breakfast, the ocean, the room.",
+      "The voice notes: they see one of our rooms \"so you'll be able to anticipate the quality you'll receive when you stay with us.\"" ],
+      hear: { clip: "03", from: 10, to: 10 },
+      say: "Picture the two of you tomorrow, breakfast by the ocean at Joia.", sayId: "n3b" },
+    { h: "Anchor the good moment", li: [
+      "When they laugh or get excited, that's the moment to hand over the invitation or say the time.",
+      "The good feeling gets linked to the hotel." ] },
+    { h: "Simple, never false", li: [
+      "\"We only ask families for 90 minutes, and breakfast tends to eat about half of that.\" It's true, and it doesn't break it into minutes.",
+      "Never trade the truth for a yes." ],
+      hear: { clip: "08", from: 2, to: 3 } }
+  ],
+  qs: [
+    Q("n26","What is pacing?","Saying things that are true for them now",["Walking at the guest's speed","Talking fast to hold attention","Counting the minutes of the pitch"],"Small truths they agree with. Then you lead."),
+    Q("n27","What is leading?","Taking them to the next step",["Walking in front of them","Talking more than they do","Picking the gift for them"],"Pace first, then lead."),
+    LISTEN("n28","03",5,8,"Listen. What does the Riu bracelet line do?","Paces their routine, then leads to our hotel",["Says Riu is a worse hotel than ours","Asks them for their room number","Checks if they qualify for a gift"],"Same breakfast every day (pace). Something new at our place (lead)."),
+    Q("n29","A couple on Eagle Beach. Which is a pacing line?","\"Beautiful day on Eagle Beach, right?\"",["\"Let me get you an invitation, folks.\"","\"Do you two own a timeshare at home?\"","\"Is 8 or 10 better for you guys?\""],"True for them right now, and easy to agree with."),
+    Q("n30","How many easy yeses before you lead?","Two or three",["None at all","Ten or more","Just one, the invitation"],"A few small yeses make the next yes easier."),
+    Q("n31","What is future pacing?","Helping them picture what's coming",["Booking them for next year","Talking about the price later","Walking ahead of them"],"\"Picture the two of you tomorrow, breakfast by the ocean.\""),
+    Q("n32","Which line helps them picture tomorrow?","\"Picture you two tomorrow, breakfast by the ocean.\"",["\"The hotel opened a year and a half ago.\"","\"Here's your invitation, folks, enjoy.\"","\"We have two more hotels coming soon.\""],"It puts them in the moment."),
+    LISTEN("n33","03",10,10,"Listen. What does seeing a room let them do?","Picture the quality of a future stay",["Pick the room they'll sleep in tonight","See the price of a membership first","Take a nap after the breakfast"],"That's future pacing, right in the voice notes."),
+    Q("n34","When is the best moment to hand over the invitation?","When they're smiling or excited",["When they check their phones","When they start to walk away","Before you even say hello"],"Link the good feeling to the invitation."),
+    LISTEN("n35","08",2,3,"Listen. Why say \"breakfast tends to eat about half of that\"?","It's true and doesn't pin down a time",["Breakfast takes exactly 45 minutes","It makes the tour sound shorter","The hostesses ask you to say it"],"Simple, never false. They still know: 90 minutes."),
+    MATCH("n36","Match each move to what it does",[["Pacing","Says what's true now"],["Leading","Takes the next step"],["Future pacing","Pictures tomorrow"],["Anchoring","Links a good feeling"]],"Pace, lead, picture it, anchor it."),
+    BUILD("n37","Help them picture tomorrow.","Picture the two of you at breakfast by the ocean.",["maybe","if"],"Future pacing: put them in the moment.")
+  ]
+},
+{
+  id: "nlp4", name: "Read and reframe", sub: "Spot a real yes, turn objections around", icon: "eye",
+  notes: [
+    { h: "Read the real answer (calibration)", li: [
+      "Watch faces, bodies and voices, not only words. The voice notes call it taking their temperature.",
+      "Real yes: eye contact, both nod, they ask about breakfast or the room, they give their number easily.",
+      "Fake yes: \"we'll try\", \"we'll see\", a look at each other, short answers, feet turned away." ],
+      hear: { clip: "07", from: 2, to: 3 } },
+    { h: "When you hear doubt", li: [
+      "Stay calm and ask again: \"Sorry if I misunderstood, I thought you were pretty sure you were coming.\"",
+      "Still unsure? A solid no is better than a fake yes." ],
+      hear: { clip: "07", from: 4, to: 4 } },
+    { h: "Answer the doubt early (pre-frame)", li: [
+      "Answer a doubt before they say it.",
+      "\"We're not selling timeshare: no weeks, no points, no maintenance fees.\"",
+      "\"There's no obligation to be a member to stay with us.\"" ],
+      hear: { clip: "05", from: 17, to: 17 } },
+    { h: "Give the objection a new meaning (reframe)", li: [
+      "\"We already own a timeshare.\" You: \"Perfect, then you know how much a good vacation matters. This is a hotel, no weeks or points.\"",
+      "\"We don't want to commit.\" You: \"Good news, there's no obligation to book or buy. Just breakfast, a tour and information.\"",
+      "\"We have plans tomorrow.\" You: \"What time are your plans? We start at 8, so you keep most of your day.\"",
+      "\"Sounds like a scam.\" You: \"I get it, it sounds too good. That's why it's an Open House: come see the hotel for yourself.\"" ],
+      hear: { clip: "04", from: 4, to: 9, label: "Hear the objections" },
+      say: "Perfect, then you already know how much a good vacation matters.", sayId: "n4a" },
+    { h: "Honest only", li: [
+      "NLP helps people feel understood and make a clear choice.",
+      "If it's not for them, let them go with a smile. We still want them staying at our hotel." ] }
+  ],
+  qs: [
+    Q("n38","What does calibrating mean?","Reading face, body and voice",["Checking their credit card","Setting your watch for the tour","Measuring the walk to the hotel"],"Watch for the real answer, not only the words. The voice notes call it taking their temperature."),
+    LISTEN("n39","07",2,3,"Listen. What are you doing when you watch how they answer?","Taking their temperature",["Writing the invitation","Checking their IDs","Counting the gifts"],"Calibrating: is it a real yes or a polite one?"),
+    Q("n40","Which one is a real yes?","They nod and give their number easily",["\"We'll try to make it, maybe tomorrow.\"","\"Sure, sure. We'll see how we feel.\"","They look at each other, then say \"OK\""],"Real interest shows in easy answers and questions about breakfast or the room."),
+    Q("n41","\"We'll try to make it.\" What does that tell you?","There's doubt, so ask again",["They're coming for sure","They want a bigger gift","They want a later time"],"\"Try\" means maybe. Ask again, calmly."),
+    Q("n42","They hesitate. Which line checks without pushing?","\"Sorry, I thought you were pretty sure.\"",["\"Come on, guys, it's all free, let's go!\"","\"You really have to come now, folks.\"","\"OK, never mind. Have a nice day, guys.\""],"Calm and honest, and it brings out the real answer."),
+    Q("n43","What is a pre-frame?","Answering a doubt before they say it",["Framing the invitation for them","Booking the time before you ask","Taking their photo first"],"\"We're not selling timeshare: no weeks, no points, no maintenance fees.\""),
+    Q("n44","What is a reframe?","Giving an objection a new meaning",["Changing the invitation time","Saying the pitch again, louder","Telling them they're wrong"],"Agree with the feeling, then show it another way."),
+    Q("n45","\"We already own a timeshare.\" Which reply reframes it?","\"Then you know a good vacation matters. This is a hotel.\"",["\"Timeshares are a bad deal. You should sell it.\"","\"Then I'm sorry, you can't come with us.\"","\"Don't worry about that, it doesn't matter.\""],"Turn it into common ground, then lead."),
+    Q("n46","\"We don't want to commit to anything.\" Best reply?","\"Good: there's no obligation to book or buy.\"",["\"You'll have to commit to a little.\"","\"Everyone commits in the end, folks.\"","\"Then this really isn't for you.\""],"True, it's in the pitch deck, and it takes away the fear."),
+    Q("n47","\"We have plans tomorrow.\" Best reply?","\"What time? We start at 8, so you keep most of your day.\"",["\"Can't you just cancel your plans for us?\"","\"Don't worry, it only takes 30 minutes.\"","\"Then come next year instead, no problem.\""],"Work the objection. Never cut the time into minutes."),
+    MATCH("n48","Match each objection to a reframe",[["\"We own a timeshare\"","You know vacations matter"],["\"We don't want to commit\"","No obligation to buy"],["\"We have plans\"","Start at 8, keep your day"],["\"Sounds like a scam\"","Come see it yourself"]],"Agree with the feeling, then give it a new meaning."),
+    Q("n49","When should you let a couple go?","When it's really not for them",["Never, keep pushing","When they ask about breakfast","When they give their number"],"A solid no beats a fake yes. Let them go with a smile.")
+  ]
+},
+{ id: "final", name: "Final run", sub: "Everything mixed: 20 in a row", icon: "trophy", final: true, count: 20, notes: [] }
 ];
-/* The pitch, in order. Step 6 is the agenda the trainer reconfirms "at the end", while the invitation is finished. */
+
+/* NLP practice lines for Say it, taken from the guidebook notes that have a sayId.
+   They're new lines, so there's no recording to play. */
+const NLP_LINES = Object.fromEntries(LEVELS.flatMap(L => (L.notes || []).filter(n => n.sayId).map(n => [n.sayId, { id: n.sayId, text: n.say }])));
+/* The pitch, in order. Step 6 is going over the plan at the end, once the invitation is written. */
 const MAP_STEPS = [
-  { t: "Why before how", line: "\"We're inviting families to come see the newest hotel on the island, so next time you travel you'll want to stay with us.\"" },
+  { t: "Say why you're inviting them", line: "\"We're inviting families to come see the newest hotel on the island, so next time you travel you'll want to stay with us.\"" },
   { t: "Share the good news", line: "\"Breakfast at one of our five-star restaurants, a personal tour, one of our rooms, and a reward for your time.\"" },
-  { t: "Ask for it", line: "\"Let me get you an invitation.\"" },
+  { t: "Offer the invitation", line: "\"Let me get you an invitation.\"" },
   { t: "Book the time", line: "\"Let me put you down for 8 o'clock.\"" },
-  { t: "Write it slow, get the number", line: "\"We also do confirmation calls, between 5 and 6, just to see if you're still able to make it.\"" },
-  { t: "Reconfirm the agenda", line: "\"Between the breakfast, the property tour and a little information about the club, we only ask families for 90 minutes.\"" },
+  { t: "Write slowly, get the number", line: "\"We also do confirmation calls, between 5 and 6, just to see if you're still able to make it.\"" },
+  { t: "Go over the plan", line: "\"Between the breakfast, the property tour and a little information about the club, we only ask families for 90 minutes.\"" },
   { t: "Lock in the show-up", line: "\"So we see you guys tomorrow at 8 for sure?\"" }
 ];
 
-/* What to say: the trainer's own words from the voice notes, step by step.
-   clip/from/to point at sentences in CLIPS, so every line plays in the trainer's voice. */
+/* What to say: the exact words from the voice notes, step by step.
+   clip/from/to point at sentences in CLIPS, so every line plays from the recording.
+   nlp names the NLP move a line uses (taught in the NLP unit). */
 const SCRIPT = [
-  { step: "Why before how", tip: "Lead with why you're inviting them. Then the gift makes sense.",
+  { step: "Say why you're inviting them", tip: "Lead with why you're inviting them. Then the gift makes sense.",
     dont: { text: "Have you been to Eagle Beach yet? We're promoting Iberostar. We're going to give you free breakfast and $200.", clip: "02", from: 7, to: 9,
             why: "Gift first sounds like a scam, not true, or timeshare. They run away." },
     lines: [
-      { id: "s1a", clip: "02", from: 12, to: 13, text: "Yes, folks, I'm part of the exciting team that's inviting families to the newest hotel on the island to come and take a peek, to have a nice branding experience. Once you've seen it, hopefully next time you travel, you'll want to stay with us." },
+      { id: "s1a", nlp: "Because", clip: "02", from: 12, to: 13, text: "Yes, folks, I'm part of the exciting team that's inviting families to the newest hotel on the island to come and take a peek, to have a nice branding experience. Once you've seen it, hopefully next time you travel, you'll want to stay with us." },
       { id: "s1b", clip: "02", from: 19, to: 24, text: "Yes, folks, we're inviting as many people as we can to come and see our beautiful hotel. So next time you travel, you'll consider staying with us. After you see it, we know you're going to want to stay with us. And it also helps us spread the word. You'll tell family and friends about it and maybe take a picture, put it on Facebook, Instagram. It's all good marketing for us." } ] },
   { step: "Share the good news", tip: "Breakfast, the tour, a room, then the thank-you. Make it personal with what you see.",
     lines: [
       { id: "s2a", clip: "03", from: 1, to: 2, text: "It's an amazing promotion. We're actually inviting families for a full branding experience, not just a quick look at the hotel." },
-      { id: "s2b", clip: "03", from: 3, to: 4, text: "When you arrive, we treat you to breakfast at one of our five-star restaurants. We know you're going to love it." },
-      { id: "s2c", clip: "03", from: 5, to: 8, text: "I see you have a bracelet from Riu. I'm sure you're eating breakfast at the same place every day. You're going to love our place. It's something new, something different for you.", note: "Use what you see: their bracelet, their hotel." },
+      { id: "s2b", nlp: "Future pacing", clip: "03", from: 3, to: 4, text: "When you arrive, we treat you to breakfast at one of our five-star restaurants. We know you're going to love it." },
+      { id: "s2c", nlp: "Pace and lead", clip: "03", from: 5, to: 8, text: "I see you have a bracelet from Riu. I'm sure you're eating breakfast at the same place every day. You're going to love our place. It's something new, something different for you.", note: "Use what you see: their bracelet, their hotel." },
       { id: "s2d", clip: "03", from: 9, to: 9, text: "After breakfast, they're going to give you a personalized tour of the property, so you can see for yourself the quality of the facilities and also the service." },
-      { id: "s2e", clip: "03", from: 10, to: 10, text: "And of course, they'll share with you one of our rooms, so you'll be able to anticipate the quality that you'll receive when you stay with us." },
+      { id: "s2e", nlp: "Future pacing", clip: "03", from: 10, to: 10, text: "And of course, they'll share with you one of our rooms, so you'll be able to anticipate the quality that you'll receive when you stay with us." },
       { id: "s2f", clip: "03", from: 11, to: 12, text: "And the best part is, we also reward you for your time as a way of saying thanks. We can offer you $100 in IberoCash that you can use at all the best restaurants and activity companies on the island: dining, shopping, activities.", note: "Offer the gift their invitation shows. $100 is the trainer's example." },
       { id: "s2g", clip: "03", from: 13, to: 15, text: "We work with Gianni's. We work with Screaming Eagle, Daniel's Steakhouse, just to name a few. We partner with all the best companies on the island because everybody wants to be associated with Iberostar." },
       { id: "s2h", clip: "03", from: 16, to: 19, text: "We own the Tierra del Sol golf course and community. We opened our first hotel a year and a half ago. We have two more coming. We have invested a lot in the island and we want to get the word out." } ] },
-  { step: "Ask for it", tip: "Don't ask if they want one. Say it. Their objections come out now, and you can work them.",
+  { step: "Offer the invitation", tip: "Don't ask if they want one. Say it. Their objections come out now, and you can work them.",
     lines: [
-      { id: "s3a", clip: "04", from: 1, to: 1, text: "Let me get you an invitation.", note: "Not \"Would you like one?\"" } ],
+      { id: "s3a", nlp: "Assume the yes", clip: "04", from: 1, to: 1, text: "Let me get you an invitation.", note: "Not \"Would you like one?\"" } ],
     extra: { label: "Hear the objections you can work", clip: "04", from: 4, to: 10,
              text: "Already own timeshare, don't want to commit, plans tomorrow: all of these can be worked. Only \"we're leaving tomorrow morning\" can't." } },
   { step: "Book the time", tip: "Start at 8. If it's too early for them, offer 10.",
     lines: [
-      { id: "s4a", clip: "05", from: 0, to: 1, text: "Let me put you down for 8 o'clock.", note: "Too early? Then offer 10 o'clock." } ] },
-  { step: "Write it slow, get the number", tip: "While you write, you've got handcuffs on them. Make a friend and ask small questions. Then ask for the number, with the why.",
+      { id: "s4a", nlp: "Two yeses", clip: "05", from: 0, to: 1, text: "Let me put you down for 8 o'clock.", note: "Too early? Then offer 10 o'clock." } ] },
+  { step: "Write slowly, get the number", tip: "While you write, they stay. Make a friend and ask small questions. Then ask for the number, and say why.",
     lines: [
-      { id: "s5a", clip: "06", from: 7, to: 11, text: "Folks, we also do confirmation calls with our guests. If you want to give me your phone number, maybe you have WhatsApp on your phone. That way, one of my managers or supervisors can reach out to you this afternoon between like 5 and 6 o'clock simply to ask you if you're still able to make it. We're not allowed to solicit or anything like that. It's just to be able to see if you're still able to make it." } ],
+      { id: "s5a", nlp: "Because", clip: "06", from: 7, to: 11, text: "Folks, we also do confirmation calls with our guests. If you want to give me your phone number, maybe you have WhatsApp on your phone. That way, one of my managers or supervisors can reach out to you this afternoon between like 5 and 6 o'clock simply to ask you if you're still able to make it. We're not allowed to solicit or anything like that. It's just to be able to see if you're still able to make it." } ],
     extra: { label: "Hear why you slow down", clip: "05", from: 3, to: 14,
              text: "One family in 100 walks away while you write. If they like you, trust you and believe you, they buy from you." } },
-  { step: "Reconfirm the agenda", tip: "Bring the invitation. Say what it really is: a hotel with a club, not timeshare. Say 90 minutes.",
+  { step: "Go over the plan", tip: "Bring the invitation. Say what it really is: a hotel with a club, not timeshare. Say 90 minutes.",
     dont: { text: "Breakfast is 45 minutes, property tour is 15 minutes…", clip: "08", from: 4, to: 5,
             why: "They think it's only 45 minutes, then the hostess says 90. Never mention minutes." },
     lines: [
       { id: "s6a", clip: "05", from: 15, to: 15, text: "Folks, make sure to bring this invitation with you to confirm which gift you are offered." },
-      { id: "s6b", clip: "05", from: 16, to: 19, text: "When you get there, it's a nice breakfast at one of our restaurants, quick little tour of the property. We're not selling timeshare. We don't have any weeks or points or maintenance fees, nothing like that. We're a full-service hotel that you can book direct through travel agents, through Expedia. But everybody who passes through, we also show you how you can book direct through our loyalty club for preferred rates and cool perks when you travel." },
-      { id: "s6c", clip: "05", from: 21, to: 25, text: "To be clear, there's no obligation to be a member to stay there. We're just like Hyatt, just like Hilton, full-service hotel. But our members do enjoy significant discounts and really cool perks when they travel. So if you see something you like in the membership, they'll be happy to show you how to get involved. If it's not something for you, we still love you anyways, because we want you staying at our hotel." },
-      { id: "s6d", clip: "08", from: 0, to: 0, text: "And guys, between the breakfast, the property tour, and a little information about the club, we only ask families for 90 minutes, and breakfast tends to eat about half of that." } ] },
+      { id: "s6b", nlp: "Pre-frame", clip: "05", from: 16, to: 19, text: "When you get there, it's a nice breakfast at one of our restaurants, quick little tour of the property. We're not selling timeshare. We don't have any weeks or points or maintenance fees, nothing like that. We're a full-service hotel that you can book direct through travel agents, through Expedia. But everybody who passes through, we also show you how you can book direct through our loyalty club for preferred rates and cool perks when you travel." },
+      { id: "s6c", nlp: "Pre-frame", clip: "05", from: 21, to: 25, text: "To be clear, there's no obligation to be a member to stay there. We're just like Hyatt, just like Hilton, full-service hotel. But our members do enjoy significant discounts and really cool perks when they travel. So if you see something you like in the membership, they'll be happy to show you how to get involved. If it's not something for you, we still love you anyways, because we want you staying at our hotel." },
+      { id: "s6d", nlp: "Simple, never false", clip: "08", from: 0, to: 0, text: "And guys, between the breakfast, the property tour, and a little information about the club, we only ask families for 90 minutes, and breakfast tends to eat about half of that." } ] },
   { step: "Lock in the show-up", tip: "Don't just say have a nice day. Ask again and take their temperature. A solid no beats a fake yes.",
     lines: [
-      { id: "s7a", clip: "07", from: 1, to: 1, text: "So we see you guys tomorrow at 8 for sure?" },
-      { id: "s7b", clip: "07", from: 4, to: 4, text: "Sorry if I misunderstood, but I thought you were pretty sure you were coming.", note: "When they say \"we'll try\" or \"we'll see\"." },
+      { id: "s7a", nlp: "Tag question", clip: "07", from: 1, to: 1, text: "So we see you guys tomorrow at 8 for sure?" },
+      { id: "s7b", nlp: "Read the real answer", clip: "07", from: 4, to: 4, text: "Sorry if I misunderstood, but I thought you were pretty sure you were coming.", note: "When they say \"we'll try\" or \"we'll see\"." },
       { id: "s7c", clip: "07", from: 8, to: 10, text: "You know, a lot of families are interested in coming for our open house promotion. And we certainly wouldn't want to block a space for someone who's sure they want to come if you're not sure you're going to make it. So tell me, guys, are we going to see you tomorrow at 8?" },
       { id: "s7d", clip: "07", from: 15, to: 16, text: "You know what, guys, maybe I should give this invitation to somebody else. I wouldn't want to hold up a space for another family if you're not sure you're going to make it.", note: "Still unsure? Offer it to another family." },
       { id: "s7e", clip: "07", from: 25, to: 27, text: "Listen, this nice young man gets a little $65 bonus on his paycheck just for you showing up. You don't have to book or buy anything. I know he would greatly appreciate it.", note: "About yourself: \"I get a little $65 bonus just for you showing up.\"" } ] }
 ];
 const SCRIPT_LINES = Object.fromEntries(SCRIPT.flatMap(s => s.lines).map(l => [l.id, l]));
 
-/* The trainer's voice notes. Segment times are in seconds. */
+/* The nine voice notes. Segment times are in seconds. */
 const CLIPS = /*CLIPS*/[{"id":"01","t":"Crawl, walk, run","d":26.2,"s":[[1.0,"Good morning team. I'm very proud of all of my new recruits."],[6.0,"You've all gotten past the crawling phase."],[9.3,"You're able to stop people."],[11.6,"You're getting past the walking phase."],[14.8,"You're able to write the invitations."],[17.9,"But now it's time to run."],[20.1,"And how we run is by making solid bookings."]]},{"id":"02","t":"Remove the doubt: why before how","d":175.1,"s":[[2.0,"An important first stop on learning how to make a solid invitation is to remove doubt."],[13.1,"You want to remove doubt in the guest's mind that we're a scam and you want to remove doubt in their minds that we're selling timeshare or promoting water sports and activities."],[25.5,"How we do that is incredibly simple."],[28.8,"You all hear me do it every day, whether it's by giving you my pitch in person or hearing me say it to the guests."],[39.9,"It's right on the pitch map."],[42.7,"The way you remove doubt is giving them the why before the how."],[49.8,"And that comes into place in a lot of places in the inviting process."],[54.6,"First and foremost, if you just run up to people and say, have you been to Eagle Beach yet?"],[59.7,"We're promoting Iberostar."],[61.8,"We're going to give you free breakfast and $200."],[63.9,"They're immediately going to think either A, it's a scam, B, it's not true, or C, it's timeshare, let's run away."],[71.9,"So if you tell them why first, it removes the doubt."],[76.5,"Yes, folks, I'm part of the exciting team that's inviting families to the newest hotel on the island to come and take a peek, to have a nice branding experience."],[86.6,"Once you've seen it, hopefully next time you travel, you'll want to stay with us."],[91.8,"I haven't mentioned the club yet, but I also haven't lied to them."],[95.1,"We do want them to see the place."],[96.8,"We do want them to love it."],[98.0,"And we want them to come and stay with us in the future."],[100.8,"Correct? So if you tell them why we are inviting them before we tell them what they get, it removes a lot of doubt and makes the rest of the invitation process go smoother."],[114.3,"Yes, folks, we're inviting as many people as we can to come and see our beautiful hotel."],[119.1,"So next time you travel, you'll consider staying with us."],[123.2,"After you see it, we know you're going to want to stay with us."],[125.8,"And it also helps us spread the word."],[127.4,"You'll tell family and friends about it and maybe take a picture, put it on Facebook, Instagram."],[133.7,"It's all good marketing for us."],[136.3,"And from here, they understand why you're approaching them, what you're inviting them to."],[143.0,"And then you tell them, this is how we do it, or this is how we go."],[148.8,"And from that point, they understand why you're approaching them."],[161.3,"And then when you tell them what we offer, they're more apt to believe it and consider it because it makes sense why you're inviting them."],[172.3,"You've removed the doubt."]]},{"id":"03","t":"Share the good news","d":94.4,"s":[[2.1,"After you've told them why we're inviting them, you share with them all the good news."],[7.4,"It's an amazing promotion."],[8.9,"We're actually inviting families for a full branding experience, not just a quick look at the hotel."],[15.2,"When you arrive, we treat you to breakfast at one of our five-star restaurants."],[19.2,"We know you're going to love it."],[21.4,"I see you have a bracelet from Riu."],[22.9,"I'm sure you're eating breakfast at the same place every day."],[26.0,"You're going to love our place."],[27.2,"It's something new, something different for you."],[29.0,"After breakfast, they're going to give you a personalized tour of the property, so you can see for yourself the quality of the facilities and also the service."],[40.2,"And of course, they'll share with you one of our rooms, so you'll be able to anticipate the quality that you'll receive when you stay with us."],[51.9,"And the best part is, we also reward you for your time as a way of saying thanks."],[59.0,"We can offer you $100 in IberoCash that you can use at all the best restaurants and activities, companies on the island, dining and shopping activities."],[67.3,"We work with Gianni's."],[68.7,"We work with Screaming Eagle, Daniel's Steakhouse, just to name a few."],[74.0,"We partner with all the best companies on the island because everybody wants to be associated with Iberostar."],[80.3,"As I told you before, we own the Tierra del Sol golf course and community for three years."],[84.7,"We opened our first hotel a year and a half ago."],[87.6,"We have two more coming."],[88.6,"We have invested a lot in the island and we want to get the word out."]]},{"id":"04","t":"\"Let me get you an invitation\"","d":54.1,"s":[[0.7,"And then you go to the invitation."],[2.7,"You simply say the words, let me get you an invitation."],[6.0,"And that is another good place to start removing doubt, but in this case, from them."],[10.9,"When you say, let me give you an invitation, not would you like one, but let me give you an invitation, they're either going to continue to let you proceed, or they're going to start throwing on you the reasons they don't want to come."],[24.7,"Oh, no, no, no, we already own timeshare."],[27.3,"We can cover that objection."],[29.1,"Oh, no, no, we don't want to be committed to anything."],[33.3,"We can overcome that objection."],[35.2,"Oh, we have things planned tomorrow."],[37.5,"We can overcome that objection."],[39.4,"Really, the only objection that we can't overcome in reality is that they're leaving tomorrow morning."],[45.6,"The rest is all an opportunity to overcome objections."],[48.9,"We won't overcome them all, but we can at least try."]]},{"id":"05","t":"8 o'clock, write it slow, say what it is","d":151.5,"s":[[1.8,"It's always helpful to say, let me put you down for 8 o'clock, to give them the opportunity to say that's too early."],[10.2,"Then you can offer 10 o'clock."],[12.0,"If they don't say it's too early, you've got a wave-one booking, very easy."],[17.9,"So, once you're writing the invitation, this is your opportunity to slow things down."],[23.7,"There's a tendency to want to hurry through the invitation and get the people moving again because you're getting nervous that they're going to take it or not, that they're going to show up or not."],[34.7,"That is actually when you want to go easy."],[37.5,"Once you're writing the invitation, you've got handcuffs on them."],[41.7,"One family in 100 is going to run away during the invitation writing process."],[46.9,"The rest are going to stay there while you write it."],[50.4,"It's just manners. That's when you slow it down."],[54.7,"Continue making a friend."],[56.6,"Continue doing little discovery questions."],[59.7,"Continue making that bond."],[61.7,"Because if they like you, trust you, and believe you, they will buy from you."],[66.7,"So, that is the best opportunity to solidify a little friendship with them while still doing business."],[73.7,"Once the invitation is written, if it hasn't come up already in the conversation, folks, make sure to bring this invitation with you to confirm which gift you are offered."],[88.4,"And as I told you, when you get there, it's a nice breakfast at one of our restaurants, quick little tour of the property."],[97.7,"And as I mentioned, where we're not selling timeshare, we don't have any weeks or points or maintenance fees, nothing like that."],[104.7,"We're a full-service hotel that you can book direct through travel agents, through Expedia, etc."],[109.6,"But everybody who passes through, we also show you how you can book direct through our loyalty club for preferred rates and cool perks when you travel."],[118.3,"That way you know your options if you do want to stay with us in the future."],[122.3,"To be clear, there's no obligation to be a member to stay there."],[125.8,"We're just like Hyatt, just like Hilton, full-service hotel."],[128.9,"But our members do enjoy significant discounts and really cool perks when they travel."],[133.5,"So if you see something you like in the membership, they'll be happy to show you how to get involved."],[139.7,"If it's not something for you, we still love you anyways because we want you staying at our hotel, whether it's as a member or a regular hotel guest."]]},{"id":"06","t":"The phone number: tell them why","d":69.0,"s":[[0.0,"Phone number is another area where you want to remove the doubt."],[5.9,"Don't just ask for a phone number."],[8.8,"They're going to wonder why."],[10.0,"Are these people going to call us?"],[11.6,"They're going to harass us."],[12.9,"They're going to share our information."],[15.4,"If you tell them why when you ask for it, it removes the doubt."],[19.5,"Folks, we also do confirmation calls with our guests."],[23.3,"If you want to give me your phone number, maybe you have WhatsApp on your phone."],[26.7,"That way, one of my managers or supervisors can reach out to you this afternoon between like 5 and 6 o'clock simply to ask you if you're still able to make it."],[35.1,"We're not allowed to solicit or anything like that."],[37.9,"It's just to be able to see if you're still able to make it."],[41.4,"Usually when you explain them why you're asking for the phone number in a very passive, ambiguous way, very comforting way, keep everything simple, they're not going to refuse to give a phone number."],[53.3,"They're not going to wonder why you're asking for a phone number, and they're not going to give a fake phone number."],[57.1,"They want to come. They want that confirmation call."],[60.3,"It makes them feel like VIPs."],[62.1,"So if you tell them why you're asking for the phone number before they ask, you remove the doubt."]]},{"id":"07","t":"Lock in the show-up","d":146.9,"s":[[1.4,"Once the invitation is in their hand and the business appears to be done, don't just tell them have a nice day."],[10.2,"Ask them again. So we see you guys tomorrow at 8 for sure?"],[15.4,"And if you feel any doubt from the people's response, you're taking their temperature."],[20.2,"If they say something like, oh, we'll try to make it or we'll see, go back again and ask them."],[27.3,"Or, sorry if I misunderstood, but I thought you were pretty sure you were coming."],[35.6,"Well, we don't know this and that and so forth."],[37.8,"Just tell them honestly."],[39.0,"And it's true. It's not a lie."],[41.1,"You know, a lot of families are interested in coming for our open house promotion."],[45.5,"And we certainly wouldn't want to block a space for someone who's sure they want to come if you're not sure you're going to make it."],[53.5,"So tell me, guys, are we going to see you tomorrow at 8?"],[56.8,"And they say, yeah, we'll be there."],[58.2,"That's good. You let them understand we're running a business."],[60.9,"This isn't an invitation handing out business."],[63.3,"This is people showing up business."],[66.6,"And if they continue to show doubt, just tell them, you know what, guys, maybe I should give this invitation to somebody else."],[73.1,"I wouldn't want to hold up a space for another family if you're not sure you're going to make it."],[77.1,"That's very important."],[78.9,"There's no shame in getting a solid no."],[81.9,"In fact, it is better to get a solid no than a bunch of fake yeses, where the people tell you, yeah, yeah, we'll be there, and then they don't show up."],[91.4,"Okay. Granted, not every tour shows up no matter what you do."],[94.6,"We all know this. But these are all just little tricks and tips to filter out some of the guests that are just taking your invitation to be friendly and not intending on showing up whatsoever."],[107.4,"And don't be afraid to tell them."],[109.5,"And I tell this to every guest."],[111.9,"I'll be buttoning up a customer for one of our staff."],[117.3,"And I tell them, listen, this nice young man gets a little $65 bonus on his paycheck just for you showing up."],[123.4,"You don't have to book or buy anything."],[125.8,"I know he would greatly appreciate it."],[127.8,"So if you can make it, it's very appreciated."],[131.0,"We'd really appreciate it."],[132.7,"It would mean a lot to him."],[136.1,"You know, let them know it's important to you that they show up."],[139.9,"Your job isn't to just talk to people and hand out invitations."],[142.4,"Your job is to get people to come to the hotel."]]},{"id":"08","t":"90 minutes. Never say minutes.","d":83.6,"s":[[0.7,"And very good when you're reconfirming the agenda at the end to say, and guys, between the breakfast, the property tour, and a little information about the club, we only ask families for 90 minutes, and breakfast tends to eat about half of that."],[15.9,"Never say 45 minutes, never say 30 minutes, never mention any minutes whatsoever, because then they're going to think the presentation is 45 minutes if you do that."],[26.4,"If you just say breakfast tends to eat about half of that, that's very vague and ambiguous."],[31.4,"It makes it sound like the rest of the preview is going to be short and sweet, which it is, by the way."],[37.5,"But the minute you start breaking it down into minutes by saying, oh, breakfast is 45 minutes, property tour is 15 minutes, blah, blah, blah, blah, they think that the presentation is only half an hour, 45 minutes."],[51.1,"And as soon as our hostesses check them in and say, you're aware this is a 90-minute presentation, they say, oh, they told us it's only 45 minutes."],[58.8,"Never mention any minutes."],[61.3,"Folks, like I told you, between the breakfast, the property tour, and a little information on booking direct to the club, we only ask families for 90 minutes, and breakfast tends to eat about half of that, which is not a lie, but it's also very vague."],[75.4,"It's not putting a pin on any specific time."],[78.3,"You've told them 90 minutes."],[80.2,"That's what they need to know."]]},{"id":"09","t":"Why this matters","d":161.4,"s":[[0.5,"In this grand total of about 13 minutes of messages, we've covered very important points that will certainly help you increase your show rate."],[12.9,"Listen to these messages."],[15.2,"Listen to them a few times if it helps you."],[18.2,"These are the same things that we say to you at the locations, but for better or for worse, when we're on location, we're usually busy attacking the customers, so we don't always have a chance to discuss these things, especially the PM shift."],[32.0,"But guys, these are all the little sweet tricks and tips that if you listen to them, learn them, start applying them, you'll go from eight bookings a week and one show up to 10 bookings a week and five show ups, six show ups, or more."],[49.9,"Plus, when you give a real expectation why we're inviting them, which is to learn about how they can book direct through our club membership, they go in with that spark of interest."],[61.5,"And when they know they're coming in to be offered something, you have a much greater chance of them buying."],[68.1,"When we just tell them to come check out the hotel and nothing else, then when they find out it's a sales presentation, they're going to be out for the rest of the presentation."],[79.9,"They're going to have their eyes closed and their ears closed."],[85.4,"So if you apply these tips and tricks, if you learn them, if you practice them, you have a better booking rate, better show rate, better Q rate, more tours, more sales."],[97.5,"And it's all a matter of just improving."],[100.8,"Everybody every day in this business can learn more, can improve, myself included, everybody in this business included."],[109.3,"There's always room for improvement."],[112.0,"So please, none of this is criticism to anybody."],[114.8,"It is all just a way to try to help you improve."],[117.1,"It's a good 15 minutes investment to listen to these messages and maybe listen to them more than once or twice."],[124.9,"Thank you all. Have a great day."],[127.1,"If anyone would ever like more tips or tricks or more training, not only can we do it person to person at the location, but we can also set up trainings with myself, with Victor, with Glenn, down at the office on different aspects of the job, not just the basic training we all go through, but we can go through closing training, we can go through covering objections."],[147.1,"We have an awesome team right now."],[149.6,"And I want everybody who's with us right now to grow, to succeed, to make a lot of money, to love their job and to have fun."],[158.1,"So let's do it, guys."]]}]/*CLIPS-END*/;
 
 /* ---------- Scenario generator (Who qualifies? and Lightning) ---------- */
-const GRADE = { Q: "Q · full gift", CT: "CT · half gift", NQ: "NQ · no gift" };
+const GRADE = { Q: "Q (full gift)", CT: "CT (half gift)", NQ: "NQ (no gift)" };
 const pick = a => a[Math.floor(Math.random() * a.length)];
 function bandUSA(a){ return a>=32&&a<=70 ? "Q" : (a>=28&&a<=31)||a>=71 ? "CT" : "NQ"; }
 function bandLat(a){ return a>=40&&a<=60 ? "Q" : "NQ"; }
@@ -894,7 +1133,7 @@ function genScenario(){
     const g = bandUSA(his);
     return { q:`Married couple from ${from}. He's ${his}, she's ${her}. ${job}, they have a ${card}, and they paid for their hotel.`,
       chips: tag(from, his, her, "Married", job, card, "Paid hotel"),
-      g, why:`USA & Canada, the man's age counts. ${his} → ${g==="Q"?"32 to 70 is Q":g==="CT"?"28 to 31 and 71+ are CT":"under 28 is NQ"}.` };
+      g, why:`USA and Canada: the man's age counts. ${his} is ${g==="Q" ? "in 32 to 70, so the full gift (Q)" : g==="CT" ? (his >= 71 ? "71 or older, so the half gift (CT)" : "in 28 to 31, so the half gift (CT)") : "under 28, so no gift (NQ)"}.` };
   }
   if (r < 0.65){
     const from = pick(["Colombia","Mexico","Peru","Chile","Brazil","Costa Rica","Panama","the Dominican Republic","Guatemala"]);
@@ -903,38 +1142,38 @@ function genScenario(){
     const g = bandLat(his);
     return { q:`Couple living together, from ${from}. He's ${his}, she's ${her}. Both work, they have a ${card}, paying for their hotel.`,
       chips: tag(from.replace(/^the /, ""), his, her, "Living together", "Both work", card, "Paid hotel"),
-      g, why:`Latin America & Caribbean: 40 to 60 is Q. There is no CT band, so ${his} is ${g}.` };
+      g, why:`Latin America and Caribbean: only 40 to 60 gets the full gift, and there's no half gift. ${his} is ${g==="Q" ? "in range, so Q" : "out of range, so NQ"}.` };
   }
   if (r < 0.85){
     const his = pick([33,35,40,44,45,50,55,56,62,70,72]), her = herAge(his, bandArg);
     const g = bandArg(his);
     return { q:`Married couple from Argentina. He's ${his}, she's ${her}. He works, they have a Mastercard, paying for their rental.`,
       chips: tag("Argentina", his, her, "Married", "He works", "Mastercard", "Paid rental"),
-      g, why:`Argentina: 45 to 55 Q, 35 to 44 and 56 to 70 CT, anything else NQ. ${his} → ${g}.` };
+      g, why:`Argentina: 45 to 55 is Q, 35 to 44 and 56 to 70 are CT, any other age is NQ. ${his} is ${g}.` };
   }
   const from = pick(["Venezuela","Ecuador","Haiti","Cuba"]);
   const his = pick([42,46,50,55,58]), her = herAge(his, bandLat);
   return { q:`Married couple from ${from}. He's ${his}, she's ${her}. Both work, Visa card, paying for their hotel.`,
     chips: tag(from, his, her, "Married", "Both work", "Visa", "Paid hotel"),
-    g:"NQ", why:`${from} is left out of the Latin America & Caribbean rules, so they're NQ at any age.` };
+    g:"NQ", why:`${from} isn't covered by the Latin America and Caribbean rules, so no gift (NQ) at any age.` };
 }
 const FIXED_SCEN = [
-  ["USA single woman, 52. She works, has a Visa, and paid for her hotel.","Q","Single women from the USA, 40 to 65, are Q."],
-  ["Canadian single woman, 52. She works, has a Visa, and paid for her hotel.","NQ","Single women qualify from the USA only."],
-  ["USA single man, 45. Works, Amex, paying for his hotel.","NQ","Only single women can qualify, and only from the USA."],
-  ["USA couple, both 45, staying free at a friend's condo.","NQ","They must be paying for their accommodation."],
-  ["USA couple, 50. He's an active-duty Marine.","NQ","Active US military is NQ."],
-  ["USA couple, 50. He's in the National Guard. Visa, paying for their hotel.","Q","National Guard is permitted."],
-  ["USA couple, 44. She's a flight attendant with a US airline.","NQ","Airline pilots and crew are NQ."],
-  ["Mexican couple, 50. Both work. Their only card is a Discover.","NQ","Latin America & Caribbean needs Visa, Mastercard or Amex."],
-  ["USA couple. He's 69, she's 72. Retired, Amex, paying for their hotel.","Q","The man's age counts: 69 is Q."],
-  ["USA couple. He's 72, she's 65. Retired, Visa, paying for their timeshare.","CT","The man's age counts: 72 is CT (71+)."],
-  ["Same-sex couple from Chicago, 45 and 52. Both work, Visa, paying for their hotel.","Q","Either partner qualifies the age. Both are in 32 to 70."],
-  ["Three couples from Boston traveling together, all in their 40s.","NQ","Trinella / Trifecta: three couples or more is NQ."],
-  ["USA couple, 40. He speaks only English, she speaks only Spanish.","NQ","Both must be fluent in the same language."],
-  ["Canadian couple, 55. Toured Iberostar in-house 4 months ago.","NQ","An in-house tour in the last 6 months is NQ."],
-  ["USA couple, 48. He works at a Marriott vacation club resort.","NQ","Hotel, timeshare and vacation club employees are NQ."],
-  ["Iberostar The Club member staying at a rental condo. Brings IDs and card.","Q","Club members off property can be invited by the GI team and count as Q."]
+  ["Single woman from the USA, 52. She works, has a Visa, and is paying for her hotel.","Q","Single women from the USA, 40 to 65, get the full gift."],
+  ["Single woman from Canada, 52. She works, has a Visa, and is paying for her hotel.","NQ","Single women qualify only from the USA."],
+  ["Single man from the USA, 45. He works, has an Amex, and is paying for his hotel.","NQ","Only single women can qualify, and only from the USA."],
+  ["Couple from the USA, both 45. They're staying free at a friend's condo.","NQ","They must be paying for where they stay."],
+  ["Couple from the USA, both 50. He's an active-duty Marine.","NQ","Active US military get no gift."],
+  ["Couple from the USA, both 50. He's in the National Guard. Visa, paying for their hotel.","Q","The National Guard is OK, and 50 is in 32 to 70."],
+  ["Couple from the USA, both 44. She's a flight attendant for a US airline.","NQ","Airline pilots and crew get no gift."],
+  ["Couple from Mexico, both 50. Both work. Their only card is a Discover.","NQ","Latin America and Caribbean needs Visa, Mastercard or Amex."],
+  ["Couple from the USA. He's 69, she's 72. Retired, Amex, paying for their hotel.","Q","The man's age counts: 69 is in 32 to 70."],
+  ["Couple from the USA. He's 72, she's 65. Retired, Visa, paying for their timeshare.","CT","The man's age counts: 72 is 71 or older, so the half gift."],
+  ["Same-sex couple from Chicago, 45 and 52. Both work, Visa, paying for their hotel.","Q","Either partner's age counts, and both are in 32 to 70."],
+  ["Three couples from Boston traveling together, all in their 40s.","NQ","Three couples or more together (Trinella or Trifecta) get no gift."],
+  ["Couple from the USA, both 40. He speaks only English, she speaks only Spanish.","NQ","Both must be fluent in the same language."],
+  ["Couple from Canada, both 55. They toured Iberostar in-house 4 months ago.","NQ","An in-house tour in the last 6 months means no gift."],
+  ["Couple from the USA, both 48. He works at a Marriott vacation club resort.","NQ","People who work for hotels, timeshares or vacation clubs get no gift."],
+  ["Iberostar The Club member staying in a rental condo, with IDs and a card.","Q","The GI team may invite members staying off property. With IDs and a card, they're Q."]
 ];
 function scenarioQ(s, id){
   const opts = ["Q","CT","NQ"].map(k => GRADE[k]);
@@ -959,8 +1198,8 @@ const SB = { url: "https://cdkopyphjvfxjqhasrae.supabase.co", key: "sb_publishab
 const TEAM_URL = "https://victorfromaruba-stack.github.io/iberostar-club/academy/";
 const TEAM_HOST = /github\.io$/.test(location.hostname) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 const GOAL = 50;
-const ORDER = ["q","why","ctnq","offer","who","solid","map","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","map","final"];
+const ORDER = ["q","why","ctnq","offer","nlp1","who","solid","words","nlp2","map","nlp3","nlp4","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","words","map","nlp1","nlp2","nlp3","nlp4","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];
@@ -1019,13 +1258,15 @@ function unlocked(id){
   const L = byId(id);
   if (L.final) return TRACKS.every(t => t.levels.every(x => S.mastered[x]));
   const T = TRACKS.find(t => t.levels.includes(id)), k = T.levels.indexOf(id);
-  return k === 0 || !!S.mastered[T.levels[k-1]];
+  return k === 0 ? (!T.after || !!S.mastered[T.after]) : !!S.mastered[T.levels[k-1]];
 }
+/* The level you must finish before this one opens. */
+function before(id){ const T = TRACKS.find(t => t.levels.includes(id)); if (!T) return null; const k = T.levels.indexOf(id); return k > 0 ? T.levels[k-1] : T.after || null; }
 const masteredCount = () => LEVEL_IDS.filter(id => S.mastered[id]).length;
 function rank(){
   if (S.mastered.final) return "Show-Up Pro";
   const n = masteredCount();
-  return n >= 5 ? "Running" : n >= 2 ? "Walking" : "Crawling";
+  return n >= 8 ? "Running" : n >= 3 ? "Walking" : "Crawling";
 }
 function streakDays(){
   const set = new Set(S.days), d = new Date();
@@ -1188,7 +1429,7 @@ async function playFull(id, at){
     loadClip(id); await whenReady();
     if (at != null) AUD.currentTime = at;
     await AUD.play();
-    try { if ("mediaSession" in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title: clipById(id).t, artist: "Show-Up Academy", album: "Trainer's voice notes" }); } catch(e){}
+    try { if ("mediaSession" in navigator && window.MediaMetadata) navigator.mediaSession.metadata = new MediaMetadata({ title: clipById(id).t, artist: "Show-Up Academy", album: "Voice notes" }); } catch(e){}
   } catch(e){ toast("This voice note won't play here. Its words are in the transcript."); const tx = app.querySelector(`[data-tx="${id}"]`); if (tx) tx.hidden = false; }
   syncClipUI();
 }
@@ -1254,7 +1495,7 @@ function scoreSay(target, said){
 }
 function sayIt(id, btn){
   if (REC){ stopRec(); btn.classList.remove("listening"); return; }
-  const L = SCRIPT_LINES[id]; stopAudio();
+  const L = SCRIPT_LINES[id] || NLP_LINES[id]; stopAudio();
   const out = app.querySelector(`[data-heard="${id}"]`), sc = app.querySelector(`[data-score="${id}"]`);
   let said = "";
   try { REC = new SR(); } catch(e){ toast("This browser can't listen. Say it out loud, then tap Hear it to compare."); return; }
@@ -1276,7 +1517,7 @@ function sayIt(id, btn){
     const total = Object.keys(SCRIPT_LINES).length, done = linesPracticed();
     const cnt = $("#saidCount"); if (cnt) cnt.textContent = `${done} of ${total} lines practiced`;
     const bar = $("#saidBar i"); if (bar) bar.style.width = (done / total * 100) + "%";
-    const lbl = app.querySelector(`[data-line="${id}"] .lbl`); if (lbl && (S.said[id]||0) >= .7) lbl.innerHTML = `You say <span class="said-check">· practiced</span>`;
+    const lbl = app.querySelector(`[data-said="${id}"]`); if (lbl) lbl.innerHTML = saidLabel(L);
   };
   try { REC.start(); sfx("tap"); } catch(e){ btn.classList.remove("listening"); REC = null; toast("Couldn't start the microphone."); }
 }
@@ -1326,7 +1567,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 function syncLine(){
   const st = !S.name ? "" : S.sync.ok ? "ok" : S.sync.ok === false ? "err" : "";
   const txt = !S.name ? "Add your name and your manager will see your progress."
-    : S.sync.ok ? `Your manager sees your progress · updated ${ago(S.sync.last)}`
+    : S.sync.ok ? `Your manager sees your progress. Updated ${ago(S.sync.last)}.`
     : S.sync.ok === false ? (TEAM_HOST ? "Couldn't reach the team list. It tries again after your next lesson." : "Your manager sees your progress when you use the team link. Here, send your report on WhatsApp.")
     : "Your progress will be shared with your manager.";
   return `<p class="sync" id="syncLine"><i class="dot ${st}"></i><span>${esc(txt)}</span></p>`;
@@ -1389,9 +1630,9 @@ function renderLearn(){
     <span class="pill bolt" title="Lightning record">${icon("bolt")}<b>${S.lightning||0}</b></span>
     <span class="pill" title="Daily goal">${ring(tx/GOAL)}<b>${Math.min(tx, GOAL)}/${GOAL}</b></span>
   </header>
-  ${S.name ? `<section class="say-row">${mingo("idle")}<div class="bubble">Hi ${esc(S.name)}. ${esc(nextUp())}</div></section>`
+  ${S.name ? `<section class="say-row">${shoco("idle")}<div class="bubble">Hi ${esc(S.name)}${/[.!?]$/.test(S.name) ? "" : "."} ${esc(nextUp())}</div></section>`
     : `<section class="card">
-        <div class="say-row">${mingo("happy")}<div class="bubble">Hi, I'm Mingo. I'll help you learn the qualifications and the pitch, one short lesson at a time. What's your name?</div></div>
+        <div class="say-row">${shoco("happy")}<div class="bubble">Hi, I'm Shoco, Aruba's burrowing owl. I'll help you learn the qualifications, the pitch and NLP, one short lesson at a time. What's your name?</div></div>
         <form class="name-form" id="nameForm"><label for="nm" class="eyebrow" style="flex-basis:100%">Your name</label><input class="field" id="nm" autocomplete="name" maxlength="30" placeholder="First name + last initial"><button class="btn">Save</button></form>
         <p class="small muted">Your manager sees your progress, so use the name they know you by, like Maria G.</p>
       </section>`}
@@ -1403,7 +1644,7 @@ function renderLearn(){
       </div>
       <div class="path">${u.levels.map(id => nodeHTML(id, u, OFFS[(k++) % OFFS.length])).join("")}</div>
     </section>`).join("")}
-  <p class="foot">Sources: Qualifications Aruba (2 March 2026), the trainer's voice notes (29 Sept 2026), the Open House flyer and partner sheet.</p>`);
+  <p class="foot">Sources: Qualifications Aruba (2 March 2026), the team's voice notes (29 Sept 2026), and the Open House pitch deck.</p>`);
   const nfm = $("#nameForm");
   if (nfm) nfm.addEventListener("submit", e => { e.preventDefault(); const v = $("#nm").value.trim().slice(0,30); if (v){ S.name = v; save(false); pushSync(); sfx("ok"); renderLearn(); } });
   on("#toScript", () => tab("script"));
@@ -1417,7 +1658,7 @@ function nodeHTML(id, u, off){
   return `<div class="node-row" style="--off:${off}px">
     ${st === "current" ? `<span class="start-tag c-${u.color}">START</span>` : ""}
     <button class="node ${st} c-${u.color}" data-node="${id}" aria-label="${esc(L.name)}, ${label}" aria-expanded="false">${icon(ic)}${st === "due" ? `<span class="due-dot">${icon("bolt")}</span>` : ""}</button>
-    ${st === "current" && S.name ? `<span class="path-mingo" style="${off > 0 ? "left" : "right"}:calc(50% - ${off > 0 ? 170 : 170}px)">${mingo("idle")}</span>` : ""}
+    ${st === "current" && S.name ? `<span class="path-mascot" style="${off > 0 ? "left" : "right"}:calc(50% - ${off > 0 ? 170 : 170}px)">${shoco("idle")}</span>` : ""}
   </div><div data-pop="${id}"></div>`;
 }
 function togglePop(id){
@@ -1428,16 +1669,19 @@ function togglePop(id){
   if (open) return;
   sfx("tap");
   const L = byId(id), u = unitOf(id), st = nodeState(id), r = reviewInfo(id), off = btn.closest(".node-row").style.getPropertyValue("--off");
-  const T = TRACKS.find(t => t.levels.includes(id)), prev = T ? T.levels[T.levels.indexOf(id)-1] : null;
+  const prev = before(id);
   const size = L.map ? "7 steps, 2 rounds" : `${levelTotal(L)} exercises`;
   let status, actions;
   if (st === "locked"){
-    status = L.final ? "Opens when you master the other 7 levels." : `Finish \u201c${byId(prev).name}\u201d first.`;
+    status = L.final ? `Opens when you master the other ${LEVEL_IDS.length - 1} levels.` : `Finish \u201c${byId(prev).name}\u201d first.`;
     actions = `<button class="btn wide" disabled>${icon("lock")} Locked</button>`;
   } else {
     status = st === "due" ? `Review due. Mastered ${plural(r.count,"time")}.` : st === "done" ? `Mastered ${plural(r.count,"time")}. Review in ${plural(r.days,"day")}.` : S.best[id] ? `Best run: ${S.best[id]} of ${levelTotal(L)}.` : size + ". One mistake and you start over.";
     const hasGuide = (L.notes && L.notes.length) || L.map || L.script;
-    actions = `<button class="btn wide" data-start="${id}">${st === "due" ? "Review" : st === "done" ? "Practice +XP" : "Start"}</button>${hasGuide ? `<button class="btn wide ghost" data-guide="${id}">${icon("book")} Guidebook</button>` : ""}`;
+    const fresh = !S.mastered[id] && !S.best[id];
+    actions = hasGuide && fresh
+      ? `<button class="btn wide" data-guide="${id}">${icon("book")} Learn first</button><button class="btn wide ghost" data-start="${id}">Start the lesson</button>`
+      : `<button class="btn wide" data-start="${id}">${st === "due" ? "Review" : st === "done" ? "Practice +XP" : "Start"}</button>${hasGuide ? `<button class="btn wide ghost" data-guide="${id}">${icon("book")} Guidebook</button>` : ""}`;
   }
   slot.innerHTML = `<div class="popover c-${u.color} ${st === "locked" ? "locked" : ""}" style="--off:${off}"><h3>${esc(L.name)}</h3><p>${esc(L.sub)}</p><p>${esc(status)}</p><div class="stack" style="margin-top:6px">${actions}</div></div>`;
   btn.setAttribute("aria-expanded","true");
@@ -1447,19 +1691,23 @@ function togglePop(id){
 }
 
 /* ---------- Guidebook ---------- */
-function noteHTML(nt){ return `<section class="note"><h3>${esc(nt.h)}</h3><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>${nt.say ? `<p class="line"><span class="quote">"${esc(nt.say)}"</span></p>` : ""}</section>`; }
+function noteHTML(nt){
+  return `<section class="note"><h3>${esc(nt.h)}</h3><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    ${nt.hear ? `<div class="acts"><button class="btn small ghost" data-seg="${nt.hear.clip}:${nt.hear.from}:${nt.hear.to}">${icon("play")} ${esc(nt.hear.label || "Hear it in the voice notes")}</button></div>` : ""}
+    ${nt.sayId ? lineHTML(NLP_LINES[nt.sayId]) : nt.say ? `<p class="line"><span class="quote">"${esc(nt.say)}"</span></p>` : ""}</section>`;
+}
 function guidebook(id){
   view = "guide"; game = null;
   const L = byId(id), u = unitOf(id);
   const hero = id === "offer" ? `<figure class="photo kb"><img src="img/photos/joia-beach.jpg" alt="Joia by Iberostar on Eagle Beach"><figcaption>Joia by Iberostar, Eagle Beach</figcaption></figure>` : "";
   const steps = L.script ? `<h2>What to say</h2>${L.script.map(i => stepHTML(SCRIPT[i], i)).join("")}` : "";
-  const flyers = (L.imgs||[]).map(im => `<figure class="flyer"><a href="${im.src}" target="_blank" rel="noopener"><img src="${im.src}" width="${im.w}" height="${im.h}" alt="${esc(im.alt)}" loading="lazy"></a><figcaption>${esc(im.cap)} · tap to open full size</figcaption></figure>`).join("");
+  const slides = (L.imgs||[]).map(im => `<figure class="deck-slide"><a href="${im.src}" target="_blank" rel="noopener"><img src="${im.src}" width="${im.w}" height="${im.h}" alt="${esc(im.alt)}" loading="lazy"></a><figcaption>${esc(im.cap)} · tap to open full size</figcaption></figure>`).join("");
   const photos = id === "offer" ? `<div class="grid2"><figure class="photo"><img src="img/photos/joia-suite.jpg" alt="A Joia suite" loading="lazy"><figcaption>A suite on the VIP tour</figcaption></figure><figure class="photo"><img src="img/photos/zima.jpg" alt="Zima rooftop bar at Joia" loading="lazy"><figcaption>Zima, Joia's rooftop bar</figcaption></figure></div>` : "";
   const video = L.video ? `<figure class="photo"><video src="${L.video}" poster="${L.poster}" autoplay muted loop playsinline preload="metadata" aria-label="Aerial view of the Tierra del Sol golf course"></video><figcaption>Tierra del Sol, Iberostar's golf course</figcaption></figure>` : "";
   const mapList = L.map ? `<section class="note"><h3>The pitch map</h3><ol class="placed">${MAP_STEPS.map(s => `<li><div>${esc(s.t)}<span>${esc(s.line)}</span></div></li>`).join("")}</ol><p class="small muted">Round 1: tap the steps in order. Round 2: tap the lines in order. One wrong tap and you start over.</p></section>` : "";
   show(`
   <div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Guidebook · Unit ${u.n}</p><h2>${esc(L.name)}</h2></div><span></span></div>
-  <div class="gb-hero">${hero}${flyers}${photos}${video}</div>
+  <div class="gb-hero">${hero}${slides}${photos}${video}</div>
   ${steps}${mapList}${(L.notes||[]).map(noteHTML).join("")}
   <button class="btn wide" id="go">${S.mastered[id] ? "Practice" : "Start the lesson"}</button>`, { full: true });
   on("#back", () => tab("learn"));
@@ -1469,14 +1717,22 @@ function guidebook(id){
 
 /* ---------- Lessons (levels, final, Daily 10) ---------- */
 const DAILY = { id:"daily", name:"Daily 10", sub:"Spaced review", notes:[] };
-function play(id){
+function play(id, missed){
   const L = byId(id);
   if (L.map) return startMap();
   let list;
   if (L.gen) list = buildScenarios(L.count);
   else if (L.final){ const pool = shuffle(ALL_QS.slice()).slice(0, L.count - 6); list = shuffle(pool.concat(buildScenarios(6))); }
   else list = shuffle(L.qs.slice());
-  startRun(L, list);
+  startRun(L, retryEarly(list, missed));
+}
+/* After a mistake, the missed question comes back second in the new run: a quick retest
+   right after seeing the answer is what makes it stick. */
+function retryEarly(list, missed){
+  if (!missed || typeof missed.q !== "string" || list.length < 3) return list;
+  const rest = list.filter(q => q !== missed && q.q !== missed.q && (missed.id === "gen" || q.id !== missed.id));
+  rest.splice(1, 0, missed);
+  return rest.slice(0, list.length);
 }
 function buildDaily(){
   const pool = LEVELS.filter(l => l.qs && S.mastered[l.id]).flatMap(l => l.qs);
@@ -1489,7 +1745,7 @@ function buildDaily(){
   }
   return shuffle(picked.concat(S.mastered.who ? buildScenarios(10 - picked.length) : []));
 }
-function startDaily(){ startRun(DAILY, buildDaily()); }
+function startDaily(missed){ startRun(DAILY, retryEarly(buildDaily(), missed)); }
 function startRun(L, list){ game = { kind:"run", L, list, idx:0, streak:0, xp:0, t0:Date.now() }; renderItem(); }
 function lessonTop(pct){
   return `<div class="l-top"><button class="icon-btn" id="quit" aria-label="Quit">${icon("x")}</button>
@@ -1500,7 +1756,7 @@ function renderItem(){
   view = "lesson";
   const g = game, it = g.list[g.idx], n = g.list.length;
   g.sel = null; g.checked = false; g.opts = null;
-  const kind = it.type === "build" ? "Build the line" : it.type === "match" ? "Match the pairs" : it.type === "listen" ? "Listen" : it.scen ? "Q, CT or NQ?" : it.line ? "Finish the line" : it.pic ? "Look and answer" : "Choose the answer";
+  const kind = it.type === "build" ? "Put the words in order" : it.type === "match" ? "Match the pairs" : it.type === "listen" ? "Listen" : it.scen ? "Which gift?" : it.line ? "Fill in the blank" : it.pic ? "Look and answer" : "Choose the answer";
   show(`<div class="lesson">
     ${lessonTop(g.idx / n * 100)}
     <p class="l-kind">${kind}</p>
@@ -1512,19 +1768,19 @@ function renderItem(){
   bindItem(it);
   if (it.type === "listen") timers.push(setTimeout(() => hearItem(1), 350));
 }
-function bubbleRow(inner, mood){ return `<div class="say-row">${mingo(mood, "lm")}<div class="bubble q">${inner}</div></div>`; }
+function bubbleRow(inner, mood){ return `<div class="say-row">${shoco(mood, "lm")}<div class="bubble q">${inner}</div></div>`; }
 function itemBody(it){
   if (it.type === "build"){
     const toks = it.text.split(" ");
     game.tokens = toks; game.tiles = shuffle(toks.concat(it.extra || [])); game.built = [];
-    return bubbleRow(`Build what you say: <b>${esc(it.ctx)}</b>`, "think") + `<div class="bank-answer" id="ans" aria-label="Your line" aria-live="polite"></div><div class="bank" id="bank">${game.tiles.map((t,i) => `<button class="wtile" data-t="${i}">${esc(t)}</button>`).join("")}</div>`;
+    return bubbleRow(esc(it.q), "think") + `<div class="bank-answer" id="ans" aria-label="Your line" aria-live="polite"></div><div class="bank" id="bank">${game.tiles.map((t,i) => `<button class="wtile" data-t="${i}">${esc(t)}</button>`).join("")}</div>`;
   }
   if (it.type === "match"){
     const left = shuffle(it.pairs.map((p,i) => ({ i, t:p[0] }))), right = shuffle(it.pairs.map((p,i) => ({ i, t:p[1] })));
     return bubbleRow(esc(it.q), "think") + `<div class="match"><div class="col">${left.map(x => `<button class="mt" data-side="l" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div><div class="col">${right.map(x => `<button class="mt" data-side="r" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div></div>`;
   }
   if (it.type === "listen")
-    return `<div class="listen"><button class="speak" id="hear" data-key="item" aria-label="Play the trainer">${icon("speaker")}</button><button class="speak slow" id="hearSlow" data-key="item-slow" aria-label="Play slower">0.75×</button></div><p class="read-it" id="readIt" hidden></p>` + bubbleRow(esc(it.q), "idle") + optionsHTML(it);
+    return `<div class="listen"><button class="speak" id="hear" data-key="item" aria-label="Play the voice note">${icon("speaker")}</button><button class="speak slow" id="hearSlow" data-key="item-slow" aria-label="Play slower">0.75×</button></div><p class="read-it" id="readIt" hidden></p>` + bubbleRow(esc(it.q), "idle") + optionsHTML(it);
   if (it.scen) return scenarioHTML(it) + optionsHTML(it);
   if (it.pic) return `<figure class="photo kb"><img src="${it.img}" alt="${esc(it.alt)}"></figure>` + bubbleRow(qText(it), "idle") + optionsHTML(it);
   return bubbleRow(qText(it), "idle") + optionsHTML(it);
@@ -1535,7 +1791,7 @@ function scenarioHTML(it){
 }
 function optionsHTML(it){
   game.opts = it.fixed ? it.fixed.slice() : shuffle([it.a, ...it.w]);
-  if (it.scen) return `<div class="opts grid3" role="group" aria-label="Answers">${game.opts.map((o,k) => { const [code, ...rest] = o.split(" · "); return `<button class="opt grade" data-k="${k}" aria-pressed="false"><b>${esc(code)}</b><span>${esc(rest.join(" · "))}</span></button>`; }).join("")}</div>`;
+  if (it.scen) return `<div class="opts grid3" role="group" aria-label="Answers">${game.opts.map((o,k) => { const m = o.match(/^(\w+) \((.+)\)$/) || [o, o, ""], code = m[1], rest = [m[2]]; return `<button class="opt grade" data-k="${k}" aria-pressed="false"><b>${esc(code)}</b><span>${esc(rest.join(" · "))}</span></button>`; }).join("")}</div>`;
   return `<div class="opts" role="group" aria-label="Answers">${game.opts.map((o,k) => `<button class="opt" data-k="${k}" aria-pressed="false"><span class="k">${k+1}</span><span>${esc(o)}</span></button>`).join("")}</div>`;
 }
 function bindItem(it){
@@ -1579,7 +1835,7 @@ function bindItem(it){
 async function hearItem(rate){
   const it = game && game.list[game.idx]; if (!it || it.type !== "listen") return;
   const ok = await playSeg(it.clip, it.from, it.to, rate === 1 ? "item" : "item-slow", rate);
-  if (!ok){ const r = $("#readIt"); if (r){ r.hidden = false; r.textContent = `Audio won't play here. The trainer says: "${segText(it.clip, it.from, it.to)}"`; } }
+  if (!ok){ const r = $("#readIt"); if (r){ r.hidden = false; r.textContent = `Audio won't play here. The voice note says: "${segText(it.clip, it.from, it.to)}"`; } }
 }
 function select(k){
   const g = game; if (!g || g.checked) return;
@@ -1619,19 +1875,21 @@ function verdict(ok){
     <div class="sh-head"><span class="badge">${icon(ok ? "check" : "x")}</span><h3>${ok ? pick(PRAISE) : "Back to the start"}</h3></div>
     ${ok ? "" : `<p class="sh-ans">Correct answer: <b>${esc(answerText(it))}</b></p>`}
     <p class="sh-why">${esc(it.why || "")}</p>
-    ${ok ? "" : `<p class="small">${g.L.id === "daily" ? `You got ${g.idx} in a row.` : `You got ${g.idx} in a row. Your best: ${best} of ${g.list.length}.`} New order next time.</p>`}
+    ${it.hear ? `<div class="acts"><button class="btn small ghost" data-seg="${it.hear.clip}:${it.hear.from}:${it.hear.to}" data-key="hear-${it.id}">${icon("play")} Hear the line</button></div>` : ""}
+    ${ok ? "" : `<p class="small">${g.L.id === "daily" ? `You got ${g.idx} in a row.` : `You got ${g.idx} in a row. Your best: ${best} of ${g.list.length}.`} New order next time, and this one comes back early.</p>`}
     <button class="btn wide ${ok ? "good" : "bad"}" id="cont">${ok ? (last ? "Finish" : "Continue") : "Start over"}</button>
     ${!ok && g.L.id !== "daily" && ((g.L.notes && g.L.notes.length) || g.L.script) ? `<button class="link" id="gb">${icon("book")} Open the guidebook first</button>` : ""}
   </div>`;
   requestAnimationFrame(() => sheet.classList.add("show"));
-  on("#cont", () => { sfx("tap"); ok ? (last ? complete() : (g.idx++, renderItem())) : (g.L.id === "daily" ? startDaily() : play(g.L.id)); });
+  bindSegButtons(sheet);
+  on("#cont", () => { sfx("tap"); ok ? (last ? complete() : (g.idx++, renderItem())) : (g.L.id === "daily" ? startDaily(it) : play(g.L.id, it)); });
   on("#gb", () => guidebook(g.L.id));
   timers.push(setTimeout(() => $("#cont")?.focus({ preventScroll: true }), 80));
 }
 function quitRun(){
   const sheet = $("#sheet"); if (!sheet) return tab("learn");
   sheet.className = "sheet bad";
-  sheet.innerHTML = `<div class="sheet-in"><div class="say-row">${mingo("sad")}<div class="bubble">Leaving now loses this run. Stay a little longer?</div></div>
+  sheet.innerHTML = `<div class="sheet-in"><div class="say-row">${shoco("sad")}<div class="bubble">Leaving now loses this run. Stay a little longer?</div></div>
     <button class="btn wide" id="stay">Keep going</button><button class="btn wide ghost" id="leave">Quit the lesson</button></div>`;
   requestAnimationFrame(() => sheet.classList.add("show"));
   on("#stay", () => sheet.classList.remove("show"));
@@ -1656,7 +1914,7 @@ function celebrate(o){
   const goalJust = todayXP() >= GOAL && todayXP() - o.xp < GOAL;
   const date = new Date().toLocaleDateString("en-US", { year:"numeric", month:"long", day:"numeric" });
   show(`<section class="celebrate">
-    ${mingo("cheer")}
+    ${shoco("cheer")}
     <h1>${esc(o.title)}</h1>
     ${goalJust ? `<p class="eyebrow" style="color:var(--fire)">Daily goal reached</p>` : ""}
     <div class="stats">
@@ -1664,7 +1922,7 @@ function celebrate(o){
       <div class="stat c-lagoon"><div class="h">Time</div><div class="v">${icon("bolt")}${fmtT(o.time/1000)}</div></div>
       <div class="stat" style="--c:var(--good);--t:#fff"><div class="h">In a row</div><div class="v">${icon("check")}${o.row}</div></div>
     </div>
-    ${o.L && o.L.final ? `<div class="cert"><p class="eyebrow">Show-Up Academy certificate</p><p class="who">${esc(S.name || "Show-Up Pro")}</p><p>Passed the final: ${o.row} questions in a row on the qualifications and the pitch, with no mistakes.</p><p class="small muted">${esc(date)}</p></div><p class="small muted">Your manager sees this on the team view too.</p>` : ""}
+    ${o.L && o.L.final ? `<div class="cert"><p class="eyebrow">Show-Up Academy certificate</p><p class="who">${esc(S.name || "Show-Up Pro")}</p><p>Passed the final: ${o.row} questions in a row on the qualifications, the pitch and NLP, with no mistakes.</p><p class="small muted">${esc(date)}</p></div><p class="small muted">Your manager sees this on the team view too.</p>` : ""}
     ${gap ? `<p class="muted">Come back in ${plural(gap,"day")} for a quick review. Spacing it out makes it stick.</p>` : ""}
     <button class="btn wide" id="cont">Continue</button>
   </section>`, { full: true });
@@ -1694,8 +1952,8 @@ function renderMap(msg){
   const g = game, total = MAP_STEPS.length*2, done = g.round*MAP_STEPS.length + g.step;
   show(`<div class="lesson">
     ${lessonTop(done / total * 100)}
-    <p class="l-kind">Pitch map · round ${g.round + 1} of 2 · ${g.round ? "the lines" : "the steps"}</p>
-    <div class="say-row">${mingo(msg ? "happy" : "think", "lm")}<div class="bubble q">${esc(msg || (g.step ? "What comes next?" : "What do you say first?"))}</div></div>
+    <p class="l-kind">Pitch map, round ${g.round + 1} of 2: ${g.round ? "the lines" : "the steps"}</p>
+    <div class="say-row">${shoco(msg ? "happy" : "think", "lm")}<div class="bubble q">${esc(msg || (g.step ? "What comes next?" : "What do you say first?"))}</div></div>
     ${g.step ? `<ol class="placed">${MAP_STEPS.slice(0, g.step).map(s => `<li><div>${esc(s.t)}${g.round ? `<span>${esc(s.line)}</span>` : ""}</div></li>`).join("")}</ol>` : ""}
     <div class="mapq" role="group" aria-label="Steps">${g.order.filter(i => i >= g.step).map(i => `<button class="cardbtn" data-i="${i}">${esc(g.round ? MAP_STEPS[i].line : MAP_STEPS[i].t)}</button>`).join("")}</div>
   </div><div class="sheet" id="sheet"></div>`, { full: true });
@@ -1738,7 +1996,7 @@ function lightningIntro(){
   view = "lightning"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><span></span><span></span></div>
   <section class="celebrate">
-    ${mingo("think")}
+    ${shoco("think")}
     <h1 style="color:var(--sea)">Lightning round</h1>
     <p>Qualify as many couples as you can in 60 seconds. One mistake ends it.</p>
     <div class="stats"><div class="stat c-sun"><div class="h">Record</div><div class="v">${icon("bolt")}${S.lightning||0}</div></div><div class="stat c-lagoon"><div class="h">Time</div><div class="v">60s</div></div><div class="stat" style="--c:var(--bad);--t:#fff"><div class="h">Mistakes</div><div class="v">${icon("heart")}1</div></div></div>
@@ -1807,7 +2065,7 @@ function endLightning(wrong){
   view = "lightning"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><span></span><span></span></div>
   <section class="celebrate">
-    ${mingo(record ? "cheer" : wrong ? "sad" : "happy")}
+    ${shoco(record ? "cheer" : wrong ? "sad" : "happy")}
     <h1 style="color:var(--sea)">${record ? "New record!" : plural(g.score, "couple")}</h1>
     <p class="muted">${wrong ? "One mistake ends the round." : "Time's up."}</p>
     <div class="stats"><div class="stat c-lagoon"><div class="h">This round</div><div class="v">${g.score}</div></div><div class="stat c-sun"><div class="h">Record</div><div class="v">${icon("bolt")}${S.lightning}</div></div><div class="stat"><div class="h">XP</div><div class="v">${icon("star")}${g.score*5}</div></div></div>
@@ -1821,23 +2079,23 @@ function endLightning(wrong){
 }
 
 /* ---------- Script tab: what to say, from the voice notes ---------- */
+function saidLabel(l){ return `You say${(S.said[l.id] || 0) >= .7 ? ` <span class="said-check">${icon("check")}practiced</span>` : ""}`; }
 function lineHTML(l){
-  const sc = S.said[l.id] || 0;
   return `<div class="line" data-line="${l.id}">
-    <p class="lbl">You say${sc >= .7 ? ` <span class="said-check">· practiced</span>` : ""}</p>
+    <p class="lbl"><span data-said="${l.id}">${saidLabel(l)}</span>${l.nlp ? `<span class="nlp-tag">NLP: ${esc(l.nlp)}</span>` : ""}</p>
     <p class="quote">"${esc(l.text)}"</p>
     ${l.note ? `<p class="note">${esc(l.note)}</p>` : ""}
-    <div class="acts"><button class="btn small sea" data-seg="${l.clip}:${l.from}:${l.to}" data-key="${l.id}">${icon("play")} Hear it</button>${SR ? `<button class="btn small ghost" data-say="${l.id}">${icon("mic")} Say it</button>` : ""}<span class="score" data-score="${l.id}"></span></div>
+    <div class="acts">${l.clip ? `<button class="btn small sea" data-seg="${l.clip}:${l.from}:${l.to}" data-key="${l.id}">${icon("play")} Hear it</button>` : ""}${SR ? `<button class="btn small ghost" data-say="${l.id}">${icon("mic")} Say it</button>` : ""}<span class="score" data-score="${l.id}"></span></div>
     <p class="heard-text" data-heard="${l.id}" hidden></p>
   </div>`;
 }
 function stepHTML(s, i){
   return `<article class="step" id="step-${i}">
     <div class="step-h"><span class="n">${i + 1}</span><h2>${esc(s.step)}</h2></div>
-    <div class="tip">${mingo("idle")}<p>${esc(s.tip)}</p></div>
+    <div class="tip">${shoco("idle")}<p>${esc(s.tip)}</p></div>
     ${s.lines.map(lineHTML).join("")}
-    ${s.dont ? `<div class="line dont"><p class="lbl">Don't say</p><p class="quote">"${esc(s.dont.text)}"</p><p class="note">${esc(s.dont.why)}</p><div class="acts"><button class="btn small ghost" data-seg="${s.dont.clip}:${s.dont.from}:${s.dont.to}">${icon("play")} Hear the trainer</button></div></div>` : ""}
-    ${s.extra ? `<div class="line" style="border-left-color:var(--sea);background:var(--sea-soft)"><p class="lbl" style="color:var(--sea-2)">From the trainer</p><p class="note" style="color:var(--ink)">${esc(s.extra.text)}</p><div class="acts"><button class="btn small ghost" data-seg="${s.extra.clip}:${s.extra.from}:${s.extra.to}">${icon("play")} ${esc(s.extra.label)}</button></div></div>` : ""}
+    ${s.dont ? `<div class="line dont"><p class="lbl">Don't say</p><p class="quote">"${esc(s.dont.text)}"</p><p class="note">${esc(s.dont.why)}</p><div class="acts"><button class="btn small ghost" data-seg="${s.dont.clip}:${s.dont.from}:${s.dont.to}">${icon("play")} Hear it in the voice notes</button></div></div>` : ""}
+    ${s.extra ? `<div class="line" style="border-left-color:var(--sea);background:var(--sea-soft)"><p class="lbl" style="color:var(--sea-2)">From the voice notes</p><p class="note" style="color:var(--ink)">${esc(s.extra.text)}</p><div class="acts"><button class="btn small ghost" data-seg="${s.extra.clip}:${s.extra.from}:${s.extra.to}">${icon("play")} ${esc(s.extra.label)}</button></div></div>` : ""}
   </article>`;
 }
 function bindSayButtons(){ app.querySelectorAll("[data-say]").forEach(b => b.onclick = () => sayIt(b.dataset.say, b)); }
@@ -1845,10 +2103,10 @@ function renderScript(){
   const total = Object.keys(SCRIPT_LINES).length, done = linesPracticed();
   const mins = Math.round(CLIPS.reduce((a, c) => a + c.d, 0) / 60);
   show(`
-  <header class="stack" style="padding-top:12px"><h1>What to say</h1><p class="muted">Your trainer's own words from the voice notes, step by step. Hear each line, then say it out loud.</p></header>
+  <header class="stack" style="padding-top:12px"><h1>What to say</h1><p class="muted">The exact lines from the voice notes, step by step. Hear each one, then say it out loud.</p></header>
   <section class="card"><div class="row" style="justify-content:space-between"><b id="saidCount">${done} of ${total} lines practiced</b>${SR ? "" : `<span class="small muted">Say it needs Chrome or Safari</span>`}</div><div class="l-bar" id="saidBar"><i style="width:${done/total*100}%"></i></div></section>
   ${SCRIPT.map(stepHTML).join("")}
-  <section class="stack" id="notes"><h2>All ${CLIPS.length} voice notes</h2><p class="muted">${mins} minutes in the trainer's voice. They play one after another. Tap any sentence to jump to it.</p><div class="stack">${CLIPS.map(clipHTML).join("")}</div></section>`, { keepAudio: true });
+  <section class="stack" id="notes"><h2>All ${CLIPS.length} voice notes</h2><p class="muted">${mins} minutes of recordings. They play one after another. Tap any sentence to jump to it.</p><div class="stack">${CLIPS.map(clipHTML).join("")}</div></section>`, { keepAudio: true });
   bindSegButtons(app); bindSayButtons(); bindClips();
 }
 
@@ -1860,7 +2118,7 @@ function renderGames(){
   <article class="tile-card c-sun"><div class="ico">${icon("calendar")}</div><div><h3>Daily 10</h3><p class="small muted">${dailyOpen() ? (S.daily.last === today() ? "Done today. Play again for practice." : "Ten questions. Your misses come back more.") : "Opens after your first mastered level."}</p></div>${dailyOpen() ? `<button class="btn small sun" id="dy">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-flamingo"><div class="ico">${icon("route")}</div><div><h3>Pitch map</h3><p class="small muted">${unlocked("map") ? "Put the pitch in order, then the lines." : "Opens after \u201cMake it solid\u201d"}</p></div>${unlocked("map") ? `<button class="btn small flamingo" id="mp">Play</button>` : icon("lock")}</article>
   <article class="tile-card"><div class="ico">${icon("headphones")}</div><div><h3>Voice notes</h3><p class="small muted">${CLIPS.filter(c => S.listened[c.id]).length} of ${CLIPS.length} heard</p></div><button class="btn small ghost" id="vn">Listen</button></article>`);
-  on("#lg", lightningIntro); on("#dy", startDaily); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
+  on("#lg", lightningIntro); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
 }
 
 /* ---------- Me tab ---------- */
@@ -1868,7 +2126,7 @@ function renderMe(){
   const weak = topMisses(3);
   const days = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return d; });
   show(`
-  <header class="me-head" style="padding-top:12px">${mingo("happy")}<div><h1>${esc(S.name || "You")}</h1><p class="muted">${rank()} · ${masteredCount()} of ${LEVEL_IDS.length} levels mastered</p></div></header>
+  <header class="me-head" style="padding-top:12px">${shoco("happy")}<div><h1>${esc(S.name || "You")}</h1><p class="muted">${rank()}: ${masteredCount()} of ${LEVEL_IDS.length} levels mastered</p><p class="small muted">Crawl, walk, run. Each level you master moves you up.</p></div></header>
   ${S.name ? "" : `<form class="name-form" id="nameForm"><label for="nm" class="eyebrow" style="flex-basis:100%">Your name</label><input class="field" id="nm" autocomplete="name" maxlength="30" placeholder="First name + last initial"><button class="btn">Save</button></form>`}
   ${syncLine()}
   <section class="grid2">
@@ -1885,7 +2143,7 @@ function renderMe(){
       <li>Short lessons in a new random order every time. One mistake and you start over, with the right answer and why.</li>
       <li>Pulling the answer out of your head is what builds memory. Re-reading doesn't.</li>
       <li>Levels come back for review after 1, 3, 7, 14 and 30 days. Spacing it out makes it stick.</li>
-      <li>Hear the trainer's lines, then say them out loud in the Script tab.</li>
+      <li>Hear the lines from the voice notes, then say them out loud in the Script tab.</li>
     </ul></section>
   <section class="row">
     <button class="btn small ghost" id="snd">${icon(S.sound ? "sound" : "mute")} Sound ${S.sound ? "on" : "off"}</button>
@@ -1916,8 +2174,7 @@ function reportText(){
     `Show-Up Academy progress`,
     `Name: ${S.name || "(no name set)"}`,
     `Rank: ${rank()} · ${nf(S.xp)} XP`,
-    `Qualify: ${TRACKS[0].levels.map(lv).join(" · ")}`,
-    `The pitch: ${TRACKS[1].levels.map(lv).join(" · ")}`,
+    ...TRACKS.map(t => `${t.title}: ${t.levels.map(lv).join(" · ")}`),
     `Final run: ${S.mastered.final ? "passed ✔" : "not yet"}`,
     `Script lines said: ${linesPracticed()} of ${Object.keys(SCRIPT_LINES).length}`,
     `Lightning record: ${plural(S.lightning||0,"couple")} · streak ${plural(streakDays(),"day")}`,
@@ -1971,7 +2228,7 @@ function parseReports(text){
 function coachLogin(msg){
   view = "coach"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h2>Team view</h2></div><span></span></div>
-  <div class="say-row">${mingo("think")}<div class="bubble">Enter the manager code to see who knows it all.</div></div>
+  <div class="say-row">${shoco("think")}<div class="bubble">Enter the manager code to see who knows it all.</div></div>
   <form class="name-form" id="codeForm"><label for="code" class="eyebrow" style="flex-basis:100%">Manager code</label><input class="field" id="code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX"><button class="btn">Open</button></form>
   ${msg ? `<p class="small" style="color:var(--bad-ink)">${esc(msg)}</p>` : ""}
   <p class="small muted">The code stays on this phone so you don't have to type it again.</p>`, { full: true });
@@ -1982,7 +2239,7 @@ async function coach(){
   if (!S.mgr) return coachLogin();
   view = "coach"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h2>Team view</h2></div><span></span></div>
-  <div class="say-row">${mingo("think")}<div class="bubble">Loading the team…</div></div>`, { full: true });
+  <div class="say-row">${shoco("think")}<div class="bubble">Loading the team…</div></div>`, { full: true });
   on("#back", () => tab("me"));
   try {
     const rows = await rpc("sua_team", { p_code: S.mgr });
@@ -2002,7 +2259,7 @@ function renderTeam(rows, err){
   const people = teamRows(rows).concat(pasted).sort((a, b) => (b.final - a.final) || (b.mastered - a.mastered) || (b.xp - a.xp));
   const names = {}; people.forEach(p => { const k = p.name.toLowerCase(); names[k] = (names[k] || 0) + 1; });
   people.forEach(p => p.dupe = names[p.name.toLowerCase()] > 1);
-  const know = people.filter(p => p.final), almost = people.filter(p => !p.final && p.mastered >= 5), learning = people.filter(p => !p.final && p.mastered >= 1 && p.mastered < 5), fresh = people.filter(p => !p.final && !p.mastered);
+  const know = people.filter(p => p.final), almost = people.filter(p => !p.final && p.mastered >= 8), learning = people.filter(p => !p.final && p.mastered >= 1 && p.mastered < 8), fresh = people.filter(p => !p.final && !p.mastered);
   const week = people.filter(p => p.updated && Date.now() - new Date(p.updated).getTime() < 7*DAY).length;
   const agg = {}; people.forEach(p => (p.stats && Array.isArray(p.stats.w) ? p.stats.w : []).forEach(([id, n]) => { if (QBY[id]) agg[id] = (agg[id]||0) + (+n||0); }));
   const teamWeak = Object.entries(agg).sort((a,b) => b[1]-a[1]).slice(0,6);
@@ -2010,7 +2267,7 @@ function renderTeam(rows, err){
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><div><p class="eyebrow">Managers</p><h2>Team view</h2></div><button class="icon-btn" id="refresh" aria-label="Refresh">${icon("refresh")}</button></div>
   ${err ? `<p class="card small" style="color:var(--bad-ink)">${esc(err)}</p>` : ""}
   <section class="summary"><div><b>${people.length}</b><span>people</span></div><div><b style="color:var(--sun-2)">${know.length}</b><span>know it all</span></div><div><b style="color:var(--sea)">${week}</b><span>active this week</span></div></section>
-  ${people.length ? "" : `<div class="say-row">${mingo("idle")}<div class="bubble">Nobody yet. When your team opens the app and saves their name, they show up here with their progress.</div></div>`}
+  ${people.length ? "" : `<div class="say-row">${shoco("idle")}<div class="bubble">Nobody yet. When your team opens the app and saves their name, they show up here with their progress.</div></div>`}
   ${group("Knows it all", "crown", "var(--sun-2)", know)}
   ${group("Almost there", "flame", "var(--fire)", almost)}
   ${group("Learning", "book", "var(--sea)", learning)}
