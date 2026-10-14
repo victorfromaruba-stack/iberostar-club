@@ -955,6 +955,9 @@ function buildScenarios(n){
    and only someone with the manager code can read the team (sua_team).
    ===================================================================== */
 const SB = { url: "https://cdkopyphjvfxjqhasrae.supabase.co", key: "sb_publishable_9th0PfSraqrnnD5cTcQqxA_oqH6bwqn" };
+/* The team list only works on the team link; other hosts (like a preview) can't reach it. */
+const TEAM_URL = "https://victorfromaruba-stack.github.io/iberostar-club/academy/";
+const TEAM_HOST = /github\.io$/.test(location.hostname) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 const GOAL = 50;
 const ORDER = ["q","why","ctnq","offer","who","solid","map","final"];
 const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","map","final"];
@@ -1324,7 +1327,8 @@ function syncLine(){
   const st = !S.name ? "" : S.sync.ok ? "ok" : S.sync.ok === false ? "err" : "";
   const txt = !S.name ? "Add your name and your manager will see your progress."
     : S.sync.ok ? `Your manager sees your progress · updated ${ago(S.sync.last)}`
-    : S.sync.ok === false ? "Couldn't reach the team list. It tries again after your next lesson." : "Your progress will be shared with your manager.";
+    : S.sync.ok === false ? (TEAM_HOST ? "Couldn't reach the team list. It tries again after your next lesson." : "Your manager sees your progress when you use the team link. Here, send your report on WhatsApp.")
+    : "Your progress will be shared with your manager.";
   return `<p class="sync" id="syncLine"><i class="dot ${st}"></i><span>${esc(txt)}</span></p>`;
 }
 
@@ -1986,7 +1990,8 @@ async function coach(){
   } catch(e){
     if (view !== "coach") return;
     if (/wrong code/.test(e.message)){ S.mgr = ""; save(false); coachLogin("That code didn't work. Check it and try again."); }
-    else renderTeam(null, "Couldn't reach the team list. Check the internet and refresh. Pasted WhatsApp reports still work below.");
+    else renderTeam(null, TEAM_HOST ? "Couldn't reach the team list. Check the internet and refresh. Pasted WhatsApp reports still work below."
+      : `The team list opens on the team link: ${TEAM_URL} Pasted WhatsApp reports work here too.`);
   }
 }
 const AV = ["--lagoon","--flamingo","--sea","--sun-2","--good-2","--flamingo-2","--lagoon-2"];
