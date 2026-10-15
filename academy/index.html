@@ -973,11 +973,12 @@ const LEVELS = [
     { h: "Our commitment", li: [
       "We don't sell timeshare: no weeks, points or maintenance fees.",
       "A full-service resort brand they can book through travel agents or online. We show how our members book direct at wholesale rates through our loyalty club.",
-      "No high pressure and no obligation to book or buy." ] },
+      "No high pressure and no obligation to book or buy.",
+      "Nothing is charged: the breakfast, the tour, the gift and the taxi are on us." ] },
     { h: "What to bring", li: [
       "Their invitation, so they get everything they were promised.",
-      "Every adult: 2 forms of ID, like a driver's license or passport.",
-      "A credit card: only one of them needs to bring one." ] },
+      "Every adult: 1 ID, like a driver's license or passport.",
+      "A credit card: only one of them needs to bring one. If they like what they see, we can show them how to get involved." ] },
     { h: "Our partners", li: [
       "At Joia: Marea, Bucatini, Gaia and the Zima rooftop bar.",
       "Dining around the island: Gianni's, Daniel's Steak & Chop, Azzurro, Azia, Amore Mio, Screaming Eagle, Dushi Bagels & Burgers, and The Birdie at Tierra del Sol.",
@@ -990,7 +991,8 @@ const LEVELS = [
     Q("o5","How does the free taxi work?","They take a taxi, and we pay both ways",["We send our own shuttle to their hotel","We pay for the ride there, not back","Only Iberostar hotel guests get a taxi"],"They arrange the taxi. We pay the fare when they arrive and again when they leave."),
     Q("o7","What is the Island Gift?","IberoCash for Aruba's top places",["A free night at the Joia hotel","Cash handed out at the desk","A discount on a timeshare week"],"A thank-you for their time, to use for dining, shopping, activities and rentals."),
     Q("o8","Where can guests use IberoCash?","Dining, shopping, activities, rentals",["Flights, hotels, cruises, trains","Groceries, gas, pharmacy, phone bills","Casino, lottery, bets, ATM cash"],"The pitch deck lists dining, shopping, activities and rentals."),
-    Q("o14","Besides the invitation, what do they bring?","2 IDs each, and one credit card",["2 IDs each, and a credit card each","Only the invitation, nothing more","Their hotel key card and receipt"],"Every adult brings 2 forms of ID, like a driver's license or passport. One credit card for the couple is enough."),
+    Q("o14","Besides the invitation, what do they bring?","1 ID each, and one credit card",["2 IDs each, and a credit card each","Only the invitation, nothing more","Their hotel key card and receipt"],"Every adult brings 1 ID, like a driver's license or passport. One credit card for the couple is enough."),
+    Q("o19","A guest asks why one of them needs a credit card. What do you say?","In case they like it and want to get involved",["To pay for the breakfast and the taxi rides","As a deposit we give back after the tour","To hold the spot, so they can't cancel"],"Nothing is charged. If they like what they see, we show them how to get involved."),
     LINE("o15","Members book direct at ___ rates through our loyalty club.","wholesale",["retail","timeshare","weekly"],"Members book direct at wholesale rates. We don't sell timeshare: no weeks, points or maintenance fees."),
     LINE("o16","We ask for 90 minutes, including breakfast, the tour and information on ___.","booking direct",["buying a week","points and fees","the casino"],"Short and sweet: 90 minutes, including the breakfast, the property tour and information on booking direct."),
     Q("o18","How does the pitch deck describe Iberostar The Club?","The newest, most luxurious way to travel",["A timeshare with weeks, points and fees","A members-only resort here in Aruba","The most affordable way to take a cruise"],"The pitch deck calls Iberostar The Club the newest and most luxurious way to travel."),
@@ -1334,7 +1336,7 @@ const LEVELS = [
       "Don't hide the presentation, the 90 minutes or what to bring. Guests remember what you said.",
       "No pressure and no tricks. Guests who feel pushed or fooled don't show up." ] },
     { h: "Button it up", li: [
-      "Before they go, go over it once more: where, what time, what to bring (2 IDs each, one credit card) and the call between 5 and 6.",
+      "Before they go, go over it once more: where, what time, what to bring (1 ID each, one credit card) and the call between 5 and 6.",
       "End warm: \"See you tomorrow at 8. Enjoy your day!\"" ] },
     { h: "Where this comes from", li: [
       "Ideas from the Timeshare OPC University videos and from Suzanne R. Angeles's audiobook \"How To Become A Booking Timeshare Marketing OPC\" (OPC Secrets By Suz), put in our own words and fitted to Iberostar's rules and the Open House." ],
@@ -1348,7 +1350,7 @@ const LEVELS = [
     Q("st4d","They say \"Let me think about it.\" What does it usually mean?","They can't picture the morning yet",["They've already decided not to come","They want you to raise the gift","They need to check with their kids"],"Go back and paint the picture: breakfast, the tour, a room, the IberoCash."),
     Q("st4e","How do you make the morning easy to picture?","Be specific: what, where, when, how long",["Repeat \"it's free\" a few more times","Say \"it's amazing\" over and over again","Talk faster so they hear every detail"],"People say yes to what they can see in their heads."),
     Q("st4f","You couldn't answer an objection today. What now?","Write it down and work out an answer",["Forget it. That couple was never coming","Avoid couples who look like that one","Blame the offer and ask for a new one"],"Your objection notebook turns today's no into tomorrow's yes."),
-    Q("st4j","They're booked and leaving. What do you go over before they go?","Where, when, what to bring, the call",["Only the gift they'll get tomorrow","Nothing. They can ask the hostess","The rules for getting a bigger gift"],"Button it up: the place, the time, 2 IDs each and one card, and the confirmation call.")
+    Q("st4j","They're booked and leaving. What do you go over before they go?","Where, when, what to bring, the call",["Only the gift they'll get tomorrow","Nothing. They can ask the hostess","The rules for getting a bigger gift"],"Button it up: the place, the time, 1 ID each and one card, and the confirmation call.")
   ]
 },
 { id: "final", name: "Final run", sub: "Everything mixed: 20 in a row", icon: "trophy", final: true, count: 20, notes: [] }
@@ -3184,7 +3186,7 @@ THE 8 STEPS (what good looks like)
 4. offer: Say it, don't ask: "Let me get you an invitation." Not "Would you like one?" Objections come out here; work them (below).
 5. time: "Let me put you down for 8 o'clock." Too early? Offer 10. Check their plans and flight: they need 3 free hours that morning with nothing prepaid, and on departure day at least 4 hours before airport pickup.
 6. number: Write slowly and keep making a friend with small questions. Ask for the number with the reason: a manager calls this afternoon between 5 and 6, only to check they can still make it. WhatsApp is fine.
-7. plan: Bring this invitation to confirm the gift. Breakfast, a quick tour, and how to book direct through the loyalty club. Not timeshare (no weeks, points or maintenance fees): a full-service hotel like Hyatt or Hilton, no obligation to be a member. "We only ask families for 90 minutes, and breakfast tends to eat about half of that." Never say 45 minutes or break it into minutes. Be open that there is a short presentation about the club ("a little information about the club"); never tell them to hide it. Every adult brings 2 IDs; one credit card is enough.
+7. plan: Bring this invitation to confirm the gift. Breakfast, a quick tour, and how to book direct through the loyalty club. Not timeshare (no weeks, points or maintenance fees): a full-service hotel like Hyatt or Hilton, no obligation to be a member. "We only ask families for 90 minutes, and breakfast tends to eat about half of that." Never say 45 minutes or break it into minutes. Be open that there is a short presentation about the club ("a little information about the club"); never tell them to hide it. Every adult brings 1 ID; one credit card is enough. If they ask why the card: in case they like what they see, we can show them how to get involved. Nothing is charged.
 8. lockin: "So we see you guys tomorrow at 8 for sure?" Read the answer. "We'll try" or "we'll see": ask again, lots of families want the spot; still unsure, offer to give it to another family. Making it yours helps: "I get a little bonus just for you showing up; you don't have to book or buy anything." A solid no beats a fake yes.
 
 WHO QUALIFIES
