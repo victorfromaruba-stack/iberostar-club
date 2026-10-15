@@ -79,7 +79,7 @@ const EVIL = [
   ok("loads with no errors", p.errors.length === 0, p.errors.join(" | "));
   ok("9 voice notes loaded", await p.evaluate(() => CLIPS.length === 9 && CLIPS.every(c => c.s.length > 3)));
   ok("Learn tab with name form", await p.isVisible("#nm"));
-  ok("every level has a node on the path", await p.evaluate(() => document.querySelectorAll("[data-node]").length === LEVEL_IDS.length && LEVEL_IDS.length === 17));
+  ok("every level has a node on the path", await p.evaluate(() => document.querySelectorAll("[data-node]").length === LEVEL_IDS.length && LEVEL_IDS.length === 16));
   ok("Street skills unit with credit", await p.evaluate(() => /Street skills/.test(document.querySelector("#app").textContent) && /Timeshare OPC University/.test(document.querySelector(".foot").textContent)));
   ok("start node is Qualified guests", await p.evaluate(() => document.querySelector(".node.current")?.dataset.node) === "q");
   ok("both tracks open at the start", await p.evaluate(() => !document.querySelector('[data-node="why"]').classList.contains("locked") && document.querySelector('[data-node="ctnq"]').classList.contains("locked")));
@@ -335,12 +335,12 @@ const EVIL = [
   await p.evaluate(() => { S.mastered.q.last = Date.now() - 2 * DAY; save(false); tab("learn"); });
   ok("review due shows on the path", await p.evaluate(() => document.querySelector('[data-node="q"]').classList.contains("due") && /Review time/.test(document.querySelector(".say-row .bubble").textContent)));
   ok("final still locked until NLP and Street skills are done", await p.evaluate(() => document.querySelector('[data-node="final"]').classList.contains("locked")));
-  await p.evaluate(() => { ["words", "nlp2", "nlp3", "nlp4", "st1", "st2", "st3"].forEach(id => S.mastered[id] = { count: 1, last: Date.now() }); save(false); tab("learn"); });
+  await p.evaluate(() => { ["words", "nlp2", "nlp3", "nlp4", "st2", "st3"].forEach(id => S.mastered[id] = { count: 1, last: Date.now() }); save(false); tab("learn"); });
   ok("final still locked with one Street skills level left", await p.evaluate(() => document.querySelector('[data-node="final"]').classList.contains("locked")));
   await p.evaluate(() => { guidebook("st4"); });
   ok("Street skills guidebook credits the source with a link", await p.evaluate(() => [...document.querySelectorAll(".note a")].some(a => a.href === "https://www.youtube.com/@timeshareopcuniversity2290" && a.target === "_blank")));
   await p.evaluate(() => { S.mastered.st4 = { count: 1, last: Date.now() }; save(false); tab("learn"); });
-  ok("final unlocked after all 16", await p.evaluate(() => !document.querySelector('[data-node="final"]').classList.contains("locked")));
+  ok("final unlocked after all 15", await p.evaluate(() => !document.querySelector('[data-node="final"]').classList.contains("locked")));
   await p.evaluate(() => play("final"));
   ok("final: 20 mixed items", await p.evaluate(() => game.list.length === 20));
   await clearRun(p);

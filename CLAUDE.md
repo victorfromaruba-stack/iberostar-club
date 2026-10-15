@@ -34,7 +34,7 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   `assets/fonts/` holds the self-hosted Inter/Playfair Display woff2 files (see Fonts below).
 - `academy/` — **staff-only**, unlinked from the guest app (like `admin.html`): "Show-Up Academy",
   a Duolingo-style training game for OPCs on guest qualifications, the Open House invitation
-  pitch, NLP (rapport, wording, reading guests) and street skills (mindset, stopping people, small talk,
+  pitch, NLP (rapport, wording, reading guests) and street skills (stopping people, small talk,
   objections: ideas from the Timeshare OPC University videos and the OPC Secrets By Suz audiobook, in our
   own words and credited with links in each guidebook), plus Street practice, a role-play with an AI
   tourist couple that Shoco scores afterwards. Served at `https://victorfromaruba-stack.github.io/iberostar-club/academy/`. It shares
