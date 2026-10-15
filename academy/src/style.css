@@ -669,6 +669,7 @@ details[open]>summary::after{transform:rotate(-135deg) translateY(-3px)}
 .rp-bigmic .ic{width:42%;height:42%}
 .rp-bigmic:active{transform:translateY(4px);box-shadow:none}
 .rp-bigmic.listening{background:var(--bad);color:var(--on-bad);box-shadow:0 5px 0 var(--bad-2),0 0 0 calc(var(--lvl,0) * 18px) color-mix(in srgb,var(--bad) 30%,transparent);transition:box-shadow .08s linear;animation:pulseb .9s ease-in-out infinite}
+.rp-bigmic.muted{background:var(--surface);color:var(--muted);box-shadow:0 5px 0 var(--line-2);outline:2px solid var(--line);outline-offset:-2px}
 .rp-miclabel{font:800 14px/1.2 var(--f-body);color:var(--muted)}
 .rp-callopts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
 .rp-opt{display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:800 14px/1 var(--f-body)}

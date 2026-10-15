@@ -688,6 +688,7 @@ details[open]>summary::after{transform:rotate(-135deg) translateY(-3px)}
 .rp-bigmic .ic{width:42%;height:42%}
 .rp-bigmic:active{transform:translateY(4px);box-shadow:none}
 .rp-bigmic.listening{background:var(--bad);color:var(--on-bad);box-shadow:0 5px 0 var(--bad-2),0 0 0 calc(var(--lvl,0) * 18px) color-mix(in srgb,var(--bad) 30%,transparent);transition:box-shadow .08s linear;animation:pulseb .9s ease-in-out infinite}
+.rp-bigmic.muted{background:var(--surface);color:var(--muted);box-shadow:0 5px 0 var(--line-2);outline:2px solid var(--line);outline-offset:-2px}
 .rp-miclabel{font:800 14px/1.2 var(--f-body);color:var(--muted)}
 .rp-callopts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
 .rp-opt{display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:800 14px/1 var(--f-body)}
@@ -726,6 +727,7 @@ const ICONS = {
   x: '<path d="M6.5 6.5l11 11m0-11l-11 11" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>',
   speaker: '<path d="M3 9.5h3.8L12 5v14l-5.2-4.5H3z"/><path d="M15.2 8.6a5 5 0 0 1 0 6.8M17.8 6a8.6 8.6 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
   mic: '<path d="M12 2.5a3.5 3.5 0 0 1 3.5 3.5v5.5a3.5 3.5 0 0 1-7 0V6A3.5 3.5 0 0 1 12 2.5z"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21m-3.5 0h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  micoff: '<path d="M12 2.5a3.5 3.5 0 0 1 3.5 3.5v5.5a3.5 3.5 0 0 1-7 0V6A3.5 3.5 0 0 1 12 2.5z"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21m-3.5 0h7M4 3l16 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
   book: '<path d="M4 5.2A2.7 2.7 0 0 1 6.7 2.5H20v15.3H6.7A1.2 1.2 0 0 0 5.5 19a1.2 1.2 0 0 0 1.2 1.2H20v1.3H6.7A2.7 2.7 0 0 1 4 18.8z"/>',
   trophy: '<path d="M7 3h10v1.8h3.5v2.4A4.3 4.3 0 0 1 16.4 11.6 5.2 5.2 0 0 1 13.3 14v2.6h3.2V21h-9v-4.4h3.2V14a5.2 5.2 0 0 1-3.1-2.4A4.3 4.3 0 0 1 3.5 7.2V4.8H7zm0 4.1V6.6H5.6v.6A2.2 2.2 0 0 0 7.1 9.3 7 7 0 0 1 7 7.1zm10 0a7 7 0 0 1-.1 2.2 2.2 2.2 0 0 0 1.5-2.1v-.6H17z"/>',
   headphones: '<path d="M12 3.5a8.5 8.5 0 0 0-8.5 8.5v5.2A2.8 2.8 0 0 0 6.3 20H8v-7H5.8v-1a6.2 6.2 0 0 1 12.4 0v1H16v7h1.7a2.8 2.8 0 0 0 2.8-2.8V12A8.5 8.5 0 0 0 12 3.5z"/>',
@@ -3545,6 +3547,7 @@ function sayNatural(b64, cb){
   catch(e){ return cb(false); }
   PLAYER.onended = () => end(true);
   PLAYER.onerror = () => end(false);
+  try { PLAYER.srcObject = null; } catch(e){}
   PLAYER.src = url;
   const p = PLAYER.play(); p && p.catch(() => end(false));
   timers.push(setTimeout(() => end(true), 30000));
@@ -3684,7 +3687,194 @@ function earDone(gen, rec){
   rpMicUI(false); rpHint();
 }
 /* Everything quiet: no voices, no microphone. show() calls it whenever the screen changes. */
-function rpHush(){ stopSpeak(); stopRec(); if (EAR.rec || EAR.stream){ EAR.gen++; const r = EAR.rec; EAR.rec = null; clearTimeout(EAR.tick); try { r && r.state !== "inactive" && r.stop(); } catch(e){} try { EAR.src && EAR.src.disconnect(); } catch(e){} EAR.src = null; if (EAR.stream){ EAR.stream.getTracks().forEach(t => t.stop()); EAR.stream = null; } } }
+function rpHush(){ stopSpeak(); stopRec(); if (LV.pc) liveClose(); if (EAR.rec || EAR.stream){ EAR.gen++; const r = EAR.rec; EAR.rec = null; clearTimeout(EAR.tick); try { r && r.state !== "inactive" && r.stop(); } catch(e){} try { EAR.src && EAR.src.disconnect(); } catch(e){} EAR.src = null; if (EAR.stream){ EAR.stream.getTracks().forEach(t => t.stop()); EAR.stream = null; } } }
+/* ---------- Live call ----------
+   The fluent way: the phone opens a call (WebRTC) straight to OpenAI's speech-to-speech model, which plays the
+   couple with the same knowledge and reactions as the typed one. It answers in about a second and stops when you
+   talk over it. The server only hands out a one-minute key for the call (op "live") and stores what was said
+   (op "live_save"); Shoco (Claude) scores it after, as usual. If the call can't connect, the recorded way
+   (earListen) takes over. */
+const LIVE_OK = !!(window.RTCPeerConnection && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+const LIVE_MAX_MS = 8 * 60 * 1000;
+const LV = { pc: null, dc: null, stream: null, gen: 0, timers: [], open: false, muted: false, slots: new Map(), from: 0, end: "" };
+let RP_LIVE = false;
+const lvLater = (fn, ms) => { LV.timers.push(setTimeout(fn, ms)); };
+function liveClose(){
+  LV.gen++;
+  LV.timers.forEach(clearTimeout); LV.timers = []; clearTimeout(LV.quiet);
+  try { LV.dc && LV.dc.close(); } catch(e){}
+  try { LV.pc && LV.pc.close(); } catch(e){}
+  if (LV.stream) LV.stream.getTracks().forEach(t => t.stop());
+  try { if (PLAYER && PLAYER.srcObject){ PLAYER.pause(); PLAYER.srcObject = null; } } catch(e){}
+  Object.assign(LV, { pc: null, dc: null, stream: null, open: false, muted: false });
+  LV.slots.clear();
+  if (RP) RP.playing = false;
+}
+function liveUI(){
+  const on = !!LV.pc, live = on && !LV.muted;
+  ["#rpMic", "#rpTalk"].forEach(sel => { const btn = $(sel); if (!btn) return;
+    btn.classList.toggle("listening", live); btn.classList.toggle("muted", on && LV.muted); btn.setAttribute("aria-pressed", String(live));
+    btn.setAttribute("aria-label", !on ? "Start the call" : LV.muted ? "Unmute" : "Mute"); btn.innerHTML = icon(on && LV.muted ? "micoff" : "mic"); });
+  const lab = $("#rpMicLabel"); if (lab) lab.textContent = !on ? "Tap to start the call" : !LV.open ? "Connecting…" : LV.muted ? "Muted · tap to talk" : "Live · just talk";
+}
+/* Start the call: key from the server, microphone, then the connection. Their voice plays through PLAYER,
+   which the tap that got here unlocked. */
+async function liveStart(){
+  if (!RP || !RP.live || RP.busy || RP.state !== "talking" || LV.pc) return;
+  const gen = ++LV.gen;
+  RP.busy = true; LV.end = "";
+  if (RP.saving){ try { await RP.saving; } catch(e){} RP.saving = null; if (gen !== LV.gen) return; }
+  LV.from = RP.log.length;
+  rpStatus("Connecting…", "think"); rpHint("Connecting the call…");
+  LV.pc = {}; liveUI();
+  let k, stream;
+  try {
+    k = await rpCall("live", { chat: RP.chat });
+    if (gen !== LV.gen) return;
+    RP.turns = k.turns;
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+    if (gen !== LV.gen){ stream.getTracks().forEach(t => t.stop()); return; }
+  } catch(e){ if (gen === LV.gen) liveFail(e && e.name === "NotAllowedError" ? { code: "mic" } : e); return; }
+  const pc = new RTCPeerConnection();
+  Object.assign(LV, { pc, stream });
+  pc.ontrack = e => { if (gen !== LV.gen || !PLAYER) return; try { PLAYER.src = ""; } catch(x){} PLAYER.srcObject = e.streams[0]; const pr = PLAYER.play(); pr && pr.catch(() => {}); };
+  stream.getTracks().forEach(t => pc.addTrack(t, stream));
+  const dc = pc.createDataChannel("oai-events"); LV.dc = dc;
+  dc.onmessage = e => { if (gen !== LV.gen) return; let m; try { m = JSON.parse(e.data); } catch(x){ return; } liveEvent(m); };
+  dc.onopen = () => {
+    if (gen !== LV.gen) return;
+    LV.open = true; RP.busy = false; RP.talk = true; liveUI();
+    rpStatus("Say hello. Just talk.", "listen");
+    rpHint("It's a live call: just talk, and they answer right away. Tap the mic to mute. Tap Done when you've finished.");
+    lvLater(() => { if (gen === LV.gen){ toast("That's 8 minutes. Let's see how you did."); rpEnd("done"); } }, LIVE_MAX_MS);
+    sfx("tap");
+  };
+  pc.onconnectionstatechange = () => { if (gen === LV.gen && ["failed", "closed"].includes(pc.connectionState) && RP && !LV.end) liveFail({ code: "drop" }); };
+  lvLater(() => { if (gen === LV.gen && !LV.open) liveFail({ code: "noconnect" }); }, 15000);
+  try {
+    const offer = await pc.createOffer(); await pc.setLocalDescription(offer);
+    const r = await fetch("https://api.openai.com/v1/realtime/calls", { method: "POST", body: offer.sdp, headers: { Authorization: `Bearer ${k.key}`, "Content-Type": "application/sdp" } });
+    const sdp = await r.text();
+    if (gen !== LV.gen) return;
+    if (!r.ok) throw Object.assign(new Error("noconnect"), { code: "noconnect" });
+    await pc.setRemoteDescription({ type: "answer", sdp });
+  } catch(e){ if (gen === LV.gen) liveFail(e && e.code ? e : { code: "noconnect" }); }
+}
+/* The call didn't work: say why, then carry on the slower way (recorded voice), or typing. */
+function liveFail(e){
+  const saving = LV.from < RP.log.length ? liveSave() : null;
+  liveClose();
+  if (!RP) return;
+  RP.busy = false; RP.talk = false;
+  const code = e && e.code;
+  if (["off", "limit", "team", "auth"].includes(code)){ RP.state = "ended"; toast(rpMsg(e)); timers.push(setTimeout(streetIntro, 2400)); return; }
+  if (code === "over"){ RP.live = false; liveUI(); rpMicUI(false); return; }
+  if (code === "mic"){ liveUI(); rpStatus("The microphone is blocked. Allow it for this site in your phone's settings, or type."); return; }
+  RP.live = false;
+  const m = code === "drop" ? "The call dropped." : "The live call couldn't connect.";
+  toast(RP.ear ? `${m} Switching to the slower voice: tap the mic and talk.` : `${m} Type your line instead.`);
+  if (!RP.ear && !SR) rpMode(false);
+  rpMicUI(false); liveUI();
+  if (saving) RP.saving = saving;
+}
+/* Who said what, kept in order: a slot opens when you stop talking or they start answering, and fills in when
+   the words arrive (yours come a moment later, from transcription). */
+function liveSlot(id, me){
+  if (!id) return null;
+  let s = LV.slots.get(id);
+  if (!s){
+    const entry = me ? { me: "" } : { them: [{ who: "A", text: "" }], cue: "" };
+    RP.log.push(entry);
+    s = { entry, el: me ? rpMe("…") : null }; LV.slots.set(id, s);
+  }
+  return s;
+}
+function liveEvent(m){
+  if (!RP) return;
+  switch (m.type){
+    case "input_audio_buffer.speech_started":
+      rpTalking(-1); RP.playing = false; rpStatus("You're talking…", "listen"); break;
+    case "input_audio_buffer.speech_stopped": case "input_audio_buffer.committed":
+      liveSlot(m.item_id, true); break;
+    case "conversation.item.input_audio_transcription.completed": {
+      const s = liveSlot(m.item_id, true), t = String(m.transcript || "").replace(/\s+/g, " ").trim().slice(0, 400);
+      if (!s) break;
+      s.entry.me = t; if (s.el){ const p = s.el.querySelector("p"); if (p) p.textContent = t || "…"; }
+      if (t) rpLearn(t);
+      break;
+    }
+    case "response.created":
+      liveSlot("r:" + (m.response && m.response.id), false);
+      if (!RP.playing) rpStatus("They're thinking…", "think");
+      break;
+    case "output_audio_buffer.started":
+      RP.playing = true; rpTalking(0); rpStatus(`${rpWho(0)} is talking…`, "talk"); break;
+    case "output_audio_buffer.stopped": case "output_audio_buffer.cleared":
+      clearTimeout(LV.quiet);
+      RP.playing = false; rpTalking(-1);
+      if (LV.end) return liveFinish();
+      rpStatus("Your turn. Just talk.", "listen"); break;
+    case "response.output_audio_transcript.delta":
+      // Some connections never send the audio-buffer events: the first words of their transcript mean they've started.
+      if (!RP.playing){ RP.playing = true; rpTalking(0); rpStatus(`${rpWho(0)} is talking…`, "talk"); }
+      clearTimeout(LV.quiet);
+      break;
+    case "response.done":
+      // ...and then guess when they've finished: about 65 ms a character after the reply is complete.
+      clearTimeout(LV.quiet);
+      if (RP.playing){ const s = LV.slots.get("r:" + (m.response && m.response.id)), n = s && s.entry.them ? s.entry.them[0].text.length : 40;
+        LV.quiet = setTimeout(() => { if (RP && RP.playing && LV.pc){ liveEvent({ type: "output_audio_buffer.stopped" }); } }, 1500 + n * 65); }
+      break;
+    case "response.output_audio_transcript.done": {
+      const s = liveSlot("r:" + m.response_id, false), t = String(m.transcript || "").replace(/\s+/g, " ").trim().slice(0, 400);
+      if (!s || !t) break;
+      s.entry.them[0].text = t;
+      rpThem(s.entry.them[0]); rpLearn(t);
+      const k = RP.log.indexOf(s.entry), mine = [...RP.log.slice(0, k)].reverse().find(e => "me" in e);
+      rpCaption(s.entry.them, "", mine ? mine.me : "");
+      break;
+    }
+    case "response.function_call_arguments.done": {
+      if (m.name !== "status") break;
+      let a = {}; try { a = JSON.parse(m.arguments || "{}"); } catch(e){}
+      RP.booked = a.booked === true;
+      if (a.state === "left" || a.state === "ended"){ LV.end = a.state; lvLater(() => { if (LV.end) liveFinish(); }, 7000); }
+      try { LV.dc.send(JSON.stringify({ type: "conversation.item.create", item: { type: "function_call_output", call_id: m.call_id, output: "{\"ok\":true}" } })); } catch(e){}
+      break;
+    }
+  }
+}
+/* What was said on this call goes to the server, so the coach (or typing on) can read it. */
+function liveSave(){
+  const items = [];
+  for (const e of RP.log.slice(LV.from)){
+    if ("me" in e && e.me) items.push({ me: true, text: e.me });
+    else if (e.them && e.them[0].text) items.push({ text: e.them[0].text });
+  }
+  const last = [...items].reverse().find(i => !i.me);
+  if (last){ last.booked = !!RP.booked; if (LV.end) last.state = LV.end; }
+  LV.from = RP.log.length;
+  if (!items.length) return Promise.resolve(null);
+  const chat = RP.chat, state = LV.end || "talking";
+  const send = () => rpCall("live_save", { chat, items, state }).then(r => { if (RP && RP.chat === chat){ RP.turns = r.turns; RP.resave = null; } return r; },
+    e => { if (RP && RP.chat === chat) RP.resave = send; throw e; });
+  return send();
+}
+/* They walked off or said goodbye: hang up and go to the score. */
+function liveFinish(){
+  if (!RP || !LV.pc) return;
+  RP.state = LV.end || RP.state;
+  rpEnd(RP.state === "talking" ? "done" : RP.state);
+}
+/* Hang up (Done, typing instead, leaving): stop the call and keep what was said. */
+function liveStop(){
+  if (!LV.pc) return null;
+  const saving = LV.open || LV.from < RP.log.length ? liveSave() : null;
+  liveClose(); liveUI();
+  if (RP){ RP.busy = false; RP.talk = false; }
+  return saving;
+}
+
 /* After their answer: in talk mode, listen again. */
 function rpResume(){ if (RP && RP.talk && RP.state === "talking" && !RP.busy) (RP.ear ? earListen() : rpListen()); }
 
@@ -3733,7 +3923,7 @@ function streetIntro(){
   if (S.name){
     left.textContent = "Checking…";
     rpReady().then(ok => ok ? rpCall("status") : Promise.reject({ code: "auth" }))
-      .then(j => { RP_EAR = !!j.voice; if (view !== "street" || !$("#rpLeft")) return; left.textContent = j.teamFull ? RP_MSG.team : j.left ? `${plural(j.left, "practice chat")} left today.` : RP_MSG.limit; if (!j.left || j.teamFull) go.disabled = true; })
+      .then(j => { RP_EAR = !!j.voice; RP_LIVE = !!j.live; if (view !== "street" || !$("#rpLeft")) return; left.textContent = j.teamFull ? RP_MSG.team : j.left ? `${plural(j.left, "practice chat")} left today.` : RP_MSG.limit; if (!j.left || j.teamFull) go.disabled = true; })
       .catch(e => { if (view !== "street" || !$("#rpLeft")) return; if (e.code === "off") return toClaude(); left.textContent = rpMsg(e); });
   }
   // No name yet: still ask the function, so a switched-off practice says so before anyone types a name.
@@ -3751,7 +3941,7 @@ function streetIntro(){
     go.disabled = true; go.textContent = "Starting…"; left.textContent = "";
     try {
       if (!await rpReady()) throw { code: navigator.onLine === false ? "net" : "auth" };
-      const j = await rpCall("start", { focus, lang: lg }); RP_EAR = !!j.voice;
+      const j = await rpCall("start", { focus, lang: lg }); RP_EAR = !!j.voice; RP_LIVE = !!j.live;
       streetChat(j);
     } catch(e){
       if (!$("#rpGo")) return;
@@ -3809,6 +3999,7 @@ function rpMode(call){
   const root = app.querySelector(".rp"); if (!root || !RP) return;
   RP.call = call; S.rpMode = call ? "voice" : "text"; save(false);
   root.classList.toggle("call", call);
+  if (!call && LV.pc){ RP.saving = liveStop(); if (RP.saving){ RP.busy = true; rpComposer(false); RP.saving.catch(() => {}).finally(() => { if (RP){ RP.busy = false; rpComposer(RP.state === "talking"); } }); } }
   if (!call && (RP.talk || REC || EAR.rec)){ RP.talk = false; RP.sendOnEnd = false; stopRec(); if (EAR.rec) earStop(false); rpMicUI(false); }
   if (!call) timers.push(setTimeout(() => { $("#rpText")?.focus({ preventScroll: true }); $("#rpLog")?.lastElementChild?.scrollIntoView({ block: "end" }); }, 50));
 }
@@ -3823,7 +4014,8 @@ function streetChat(j, couple){
     couple: couple || null, core: [], playing: false, idle: 0 };
   RP.ear = !RP.couple && RP_EAR && EAR_OK;   // the server hears you and speaks for them
   RP.tts = !RP.couple && RP_EAR;              // natural voices, even when typing
-  const talkable = RP.ear || !!SR;
+  RP.live = !RP.couple && RP_LIVE && LIVE_OK;  // a live call: the fluent way
+  const talkable = RP.live || RP.ear || !!SR;
   RP.call = talkable && S.rpMode !== "text";
   view = "street"; game = { kind: "street" };
   const sc = j.scene, who = sc.people.length > 1 ? "A couple" : sc.people[0].sex === "m" ? "A man" : "A woman";
@@ -3874,6 +4066,7 @@ function streetChat(j, couple){
     if (S.rpVoice) earUnlock(); else if (RP.playing){ stopSpeak(); rpTalking(-1); rpStatus(RP.talk ? "" : "Your turn."); rpResume(); } });
   on("#rpDone", () => rpEnd("done"));
   on("#rpQuit", rpQuit);
+  if (RP.live){ liveUI(); rpStatus("Tap the mic to start the call."); }
   if (!RP.call) timers.push(setTimeout(() => box.focus({ preventScroll: true }), 120));
 }
 
@@ -3973,6 +4166,13 @@ function rpMicUI(on, manual){
 function rpMic(){
   if (!RP || !($("#rpMic") || $("#rpTalk"))) return;
   earUnlock();
+  // A live call: the first tap starts it, then the mic mutes and unmutes.
+  if (RP.live && RP.call){
+    if (!LV.pc) return liveStart();
+    if (!LV.open) return;
+    LV.muted = !LV.muted; if (LV.stream) LV.stream.getTracks().forEach(t => t.enabled = !LV.muted);
+    liveUI(); rpStatus(LV.muted ? "Muted. Tap the mic to talk." : "Your turn. Just talk.", LV.muted ? "" : "listen"); return;
+  }
   // While they're talking, a tap cuts in: they stop and it listens.
   if (RP.playing && !RP.busy && RP.state === "talking"){ stopSpeak(); rpTalking(-1); RP.talk = true; RP.idle = 0; return RP.ear ? earListen() : rpListen(); }
   if (RP.ear){
@@ -4050,7 +4250,8 @@ function rpEnd(how){
   if (!RP) return;
   RP.talk = false;
   stopRec();
-  if (!RP.log.some(e => e.them)) return streetIntro();
+  if (LV.pc){ const sv = liveStop(); if (sv) RP.saving = sv; }
+  if (!RP.log.some(e => e.them && e.them.some(l => l.text))) return streetIntro();
   const talking = how === "done" && RP.state === "talking";
   rpComposer(false);
   const title = RP.state === "left" ? "They walked away." : RP.booked ? "They said yes." : RP.state === "ended" ? "They went on their way." : "You ended the chat.";
@@ -4064,7 +4265,9 @@ function rpEnd(how){
 }
 async function rpCoach(call){
   rpSheet(`<div class="say-row">${shoco("think")}<div class="bubble">Reading your chat… ${RP.couple ? "This can take up to a minute." : "This takes a few seconds."}</div></div>`);
-  try { RP.state = RP.state === "talking" ? "ended" : RP.state; streetScore(RP.couple ? await rpLocalCoach(call) : await rpCall("coach", { chat: RP.chat, call })); }
+  try {
+    if (RP.saving || RP.resave){ const sv = RP.saving || RP.resave(); RP.saving = null; await sv; }
+    RP.state = RP.state === "talking" ? "ended" : RP.state; streetScore(RP.couple ? await rpLocalCoach(call) : await rpCall("coach", { chat: RP.chat, call })); }
   catch(e){
     if (!$("#sheet")) return;
     rpSheet(`<div class="say-row">${shoco("sad")}<div class="bubble">${esc(rpMsg(e))}</div></div><button class="btn wide" id="rpRetry">Try again</button><button class="btn wide ghost" id="rpSkip">Leave without a score</button>`);

@@ -9,6 +9,7 @@ const ICONS = {
   x: '<path d="M6.5 6.5l11 11m0-11l-11 11" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>',
   speaker: '<path d="M3 9.5h3.8L12 5v14l-5.2-4.5H3z"/><path d="M15.2 8.6a5 5 0 0 1 0 6.8M17.8 6a8.6 8.6 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
   mic: '<path d="M12 2.5a3.5 3.5 0 0 1 3.5 3.5v5.5a3.5 3.5 0 0 1-7 0V6A3.5 3.5 0 0 1 12 2.5z"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21m-3.5 0h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  micoff: '<path d="M12 2.5a3.5 3.5 0 0 1 3.5 3.5v5.5a3.5 3.5 0 0 1-7 0V6A3.5 3.5 0 0 1 12 2.5z"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21m-3.5 0h7M4 3l16 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
   book: '<path d="M4 5.2A2.7 2.7 0 0 1 6.7 2.5H20v15.3H6.7A1.2 1.2 0 0 0 5.5 19a1.2 1.2 0 0 0 1.2 1.2H20v1.3H6.7A2.7 2.7 0 0 1 4 18.8z"/>',
   trophy: '<path d="M7 3h10v1.8h3.5v2.4A4.3 4.3 0 0 1 16.4 11.6 5.2 5.2 0 0 1 13.3 14v2.6h3.2V21h-9v-4.4h3.2V14a5.2 5.2 0 0 1-3.1-2.4A4.3 4.3 0 0 1 3.5 7.2V4.8H7zm0 4.1V6.6H5.6v.6A2.2 2.2 0 0 0 7.1 9.3 7 7 0 0 1 7 7.1zm10 0a7 7 0 0 1-.1 2.2 2.2 2.2 0 0 0 1.5-2.1v-.6H17z"/>',
   headphones: '<path d="M12 3.5a8.5 8.5 0 0 0-8.5 8.5v5.2A2.8 2.8 0 0 0 6.3 20H8v-7H5.8v-1a6.2 6.2 0 0 1 12.4 0v1H16v7h1.7a2.8 2.8 0 0 0 2.8-2.8V12A8.5 8.5 0 0 0 12 3.5z"/>',

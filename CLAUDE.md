@@ -50,7 +50,7 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   grammar slips, including in 300 generated guest cards) and whenever answer length would give
   the right option away (it may not be the longest by more than 5 characters, and may be the
   longest option in at most 35% of questions). Test with
-  `node academy/src/e2e.js <url> <outdir>` and `node academy/src/street_e2e.js <url> <outdir>` and `node academy/src/ear_e2e.js <url> <outdir>` (Playwright; serve `academy/`
+  `node academy/src/e2e.js <url> <outdir>` and `node academy/src/street_e2e.js <url> <outdir>`, `node academy/src/ear_e2e.js <url> <outdir>` and `node academy/src/live_e2e.js <url> <outdir>` (Playwright; serve `academy/`
   with Range support, e.g. `npx http-server academy`, and use a `localhost` url). Media: `academy/audio/` (voice notes, MP3), `academy/img/` (two slides
   from the Open House pitch deck, `photos/`), `academy/video/` (golf loop, H.264 MP4). It has `noindex`. Progress is
   per device in `localStorage['showup.v1']`. Once a worker saves a name, the phone also sends its
@@ -74,7 +74,12 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   the phone records you (MediaRecorder, and it sends when you pause), the function transcribes it
   (`SUA_STT_MODEL`, default `gpt-4o-mini-transcribe`) and reads the couple's lines in natural voices
   (`SUA_TTS_MODEL`, default `gpt-4o-mini-tts`). Without it, phones use their own speech recognition and voices,
-  which iPhones often don't pass to the page. It runs with `verify_jwt` off because it checks each phone's device id and secret itself.
+  which iPhones often don't pass to the page. The same key turns the voice call into a live call (the default):
+  the function mints a one-minute OpenAI Realtime key (op `live`, `SUA_LIVE_MODEL`, default `gpt-realtime-2.1-mini`),
+  the phone talks to OpenAI directly over WebRTC (`liveStart()` in `street.js`), the couple answers in about a
+  second with the same knowledge and reactions (`liveInstructions()` in `street-core.js`; one voice, so the lead
+  person passes on what the partner says), and the transcript goes back with op `live_save` for Shoco (Claude) to
+  score. If the call can't connect, the recorded way takes over. It runs with `verify_jwt` off because it checks each phone's device id and secret itself.
   The deployed `index.ts` is this repo's, except that it imports `handler.ts` (and with it `street-core.js` and `voice.ts`) from this
   repo at a pinned commit, so what runs is what's in git: after changing either, push, then redeploy `index.ts` with
   the new commit id.
