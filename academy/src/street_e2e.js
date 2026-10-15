@@ -168,6 +168,10 @@ const TEAMROWS = [
   await q.waitForFunction(() => document.querySelector("#rpLeft") && !/Checking/.test(document.querySelector("#rpLeft").textContent), null, { timeout: 3000 });
   ok("off: points to the free Claude version and disables Start", (await q.textContent("#rpLeft")).includes("free in the Claude version") && (await q.getAttribute("#rpLeft a", "href")).startsWith("https://claude.ai/artifact/") && await q.isDisabled("#rpGo"));
   await q.screenshot({ path: `${out}/08-off.png` });
+  const q2 = await mk({}, { off: true });
+  await q2.click('.tabs button[data-tab="games"]'); await q2.click("#rp");
+  await q2.waitForSelector("#rpLeft a", { timeout: 3000 });
+  ok("off, no name yet: points to the Claude version right away, no name field", (await q2.getAttribute("#rpLeft a", "href")).startsWith("https://claude.ai/artifact/") && await q2.isDisabled("#rpGo") && !(await q2.$("#rpName")));
 
   /* 3. Dark mode chat + score */
   const d = await mk({ colorScheme: "dark" });

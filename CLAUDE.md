@@ -71,6 +71,9 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   Function secret `SUA_ANTHROPIC_KEY`; without it, it answers `off` and the page points to the Claude version. Optional
   secrets: `SUA_RP_MODEL` (default `claude-haiku-5-5`), `SUA_RP_PER_DAY` (chats per phone per day, 6),
   `SUA_RP_TEAM_DAY` (150). It runs with `verify_jwt` off because it checks each phone's device id and secret itself.
+  The deployed `index.ts` is this repo's, except that it imports `handler.ts` (and with it `street-core.js`) from this
+  repo at a pinned commit, so what runs is what's in git: after changing either, push, then redeploy `index.ts` with
+  the new commit id.
   Chats are kept in `sua_rp_chats` (service role only) and wiped after 30 days. `build.py` keeps
   `server/sua-roleplay/street-core.js` a copy of `src/street-core.js`. Never put the key in the page or the repo.
   Don't link it from guest pages.

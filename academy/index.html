@@ -3522,7 +3522,7 @@ function streetIntro(){
   </div>`, { full: true });
   on("#rpBack", () => tab("games"));
   const left = $("#rpLeft"), go = $("#rpGo");
-  const toClaude = () => { left.innerHTML = `${esc(RP_MSG.off)} <a href="${CLAUDE_URL}" target="_blank" rel="noopener">Open the Claude version</a>`; go.disabled = true; };
+  const toClaude = () => { $("#rpName")?.closest(".stack")?.remove(); left.innerHTML = `${esc(RP_MSG.off)} <a href="${CLAUDE_URL}" target="_blank" rel="noopener">Open the Claude version</a>`; go.disabled = true; };
   if (inClaude){
     left.textContent = "Checking…"; go.disabled = true;
     rpSampler().then(fn => {
@@ -3545,6 +3545,8 @@ function streetIntro(){
       .then(j => { if (view !== "street" || !$("#rpLeft")) return; left.textContent = j.teamFull ? RP_MSG.team : j.left ? `${plural(j.left, "practice chat")} left today.` : RP_MSG.limit; if (!j.left || j.teamFull) go.disabled = true; })
       .catch(e => { if (view !== "street" || !$("#rpLeft")) return; if (e.code === "off") return toClaude(); left.textContent = rpMsg(e); });
   }
+  // No name yet: still ask the function, so a switched-off practice says so before anyone types a name.
+  else rpCall("status").catch(e => { if (e.code === "off" && view === "street" && $("#rpLeft")) toClaude(); });
   on("#rpGo", async () => {
     const focus = app.querySelector("input[name=focus]:checked")?.value || "any", lg = app.querySelector("input[name=lang]:checked")?.value || "en";
     S.rpFocus = focus; S.rpLang = lg;
