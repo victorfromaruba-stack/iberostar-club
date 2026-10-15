@@ -1,6 +1,6 @@
-// End-to-end run of Show-Up Academy in headless Chromium, like a player on a phone (about 125 checks).
+// End-to-end run of Show-Up Academy in headless Chromium, like a player on a phone (about 130 checks).
 // Usage: node academy/src/e2e.js <pageUrl> <outDir>   (needs Playwright; serve academy/ with Range support, e.g. npx http-server academy)
-// The team database is mocked here, so the test never writes to it.
+// The team database is mocked here, so the test never writes to it. Street practice has its own test: street_e2e.js.
 const { chromium } = require("playwright");
 const [url, out] = process.argv.slice(2);
 const results = [];
@@ -79,7 +79,8 @@ const EVIL = [
   ok("loads with no errors", p.errors.length === 0, p.errors.join(" | "));
   ok("9 voice notes loaded", await p.evaluate(() => CLIPS.length === 9 && CLIPS.every(c => c.s.length > 3)));
   ok("Learn tab with name form", await p.isVisible("#nm"));
-  ok("13 level nodes on the path", await p.evaluate(() => document.querySelectorAll("[data-node]").length) === 13);
+  ok("every level has a node on the path", await p.evaluate(() => document.querySelectorAll("[data-node]").length === LEVEL_IDS.length && LEVEL_IDS.length === 17));
+  ok("Street skills unit with credit", await p.evaluate(() => /Street skills/.test(document.querySelector("#app").textContent) && /Timeshare OPC University/.test(document.querySelector(".foot").textContent)));
   ok("start node is Qualified guests", await p.evaluate(() => document.querySelector(".node.current")?.dataset.node) === "q");
   ok("both tracks open at the start", await p.evaluate(() => !document.querySelector('[data-node="why"]').classList.contains("locked") && document.querySelector('[data-node="ctnq"]').classList.contains("locked")));
   ok("final locked", await p.evaluate(() => document.querySelector('[data-node="final"]').classList.contains("locked")));
@@ -333,9 +334,13 @@ const EVIL = [
   // 13. Review due, final run, certificate
   await p.evaluate(() => { S.mastered.q.last = Date.now() - 2 * DAY; save(false); tab("learn"); });
   ok("review due shows on the path", await p.evaluate(() => document.querySelector('[data-node="q"]').classList.contains("due") && /Review time/.test(document.querySelector(".say-row .bubble").textContent)));
-  ok("final still locked until NLP is done", await p.evaluate(() => document.querySelector('[data-node="final"]').classList.contains("locked")));
-  await p.evaluate(() => { ["words", "nlp2", "nlp3", "nlp4"].forEach(id => S.mastered[id] = { count: 1, last: Date.now() }); save(false); tab("learn"); });
-  ok("final unlocked after all 12", await p.evaluate(() => !document.querySelector('[data-node="final"]').classList.contains("locked")));
+  ok("final still locked until NLP and Street skills are done", await p.evaluate(() => document.querySelector('[data-node="final"]').classList.contains("locked")));
+  await p.evaluate(() => { ["words", "nlp2", "nlp3", "nlp4", "st1", "st2", "st3"].forEach(id => S.mastered[id] = { count: 1, last: Date.now() }); save(false); tab("learn"); });
+  ok("final still locked with one Street skills level left", await p.evaluate(() => document.querySelector('[data-node="final"]').classList.contains("locked")));
+  await p.evaluate(() => { guidebook("st4"); });
+  ok("Street skills guidebook credits the source with a link", await p.evaluate(() => [...document.querySelectorAll(".note a")].some(a => a.href === "https://www.youtube.com/@timeshareopcuniversity2290" && a.target === "_blank")));
+  await p.evaluate(() => { S.mastered.st4 = { count: 1, last: Date.now() }; save(false); tab("learn"); });
+  ok("final unlocked after all 16", await p.evaluate(() => !document.querySelector('[data-node="final"]').classList.contains("locked")));
   await p.evaluate(() => play("final"));
   ok("final: 20 mixed items", await p.evaluate(() => game.list.length === 20));
   await clearRun(p);
@@ -368,7 +373,7 @@ const EVIL = [
   await pn.fill("#nm", "Ana"); await pn.keyboard.press("Enter");
   await pn.evaluate(() => { const L = byId("q"); const q = L.qs.find(q => q.type === "match"); startRun(L, [q]); });
   await noOverflow("match at 320px", pn);
-  await pn.evaluate(() => { S.mastered = Object.fromEntries(LEVEL_IDS.slice(0, 12).map(id => [id, { count: 1, last: Date.now() }])); play("who"); });
+  await pn.evaluate(() => { S.mastered = Object.fromEntries(LEVEL_IDS.slice(0, -1).map(id => [id, { count: 1, last: Date.now() }])); play("who"); });
   await noOverflow("scenario at 320px", pn);
   await pn.evaluate(() => tab("script")); await noOverflow("script at 320px", pn);
   await pn.evaluate(() => tab("me")); await noOverflow("me at 320px", pn);

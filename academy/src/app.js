@@ -9,8 +9,8 @@ const SB = { url: "https://cdkopyphjvfxjqhasrae.supabase.co", key: "sb_publishab
 const TEAM_URL = "https://victorfromaruba-stack.github.io/iberostar-club/academy/";
 const TEAM_HOST = /github\.io$/.test(location.hostname) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 const GOAL = 50;
-const ORDER = ["q","why","ctnq","offer","nlp1","who","solid","words","nlp2","map","nlp3","nlp4","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","words","map","nlp1","nlp2","nlp3","nlp4","final"];
+const ORDER = ["q","why","st1","ctnq","offer","st2","nlp1","who","st3","solid","words","nlp2","st4","map","nlp3","nlp4","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","words","map","nlp1","nlp2","nlp3","nlp4","st1","st2","st3","st4","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];
@@ -52,18 +52,20 @@ function levelTotal(L){ return L.map ? MAP_STEPS.length*2 : (L.count || (L.qs||[
 const KEY = "showup.v1";
 const blank = () => ({ name:"", mastered:{}, best:{}, misses:{}, sound:true, xp:0, lightning:0, daily:{ last:"", streak:0, best:0 },
   listened:{}, intro:false, days:[], today:{ d:"", xp:0 }, said:{}, sync:{ device:"", secret:"", last:0, ok:null }, mgr:"", tab:"learn",
-  lv:{}, log:[] });
+  lv:{}, log:[], rp:{ n:0, best:0, res:[] }, rpVoice:true, rpFocus:"any", rpLang:"en" });
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e){}
 for (const [k, v] of Object.entries(blank())) if (typeof S[k] !== typeof v || (Array.isArray(v) && !Array.isArray(S[k]))) S[k] = v;
 if (S.daily.last && !S.days.includes(S.daily.last)) S.days.push(S.daily.last);
+if (!Array.isArray(S.rp.res) || typeof S.rp.n !== "number") S.rp = blank().rp;
 /* Levels can get shorter between versions: a saved best run never shows more than the level has. */
 for (const id of Object.keys(S.best)){ const L = LEVELS.find(l => l.id === id); if (L) S.best[id] = Math.min(S.best[id], levelTotal(L)); }
 function save(sync = true){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} if (sync) queueSync(); }
 
 /* For the manager panel: right and wrong answers and tries per level, and a log of recent lessons.
    Log entries are [time, kind, level, value, total]. Kinds: m mastered, r review done, p practice,
-   f a run that ended on a mistake (value = how many in a row), d Daily 10, lg Lightning round. */
+   f a run that ended on a mistake (value = how many in a row), d Daily 10, lg Lightning round,
+   rp Street practice (level = the couple's mood, value = score, total = 1 if they called the gift right). */
 const QLEVEL = Object.fromEntries(LEVELS.flatMap(l => (l.qs || []).map(q => [q.id, l.id])));
 function lvOf(id){ return S.lv[id] && typeof S.lv[id] === "object" ? S.lv[id] : (S.lv[id] = { r:0, w:0, t:0 }); }
 function logEvent(k, id, v = 0, n = 0){ S.log.push([Date.now(), k, id, v, n]); S.log = S.log.slice(-25); }
@@ -365,7 +367,8 @@ function payload(){
     b:Object.fromEntries(LEVEL_IDS.map(id => [id, S.best[id]||0])),
     a:Object.fromEntries(LEVEL_IDS.map(id => { const v = S.lv[id] || {}; return [id, [v.r||0, v.w||0, v.t||0]]; })),
     l:S.lightning||0, d:streakDays(), h:CLIPS.filter(c => S.listened[c.id]).length,
-    sl:linesPracticed(), w:topMisses(20), lg:S.log.slice(-20), dd:S.days.slice(-30), t:Date.now(), ld:S.days[S.days.length-1] || "" };
+    sl:linesPracticed(), w:topMisses(20), lg:S.log.slice(-20), dd:S.days.slice(-30), t:Date.now(), ld:S.days[S.days.length-1] || "",
+    rp:{ n:S.rp.n, b:S.rp.best, s:S.rp.res.slice(-10) } };
 }
 async function rpc(fn, body){
   const r = await fetch(`${SB.url}/rest/v1/rpc/${fn}`, { method:"POST", keepalive: fn === "sua_save", headers:{ "apikey": SB.key, "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -406,6 +409,7 @@ function show(html, opts = {}){
   timers.forEach(clearTimeout); timers = [];
   if (!opts.keepAudio) stopAudio();
   stopRec();
+  try { window.speechSynthesis && speechSynthesis.cancel(); } catch(e){}
   document.querySelectorAll(".combo,.plus").forEach(n => n.remove());
   app.innerHTML = html;
   document.body.classList.toggle("full", !!opts.full);
@@ -469,7 +473,7 @@ function renderLearn(){
       </div>
       <div class="path">${u.levels.map(id => nodeHTML(id, u, OFFS[(k++) % OFFS.length])).join("")}</div>
     </section>`).join("")}
-  <p class="foot">Sources: Qualifications Aruba (2 March 2026), the team's voice notes (29 Sept 2026), and the Open House pitch deck.</p>`);
+  <p class="foot">Sources: Qualifications Aruba (2 March 2026), the team's voice notes (29 Sept 2026), and the Open House pitch deck. Street skills uses ideas from the Timeshare OPC University videos and the OPC Secrets By Suz audiobook, in our own words.</p>`);
   const nfm = $("#nameForm");
   if (nfm) nfm.addEventListener("submit", e => { e.preventDefault(); const v = $("#nm").value.trim().slice(0,30); if (v){ S.name = v; save(false); pushSync(); sfx("ok"); renderLearn(); } });
   on("#toScript", () => tab("script"));
@@ -519,7 +523,8 @@ function togglePop(id){
 function noteHTML(nt){
   return `<section class="note"><h2>${esc(nt.h)}</h2><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
     ${nt.hear ? `<div class="acts"><button class="btn small ghost" data-seg="${nt.hear.clip}:${nt.hear.from}:${nt.hear.to}">${icon("play")} ${esc(nt.hear.label || "Hear it in the voice notes")}</button></div>` : ""}
-    ${nt.sayId ? lineHTML(NLP_LINES[nt.sayId]) : nt.say ? `<p class="line"><span class="quote">"${esc(nt.say)}"</span></p>` : ""}</section>`;
+    ${nt.sayId ? lineHTML(NLP_LINES[nt.sayId]) : nt.say ? `<p class="line"><span class="quote">"${esc(nt.say)}"</span></p>` : ""}
+    ${nt.src ? [].concat(nt.src).map(x => `<p class="small"><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a></p>`).join("") : ""}</section>`;
 }
 function guidebook(id){
   view = "guide"; game = null;
@@ -949,12 +954,13 @@ function renderScript(){
 /* ---------- Games tab ---------- */
 function renderGames(){
   show(`
-  <header class="stack" style="padding-top:12px"><h1>Games</h1><p class="muted">Speed and memory. Every game you finish counts for your streak.</p></header>
+  <header class="stack" style="padding-top:12px"><h1>Games</h1><p class="muted">Speed, memory and the real conversation. Every game you finish counts for your streak.</p></header>
+  <article class="tile-card c-flamingo rp-tile"><div class="ico">${icon("couple")}</div><div><h2>Street practice</h2><p class="small muted">Pitch a tourist couple by voice or text. Shoco scores you after.${S.rp.n ? ` Best: ${S.rp.best}.` : ""}</p></div><button class="btn small flamingo" id="rp">Start</button></article>
   <article class="tile-card c-lagoon" style="--c:var(--sea);--soft:var(--sea-soft)"><div class="ico">${icon("bolt")}</div><div><h2>Lightning round</h2><p class="small muted">${lightningOpen() ? `60 seconds. Record: ${S.lightning||0} couples.` : 'Opens after "Who qualifies?"'}</p></div>${lightningOpen() ? `<button class="btn small sea" id="lg">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-sun"><div class="ico">${icon("calendar")}</div><div><h2>Daily 10</h2><p class="small muted">${dailyOpen() ? (S.daily.last === today() ? "Done today. Play again for practice." : "Ten questions. Your misses come back more.") : "Opens after your first mastered level."}</p></div>${dailyOpen() ? `<button class="btn small sun" id="dy">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-flamingo"><div class="ico">${icon("route")}</div><div><h2>Pitch map</h2><p class="small muted">${unlocked("map") ? "Put the pitch in order, then the lines." : `Opens after "${byId(before("map")).name}"`}</p></div>${unlocked("map") ? `<button class="btn small flamingo" id="mp">Play</button>` : icon("lock")}</article>
   <article class="tile-card"><div class="ico">${icon("headphones")}</div><div><h2>Voice notes</h2><p class="small muted">${CLIPS.filter(c => S.listened[c.id]).length} of ${CLIPS.length} heard</p></div><button class="btn small ghost" id="vn">Listen</button></article>`);
-  on("#lg", lightningIntro); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
+  on("#rp", streetIntro); on("#lg", lightningIntro); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
 }
 
 /* ---------- Me tab ---------- */
@@ -970,6 +976,8 @@ function renderMe(){
     <div class="statbox" style="color:var(--sun-2)">${icon("star")}<b style="color:var(--ink)">${nf(S.xp)}</b><span>total XP</span></div>
     <div class="statbox" style="color:var(--sea)">${icon("bolt")}<b style="color:var(--ink)">${S.lightning||0}</b><span>Lightning record</span></div>
     <div class="statbox" style="color:var(--flamingo)">${icon("mic")}<b style="color:var(--ink)">${linesPracticed()}</b><span>script lines said</span></div>
+    <div class="statbox" style="color:var(--flamingo)">${icon("couple")}<b style="color:var(--ink)">${S.rp.n}</b><span>street practice chats</span></div>
+    <div class="statbox" style="color:var(--good)">${icon("trophy")}<b style="color:var(--ink)">${S.rp.n ? S.rp.best : "–"}</b><span>best street score</span></div>
   </section>
   <section class="card"><p class="eyebrow">This week</p><div class="week">${days.map(d => { const on = S.days.includes(dstr(d)); return `<span>${"SMTWTFS"[d.getDay()]}<i class="${on ? "on" : ""}">${on ? icon("check") : ""}</i></span>`; }).join("")}</div></section>
   ${weak.length ? `<section class="card weak"><p class="eyebrow">Your weak spots</p><ul>${weak.map(([id, n]) => `<li>${esc(QBY[id].q)}<br><span class="ans">${esc(answerText(QBY[id]))}</span> <span class="small muted nowrap">· missed ${n}×</span></li>`).join("")}</ul></section>` : ""}
@@ -979,6 +987,7 @@ function renderMe(){
       <li>Pulling the answer out of your head is what builds memory. Re-reading doesn't.</li>
       <li>Levels come back for review after 1, 3, 7, 14 and 30 days. Spacing it out makes it stick.</li>
       <li>Hear the lines from the voice notes, then say them out loud in the Script tab.</li>
+      <li>Street practice in Games puts it all together: a real conversation with a tourist couple, then your score.</li>
     </ul></section>
   <section class="row">
     <button class="btn small ghost" id="snd">${icon(S.sound ? "sound" : "mute")} Sound ${S.sound ? "on" : "off"}</button>

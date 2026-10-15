@@ -460,6 +460,203 @@ const LEVELS = [
     Q("n49","When should you let a couple go?","When it's really not for them",["Never, keep pushing","When they ask about breakfast","When they give their number"],"A solid no beats a fake yes. Let them go with a smile.")
   ]
 },
+{
+  id: "st1", name: "Mindset", sub: "Numbers, goals, attitude", icon: "target",
+  notes: [
+    { h: "It's a numbers game", li: [
+      "Most people you greet keep walking. That's normal, and it isn't about you.",
+      "Greet everyone who walks by. The more people you talk to, the more couples you book.",
+      "Every no gets you closer to the couple who says yes. Smile, let it go, greet the next one." ] },
+    { h: "Attitude is a choice", li: [
+      "Keep a positive attitude all day, in the sun and in the rain.",
+      "Stay out of the \"it's slow today\" talk. Negative coworkers drain your energy.",
+      "People feel your mood from across the street." ] },
+    { h: "Goals on paper", li: [
+      "Write down what you're working for, and be specific: what it is, how much, and by when.",
+      "Work back from it: how many bookings a week get you there? Look at that number every morning.",
+      "Next month, aim a little higher." ] },
+    { h: "Get your body ready", li: [
+      "Eat a real meal and drink water. Skipped meals and three coffees make you slow and short-tempered by noon.",
+      "Take a short walk before your shift, put on music that lifts you, and take a few slow, deep breaths.",
+      "Start with something you're grateful for. People feel your energy before they hear your words." ] },
+    { h: "Your day starts at home", li: [
+      "Before your shift, go over your lines, check your goal and plan how many bookings you need today.",
+      "Bring everything: pens, invitations, a map. Fumbling for a pen costs you trust.",
+      "Look the part: clean uniform, name tag, a real smile. People say yes to people they like." ] },
+    { h: "It's not the spot, it's you", li: [
+      "A quiet corner still has people walking by. All you need is one couple who stops.",
+      "Book from a slow spot, and the better spots follow.",
+      "Don't judge people by how they look. Greet everyone, and let the small talk tell you who qualifies." ] },
+    { h: "Win together", li: [
+      "Share what works with your coworkers, and ask the top promoters what they say. There are enough couples for everyone.",
+      "Celebrate a good week. Then do it again." ] },
+    { h: "Know your area", li: [
+      "Know the beaches, restaurants, shops, bus stops and supermarkets around your spot.",
+      "Help people find things and they trust you. Trust comes before every booking." ] },
+    { h: "Where this comes from", li: [
+      "Ideas from the Timeshare OPC University videos and from Suzanne R. Angeles's audiobook \"How To Become A Booking Timeshare Marketing OPC\" (OPC Secrets By Suz), put in our own words and fitted to Iberostar's rules and the Open House." ],
+      src: [{ label: "Timeshare OPC University on YouTube", url: "https://www.youtube.com/@timeshareopcuniversity2290" },
+            { label: "OPC Secrets By Suz on YouTube", url: "https://www.youtube.com/watch?v=BzTAhkKYrWg" }] }
+  ],
+  qs: [
+    Q("st1a","Most people you greet keep walking. What does that mean?","It's normal. Greet the next person",["Your pitch is wrong. Stop for today","Move to a busier spot right away","Ask your manager for a new script"],"Most people say no. The more people you greet, the more you book."),
+    Q("st1b","A coworker says, \"It's dead today, why bother?\" What do you do?","Stay positive and keep greeting people",["Agree and take a long break together","Go home early and try again tomorrow","Complain to the manager about the spot"],"Negative talk drains you. Your attitude is yours to choose."),
+    Q("st1c","How should you write down a goal?","Specific: what, how much and by when",["Short and vague, so it feels easy","Only in your head, never on paper","As a wish, like \"make more money\""],"A specific goal on paper is one you can plan for."),
+    Q("st1d","You have your goal. What do you work out next?","How many bookings a week get you there",["How many hours you can skip each week","How many people walk past your spot","How much the other promoters make"],"Turn the goal into a weekly number, and check it every morning."),
+    Q("st1e","Your shift starts at 8. When does your work start?","At home: lines, goal and materials",["The moment the first couple stops","After your first booking of the day","When your manager arrives at the spot"],"Plan the day before it starts: what you'll say and how many you need."),
+    Q("st1f","You're given the quietest spot. What's the best attitude?","It's not the spot, it's me. Book here",["Wait until they give me a better spot","Spend the day talking with coworkers","Only greet people who look like buyers"],"One couple is all you need. Book from a slow spot and better spots follow."),
+    Q("st1g","Why learn the beaches, shops and bus stops around you?","Helping people builds trust fast",["Guests only want directions, not offers","So you can leave your spot more often","Your manager tests you on the map"],"Help first. Trust comes before every booking."),
+    Q("st1h","Why keep pens and invitations ready at all times?","Fumbling for a pen costs you trust",["Managers count your pens every morning","Guests like to keep a pen as a gift","Invitations run out by the afternoon"],"Be ready the second a couple says yes."),
+    Q("st1i","What helps your energy before a shift?","A real meal, water and a short walk",["Skipping lunch to save some time","Three coffees and no breakfast at all","Scrolling your phone until the start"],"Your body carries your mood. People feel it before you say a word."),
+    Q("st1j","A couple looks like they couldn't afford a vacation. What do you do?","Greet them like everyone else",["Let them walk past without a word","Ask them first what they earn","Only point them to the bus stop"],"Don't judge by looks. The small talk tells you who qualifies.")
+  ]
+},
+{
+  id: "st2", name: "Stop them", sub: "Read people, open the talk", icon: "hand",
+  notes: [
+    { h: "Stopping people is most of the job", li: [
+      "Once a couple stops and talks with you, the rest gets much easier. Master this first.",
+      "Practice it on purpose: spend a whole shift trying only to stop people." ] },
+    { h: "Read them before they reach you", li: [
+      "Watch them come: a team cap, a hotel bracelet, holding hands, kids, a map in hand, looking at street signs.",
+      "Young couple, family, retirees, honeymooners: each one gets a different opener.",
+      "Pick your opener before they're in front of you." ] },
+    { h: "Open with them, not the offer", li: [
+      "Say something real about what you see, or offer help: \"Go Steelers! Where are you guys from?\" \"Looking for something? I know the area.\"",
+      "Ask questions people enjoy answering. People love to talk about themselves.",
+      "Don't open with free stuff. Say why you're inviting them before what they get." ] },
+    { h: "Compliments and easy openers", li: [
+      "A sincere compliment stops people: their hat, their bag, a cute kid. Keep it real, never flirty.",
+      "Easy questions open people up: \"Did you just get in?\" \"Celebrating anything special?\"",
+      "An anniversary or a birthday? \"Congratulations! How nice that you chose Aruba for it.\"" ] },
+    { h: "How you say it", li: [
+      "Start talking before they're in front of you: a bit louder while they're far, then softer so they lean in.",
+      "Smile, make eye contact, sound glad to see them. How you say it matters as much as what you say.",
+      "Be sincere. People feel a fake line from far away." ] },
+    { h: "Lead the way", li: [
+      "When you point them to your spot, turn and walk. Assume they're coming.",
+      "Don't pull or push. Lead with confidence and most people follow." ] },
+    { h: "Have your openers ready", li: [
+      "Write openers for the people you meet most: Americans, Canadians, South Americans, families, retirees, honeymooners.",
+      "Say them out loud until they sound like you." ] },
+    { h: "Where this comes from", li: [
+      "Ideas from the Timeshare OPC University videos and from Suzanne R. Angeles's audiobook \"How To Become A Booking Timeshare Marketing OPC\" (OPC Secrets By Suz), put in our own words and fitted to Iberostar's rules and the Open House." ],
+      src: [{ label: "Timeshare OPC University on YouTube", url: "https://www.youtube.com/@timeshareopcuniversity2290" },
+            { label: "OPC Secrets By Suz on YouTube", url: "https://www.youtube.com/watch?v=BzTAhkKYrWg" }] }
+  ],
+  qs: [
+    Q("st2a","A couple walks toward you. When do you pick your opener?","Before they reach you, from what you see",["Once they stop and look at your stand","After they ask you what you're selling","Never. I say the same line to everyone"],"Read them as they come: caps, bracelets, kids, maps. Then pick your opener."),
+    Q("st2b","He wears a Pittsburgh Steelers cap. What's a good opener?","\"Go Steelers! Where are you guys from?\"",["\"Hi! Free breakfast and a gift for you!\"","\"Excuse me, do you have a minute?\"","\"Are you interested in a promotion?\""],"Open with something real about them and a question they enjoy answering."),
+    Q("st2c","Why ask people questions about themselves?","People love to talk about themselves",["It fills the time until they leave","So you can sell them something else","It's the rule for every promoter"],"When they talk about themselves, they relax and start to like you."),
+    Q("st2d","They're still far away. How do you use your voice?","A bit louder first, then softer up close",["Loud the whole time, so they all hear","A whisper, so they have to come close","Wait until they're right next to you"],"Reach them from a distance, then lower your voice so they lean in."),
+    Q("st2e","Why should your opener be sincere?","People feel a fake line from far away",["Fake lines are against the law here","Sincere lines are always much shorter","Managers listen to every opener"],"Say something true about what you see. Fake lines push people away."),
+    Q("st2f","You told them where to go. What next?","Turn and walk. Assume they'll follow",["Wait for them to say they're coming","Hold their arm and walk them over","Ask twice if they really want to go"],"Lead with confidence. Most people follow."),
+    Q("st2g","Someone is reading street signs. What's a good way in?","Offer help: \"Looking for something?\"",["Tell them about the gift right away","Ask how old they are and if they work","Let them go. Lost people never stop"],"Help first. A lost tourist is glad to meet someone who knows the area."),
+    Q("st2h","How do you get better at stopping people?","Practice only stopping people for a day",["Wait for the busy season to come back","Change your opener after every no","Stand closer to the hotel entrance"],"Stopping people is most of the job. Practice it on purpose."),
+    BUILD("bs3","Build a friendly opener.","Go Steelers! Where are you guys from?",["Free","gift"],"Something real about them, then a question they enjoy answering."),
+    Q("st2i","Which compliment works best?","A sincere one about something they chose",["A flirty one, to make them both laugh","One about how rich they both look","None. Compliments always sound fake"],"A real compliment about their hat, bag or kids stops people. Never flirty."),
+    Q("st2j","They say they're here for their anniversary. What do you say?","\"Congratulations! You chose Aruba for it!\"",["\"Great, then you need our free gift.\"","\"Okay. Are you two over 32 years old?\"","\"Nice. Do you have a credit card?\""],"Share the moment first. The pitch can wait a few seconds.")
+  ]
+},
+{
+  id: "st3", name: "Small talk", sub: "Break the ice, qualify as you go", icon: "talk",
+  notes: [
+    { h: "Give first, then ask", li: [
+      "While you help (directions, a tip, a good restaurant), ask about them: where they're from, first time in Aruba, what they've liked so far.",
+      "Talk with them, not at them. It should feel like a chat, never an interview.",
+      "People don't care how much you know until they know how much you care." ] },
+    { h: "Qualify inside the small talk", li: [
+      "\"Where are you from? Where are you staying? When do you fly home?\" These fit any friendly chat.",
+      "Work: \"What do you guys do back home?\"",
+      "Age: ask in a friendly way. With older couples, \"Are you retired yet, or still working?\" often opens it up.",
+      "Recent tour: \"Have you been to an Iberostar breakfast before?\"",
+      "Card: check which card they have when you go over what to bring." ] },
+    { h: "Tie the gift to what they love", li: [
+      "Find out what they enjoy: a great dinner, snorkeling, shopping, golf.",
+      "Then make the gift real for them: their IberoCash works at partners like Gianni's, Daniel's Steak & Chop or Rocka Beach Tours.",
+      "Only promise what the invitation really gives. Never invent prices or extras." ] },
+    { h: "True stories only", li: [
+      "A real story from a couple you invited helps a doubtful couple: \"A couple I met last week used theirs at Gianni's and loved it.\"",
+      "Only tell stories that really happened. Made-up stories come out, and then nothing you said counts." ] },
+    { h: "One question at a time", li: [
+      "Never fire questions one after another. Ask, listen, share something, then ask the next.",
+      "Do the math as you go: country, his age, work, card, where they stay, when they leave." ] },
+    { h: "If they don't qualify", li: [
+      "Let them go with a smile and wish them a great trip. The next couple is coming.",
+      "Never ask anyone to bend the truth to qualify. It comes out at the hostess desk anyway.",
+      "A couple who doesn't qualify earns you nothing, so don't spend your morning on them." ] },
+    { h: "Go over it before they leave", li: [
+      "While you write the invitation, go over what they need: every adult brings 2 IDs, and one of them brings a credit card.",
+      "Tell them there's a short presentation about the club. Prepared guests stay curious. Surprised guests close up." ] },
+    { h: "Where this comes from", li: [
+      "Ideas from the Timeshare OPC University videos and from Suzanne R. Angeles's audiobook \"How To Become A Booking Timeshare Marketing OPC\" (OPC Secrets By Suz), put in our own words and fitted to Iberostar's rules and the Open House." ],
+      src: [{ label: "Timeshare OPC University on YouTube", url: "https://www.youtube.com/@timeshareopcuniversity2290" },
+            { label: "OPC Secrets By Suz on YouTube", url: "https://www.youtube.com/watch?v=BzTAhkKYrWg" }] }
+  ],
+  qs: [
+    Q("st3a","When do you ask about them?","While you help with directions or tips",["Only after they have agreed to come","Before you say anything else at all","Never. Personal questions scare people"],"Give first, then ask. It feels like a chat, not an interview."),
+    Q("st3b","Which way of asking about work feels friendly?","\"What do you guys do back home?\"",["\"Are you employed? What's your job?\"","\"Do you earn enough to qualify?\"","\"Tell me your job title and salary.\""],"A friendly question gets a friendly answer, and tells you if they work."),
+    Q("st3c","An older couple. What's an easy way into their ages?","\"Are you retired yet, or still working?\"",["\"How old are you both, exactly?\"","\"You two look over seventy, right?\"","\"Can we see your IDs, for your ages?\""],"Retirement opens the topic. Then you can ask how long ago, or how long to go."),
+    Q("st3d","What should small talk never feel like?","An interview, one question after another",["A friendly chat between new friends","A conversation about their vacation","A talk where they ask you questions"],"Ask, listen, share something, then ask the next question."),
+    Q("st3e","They're from Venezuela, and they love the offer. What now?","Let them go nicely. They don't qualify",["Write it up and hope no one checks","Ask them to say they're from Colombia","Book them for 10 instead of 8"],"Venezuela is one of the five countries left out. Wish them a great trip."),
+    Q("st3f","Why never ask a guest to bend the truth to qualify?","It comes out at the hostess desk anyway",["Guests always refuse to do it anyway","It only works for Canadian couples","The gift is the same either way"],"Guests show IDs and a card at check-in. Honest bookings are the only ones that count."),
+    Q("st3g","When do you go over the IDs and the credit card?","While you write the invitation",["Never. The hostess explains it all","Only if they ask what to bring","Right at the start, before small talk"],"Every adult brings 2 IDs, and one of them brings a credit card. No surprises tomorrow."),
+    LINE("st3h","People don't care how much you know until they know how much you ___.","care",["earn","sell","talk"],"Show you care about them first. Then they listen."),
+    Q("st3i","They love a good steak. How do you make the gift feel real?","Tie the IberoCash to a steakhouse partner",["Say the gift is worth a lot of money","Skip the gift and talk about the room","Promise them a free steak dinner"],"Daniel's Steak & Chop is a partner. Show them how the gift fits what they love."),
+    Q("st3j","When can you tell a story about another couple?","Only when it really happened",["Whenever it helps to get a yes","Only with the skeptical couples","Never. Stories sound like lies"],"True stories build trust. Made-up ones break it.")
+  ]
+},
+{
+  id: "st4", name: "Objections and the close", sub: "Welcome objections, make it yours", icon: "shield",
+  notes: [
+    { h: "An objection is a test", li: [
+      "Most objections mean \"tell me more\" or \"show me I can trust you.\"",
+      "Welcome it: \"Great question.\" Then answer with the plain truth.",
+      "Getting objections means you're doing your job. Silence often means they stopped listening." ] },
+    { h: "Never lie to get a yes", li: [
+      "Don't hide the presentation, the 90 minutes or what to bring. Guests remember what you said.",
+      "One small lie makes them doubt everything at the hotel, and they shut down." ] },
+    { h: "\"Let me think about it\"", li: [
+      "It usually means a step was skipped: they can't picture the morning yet.",
+      "Go back and paint it: breakfast at one of our five-star restaurants, the tour, one of our rooms, and IberoCash for a dinner out.",
+      "Be specific: what's included, where, when and how long. People say yes to what they can picture." ] },
+    { h: "Your objection notebook", li: [
+      "When you can't answer an objection, write it down.",
+      "At home, ask yourself what answer would convince you. Practice it out loud.",
+      "Bring your best answers to the team meeting." ] },
+    { h: "Make the booking yours", li: [
+      "Tell them you only get credit when they show up and stay for the 90 minutes.",
+      "If another promoter stops them, they just show your invitation.",
+      "Tell them they'll meet someone just as friendly tomorrow, and ask them to give it a fair chance." ] },
+    { h: "Button it up", li: [
+      "Before they go: where to go, what time, and what to bring (2 IDs each, one credit card).",
+      "Ask them to arrive 5 to 10 minutes early, and to answer the confirmation call this afternoon.",
+      "Ask where they'd love to travel next. It keeps them excited about tomorrow.",
+      "End warm: \"Congratulations, you two. See you at 8!\"" ] },
+    { h: "Tricks we never use", li: [
+      "Some promoters hold a guest's ID so they can't walk away, confuse people on purpose, or invent a \"last spot\". Never do it.",
+      "Our promise is no high pressure and no obligation. Guests who feel tricked don't show up, and they don't buy." ] },
+    { h: "Your own pitch", li: [
+      "Write your pitch in your own words, built on the lines from the voice notes. Change what doesn't sound like you.",
+      "Have versions for families, retirees, honeymooners and skeptical couples." ] },
+    { h: "Where this comes from", li: [
+      "Ideas from the Timeshare OPC University videos and from Suzanne R. Angeles's audiobook \"How To Become A Booking Timeshare Marketing OPC\" (OPC Secrets By Suz), put in our own words and fitted to Iberostar's rules and the Open House." ],
+      src: [{ label: "Timeshare OPC University on YouTube", url: "https://www.youtube.com/@timeshareopcuniversity2290" },
+            { label: "OPC Secrets By Suz on YouTube", url: "https://www.youtube.com/watch?v=BzTAhkKYrWg" }] }
+  ],
+  qs: [
+    Q("st4a","A guest raises an objection. What is it, most of the time?","A test: \"tell me more, can I trust you?\"",["A firm no. Thank them and move on","A sign your pitch went on too long","A trick to get a bigger gift from you"],"Most objections ask for more information. Welcome them."),
+    Q("st4b","What do you say first when you hear an objection?","\"Great question.\" Then the plain truth",["\"That's not true at all, trust me.\"","\"Everyone says that. It's nothing.\"","\"Let me get my manager to explain.\""],"Welcome it, then answer honestly."),
+    Q("st4c","Why never say \"it's not a presentation\" to get a yes?","They find out, and they shut down",["It makes the gift a lot smaller","Hostesses don't allow that word","Guests prefer longer presentations"],"Guests remember what you said. One lie and they stop listening."),
+    Q("st4d","They say \"Let me think about it.\" What does it usually mean?","They can't picture the morning yet",["They've already decided not to come","They want you to raise the gift","They need to check with their kids"],"Go back and paint the picture: breakfast, the tour, a room, the IberoCash."),
+    Q("st4e","How do you make the morning easy to picture?","Be specific: what, where, when, how long",["Repeat \"it's free\" a few more times","Say \"it's amazing\" over and over again","Talk faster so they hear every detail"],"People say yes to what they can see in their heads."),
+    Q("st4f","You couldn't answer an objection today. What now?","Write it down and work out an answer",["Forget it. That couple was never coming","Avoid couples who look like that one","Blame the offer and ask for a new one"],"Your objection notebook turns today's no into tomorrow's yes."),
+    Q("st4g","How do you help a booking stay yours?","Say you get credit only if they show up",["Ask them for a deposit to hold the spot","Tell them the offer ends at midnight","Keep their passports until tomorrow"],"They don't have to book or buy anything. Showing up is what counts."),
+    Q("st4h","What's the best way to sound natural?","Your own words, built on the notes",["Read every line straight off the flyer","Copy exactly what the top promoter says","Make up a new pitch for every couple"],"Write it in your words, using the voice-note lines. Practice it out loud."),
+    Q("st4i","Another promoter says: hold their ID so they can't walk away. Do you?","No. No pressure and no tricks, ever",["Yes, but only with skeptical couples","Yes, and give it back after booking","Only if your manager isn't around"],"Our promise is no high pressure and no obligation. Tricked guests don't show up."),
+    Q("st4j","They're booked and leaving. What do you go over before they go?","Where, when, what to bring, the call",["Only the gift they'll get tomorrow","Nothing. They can ask the hostess","The rules for getting a bigger gift"],"Button it up: the place, the time, 2 IDs each and one card, and the confirmation call.")
+  ]
+},
 { id: "final", name: "Final run", sub: "Everything mixed: 20 in a row", icon: "trophy", final: true, count: 20, notes: [] }
 ];
 

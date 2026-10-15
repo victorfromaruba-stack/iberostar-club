@@ -17,11 +17,17 @@ ARGS = sys.argv[1:]
 PAGE = "--page" in ARGS
 OUT = Path(ARGS[ARGS.index("--out") + 1]) if "--out" in ARGS else ROOT / "index.html"
 CLIPS = SRC / "clips.json"
-JS = ["icons.js", "mascot.js", "content-pre.js", "levels.js", "content-post.js", "app.js", "team.js", "boot.js"]
+JS = ["icons.js", "mascot.js", "content-pre.js", "levels.js", "content-post.js", "app.js", "street-core.js", "street.js", "team.js", "boot.js"]
 FONTS = ("https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800"
          "&family=Nunito:ital,wght@0,600;0,700;0,800;0,900;1,700&display=swap")
 
 clips = json.loads(CLIPS.read_text(encoding="utf-8"))
+# The Edge Function (server/sua-roleplay) runs the same Street practice engine: keep its copy in step.
+FN = ROOT / "server" / "sua-roleplay"
+if FN.is_dir():
+    core = (SRC / "street-core.js").read_text(encoding="utf-8")
+    if not (FN / "street-core.js").exists() or (FN / "street-core.js").read_text(encoding="utf-8") != core:
+        (FN / "street-core.js").write_text(core, encoding="utf-8")
 script = "\n".join((SRC / f).read_text(encoding="utf-8").strip() for f in JS)
 clips_js = json.dumps(clips, ensure_ascii=False, separators=(",", ":"))
 script, n = re.subn(r"/\*CLIPS\*/\[\]/\*CLIPS-END\*/", lambda m: f"/*CLIPS*/{clips_js}/*CLIPS-END*/", script)

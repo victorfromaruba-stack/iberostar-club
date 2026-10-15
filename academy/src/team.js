@@ -8,7 +8,7 @@
    ===================================================================== */
 const num = (v, max) => Number.isFinite(+v) ? Math.max(0, Math.min(max, Math.round(+v))) : 0;
 const cleanName = v => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 40) || "No name";
-const LOG_KINDS = ["m", "r", "p", "f", "d", "lg"];
+const LOG_KINDS = ["m", "r", "p", "f", "d", "lg", "rp"];
 const LOG_IDS = new Set([...LEVEL_IDS, "daily", "lightning"]);
 const NUDGE_DAYS = 3;
 const AV = ["#00737a", "#b8325a", "#11709f", "#8f6600", "#2b7a1f", "#a12a4d", "#00636a"];
@@ -28,11 +28,15 @@ function cleanStats(p){
   const perLevel = (o, max) => Object.fromEntries(LEVEL_IDS.map(id => [id, num(obj(o)[id], max)]));
   const a = Object.fromEntries(LEVEL_IDS.map(id => { const v = obj(p.a)[id]; return [id, Array.isArray(v) ? [num(v[0], 1e6), num(v[1], 1e6), num(v[2], 1e6)] : [0, 0, 0]]; }));
   const w = Array.isArray(p.w) ? p.w.filter(x => Array.isArray(x) && typeof x[0] === "string" && QBY[x[0]]).map(x => [x[0], num(x[1], 9999)]).filter(x => x[1] > 0).slice(0, 20) : [];
-  const lg = Array.isArray(p.lg) ? p.lg.filter(e => Array.isArray(e) && LOG_KINDS.includes(e[1]) && LOG_IDS.has(e[2])).slice(-25)
+  const lg = Array.isArray(p.lg) ? p.lg.filter(e => Array.isArray(e) && LOG_KINDS.includes(e[1]) && (e[1] === "rp" ? isMood(e[2]) : LOG_IDS.has(e[2]))).slice(-25)
     .map(e => [num(e[0], maxT), e[1], e[2], num(e[3], 999), num(e[4], 999)]) : [];
   const dd = Array.isArray(p.dd) ? [...new Set(p.dd.filter(s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s)))].slice(-60) : [];
+  // Street practice results: [time, score or -1, mood, gift, booked, called the gift right, step codes]
+  const rp = obj(p.rp), rs = Array.isArray(rp.s) ? rp.s.filter(x => Array.isArray(x) && isMood(x[2]) && ["Q", "CT", "NQ"].includes(x[3]) && typeof x[6] === "string" && /^[gwmn]{9}$/.test(x[6]))
+    .slice(-10).map(x => [num(x[0], maxT), x[1] === -1 ? -1 : num(x[1], 100), x[2], x[3], x[4] ? 1 : 0, x[5] ? 1 : 0, x[6]]) : [];
   return { v: num(p.v, 99), x: num(p.x, 1e7), m: perLevel(p.m, 999), ml: perLevel(p.ml, maxT), b: perLevel(p.b, 999), a,
-    l: num(p.l, 999), d: num(p.d, 9999), h: num(p.h, CLIPS.length), sl: num(p.sl, 999), w, lg, dd };
+    l: num(p.l, 999), d: num(p.d, 9999), h: num(p.h, CLIPS.length), sl: num(p.sl, 999), w, lg, dd,
+    rp: { n: Math.max(num(rp.n, 9999), rs.length), b: num(rp.b, 100), s: rs } };
 }
 function person(r){
   const st = cleanStats(r && r.stats), name = cleanName(r && r.name);
@@ -41,7 +45,7 @@ function person(r){
   const mastered = LEVEL_IDS.filter(id => st.m[id]).length;
   return { device: String((r && r.device) || ""), name, st, updated, mastered, ready: !!st.m.final, right, answers: right + wrong,
     due: LEVEL_IDS.filter(id => st.m[id] && st.ml[id] && dueAt(st.m[id], st.ml[id]) <= Date.now()),
-    started: mastered > 0 || LEVEL_IDS.some(id => st.b[id] || st.a[id][2]) || st.lg.length > 0,
+    started: mastered > 0 || LEVEL_IDS.some(id => st.b[id] || st.a[id][2]) || st.lg.length > 0 || st.rp.n > 0,
     idle: updated ? Math.floor((Date.now() - updated) / DAY) : Infinity };
 }
 function teamRows(rows){
@@ -99,6 +103,22 @@ function levelsToCoach(people){
   }).filter(x => x.trying > 0).sort((a, b) => (b.trying - a.trying) || (pct(a.right, a.answers) - pct(b.right, b.answers))).slice(0, 5);
 }
 
+/* Street practice: the steps people miss or only half do, across their recent chats. */
+const RP_ROWS = [...RP_KEYS.map((k, i) => [i, RP_LABEL[k]]), [RP_KEYS.length, "Finding out who they are"]];
+function rpSteps(results){
+  return RP_ROWS.map(([i, name]) => {
+    const codes = results.map(r => r[6][i]).filter(c => c !== "n");
+    const good = codes.filter(c => c === "g").length, weak = codes.filter(c => c === "w").length, missed = codes.filter(c => c === "m").length;
+    return { name, n: codes.length, good, weak, missed, bad: weak / 2 + missed };
+  }).filter(x => x.n).sort((a, b) => (b.bad / b.n) - (a.bad / a.n));
+}
+const rpAvg = list => { const sc = list.map(r => r[1]).filter(v => v >= 0); return sc.length ? Math.round(sc.reduce((a, b) => a + b, 0) / sc.length) : null; };
+function rpStepsHTML(rows){
+  return `<ul class="tp-list">${rows.slice(0, 4).map(x => `<li><p class="q">${esc(x.name)}</p>
+    <div class="tp-bar rp-sbar" role="img" aria-label="${x.good} good, ${x.weak} almost, ${x.missed} missed"><i style="width:${pct(x.good, x.n)}%"></i><i class="w" style="width:${pct(x.weak, x.n)}%"></i></div>
+    <p class="small muted">${x.missed ? `Missed in ${x.missed} of ${x.n}` : `Never missed`}${x.weak ? ` · almost in ${x.weak}` : ""}</p></li>`).join("")}</ul>`;
+}
+
 /* ---------- Screens ---------- */
 function teamTop(title, eyebrow, backId, extra = ""){
   return `<div class="l-top"><button class="icon-btn" id="${backId}" aria-label="${backId === "back" ? "Close the manager panel" : "Back to the team"}">${icon("x")}</button>
@@ -137,6 +157,9 @@ function renderPanel(keepScroll){
   const nudge = people.filter(p => !p.ready && (!p.started || p.idle >= NUDGE_DAYS));
   const right = people.reduce((s, p) => s + p.right, 0), answers = people.reduce((s, p) => s + p.answers, 0);
   const misses = teamMisses(people), coachLv = levelsToCoach(people);
+  const monthAgo = Date.now() - 30 * DAY, weekAgo = Date.now() - 7 * DAY;
+  const rpRecent = people.flatMap(p => p.st.rp.s.filter(r => r[0] >= monthAgo)), rpWeek = rpRecent.filter(r => r[0] >= weekAgo).length;
+  const rpWho = people.filter(p => p.st.rp.s.some(r => r[0] >= monthAgo)).length, rpCalls = rpRecent.filter(r => r[5]).length;
   const tile = (ic, cls, value, label, exp) => `<div class="tp-tile ${cls}"><p class="lbl">${icon(ic)}${label}</p><b>${value}</b><p class="exp">${exp}</p></div>`;
   show(`${teamTop("Your team", "Managers", "back", `<button class="icon-btn" id="refresh" aria-label="Refresh">${icon("refresh")}</button>`)}
   <p class="tp-meta">${ppl(n)} · updated ${TEAM.at ? ago(TEAM.at) : "never"}</p>
@@ -167,6 +190,15 @@ function renderPanel(keepScroll){
         <p class="small muted">${x.trying} still trying · ${x.done} mastered${x.answers >= 10 ? ` · ${pct(x.right, x.answers)}% right` : ""}</p></li>`; }).join("")}</ul>` : `<p class="muted">Nobody is stuck right now.</p>`}
     </section>
   </div>
+  <section class="tp-card" aria-labelledby="rpH"><div class="tp-card-h"><h2 id="rpH">Street practice</h2><span class="small muted">Last 30 days</span></div>
+    ${rpRecent.length ? `<div class="tp-tiles">
+      ${tile("couple", "t-sea", rpRecent.length, "Practice chats", `${ppl(rpWho)} · ${rpWeek} this week`)}
+      ${tile("star", "t-sun", rpAvg(rpRecent) ?? "–", "Average score", "Out of 100")}
+      ${tile("check", "t-good", `${pct(rpCalls, rpRecent.length)}%`, "Gift called right", "Q, CT or NQ, after the chat")}
+      ${tile("calendar", "t-fire", `${pct(rpRecent.filter(r => r[4]).length, rpRecent.length)}%`, "Couples booked", "They said yes to a time")}</div>
+      <h3 class="tp-sub">Steps to work on</h3>${rpStepsHTML(rpSteps(rpRecent))}<p class="small muted">From Shoco's feedback on every chat. Green is done well, yellow is almost.</p>`
+      : `<p class="muted">No practice chats yet. They're in Games > Street practice.</p>`}
+  </section>
   <section class="tp-card" aria-labelledby="ndH"><h2 id="ndH">Need a nudge</h2>
     ${nudge.length ? `<ul class="tp-people">${nudge.map(p => `<li><button data-open="${esc(p.device)}">${avatarHTML(p)}<span><span class="pname">${esc(p.name)}</span><span class="psub">${esc(p.started ? `${lastSeen(p)} · ${nextStep(p)}` : nextStep(p))}</span></span>${icon("play", "go")}</button></li>`).join("")}</ul>`
       : `<p class="muted">Everyone has done a lesson in the last ${NUDGE_DAYS} days.</p>`}
@@ -177,6 +209,7 @@ function renderPanel(keepScroll){
     <li>Ready: they passed the Final, 20 questions in a row.</li>
     <li>Need a nudge: not ready yet, and either no lessons yet or none in the last ${NUDGE_DAYS} days.</li>
     <li>Right answers: every answer they gave in lessons since this update.</li>
+    <li>Street practice: chats with an AI tourist couple. Shoco scores stopping them, each of the 7 pitch steps and finding out who they are, and checks the gift they called.</li>
     <li>Progress arrives from each phone after every answer, when it has internet.</li></ul></details>
   <details class="card"><summary>Change the manager code</summary><form class="name-form" id="newCode"><input class="field" id="nc" autocomplete="off" autocapitalize="characters" placeholder="New code, 6+ letters or numbers" aria-label="New manager code"><button class="btn small">Save</button></form><p class="small muted">Every manager will need the new code.</p></details>
   <p class="foot"><button class="link" id="forget">Forget the code on this phone</button></p>`, { full: true, wide: true, keepScroll });
@@ -202,11 +235,13 @@ function matrixHTML(people){
   return `<div class="kw-wrap"><table class="kw"><caption class="sr-only">Levels each person has mastered or started</caption>
     <colgroup><col class="cn">${groups(u => `<col span="${u.levels.length}">`, `<col class="cg">`)}</colgroup>
     <thead><tr><th scope="col"><span class="sr-only">Person</span></th>${groups(u => `<th scope="colgroup" colspan="${u.levels.length}" class="u c-${u.color}">${u.id === "final" ? `${icon("crown", "fin")}<span class="sr-only">Final</span>` : `<span>${esc(u.id === "pitch" ? "Pitch" : u.title)}</span>`}</th>`, `<th aria-hidden="true"></th>`)}</tr>
-    <tr class="kw-lv"><th></th>${groups(u => u.levels.map(id => `<th scope="col"><span>${esc(byId(id).name)}</span></th>`).join(""), `<th aria-hidden="true"></th>`)}</tr></thead>
+    <tr class="kw-lv"><th><span class="sr-only">Level</span></th>${groups(u => u.levels.map(id => `<th scope="col"><span>${esc(byId(id).name)}</span></th>`).join(""), `<th aria-hidden="true"></th>`)}</tr></thead>
     <tbody>${people.map(p => `<tr><th scope="row"><button class="kw-name" data-open="${esc(p.device)}"><span class="pname">${esc(p.name)}</span><span class="psub">${esc(sub(p))}</span></button></th>${groups(u => u.levels.map(id => cell(p, id)).join(""), `<td aria-hidden="true"></td>`)}</tr>`).join("")}</tbody></table></div>`;
 }
 function logText(e){
-  const [, k, id, v, n] = e, name = id === "daily" ? "Daily 10" : id === "lightning" ? "Lightning round" : `"${byId(id).name}"`;
+  const [, k, id, v, n] = e;
+  if (k === "rp") return `Street practice: ${RP_MOOD[id].toLowerCase()} couple, ${v} of 100${n ? "" : ", wrong gift"}`;
+  const name = id === "daily" ? "Daily 10" : id === "lightning" ? "Lightning round" : `"${byId(id).name}"`;
   return { m: `Mastered ${name}`, r: `Review done: ${name}`, p: `Practiced ${name}`, d: "Finished a Daily 10",
     f: `${name}: ${v} of ${n} in a row, then a mistake`, lg: `Lightning round: ${plural(v, "couple")}` }[k];
 }
@@ -250,6 +285,12 @@ function renderWorker(device, keepScroll){
           <li>${icon("mic")}<span><b>${st.sl} of ${Object.keys(SCRIPT_LINES).length}</b> script lines said out loud</span></li>
           <li>${icon("headphones")}<span><b>${st.h} of ${CLIPS.length}</b> voice notes heard</span></li>
           <li>${icon("bolt")}<span><b>${plural(st.l, "couple")}</b> Lightning record</span></li></ul>
+      </section>
+      <section class="tp-card" aria-labelledby="spH"><h2 id="spH">Street practice</h2>
+        ${st.rp.s.length ? `<p class="small muted">${plural(st.rp.n, "chat")} · best ${st.rp.b} · last 5 average ${rpAvg(st.rp.s.slice(-5))}</p>
+          <ul class="tp-log rp-res">${st.rp.s.slice().reverse().slice(0, 5).map(r => `<li><span><b>${r[1] >= 0 ? r[1] : "–"}</b> ${esc(RP_MOOD[r[2]])} couple, ${r[3]}${r[5] ? "" : " (called it wrong)"}${r[4] ? " · booked" : ""}</span><time>${esc(ago(r[0]))}</time></li>`).join("")}</ul>
+          <h3 class="tp-sub">Steps to work on</h3>${rpStepsHTML(rpSteps(st.rp.s))}`
+          : `<p class="muted">No practice chats yet.</p>`}
       </section>
       <section class="tp-card" aria-labelledby="acH"><h2 id="acH">Activity</h2>
         ${st.dd.length ? `<div class="tp-days" role="img" aria-label="Active ${activeDays} of the last 14 days">${days.map(d => `<i class="${st.dd.includes(d) ? "on" : ""}"></i>`).join("")}</div>

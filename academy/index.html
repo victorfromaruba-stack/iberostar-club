@@ -22,7 +22,7 @@
 :root{
   --bg:#fbfaf6; --surface:#ffffff; --sunk:#f1eee6; --line:#e6e0d4; --line-2:#d3cbbb; --ink:#22323a; --muted:#56676d;
   --lagoon:#00838a; --lagoon-2:#00636a; --lagoon-soft:#ddf1f1; --on-lagoon:#ffffff;
-  --flamingo:#cf3a64; --flamingo-2:#a12a4d; --flamingo-soft:#fde6ee; --on-flamingo:#ffffff;
+  --flamingo:#cf3a64; --flamingo-2:#a12a4d; --flamingo-soft:#fde6ee; --on-flamingo:#ffffff; --flamingo-ink:#a12a4d;
   --sun:#ffbf2e; --sun-2:#d39700; --sun-soft:#fff3d4; --on-sun:#4a3500; --sun-ink:#a36400;
   --good:#2b851f; --good-2:#1f6a15; --good-soft:#e6f7dc; --good-ink:#23691a; --on-good:#ffffff;
   --bad:#d33a3f; --bad-2:#a3262c; --bad-soft:#fde8e8; --bad-ink:#b0242a; --on-bad:#ffffff;
@@ -38,7 +38,7 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0f1a1d; --surface:#172529; --sunk:#132024; --line:#26383d; --line-2:#364b51; --ink:#ecf3f4; --muted:#9db1b5;
   --lagoon:#1bb6bc; --lagoon-2:#0d7f84; --lagoon-soft:#10383b; --on-lagoon:#062326;
-  --flamingo:#ff6f98; --flamingo-2:#c4426a; --flamingo-soft:#3a1d29; --on-flamingo:#2a0b16;
+  --flamingo:#ff6f98; --flamingo-2:#c4426a; --flamingo-soft:#3a1d29; --on-flamingo:#2a0b16; --flamingo-ink:#ff8fb0;
   --sun:#ffc93c; --sun-2:#c9930a; --sun-soft:#3a2f12; --on-sun:#2b1e00; --sun-ink:#ffc93c;
   --good:#5ccc3f; --good-2:#3a9a24; --good-soft:#17301a; --good-ink:#8fe073; --on-good:#0b1a0b;
   --bad:#ff6b6b; --bad-2:#c43c3c; --bad-soft:#3a1c1e; --bad-ink:#ffa3a3; --on-bad:#2b0b0b;
@@ -48,7 +48,7 @@
 :root[data-theme="dark"]{
   --bg:#0f1a1d; --surface:#172529; --sunk:#132024; --line:#26383d; --line-2:#364b51; --ink:#ecf3f4; --muted:#9db1b5;
   --lagoon:#1bb6bc; --lagoon-2:#0d7f84; --lagoon-soft:#10383b; --on-lagoon:#062326;
-  --flamingo:#ff6f98; --flamingo-2:#c4426a; --flamingo-soft:#3a1d29; --on-flamingo:#2a0b16;
+  --flamingo:#ff6f98; --flamingo-2:#c4426a; --flamingo-soft:#3a1d29; --on-flamingo:#2a0b16; --flamingo-ink:#ff8fb0;
   --sun:#ffc93c; --sun-2:#c9930a; --sun-soft:#3a2f12; --on-sun:#2b1e00; --sun-ink:#ffc93c;
   --good:#5ccc3f; --good-2:#3a9a24; --good-soft:#17301a; --good-ink:#8fe073; --on-good:#0b1a0b;
   --bad:#ff6b6b; --bad-2:#c43c3c; --bad-soft:#3a1c1e; --bad-ink:#ffa3a3; --on-bad:#2b0b0b;
@@ -160,6 +160,7 @@ a{color:var(--sea-ink)}
 .c-flamingo{--c:var(--flamingo);--c2:var(--flamingo-2);--t:var(--on-flamingo);--soft:var(--flamingo-soft)}
 .c-sun{--c:var(--sun);--c2:var(--sun-2);--t:var(--on-sun);--soft:var(--sun-soft)}
 .c-sea{--c:var(--nlp);--c2:var(--nlp-2);--t:var(--on-nlp);--soft:var(--nlp-soft)}
+.c-good{--c:var(--good);--c2:var(--good-2);--t:var(--on-good);--soft:var(--good-soft)}
 .path{display:flex;flex-direction:column;align-items:center;padding-block:14px 6px;gap:6px}
 .node-row{position:relative;display:flex;justify-content:center;width:100%;height:96px;align-items:center}
 .node{position:relative;transform:translateX(var(--off,0px));width:74px;height:68px;border-radius:50%;border:0;display:grid;place-items:center;
@@ -173,10 +174,12 @@ a{color:var(--sea-ink)}
 .node .due-dot .ic{width:12px;height:12px}
 @keyframes pulse{0%{transform:scale(.9);opacity:.5}100%{transform:scale(1.25);opacity:0}}
 .start-tag{position:absolute;top:-16px;left:50%;transform:translateX(calc(-50% + var(--off,0px)));background:var(--surface);color:var(--c);border:2px solid var(--line);border-radius:12px;padding:6px 12px;font:900 14px/1 var(--f-body);letter-spacing:.06em;white-space:nowrap;animation:tagbob 1.6s ease-in-out infinite;z-index:2}
+.start-tag.c-sun{color:var(--sun-ink)}
 .start-tag::after{content:"";position:absolute;left:50%;bottom:-8px;width:12px;height:12px;background:var(--surface);border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:translateX(-50%) rotate(45deg)}
 @keyframes tagbob{50%{transform:translateX(calc(-50% + var(--off,0px))) translateY(-4px)}}
 .path-mascot{position:absolute;width:70px;height:88px;bottom:0}
-.popover{--c:var(--lagoon);width:100%;background:var(--c);color:var(--t);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:6px;position:relative;margin-top:4px;animation:popin .18s ease}
+:where(.popover){--c:var(--lagoon);--t:var(--on-lagoon)}
+.popover{width:100%;background:var(--c);color:var(--t);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:6px;position:relative;margin-top:4px;animation:popin .18s ease}
 .popover::before{content:"";position:absolute;top:-8px;left:calc(50% + var(--off,0px));width:16px;height:16px;background:var(--c);transform:translateX(-50%) rotate(45deg)}
 .popover h3{font-size:21px}
 .popover p{font-size:15px}
@@ -503,7 +506,118 @@ body.wide #app{max-width:1080px}
 .tp-log .k-p span::before,.tp-log .k-d span::before{background:var(--good)}
 .tp-log .k-f span::before{background:var(--bad)}
 .tp-log .k-lg span::before{background:var(--sea)}
+.tp-log .k-rp span::before,.tp-log.rp-res span::before{background:var(--flamingo)}
 .tp-log time{color:var(--muted);font-size:13px;white-space:nowrap}
+
+/* Street practice: setup, the chat, the score */
+.rp .l-top h1{font-size:22px}
+.rp-title h1{font-size:20px}
+.rp-title .eyebrow{font-size:11px}
+.rp-tools{display:flex;align-items:center;gap:4px}
+.rp-pick{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.pchips{display:flex;flex-wrap:wrap;gap:8px}
+.pchip{position:relative;display:inline-flex}
+.pchip input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.pchip span{display:inline-flex;align-items:center;min-height:44px;padding:9px 14px;border-radius:999px;border:2px solid var(--line-2);background:var(--surface);font-weight:800;font-size:15px}
+.pchip input:checked+span{border-color:var(--sea);background:var(--sea-soft);color:var(--sea-ink)}
+.pchip input:focus-visible+span{outline:3px solid var(--sea);outline-offset:3px}
+.rp .stack>.field{flex:none}
+.rp-how{padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--muted)}
+.rp-foot{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.rp-foot p{text-align:center}
+.rp-foot p:empty{display:none}
+.rp-scene{background:var(--surface);border:2px solid var(--line);border-bottom-width:4px;border-radius:var(--r);padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px}
+.rp-scene .tag-h{display:flex;align-items:center;gap:8px;font:900 12px/1.3 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.rp-scene .tag-h .ic{width:18px;height:18px;color:var(--flamingo)}
+.rp-scene>p{font-size:17px}
+.rp-scene>p.small{font-size:14px}
+.rp-scene ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.rp-scene li{display:grid;grid-template-columns:20px 1fr;gap:8px;align-items:start;font-size:15px}
+.rp-scene li .ic{width:20px;height:20px;color:var(--sea);margin-top:1px}
+.rp-log{display:flex;flex-direction:column;gap:10px;flex:1;padding-bottom:4px}
+.rp-msg{display:flex;gap:8px;align-items:flex-end;max-width:88%;animation:popin .18s ease}
+.rp-msg p{margin:0;overflow-wrap:anywhere}
+.rp-msg.me{align-self:flex-end;flex-direction:column;align-items:flex-end}
+.rp-msg.me>p{background:var(--lagoon);color:var(--on-lagoon);padding:10px 14px;border-radius:18px 18px 6px 18px}
+.rp-msg.them .rp-b{background:var(--surface);border:2px solid var(--line);padding:8px 12px 10px;border-radius:18px 18px 18px 6px;min-width:0}
+.rp-who{display:block;font:900 12px/1.3 var(--f-body);letter-spacing:.04em;text-transform:uppercase;color:var(--flamingo-ink)}
+.rp-msg.p1 .rp-who{color:var(--sea-ink)}
+.rp-av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--flamingo);color:var(--on-flamingo);font:800 15px/1 var(--f-display);flex:none}
+.rp-av .ic{width:18px;height:18px}
+.rp-msg.p1 .rp-av{background:var(--sea);color:var(--on-sea)}
+.rp-msg.typing .rp-av{background:var(--sunk);color:var(--muted)}
+.dots{display:inline-flex;gap:5px;padding:7px 2px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:dot 1s infinite ease-in-out}
+.dots i:nth-child(2){animation-delay:.15s} .dots i:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,80%,100%{opacity:.3;transform:none}40%{opacity:1;transform:translateY(-3px)}}
+.rp-cue{align-self:center;display:flex;gap:6px;align-items:center;max-width:90%;font-size:14px;font-style:italic;color:var(--muted);text-align:center}
+.rp-cue .ic{width:16px;height:16px}
+.rp-err{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:center;justify-content:flex-end;font-size:14px;color:var(--bad-ink)}
+.rp-err .link{min-height:40px;padding:4px}
+.rp-say{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end}
+.rp-say textarea{resize:none;min-height:50px;max-height:150px;line-height:1.35;font-size:16px}
+.rp-mic,.rp-send{width:50px;height:50px;border-radius:50%;border:0;display:grid;place-items:center;transition:transform .08s,box-shadow .08s}
+.rp-mic{background:var(--sea);color:var(--on-sea);box-shadow:0 4px 0 var(--sea-2)}
+.rp-mic.listening{background:var(--bad);color:var(--on-bad);box-shadow:0 4px 0 var(--bad-2);animation:pulseb .9s ease-in-out infinite}
+.rp-send{background:var(--lagoon);color:var(--on-lagoon);box-shadow:0 4px 0 var(--lagoon-2)}
+.rp-mic:active:not(:disabled),.rp-send:active:not(:disabled){transform:translateY(3px);box-shadow:none}
+.rp-mic:disabled,.rp-send:disabled{background:var(--sunk);color:var(--muted);box-shadow:0 4px 0 var(--line);cursor:not-allowed}
+.rp-hint{grid-column:1/-1}
+.rp-hint:empty{display:none}
+.sheet.rp-sheet{background:var(--surface);color:var(--ink);border-top:2px solid var(--line);box-shadow:0 -10px 30px rgba(0,0,0,.12)}
+.rp-call .grade span{font-size:12px;line-height:1.25}
+.rp-hero{display:flex;justify-content:center;align-items:center;gap:18px}
+.rp-hero .shoco{width:96px;height:120px}
+.rp-ring{--p:0;width:132px;height:132px;border-radius:50%;display:grid;place-items:center;align-content:center;gap:2px;
+  background:radial-gradient(closest-side,var(--bg) 79%,transparent 80%),conic-gradient(var(--good) calc(var(--p) * 1%),var(--line) 0)}
+.rp-ring b{font:800 46px/1 var(--f-display)}
+.rp-ring span{font-size:13px;color:var(--muted)}
+.rp-headline{font:800 20px/1.35 var(--f-body);text-align:center;text-wrap:balance}
+.rp-reveal-h{display:flex;gap:12px;align-items:center}
+.rp-reveal-h h2{font-size:21px}
+.rp-grade{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font:800 22px/1 var(--f-display);flex:none}
+.g-Q{background:var(--good);color:var(--on-good)} .g-CT{background:var(--sun);color:var(--on-sun)} .g-NQ{background:var(--bad);color:var(--on-bad)}
+.rp-callline{display:flex;gap:8px;align-items:flex-start;font-weight:900}
+.rp-callline .ic{width:22px;height:22px}
+.rp-callline.ok{color:var(--good-ink)} .rp-callline.no{color:var(--bad-ink)}
+.rp-reveal .chips{display:flex;flex-wrap:wrap;gap:8px}
+.rp-reveal .chip{display:inline-flex;gap:6px;align-items:center;font-weight:800;font-size:15px;line-height:1.25;padding:7px 12px 7px 9px;border-radius:14px;background:var(--sea-soft);min-width:0}
+.rp-reveal .chip .ic{width:18px;height:18px;color:var(--sea)}
+.rp-steps{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.rp-step{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.rp-step:first-child{border-top:0;padding-top:0}
+.rp-step .n{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:800 15px/1 var(--f-display);background:var(--sunk);color:var(--muted)}
+.rp-step.s-good .n{background:var(--good);color:var(--on-good)}
+.rp-step.s-weak .n{background:var(--sun);color:var(--on-sun)}
+.rp-step.s-missed .n{background:var(--bad);color:var(--on-bad)}
+.rp-step-h{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
+.rp-st{font:900 12px/1 var(--f-body);padding:6px 9px;border-radius:999px;background:var(--sunk);color:var(--muted)}
+.rp-st.good{background:var(--good-soft);color:var(--good-ink)} .rp-st.weak{background:var(--sun-soft);color:var(--ink)} .rp-st.missed{background:var(--bad-soft);color:var(--bad-ink)}
+.rp-try{display:flex;flex-direction:column;gap:2px;border-left:5px solid var(--good);background:var(--good-soft);border-radius:0 12px 12px 0;padding:8px 12px;font-weight:800}
+.rp-try .eyebrow{color:var(--good-ink);font-size:11px}
+.rp-ask{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
+.rp-ask li{display:inline-flex;align-items:center;gap:6px;padding:7px 12px 7px 9px;border-radius:999px;font-weight:800;font-size:15px}
+.rp-ask li .ic{width:16px;height:16px}
+.rp-ask .yes{background:var(--good-soft);color:var(--good-ink)} .rp-ask .no{background:var(--sunk);color:var(--muted)}
+.rp-graph{display:flex;align-items:flex-end;gap:4px;height:110px;border-bottom:2px solid var(--line);padding-bottom:2px}
+.rp-graph i{flex:1;max-width:28px;height:var(--h);border-radius:6px 6px 2px 2px;background:var(--line-2)}
+.rp-graph .b-maybe,.rp-key .b-maybe{background:var(--sun)} .rp-graph .b-yes,.rp-key .b-yes{background:var(--good)}
+.rp-key{display:flex;gap:6px 14px;flex-wrap:wrap;color:var(--muted);font-weight:800}
+.rp-key span{display:inline-flex;align-items:center;gap:6px}
+.rp-key i{width:12px;height:12px;border-radius:3px;background:var(--line-2)}
+.rp-quote{display:grid;grid-template-columns:24px 1fr;gap:10px;font:800 17px/1.45 var(--f-body)}
+.rp-quote .ic{color:var(--flamingo)}
+.card.rp-fix{border-color:var(--sea);background:var(--sea-soft)}
+.card.rp-handoff{border-color:var(--sun-2);background:var(--sun-soft)}
+.rp-handoff p{font-weight:800}
+.rp-fix p:last-child{font-weight:800}
+.rp-transcript{display:flex;flex-direction:column;gap:6px;font-size:15px;font-weight:700}
+.rp-transcript .me{color:var(--sea-ink)}
+.rp-transcript .cue{font-style:italic;color:var(--muted);font-size:14px}
+.rp-end-acts{padding-bottom:12px}
+.tp-sub{font-size:16px;margin-top:4px}
+.tp-bar.rp-sbar{display:flex}
+.rp-sbar i{border-radius:0} .rp-sbar i.w{background:var(--sun)}
 
 /* Tab bar */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:2px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
@@ -575,7 +689,13 @@ const ICONS = {
   smile: '<path fill-rule="evenodd" d="M12 2.5a9.5 9.5 0 1 1 0 19 9.5 9.5 0 0 1 0-19zM8.9 8.3a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm6.2 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM7.4 13.4a4.8 4.8 0 0 0 9.2 0z"/>',
   quote: '<path d="M3.5 6.5h7v6.4c0 3.6-2 5.8-5.6 6.5l-.8-2c1.9-.7 2.9-1.8 3-3.4H3.5zm10 0h7v6.4c0 3.6-2 5.8-5.6 6.5l-.8-2c1.9-.7 2.9-1.8 3-3.4h-3.6z"/>',
   steps: '<ellipse cx="7.5" cy="13.6" rx="3" ry="4.4"/><ellipse cx="7.5" cy="20.2" rx="2.1" ry="1.5"/><ellipse cx="16.5" cy="6.6" rx="3" ry="4.4"/><ellipse cx="16.5" cy="13.2" rx="2.1" ry="1.5"/>',
-  crown: '<path d="M3 7.5l4.5 3.8L12 4.5l4.5 6.8L21 7.5l-1.8 10H4.8zM4.8 19h14.4v2H4.8z"/>'
+  crown: '<path d="M3 7.5l4.5 3.8L12 4.5l4.5 6.8L21 7.5l-1.8 10H4.8zM4.8 19h14.4v2H4.8z"/>',
+  send: '<path d="M3.3 20.4L21.5 12 3.3 3.6l.1 6.6 11.9 1.8-11.9 1.8z"/>',
+  target: '<path fill-rule="evenodd" d="M12 2.5a9.5 9.5 0 1 1 0 19 9.5 9.5 0 0 1 0-19zm0 3.3a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 0 0 0-12.4zm0 3.2a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/>',
+  hand: '<path d="M8.6 11.2V5.1a1.6 1.6 0 0 1 3.2 0v5.2h.6V3.6a1.6 1.6 0 0 1 3.2 0v6.7h.6V5.4a1.6 1.6 0 0 1 3.2 0v8.4c0 4.6-3 7.7-7.1 7.7-2.6 0-4.4-1-5.9-3.2l-2.9-4.3a1.6 1.6 0 0 1 2.5-2l1.7 1.7z"/>',
+  talk: '<path d="M3.5 3h11A2.5 2.5 0 0 1 17 5.5v6a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.2V14h-1.5A2.5 2.5 0 0 1 1 11.5v-6A2.5 2.5 0 0 1 3.5 3z"/><path d="M19 8.2h1.5A2.5 2.5 0 0 1 23 10.7v6a2.5 2.5 0 0 1-2.5 2.5H20v3l-4-3h-4.5a2.5 2.5 0 0 1-2.4-1.8H15a4 4 0 0 0 4-4z"/>',
+  shield: '<path d="M12 2.2l8.5 3.2v6.1c0 5.2-3.6 9.2-8.5 10.6-4.9-1.4-8.5-5.4-8.5-10.6V5.4z"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="2.6"/>'
 };
 const icon = (n, cls = "") => `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">${ICONS[n] || ""}</svg>`;
 // Shoco, Aruba's burrowing owl. Moods: idle, happy, sad, cheer, think.
@@ -645,7 +765,9 @@ function shoco(mood = "idle", cls = "") {
 /* =====================================================================
    CONTENT
    Sources: "Qualifications Aruba, 2 March 2026" (PDF), the nine voice notes
-   of 29 Sept 2026, and the Open House pitch deck.
+   of 29 Sept 2026, and the Open House pitch deck. Street skills: ideas from the
+   Timeshare OPC University videos and the OPC Secrets By Suz audiobook (Suzanne R. Angeles),
+   in our own words, credited with links in each guidebook.
    ===================================================================== */
 const Q = (id, q, a, w, why) => ({ id, q, a, w, why });
 const LINE = (id, q, a, w, why, hear) => ({ id, q, a, w, why, line: true, ...(hear ? { hear: { clip: hear[0], from: hear[1], to: hear[2] } } : {}) });
@@ -658,7 +780,8 @@ const UNITS = [
   { id: "qualify", n: 1, title: "Qualify", sub: "Who gets which gift", color: "lagoon", levels: ["q", "ctnq", "who"] },
   { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "solid", "words", "map"] },
   { id: "nlp", n: 3, title: "NLP", sub: "Rapport, words that lead, reading people", color: "sea", levels: ["nlp1", "nlp2", "nlp3", "nlp4"], after: "why" },
-  { id: "final", n: 4, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
+  { id: "street", n: 4, title: "Street skills", sub: "Mindset, stopping people, small talk, objections", color: "good", levels: ["st1", "st2", "st3", "st4"], after: "q" },
+  { id: "final", n: 5, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
 ];
 const TRACKS = UNITS.filter(u => u.id !== "final");
 /* Lessons. Writing rules for every item:
@@ -1123,6 +1246,203 @@ const LEVELS = [
     Q("n49","When should you let a couple go?","When it's really not for them",["Never, keep pushing","When they ask about breakfast","When they give their number"],"A solid no beats a fake yes. Let them go with a smile.")
   ]
 },
+{
+  id: "st1", name: "Mindset", sub: "Numbers, goals, attitude", icon: "target",
+  notes: [
+    { h: "It's a numbers game", li: [
+      "Most people you greet keep walking. That's normal, and it isn't about you.",
+      "Greet everyone who walks by. The more people you talk to, the more couples you book.",
+      "Every no gets you closer to the couple who says yes. Smile, let it go, greet the next one." ] },
+    { h: "Attitude is a choice", li: [
+      "Keep a positive attitude all day, in the sun and in the rain.",
+      "Stay out of the \"it's slow today\" talk. Negative coworkers drain your energy.",
+      "People feel your mood from across the street." ] },
+    { h: "Goals on paper", li: [
+      "Write down what you're working for, and be specific: what it is, how much, and by when.",
+      "Work back from it: how many bookings a week get you there? Look at that number every morning.",
+      "Next month, aim a little higher." ] },
+    { h: "Get your body ready", li: [
+      "Eat a real meal and drink water. Skipped meals and three coffees make you slow and short-tempered by noon.",
+      "Take a short walk before your shift, put on music that lifts you, and take a few slow, deep breaths.",
+      "Start with something you're grateful for. People feel your energy before they hear your words." ] },
+    { h: "Your day starts at home", li: [
+      "Before your shift, go over your lines, check your goal and plan how many bookings you need today.",
+      "Bring everything: pens, invitations, a map. Fumbling for a pen costs you trust.",
+      "Look the part: clean uniform, name tag, a real smile. People say yes to people they like." ] },
+    { h: "It's not the spot, it's you", li: [
+      "A quiet corner still has people walking by. All you need is one couple who stops.",
+      "Book from a slow spot, and the better spots follow.",
+      "Don't judge people by how they look. Greet everyone, and let the small talk tell you who qualifies." ] },
+    { h: "Win together", li: [
+      "Share what works with your coworkers, and ask the top promoters what they say. There are enough couples for everyone.",
+      "Celebrate a good week. Then do it again." ] },
+    { h: "Know your area", li: [
+      "Know the beaches, restaurants, shops, bus stops and supermarkets around your spot.",
+      "Help people find things and they trust you. Trust comes before every booking." ] },
+    { h: "Where this comes from", li: [
+      "Ideas from the Timeshare OPC University videos and from Suzanne R. Angeles's audiobook \"How To Become A Booking Timeshare Marketing OPC\" (OPC Secrets By Suz), put in our own words and fitted to Iberostar's rules and the Open House." ],
+      src: [{ label: "Timeshare OPC University on YouTube", url: "https://www.youtube.com/@timeshareopcuniversity2290" },
+            { label: "OPC Secrets By Suz on YouTube", url: "https://www.youtube.com/watch?v=BzTAhkKYrWg" }] }
+  ],
+  qs: [
+    Q("st1a","Most people you greet keep walking. What does that mean?","It's normal. Greet the next person",["Your pitch is wrong. Stop for today","Move to a busier spot right away","Ask your manager for a new script"],"Most people say no. The more people you greet, the more you book."),
+    Q("st1b","A coworker says, \"It's dead today, why bother?\" What do you do?","Stay positive and keep greeting people",["Agree and take a long break together","Go home early and try again tomorrow","Complain to the manager about the spot"],"Negative talk drains you. Your attitude is yours to choose."),
+    Q("st1c","How should you write down a goal?","Specific: what, how much and by when",["Short and vague, so it feels easy","Only in your head, never on paper","As a wish, like \"make more money\""],"A specific goal on paper is one you can plan for."),
+    Q("st1d","You have your goal. What do you work out next?","How many bookings a week get you there",["How many hours you can skip each week","How many people walk past your spot","How much the other promoters make"],"Turn the goal into a weekly number, and check it every morning."),
+    Q("st1e","Your shift starts at 8. When does your work start?","At home: lines, goal and materials",["The moment the first couple stops","After your first booking of the day","When your manager arrives at the spot"],"Plan the day before it starts: what you'll say and how many you need."),
+    Q("st1f","You're given the quietest spot. What's the best attitude?","It's not the spot, it's me. Book here",["Wait until they give me a better spot","Spend the day talking with coworkers","Only greet people who look like buyers"],"One couple is all you need. Book from a slow spot and better spots follow."),
+    Q("st1g","Why learn the beaches, shops and bus stops around you?","Helping people builds trust fast",["Guests only want directions, not offers","So you can leave your spot more often","Your manager tests you on the map"],"Help first. Trust comes before every booking."),
+    Q("st1h","Why keep pens and invitations ready at all times?","Fumbling for a pen costs you trust",["Managers count your pens every morning","Guests like to keep a pen as a gift","Invitations run out by the afternoon"],"Be ready the second a couple says yes."),
+    Q("st1i","What helps your energy before a shift?","A real meal, water and a short walk",["Skipping lunch to save some time","Three coffees and no breakfast at all","Scrolling your phone until the start"],"Your body carries your mood. People feel it before you say a word."),
+    Q("st1j","A couple looks like they couldn't afford a vacation. What do you do?","Greet them like everyone else",["Let them walk past without a word","Ask them first what they earn","Only point them to the bus stop"],"Don't judge by looks. The small talk tells you who qualifies.")
+  ]
+},
+{
+  id: "st2", name: "Stop them", sub: "Read people, open the talk", icon: "hand",
+  notes: [
+    { h: "Stopping people is most of the job", li: [
+      "Once a couple stops and talks with you, the rest gets much easier. Master this first.",
+      "Practice it on purpose: spend a whole shift trying only to stop people." ] },
+    { h: "Read them before they reach you", li: [
+      "Watch them come: a team cap, a hotel bracelet, holding hands, kids, a map in hand, looking at street signs.",
+      "Young couple, family, retirees, honeymooners: each one gets a different opener.",
+      "Pick your opener before they're in front of you." ] },
+    { h: "Open with them, not the offer", li: [
+      "Say something real about what you see, or offer help: \"Go Steelers! Where are you guys from?\" \"Looking for something? I know the area.\"",
+      "Ask questions people enjoy answering. People love to talk about themselves.",
+      "Don't open with free stuff. Say why you're inviting them before what they get." ] },
+    { h: "Compliments and easy openers", li: [
+      "A sincere compliment stops people: their hat, their bag, a cute kid. Keep it real, never flirty.",
+      "Easy questions open people up: \"Did you just get in?\" \"Celebrating anything special?\"",
+      "An anniversary or a birthday? \"Congratulations! How nice that you chose Aruba for it.\"" ] },
+    { h: "How you say it", li: [
+      "Start talking before they're in front of you: a bit louder while they're far, then softer so they lean in.",
+      "Smile, make eye contact, sound glad to see them. How you say it matters as much as what you say.",
+      "Be sincere. People feel a fake line from far away." ] },
+    { h: "Lead the way", li: [
+      "When you point them to your spot, turn and walk. Assume they're coming.",
+      "Don't pull or push. Lead with confidence and most people follow." ] },
+    { h: "Have your openers ready", li: [
+      "Write openers for the people you meet most: Americans, Canadians, South Americans, families, retirees, honeymooners.",
+      "Say them out loud until they sound like you." ] },
+    { h: "Where this comes from", li: [
+      "Ideas from the Timeshare OPC University videos and from Suzanne R. Angeles's audiobook \"How To Become A Booking Timeshare Marketing OPC\" (OPC Secrets By Suz), put in our own words and fitted to Iberostar's rules and the Open House." ],
+      src: [{ label: "Timeshare OPC University on YouTube", url: "https://www.youtube.com/@timeshareopcuniversity2290" },
+            { label: "OPC Secrets By Suz on YouTube", url: "https://www.youtube.com/watch?v=BzTAhkKYrWg" }] }
+  ],
+  qs: [
+    Q("st2a","A couple walks toward you. When do you pick your opener?","Before they reach you, from what you see",["Once they stop and look at your stand","After they ask you what you're selling","Never. I say the same line to everyone"],"Read them as they come: caps, bracelets, kids, maps. Then pick your opener."),
+    Q("st2b","He wears a Pittsburgh Steelers cap. What's a good opener?","\"Go Steelers! Where are you guys from?\"",["\"Hi! Free breakfast and a gift for you!\"","\"Excuse me, do you have a minute?\"","\"Are you interested in a promotion?\""],"Open with something real about them and a question they enjoy answering."),
+    Q("st2c","Why ask people questions about themselves?","People love to talk about themselves",["It fills the time until they leave","So you can sell them something else","It's the rule for every promoter"],"When they talk about themselves, they relax and start to like you."),
+    Q("st2d","They're still far away. How do you use your voice?","A bit louder first, then softer up close",["Loud the whole time, so they all hear","A whisper, so they have to come close","Wait until they're right next to you"],"Reach them from a distance, then lower your voice so they lean in."),
+    Q("st2e","Why should your opener be sincere?","People feel a fake line from far away",["Fake lines are against the law here","Sincere lines are always much shorter","Managers listen to every opener"],"Say something true about what you see. Fake lines push people away."),
+    Q("st2f","You told them where to go. What next?","Turn and walk. Assume they'll follow",["Wait for them to say they're coming","Hold their arm and walk them over","Ask twice if they really want to go"],"Lead with confidence. Most people follow."),
+    Q("st2g","Someone is reading street signs. What's a good way in?","Offer help: \"Looking for something?\"",["Tell them about the gift right away","Ask how old they are and if they work","Let them go. Lost people never stop"],"Help first. A lost tourist is glad to meet someone who knows the area."),
+    Q("st2h","How do you get better at stopping people?","Practice only stopping people for a day",["Wait for the busy season to come back","Change your opener after every no","Stand closer to the hotel entrance"],"Stopping people is most of the job. Practice it on purpose."),
+    BUILD("bs3","Build a friendly opener.","Go Steelers! Where are you guys from?",["Free","gift"],"Something real about them, then a question they enjoy answering."),
+    Q("st2i","Which compliment works best?","A sincere one about something they chose",["A flirty one, to make them both laugh","One about how rich they both look","None. Compliments always sound fake"],"A real compliment about their hat, bag or kids stops people. Never flirty."),
+    Q("st2j","They say they're here for their anniversary. What do you say?","\"Congratulations! You chose Aruba for it!\"",["\"Great, then you need our free gift.\"","\"Okay. Are you two over 32 years old?\"","\"Nice. Do you have a credit card?\""],"Share the moment first. The pitch can wait a few seconds.")
+  ]
+},
+{
+  id: "st3", name: "Small talk", sub: "Break the ice, qualify as you go", icon: "talk",
+  notes: [
+    { h: "Give first, then ask", li: [
+      "While you help (directions, a tip, a good restaurant), ask about them: where they're from, first time in Aruba, what they've liked so far.",
+      "Talk with them, not at them. It should feel like a chat, never an interview.",
+      "People don't care how much you know until they know how much you care." ] },
+    { h: "Qualify inside the small talk", li: [
+      "\"Where are you from? Where are you staying? When do you fly home?\" These fit any friendly chat.",
+      "Work: \"What do you guys do back home?\"",
+      "Age: ask in a friendly way. With older couples, \"Are you retired yet, or still working?\" often opens it up.",
+      "Recent tour: \"Have you been to an Iberostar breakfast before?\"",
+      "Card: check which card they have when you go over what to bring." ] },
+    { h: "Tie the gift to what they love", li: [
+      "Find out what they enjoy: a great dinner, snorkeling, shopping, golf.",
+      "Then make the gift real for them: their IberoCash works at partners like Gianni's, Daniel's Steak & Chop or Rocka Beach Tours.",
+      "Only promise what the invitation really gives. Never invent prices or extras." ] },
+    { h: "True stories only", li: [
+      "A real story from a couple you invited helps a doubtful couple: \"A couple I met last week used theirs at Gianni's and loved it.\"",
+      "Only tell stories that really happened. Made-up stories come out, and then nothing you said counts." ] },
+    { h: "One question at a time", li: [
+      "Never fire questions one after another. Ask, listen, share something, then ask the next.",
+      "Do the math as you go: country, his age, work, card, where they stay, when they leave." ] },
+    { h: "If they don't qualify", li: [
+      "Let them go with a smile and wish them a great trip. The next couple is coming.",
+      "Never ask anyone to bend the truth to qualify. It comes out at the hostess desk anyway.",
+      "A couple who doesn't qualify earns you nothing, so don't spend your morning on them." ] },
+    { h: "Go over it before they leave", li: [
+      "While you write the invitation, go over what they need: every adult brings 2 IDs, and one of them brings a credit card.",
+      "Tell them there's a short presentation about the club. Prepared guests stay curious. Surprised guests close up." ] },
+    { h: "Where this comes from", li: [
+      "Ideas from the Timeshare OPC University videos and from Suzanne R. Angeles's audiobook \"How To Become A Booking Timeshare Marketing OPC\" (OPC Secrets By Suz), put in our own words and fitted to Iberostar's rules and the Open House." ],
+      src: [{ label: "Timeshare OPC University on YouTube", url: "https://www.youtube.com/@timeshareopcuniversity2290" },
+            { label: "OPC Secrets By Suz on YouTube", url: "https://www.youtube.com/watch?v=BzTAhkKYrWg" }] }
+  ],
+  qs: [
+    Q("st3a","When do you ask about them?","While you help with directions or tips",["Only after they have agreed to come","Before you say anything else at all","Never. Personal questions scare people"],"Give first, then ask. It feels like a chat, not an interview."),
+    Q("st3b","Which way of asking about work feels friendly?","\"What do you guys do back home?\"",["\"Are you employed? What's your job?\"","\"Do you earn enough to qualify?\"","\"Tell me your job title and salary.\""],"A friendly question gets a friendly answer, and tells you if they work."),
+    Q("st3c","An older couple. What's an easy way into their ages?","\"Are you retired yet, or still working?\"",["\"How old are you both, exactly?\"","\"You two look over seventy, right?\"","\"Can we see your IDs, for your ages?\""],"Retirement opens the topic. Then you can ask how long ago, or how long to go."),
+    Q("st3d","What should small talk never feel like?","An interview, one question after another",["A friendly chat between new friends","A conversation about their vacation","A talk where they ask you questions"],"Ask, listen, share something, then ask the next question."),
+    Q("st3e","They're from Venezuela, and they love the offer. What now?","Let them go nicely. They don't qualify",["Write it up and hope no one checks","Ask them to say they're from Colombia","Book them for 10 instead of 8"],"Venezuela is one of the five countries left out. Wish them a great trip."),
+    Q("st3f","Why never ask a guest to bend the truth to qualify?","It comes out at the hostess desk anyway",["Guests always refuse to do it anyway","It only works for Canadian couples","The gift is the same either way"],"Guests show IDs and a card at check-in. Honest bookings are the only ones that count."),
+    Q("st3g","When do you go over the IDs and the credit card?","While you write the invitation",["Never. The hostess explains it all","Only if they ask what to bring","Right at the start, before small talk"],"Every adult brings 2 IDs, and one of them brings a credit card. No surprises tomorrow."),
+    LINE("st3h","People don't care how much you know until they know how much you ___.","care",["earn","sell","talk"],"Show you care about them first. Then they listen."),
+    Q("st3i","They love a good steak. How do you make the gift feel real?","Tie the IberoCash to a steakhouse partner",["Say the gift is worth a lot of money","Skip the gift and talk about the room","Promise them a free steak dinner"],"Daniel's Steak & Chop is a partner. Show them how the gift fits what they love."),
+    Q("st3j","When can you tell a story about another couple?","Only when it really happened",["Whenever it helps to get a yes","Only with the skeptical couples","Never. Stories sound like lies"],"True stories build trust. Made-up ones break it.")
+  ]
+},
+{
+  id: "st4", name: "Objections and the close", sub: "Welcome objections, make it yours", icon: "shield",
+  notes: [
+    { h: "An objection is a test", li: [
+      "Most objections mean \"tell me more\" or \"show me I can trust you.\"",
+      "Welcome it: \"Great question.\" Then answer with the plain truth.",
+      "Getting objections means you're doing your job. Silence often means they stopped listening." ] },
+    { h: "Never lie to get a yes", li: [
+      "Don't hide the presentation, the 90 minutes or what to bring. Guests remember what you said.",
+      "One small lie makes them doubt everything at the hotel, and they shut down." ] },
+    { h: "\"Let me think about it\"", li: [
+      "It usually means a step was skipped: they can't picture the morning yet.",
+      "Go back and paint it: breakfast at one of our five-star restaurants, the tour, one of our rooms, and IberoCash for a dinner out.",
+      "Be specific: what's included, where, when and how long. People say yes to what they can picture." ] },
+    { h: "Your objection notebook", li: [
+      "When you can't answer an objection, write it down.",
+      "At home, ask yourself what answer would convince you. Practice it out loud.",
+      "Bring your best answers to the team meeting." ] },
+    { h: "Make the booking yours", li: [
+      "Tell them you only get credit when they show up and stay for the 90 minutes.",
+      "If another promoter stops them, they just show your invitation.",
+      "Tell them they'll meet someone just as friendly tomorrow, and ask them to give it a fair chance." ] },
+    { h: "Button it up", li: [
+      "Before they go: where to go, what time, and what to bring (2 IDs each, one credit card).",
+      "Ask them to arrive 5 to 10 minutes early, and to answer the confirmation call this afternoon.",
+      "Ask where they'd love to travel next. It keeps them excited about tomorrow.",
+      "End warm: \"Congratulations, you two. See you at 8!\"" ] },
+    { h: "Tricks we never use", li: [
+      "Some promoters hold a guest's ID so they can't walk away, confuse people on purpose, or invent a \"last spot\". Never do it.",
+      "Our promise is no high pressure and no obligation. Guests who feel tricked don't show up, and they don't buy." ] },
+    { h: "Your own pitch", li: [
+      "Write your pitch in your own words, built on the lines from the voice notes. Change what doesn't sound like you.",
+      "Have versions for families, retirees, honeymooners and skeptical couples." ] },
+    { h: "Where this comes from", li: [
+      "Ideas from the Timeshare OPC University videos and from Suzanne R. Angeles's audiobook \"How To Become A Booking Timeshare Marketing OPC\" (OPC Secrets By Suz), put in our own words and fitted to Iberostar's rules and the Open House." ],
+      src: [{ label: "Timeshare OPC University on YouTube", url: "https://www.youtube.com/@timeshareopcuniversity2290" },
+            { label: "OPC Secrets By Suz on YouTube", url: "https://www.youtube.com/watch?v=BzTAhkKYrWg" }] }
+  ],
+  qs: [
+    Q("st4a","A guest raises an objection. What is it, most of the time?","A test: \"tell me more, can I trust you?\"",["A firm no. Thank them and move on","A sign your pitch went on too long","A trick to get a bigger gift from you"],"Most objections ask for more information. Welcome them."),
+    Q("st4b","What do you say first when you hear an objection?","\"Great question.\" Then the plain truth",["\"That's not true at all, trust me.\"","\"Everyone says that. It's nothing.\"","\"Let me get my manager to explain.\""],"Welcome it, then answer honestly."),
+    Q("st4c","Why never say \"it's not a presentation\" to get a yes?","They find out, and they shut down",["It makes the gift a lot smaller","Hostesses don't allow that word","Guests prefer longer presentations"],"Guests remember what you said. One lie and they stop listening."),
+    Q("st4d","They say \"Let me think about it.\" What does it usually mean?","They can't picture the morning yet",["They've already decided not to come","They want you to raise the gift","They need to check with their kids"],"Go back and paint the picture: breakfast, the tour, a room, the IberoCash."),
+    Q("st4e","How do you make the morning easy to picture?","Be specific: what, where, when, how long",["Repeat \"it's free\" a few more times","Say \"it's amazing\" over and over again","Talk faster so they hear every detail"],"People say yes to what they can see in their heads."),
+    Q("st4f","You couldn't answer an objection today. What now?","Write it down and work out an answer",["Forget it. That couple was never coming","Avoid couples who look like that one","Blame the offer and ask for a new one"],"Your objection notebook turns today's no into tomorrow's yes."),
+    Q("st4g","How do you help a booking stay yours?","Say you get credit only if they show up",["Ask them for a deposit to hold the spot","Tell them the offer ends at midnight","Keep their passports until tomorrow"],"They don't have to book or buy anything. Showing up is what counts."),
+    Q("st4h","What's the best way to sound natural?","Your own words, built on the notes",["Read every line straight off the flyer","Copy exactly what the top promoter says","Make up a new pitch for every couple"],"Write it in your words, using the voice-note lines. Practice it out loud."),
+    Q("st4i","Another promoter says: hold their ID so they can't walk away. Do you?","No. No pressure and no tricks, ever",["Yes, but only with skeptical couples","Yes, and give it back after booking","Only if your manager isn't around"],"Our promise is no high pressure and no obligation. Tricked guests don't show up."),
+    Q("st4j","They're booked and leaving. What do you go over before they go?","Where, when, what to bring, the call",["Only the gift they'll get tomorrow","Nothing. They can ask the hostess","The rules for getting a bigger gift"],"Button it up: the place, the time, 2 IDs each and one card, and the confirmation call.")
+  ]
+},
 { id: "final", name: "Final run", sub: "Everything mixed: 20 in a row", icon: "trophy", final: true, count: 20, notes: [] }
 ];
 
@@ -1284,8 +1604,8 @@ const SB = { url: "https://cdkopyphjvfxjqhasrae.supabase.co", key: "sb_publishab
 const TEAM_URL = "https://victorfromaruba-stack.github.io/iberostar-club/academy/";
 const TEAM_HOST = /github\.io$/.test(location.hostname) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 const GOAL = 50;
-const ORDER = ["q","why","ctnq","offer","nlp1","who","solid","words","nlp2","map","nlp3","nlp4","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","words","map","nlp1","nlp2","nlp3","nlp4","final"];
+const ORDER = ["q","why","st1","ctnq","offer","st2","nlp1","who","st3","solid","words","nlp2","st4","map","nlp3","nlp4","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","words","map","nlp1","nlp2","nlp3","nlp4","st1","st2","st3","st4","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];
@@ -1327,18 +1647,20 @@ function levelTotal(L){ return L.map ? MAP_STEPS.length*2 : (L.count || (L.qs||[
 const KEY = "showup.v1";
 const blank = () => ({ name:"", mastered:{}, best:{}, misses:{}, sound:true, xp:0, lightning:0, daily:{ last:"", streak:0, best:0 },
   listened:{}, intro:false, days:[], today:{ d:"", xp:0 }, said:{}, sync:{ device:"", secret:"", last:0, ok:null }, mgr:"", tab:"learn",
-  lv:{}, log:[] });
+  lv:{}, log:[], rp:{ n:0, best:0, res:[] }, rpVoice:true, rpFocus:"any", rpLang:"en" });
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e){}
 for (const [k, v] of Object.entries(blank())) if (typeof S[k] !== typeof v || (Array.isArray(v) && !Array.isArray(S[k]))) S[k] = v;
 if (S.daily.last && !S.days.includes(S.daily.last)) S.days.push(S.daily.last);
+if (!Array.isArray(S.rp.res) || typeof S.rp.n !== "number") S.rp = blank().rp;
 /* Levels can get shorter between versions: a saved best run never shows more than the level has. */
 for (const id of Object.keys(S.best)){ const L = LEVELS.find(l => l.id === id); if (L) S.best[id] = Math.min(S.best[id], levelTotal(L)); }
 function save(sync = true){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} if (sync) queueSync(); }
 
 /* For the manager panel: right and wrong answers and tries per level, and a log of recent lessons.
    Log entries are [time, kind, level, value, total]. Kinds: m mastered, r review done, p practice,
-   f a run that ended on a mistake (value = how many in a row), d Daily 10, lg Lightning round. */
+   f a run that ended on a mistake (value = how many in a row), d Daily 10, lg Lightning round,
+   rp Street practice (level = the couple's mood, value = score, total = 1 if they called the gift right). */
 const QLEVEL = Object.fromEntries(LEVELS.flatMap(l => (l.qs || []).map(q => [q.id, l.id])));
 function lvOf(id){ return S.lv[id] && typeof S.lv[id] === "object" ? S.lv[id] : (S.lv[id] = { r:0, w:0, t:0 }); }
 function logEvent(k, id, v = 0, n = 0){ S.log.push([Date.now(), k, id, v, n]); S.log = S.log.slice(-25); }
@@ -1640,7 +1962,8 @@ function payload(){
     b:Object.fromEntries(LEVEL_IDS.map(id => [id, S.best[id]||0])),
     a:Object.fromEntries(LEVEL_IDS.map(id => { const v = S.lv[id] || {}; return [id, [v.r||0, v.w||0, v.t||0]]; })),
     l:S.lightning||0, d:streakDays(), h:CLIPS.filter(c => S.listened[c.id]).length,
-    sl:linesPracticed(), w:topMisses(20), lg:S.log.slice(-20), dd:S.days.slice(-30), t:Date.now(), ld:S.days[S.days.length-1] || "" };
+    sl:linesPracticed(), w:topMisses(20), lg:S.log.slice(-20), dd:S.days.slice(-30), t:Date.now(), ld:S.days[S.days.length-1] || "",
+    rp:{ n:S.rp.n, b:S.rp.best, s:S.rp.res.slice(-10) } };
 }
 async function rpc(fn, body){
   const r = await fetch(`${SB.url}/rest/v1/rpc/${fn}`, { method:"POST", keepalive: fn === "sua_save", headers:{ "apikey": SB.key, "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -1681,6 +2004,7 @@ function show(html, opts = {}){
   timers.forEach(clearTimeout); timers = [];
   if (!opts.keepAudio) stopAudio();
   stopRec();
+  try { window.speechSynthesis && speechSynthesis.cancel(); } catch(e){}
   document.querySelectorAll(".combo,.plus").forEach(n => n.remove());
   app.innerHTML = html;
   document.body.classList.toggle("full", !!opts.full);
@@ -1744,7 +2068,7 @@ function renderLearn(){
       </div>
       <div class="path">${u.levels.map(id => nodeHTML(id, u, OFFS[(k++) % OFFS.length])).join("")}</div>
     </section>`).join("")}
-  <p class="foot">Sources: Qualifications Aruba (2 March 2026), the team's voice notes (29 Sept 2026), and the Open House pitch deck.</p>`);
+  <p class="foot">Sources: Qualifications Aruba (2 March 2026), the team's voice notes (29 Sept 2026), and the Open House pitch deck. Street skills uses ideas from the Timeshare OPC University videos and the OPC Secrets By Suz audiobook, in our own words.</p>`);
   const nfm = $("#nameForm");
   if (nfm) nfm.addEventListener("submit", e => { e.preventDefault(); const v = $("#nm").value.trim().slice(0,30); if (v){ S.name = v; save(false); pushSync(); sfx("ok"); renderLearn(); } });
   on("#toScript", () => tab("script"));
@@ -1794,7 +2118,8 @@ function togglePop(id){
 function noteHTML(nt){
   return `<section class="note"><h2>${esc(nt.h)}</h2><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
     ${nt.hear ? `<div class="acts"><button class="btn small ghost" data-seg="${nt.hear.clip}:${nt.hear.from}:${nt.hear.to}">${icon("play")} ${esc(nt.hear.label || "Hear it in the voice notes")}</button></div>` : ""}
-    ${nt.sayId ? lineHTML(NLP_LINES[nt.sayId]) : nt.say ? `<p class="line"><span class="quote">"${esc(nt.say)}"</span></p>` : ""}</section>`;
+    ${nt.sayId ? lineHTML(NLP_LINES[nt.sayId]) : nt.say ? `<p class="line"><span class="quote">"${esc(nt.say)}"</span></p>` : ""}
+    ${nt.src ? [].concat(nt.src).map(x => `<p class="small"><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a></p>`).join("") : ""}</section>`;
 }
 function guidebook(id){
   view = "guide"; game = null;
@@ -2224,12 +2549,13 @@ function renderScript(){
 /* ---------- Games tab ---------- */
 function renderGames(){
   show(`
-  <header class="stack" style="padding-top:12px"><h1>Games</h1><p class="muted">Speed and memory. Every game you finish counts for your streak.</p></header>
+  <header class="stack" style="padding-top:12px"><h1>Games</h1><p class="muted">Speed, memory and the real conversation. Every game you finish counts for your streak.</p></header>
+  <article class="tile-card c-flamingo rp-tile"><div class="ico">${icon("couple")}</div><div><h2>Street practice</h2><p class="small muted">Pitch a tourist couple by voice or text. Shoco scores you after.${S.rp.n ? ` Best: ${S.rp.best}.` : ""}</p></div><button class="btn small flamingo" id="rp">Start</button></article>
   <article class="tile-card c-lagoon" style="--c:var(--sea);--soft:var(--sea-soft)"><div class="ico">${icon("bolt")}</div><div><h2>Lightning round</h2><p class="small muted">${lightningOpen() ? `60 seconds. Record: ${S.lightning||0} couples.` : 'Opens after "Who qualifies?"'}</p></div>${lightningOpen() ? `<button class="btn small sea" id="lg">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-sun"><div class="ico">${icon("calendar")}</div><div><h2>Daily 10</h2><p class="small muted">${dailyOpen() ? (S.daily.last === today() ? "Done today. Play again for practice." : "Ten questions. Your misses come back more.") : "Opens after your first mastered level."}</p></div>${dailyOpen() ? `<button class="btn small sun" id="dy">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-flamingo"><div class="ico">${icon("route")}</div><div><h2>Pitch map</h2><p class="small muted">${unlocked("map") ? "Put the pitch in order, then the lines." : `Opens after "${byId(before("map")).name}"`}</p></div>${unlocked("map") ? `<button class="btn small flamingo" id="mp">Play</button>` : icon("lock")}</article>
   <article class="tile-card"><div class="ico">${icon("headphones")}</div><div><h2>Voice notes</h2><p class="small muted">${CLIPS.filter(c => S.listened[c.id]).length} of ${CLIPS.length} heard</p></div><button class="btn small ghost" id="vn">Listen</button></article>`);
-  on("#lg", lightningIntro); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
+  on("#rp", streetIntro); on("#lg", lightningIntro); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
 }
 
 /* ---------- Me tab ---------- */
@@ -2245,6 +2571,8 @@ function renderMe(){
     <div class="statbox" style="color:var(--sun-2)">${icon("star")}<b style="color:var(--ink)">${nf(S.xp)}</b><span>total XP</span></div>
     <div class="statbox" style="color:var(--sea)">${icon("bolt")}<b style="color:var(--ink)">${S.lightning||0}</b><span>Lightning record</span></div>
     <div class="statbox" style="color:var(--flamingo)">${icon("mic")}<b style="color:var(--ink)">${linesPracticed()}</b><span>script lines said</span></div>
+    <div class="statbox" style="color:var(--flamingo)">${icon("couple")}<b style="color:var(--ink)">${S.rp.n}</b><span>street practice chats</span></div>
+    <div class="statbox" style="color:var(--good)">${icon("trophy")}<b style="color:var(--ink)">${S.rp.n ? S.rp.best : "–"}</b><span>best street score</span></div>
   </section>
   <section class="card"><p class="eyebrow">This week</p><div class="week">${days.map(d => { const on = S.days.includes(dstr(d)); return `<span>${"SMTWTFS"[d.getDay()]}<i class="${on ? "on" : ""}">${on ? icon("check") : ""}</i></span>`; }).join("")}</div></section>
   ${weak.length ? `<section class="card weak"><p class="eyebrow">Your weak spots</p><ul>${weak.map(([id, n]) => `<li>${esc(QBY[id].q)}<br><span class="ans">${esc(answerText(QBY[id]))}</span> <span class="small muted nowrap">· missed ${n}×</span></li>`).join("")}</ul></section>` : ""}
@@ -2254,6 +2582,7 @@ function renderMe(){
       <li>Pulling the answer out of your head is what builds memory. Re-reading doesn't.</li>
       <li>Levels come back for review after 1, 3, 7, 14 and 30 days. Spacing it out makes it stick.</li>
       <li>Hear the lines from the voice notes, then say them out loud in the Script tab.</li>
+      <li>Street practice in Games puts it all together: a real conversation with a tourist couple, then your score.</li>
     </ul></section>
   <section class="row">
     <button class="btn small ghost" id="snd">${icon(S.sound ? "sound" : "mute")} Sound ${S.sound ? "on" : "off"}</button>
@@ -2297,6 +2626,1259 @@ document.addEventListener("keydown", e => {
   }
 });
 /* =====================================================================
+   STREET PRACTICE ENGINE (shared)
+   The couples, their rules, the prompts and the feedback format for Street practice.
+   One plain script used three ways: in the app (the Claude version asks Claude on the
+   viewer's own account), in the sua-roleplay Edge Function (paid API path), and in tests.
+   It sets globalThis.RPCORE and touches nothing else.
+   Couples are graded by the same rules the lessons teach (qualifications PDF, 2 March 2026).
+   ===================================================================== */
+globalThis.RPCORE = (() => {
+  const FOCUS = ["any", "friendly", "skeptical", "hurry", "brush", "objections", "nq"];
+  const MOOD_LABEL = { friendly: "Friendly", chatty: "Chatty", skeptical: "Skeptical", hurry: "In a hurry", brush: "Didn't want to talk", split: "One keen, one not" };
+
+  /* ---------- random helpers (seedable for tests) ---------- */
+  function seeded(seed){
+    let a = seed >>> 0;
+    return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  }
+  const pickR = (r, a) => a[Math.floor(r() * a.length)];
+  const intR = (r, lo, hi) => lo + Math.floor(r() * (hi - lo + 1));
+  function weighted(r, pairs){
+    const total = pairs.reduce((s, p) => s + p[1], 0);
+    let x = r() * total;
+    for (const [v, w] of pairs){ if ((x -= w) < 0) return v; }
+    return pairs[pairs.length - 1][0];
+  }
+  const cap = s => s.replace(/^the /, "The ");
+
+  /* ---------- the rules: the man's age counts; in a same-sex couple, either partner's ---------- */
+  const bandUSA = a => a >= 32 && a <= 70 ? "Q" : (a >= 28 && a <= 31) || a >= 71 ? "CT" : "NQ";
+  const bandLat = a => a >= 40 && a <= 60 ? "Q" : "NQ";
+  const bandArg = a => a >= 45 && a <= 55 ? "Q" : (a >= 35 && a <= 44) || (a >= 56 && a <= 70) ? "CT" : "NQ";
+  const RANK = { NQ: 0, CT: 1, Q: 2 };
+  const FLAG_WHY = {
+    crew: "Airline pilots and crew, like flight attendants, get no gift.",
+    military: "Active US military get no gift. (The National Guard is OK.)",
+    industry: "People who work for hotel, timeshare or vacation club companies get no gift.",
+    agent: "Travel agents and tour operators get no gift.",
+    toured: "An Iberostar tour in the last 6 months (in-house) or 12 months (street program) means no gift.",
+    trio: "Three couples or more traveling together (Trinella or Trifecta) get no gift."
+  };
+
+  /* The grade from the facts alone. The generator's intended grade must always match it. */
+  function rules(f, people){
+    if (f.flag) return { g: "NQ", why: FLAG_WHY[f.flag] };
+    if (f.stayKind === "cruise") return { g: "NQ", why: "They're on a cruise ship, not paying for a hotel, timeshare or rental here, and they sail tonight." };
+    if (f.stayKind === "free") return { g: "NQ", why: "They must be paying for where they stay. Staying free with family or friends: no gift." };
+    if (f.region === "aw" || f.stayKind === "home") return { g: "NQ", why: "They live in Aruba, one of the five countries left out (Aruba, Cuba, Venezuela, Haiti and Ecuador)." };
+    if (f.region === "out") return { g: "NQ", why: `${cap(f.country)} is one of the five countries left out: Aruba, Cuba, Venezuela, Haiti and Ecuador. No gift at any age.` };
+    if (f.region === "eu") return { g: "NQ", why: "Only the USA and Canada, Argentina, and Central and South America and the Caribbean qualify. Europeans get no gift." };
+    if (!f.sameLang) return { g: "NQ", why: "Both must be fluent in the same language: both English, or both Spanish." };
+    if (!f.working && !f.retired) return { g: "NQ", why: "One of them must work (or, for the USA and Canada, be retired)." };
+    if (f.together === "single"){
+      const p = people[0];
+      if (f.region === "us" && p.sex === "f" && p.age >= 40 && p.age <= 65 && f.card !== "debit")
+        return { g: "Q", why: `Single women from the USA, 40 to 65, get the full gift. She's ${p.age}.` };
+      if (p.sex === "m") return { g: "NQ", why: "Only single women can qualify, and only from the USA." };
+      if (f.region !== "us") return { g: "NQ", why: "Single women qualify only from the USA." };
+      return { g: "NQ", why: `Single women from the USA qualify from 40 to 65. She's ${p.age}.` };
+    }
+    const men = people.filter(p => p.sex === "m");
+    const sameSex = men.length !== 1;
+    if (f.region === "us" || f.region === "ca"){
+      const best = sameSex ? people.reduce((b, p) => RANK[bandUSA(p.age)] > RANK[bandUSA(b.age)] ? p : b) : men[0];
+      const g = bandUSA(best.age);
+      const who = sameSex ? `In a same-sex couple, either partner's age counts. ${best.name} is ${best.age}` : `USA and Canada: the man's age counts. He's ${best.age}`;
+      if (g === "NQ") return { g, why: `${who}, under 28, so no gift (NQ).` };
+      if (g === "Q" && f.card === "debit") return { g: "NQ", why: "The full gift needs a credit card: Visa, Mastercard, Amex or Discover." };
+      if (g === "Q") return { g, why: `${who}, between 32 and 70, so the full gift (Q).` };
+      return { g, why: `${who}, ${best.age >= 71 ? "71 or older" : "between 28 and 31"}, so the half gift (CT).${f.card === "debit" ? " A debit card is OK for CT." : ""}` };
+    }
+    const band = f.region === "ar" ? bandArg : bandLat;
+    const man = sameSex ? people.reduce((b, p) => RANK[band(p.age)] > RANK[band(b.age)] ? p : b) : men[0];
+    if (!f.working) return { g: "NQ", why: "Outside the USA and Canada, one of them must work. Retirees get no gift." };
+    if (f.card === "Discover" || f.card === "debit") return { g: "NQ", why: "Outside the USA and Canada, the card must be Visa, Mastercard or Amex. No Discover." };
+    if (f.region === "ar"){
+      const g = bandArg(man.age);
+      return { g, why: `Argentina: 45 to 55 is Q, 35 to 44 and 56 to 70 are CT, any other age is NQ. He's ${man.age}, so ${g === "Q" ? "the full gift (Q)" : g === "CT" ? "the half gift (CT)" : "no gift (NQ)"}.` };
+    }
+    const g = bandLat(man.age);
+    return { g, why: `${cap(f.country)}: only 40 to 60 gets the full gift, and there's no half gift. He's ${man.age}, so ${g === "Q" ? "the full gift (Q)" : "no gift (NQ)"}.` };
+  }
+
+  /* ---------- people, places and things ---------- */
+  const NAMES = {
+    us: { m: ["Mike","Dave","Steve","Brian","Jason","Tom","Kevin","Mark","Greg","Rob","Chris","Jeff","Matt","Paul","Scott","Eric"],
+          f: ["Linda","Karen","Amy","Lisa","Jen","Michelle","Sarah","Kim","Nicole","Donna","Laura","Beth","Megan","Tracy","Heather","Julie"] },
+    lat: { m: ["Carlos","Andrés","Javier","Luis","Diego","Alejandro","Jorge","Ricardo","Fernando","Miguel"],
+           f: ["María","Paola","Carolina","Lucía","Daniela","Valentina","Gabriela","Fernanda","Camila","Sofía"] },
+    ar: { m: ["Martín","Facundo","Gonzalo","Pablo","Nicolás"], f: ["Florencia","Agustina","Romina","Julieta","Natalia"] },
+    eu: { m: ["Jeroen","Bas","Sander","Jens","Tobias","Gareth"], f: ["Sanne","Femke","Anouk","Katrin","Anja","Claire"] },
+    aw: { m: ["Ricky","Glenn","Ruben","Junior"], f: ["Giselle","Shirley","Natasha","Jacqueline"] }
+  };
+  const HOMES = {
+    us: [["Columbus, Ohio","He wears an Ohio State cap."],["Houston, Texas","He wears a Texas Longhorns T-shirt."],["Newark, New Jersey","He wears a Giants cap."],
+         ["Tampa, Florida","He wears a Buccaneers cap."],["Buffalo, New York","He wears a Buffalo Bills cap."],["Chicago, Illinois","He wears a Cubs cap."],
+         ["Pittsburgh, Pennsylvania","He wears a Steelers T-shirt."],["Boston, Massachusetts","He wears a Red Sox cap."],["Charlotte, North Carolina","He wears a Panthers cap."],
+         ["Atlanta, Georgia","He wears a Braves cap."],["Denver, Colorado","He wears a Broncos T-shirt."],["Detroit, Michigan","He wears a Tigers cap."]],
+    ca: [["Toronto, Ontario","He wears a Maple Leafs cap."],["Calgary, Alberta","He wears a Calgary Flames T-shirt."],["Vancouver, British Columbia","He wears a Canucks cap."],
+         ["Ottawa, Ontario","There's a small Canadian flag on his backpack."],["Halifax, Nova Scotia","There's a small Canadian flag on his backpack."]]
+  };
+  const LAT = [["Monterrey","Mexico"],["Guadalajara","Mexico"],["Mexico City","Mexico"],["Bogotá","Colombia"],["Medellín","Colombia"],
+               ["Lima","Peru"],["Santiago","Chile"],["San José","Costa Rica"],["Panama City","Panama"],["Santo Domingo","the Dominican Republic"],
+               ["Guatemala City","Guatemala"],["Montevideo","Uruguay"]];
+  const ARG = ["Buenos Aires","Córdoba","Rosario","Mendoza"];
+  const OUT = [["Caracas","Venezuela"],["Maracaibo","Venezuela"],["Quito","Ecuador"],["Guayaquil","Ecuador"],["Havana","Cuba"]];
+  const EU = [["Amsterdam","the Netherlands","Dutch"],["Utrecht","the Netherlands","Dutch"],["Munich","Germany","German"],["Manchester","England","English"]];
+  const AW = ["Noord","Santa Cruz","San Nicolas","Paradera"];
+  const JOBS_US = ["a sales manager","a nurse","a teacher","an electrician","an accountant","a dental hygienist","a police officer","a real estate agent",
+                   "a software developer","owns a landscaping business","an HR manager","a pharmacist","a firefighter","a truck driver","an insurance agent","a physical therapist"];
+  const JOBS_LAT = ["an engineer","a doctor","a lawyer","owns a small restaurant","an architect","an accountant","a teacher","works at a bank","sells insurance"];
+  const RETIRED_JOBS = ["a retired teacher","a retired nurse","a retired engineer","a retired police officer","a retired bank manager","a retired mechanic"];
+  const FLAG_JOBS = {
+    crew: ["a flight attendant with American Airlines","a flight attendant with Delta","a pilot for United","a flight attendant with JetBlue"],
+    military: ["active-duty in the US Navy","active-duty in the US Army","an active-duty Marine","active-duty in the Air Force","active-duty in the Coast Guard"],
+    industry: ["sells timeshare for Westgate in Orlando","the front desk manager at a Marriott hotel","in sales for Hilton Grand Vacations","a manager at a Hyatt hotel"],
+    agent: ["a travel agent","runs a small tour company"]
+  };
+  const LOOKS = ["in a cap","in sunglasses","in a blue shirt","with the beach bag","in a straw hat","in flip-flops"];
+  const HOTELS = [["the Riu Palace Aruba", true],["the Riu Palace Antillas", true],["the Barceló Aruba", true],["the Hilton Aruba", false],
+                  ["the Holiday Inn Resort", false],["the Hyatt Regency", false],["the Aruba Marriott", false]];
+  const TIMESHARES = ["Marriott's Aruba Surf Club","the Playa Linda Beach Resort","Divi Village"];
+  const RENTALS = ["an Airbnb condo in Noord","a rental apartment near Eagle Beach","a rental villa in Malmok"];
+  const FREE = ["his sister's condo in Noord, for free","a friend's timeshare week, which the friend gave them for free"];
+  const PLACES = ["on the Palm Beach strip, outside the shops","by the entrance of the Paseo Herencia mall","on the sidewalk near the Palm Beach Plaza mall","on the beach path behind the high-rise hotels"];
+  const TIMES = [["10:20 am",["to the beach","to rent snorkel gear","to get coffee"]],["3:40 pm",["back to their hotel","to the shops"]],["6:10 pm",["to dinner","to watch the sunset"]]];
+  const OBJ = {
+    timeshare: "Is this a timeshare thing?",
+    own_ts: "We already own a timeshare.",
+    commit: "We don't want to commit to anything. We're on vacation.",
+    pitch: "We're not sitting through a sales pitch on our vacation.",
+    plans: "We've got plans tomorrow.",
+    scam: "That sounds too good to be true. What's the catch?",
+    breakfast: "Our hotel's all-inclusive. We already have breakfast.",
+    early: "8 o'clock is way too early for us.",
+    phone: "Why do you need our phone number?",
+    think: "Let us think about it. Where can we find you later?",
+    time90: "Ninety minutes? That's a big chunk of our day."
+  };
+  const MOODS = {
+    friendly: { start: 6, patience: 12, fake: .6, pool: ["early","think","time90"] },
+    chatty: { start: 7, patience: 14, fake: .7, pool: ["early","think","time90"] },
+    skeptical: { start: 3, patience: 8, fake: .2, pool: ["timeshare","scam","pitch","phone","own_ts"] },
+    hurry: { start: 4, patience: 4, fake: .4, pool: ["time90","think","early"] },
+    brush: { start: 1, patience: 2, fake: .3, pool: ["pitch","think"] },
+    split: { start: 4, patience: 8, fake: .4, pool: ["commit","pitch","time90","early"] }
+  };
+
+  /* ---------- which couple: a case (Q, CT or an NQ reason), then a mood ---------- */
+  function pickCase(r, focus, lang){
+    const es = lang === "es";
+    const q = () => ({ g: "Q", key: es ? weighted(r, [["lat", 5], ["ar", 2], ["us", 1]]) : weighted(r, [["us", 6], ["ca", 2], ["lat", 2], ["ar", 1], ["single", 1], ["samesex", 1], ["leaveEve", 1]]) });
+    const ct = () => ({ g: "CT", key: es ? "ar" : weighted(r, [["us", 3], ["old", 2], ["debit", 1], ["ar", 1]]) });
+    const nq = () => ({ g: "NQ", key: es
+      ? weighted(r, [["latAge", 3], ["arAge", 1], ["out", 3], ["latRetired", 2], ["latDiscover", 2], ["free", 1], ["toured", 1], ["trio", 1], ["agent", 1], ["industry", 1]])
+      : weighted(r, [["young", 2], ["latAge", 1], ["out", 1], ["local", 1], ["eu", 2], ["latRetired", 1], ["latDiscover", 1], ["crew", 2], ["military", 2], ["industry", 2],
+                     ["agent", 1], ["toured", 2], ["free", 2], ["cruise", 2], ["langMix", 1], ["trio", 1], ["singleMan", 1], ["singleCa", 1]]) });
+    const tricky = () => es ? weighted(r, [[{ g: "Q", key: "edgeLat" }, 2], [{ g: "CT", key: "ar" }, 1]])
+      : weighted(r, [[{ g: "Q", key: "guard" }, 2], [{ g: "Q", key: "veteran" }, 2], [{ g: "Q", key: "samesex" }, 1], [{ g: "Q", key: "edge70" }, 1],
+                     [{ g: "Q", key: "edgeLat" }, 1], [{ g: "CT", key: "old" }, 2], [{ g: "CT", key: "debit" }, 1]]);
+    const leaving = () => ({ g: "Q", key: "leaving" });
+    if (focus === "nq") return weighted(r, [[nq, 3], [tricky, 1]])();
+    if (focus === "any") return weighted(r, [[q, 11], [ct, 3], [nq, 5], [tricky, 1], [leaving, 1]])();
+    return weighted(r, [[q, 14], [ct, 3], [nq, 2], [leaving, 1]])();
+  }
+  function pickMood(r, focus){
+    switch (focus){
+      case "friendly": return weighted(r, [["friendly", 3], ["chatty", 1]]);
+      case "skeptical": return "skeptical";
+      case "hurry": return "hurry";
+      case "brush": return "brush";
+      case "objections": return weighted(r, [["skeptical", 2], ["split", 2], ["friendly", 1]]);
+      case "nq": return weighted(r, [["friendly", 3], ["chatty", 2], ["split", 1]]);
+      default: return weighted(r, [["friendly", 3], ["chatty", 1], ["skeptical", 2], ["hurry", 2], ["brush", 1], ["split", 2]]);
+    }
+  }
+  /* her age: close to his, and never under 22 */
+  const partnerAge = (r, his) => Math.max(22, his + pickR(r, [-6, -4, -3, -2, -1, 0, 1, 2, 3, 5]));
+
+  function makeCouple(focus, lang, r = Math.random){
+    const c = pickCase(r, focus, lang);
+    let mood = pickMood(r, focus);
+    const es = lang === "es";
+    let region = "us", country = "the USA", home = "", capLook = "";
+    let together = r() < .7 ? "married" : "living together";
+    let working = true, retired = false;
+    let card = pickR(r, ["Visa", "Mastercard", "Amex", "Discover"]);
+    let stayKind = weighted(r, [["hotel", 6], ["timeshare", 2], ["rental", 2]]);
+    let sameLang = true, flag = "";
+    let speak = es ? "Both speak Spanish. Their English is basic." : "Both speak English.";
+    let names = NAMES.us;
+    let sexes = ["m", "f"];
+    let ages = [], jobs = [];
+    const extra = [], cues = [];
+    let leaveDays = intR(r, 2, 7);
+    let leave = "", canBook = true, bookNote = "";
+
+    const usHome = () => {
+      const ca = c.key === "ca" || c.key === "singleCa" || (c.g !== "NQ" && c.key === "us" && r() < .25 && !es);
+      const [h, look] = pickR(r, ca ? HOMES.ca : HOMES.us);
+      region = ca ? "ca" : "us"; country = ca ? "Canada" : "the USA"; home = h; capLook = look;
+      if (es){ speak = "Both speak Spanish and English. They live in the USA but grew up in Puerto Rico."; names = NAMES.lat; }
+    };
+    const latHome = (ar = false) => {
+      if (ar){ region = "ar"; country = "Argentina"; home = `${pickR(r, ARG)}, Argentina`; names = NAMES.ar; }
+      else { const [city, ctry] = pickR(r, LAT); region = "latam"; country = ctry; home = city === "Mexico City" || city === "Guatemala City" || city === "Panama City" ? city : `${city}, ${ctry}`; names = NAMES.lat; }
+      card = pickR(r, ["Visa", "Mastercard", "Amex"]);
+      if (!es) speak = "Both speak Spanish, and good English.";
+    };
+    const usJobs = (n, age) => {
+      if (age >= 62 && r() < .6){ retired = true; working = false; return Array.from({ length: n }, () => pickR(r, RETIRED_JOBS)); }
+      const both = r() < .6;
+      return Array.from({ length: n }, (_, i) => i === 0 || both ? pickR(r, JOBS_US) : "stays home");
+    };
+    const latJobs = n => { const both = r() < .5; return Array.from({ length: n }, (_, i) => i === 0 || both ? pickR(r, JOBS_LAT) : "stays home"); };
+
+    switch (c.key){
+      case "us": case "ca": {
+        usHome();
+        const his = c.g === "Q" ? intR(r, 33, 68) : pickR(r, [28, 29, 30, 31, 71, 72, 74, 76, 78]);
+        ages = [his, partnerAge(r, his)];
+        jobs = usJobs(2, his);
+        if (c.g === "CT" && his < 32) ages[1] = Math.min(ages[1], 33);
+        if (c.g === "Q" && r() < .5 && mood === "skeptical" && stayKind !== "timeshare") extra.push("You own a timeshare week in Orlando that you rarely use.");
+        if (c.key === "us" && c.g === "CT" && !es && r() < .3) card = "debit";
+        break;
+      }
+      case "lat": case "edgeLat": case "latAge": case "latRetired": case "latDiscover": {
+        latHome();
+        const his = c.key === "edgeLat" ? pickR(r, [40, 60]) : c.key === "latAge" ? pickR(r, [33, 35, 37, 38, 39, 61, 62, 64, 66, 68]) : c.key === "latRetired" ? intR(r, 55, 60) : intR(r, 41, 59);
+        ages = [his, partnerAge(r, his)];
+        jobs = latJobs(2);
+        if (c.key === "latRetired"){ working = false; retired = true; jobs = [pickR(r, RETIRED_JOBS), pickR(r, RETIRED_JOBS)]; }
+        if (c.key === "latDiscover"){ card = "Discover"; extra.push("Your only credit card is a Discover. You left the others at home."); }
+        break;
+      }
+      case "ar": case "arAge": {
+        latHome(true);
+        const his = c.key === "arAge" ? pickR(r, [27, 30, 33, 34, 71, 73, 75]) : c.g === "Q" ? intR(r, 45, 55) : pickR(r, [36, 38, 40, 43, 44, 56, 58, 62, 66, 70]);
+        ages = [his, partnerAge(r, his)];
+        jobs = latJobs(2);
+        break;
+      }
+      case "single": case "singleMan": case "singleCa": {
+        usHome();
+        together = "single";
+        const male = c.key === "singleMan";
+        sexes = [male ? "m" : "f"];
+        ages = [c.key === "single" ? intR(r, 41, 64) : intR(r, 42, 60)];
+        jobs = [pickR(r, JOBS_US)];
+        if (!male) extra.push("You're traveling on your own and loving it.");
+        break;
+      }
+      case "samesex": {
+        usHome();
+        const s = r() < .5 ? "m" : "f";
+        sexes = [s, s];
+        ages = r() < .5 ? [pickR(r, [29, 30, 31]), intR(r, 38, 55)] : [intR(r, 35, 60), intR(r, 35, 60)];
+        jobs = usJobs(2, Math.max(...ages));
+        break;
+      }
+      case "old": {
+        usHome();
+        const his = intR(r, 71, 77);
+        ages = [his, intR(r, 62, 68)];
+        jobs = usJobs(2, his);
+        break;
+      }
+      case "debit": {
+        usHome();
+        const his = pickR(r, [28, 29, 30, 31]);
+        ages = [his, partnerAge(r, his)];
+        jobs = usJobs(2, his);
+        card = "debit";
+        extra.push("You only have a debit card with you. No credit card.");
+        break;
+      }
+      case "edge70": {
+        usHome();
+        ages = [70, pickR(r, [66, 68, 72])];
+        jobs = usJobs(2, 70);
+        break;
+      }
+      case "guard": case "veteran": case "crew": case "military": case "industry": case "agent": case "toured": case "trio": case "leaving": case "leaveEve": {
+        usHome();
+        const his = intR(r, 34, 62);
+        ages = [his, partnerAge(r, his)];
+        jobs = usJobs(2, his);
+        if (retired && ["guard", "veteran", "crew", "military", "industry", "agent"].includes(c.key)){ retired = false; working = true; jobs = [pickR(r, JOBS_US), pickR(r, JOBS_US)]; }
+        if (c.key === "guard") jobs[0] = "an electrician, and in the National Guard one weekend a month";
+        if (c.key === "veteran"){ jobs[0] = "a mail carrier, retired from the Navy after 20 years"; cues.push("He wears a Navy veteran cap."); }
+        if (["crew", "military", "industry", "agent"].includes(c.key)){
+          flag = c.key;
+          const who = c.key === "crew" && r() < .6 ? 1 : 0;
+          jobs[who] = pickR(r, FLAG_JOBS[c.key]);
+          if (c.key === "military") cues.push("He has a short military haircut.");
+        }
+        if (c.key === "toured"){
+          flag = "toured";
+          extra.push(pickR(r, [
+            "On your last trip, 4 months ago, you stayed at an Iberostar in Cancún and toured it there.",
+            "Last March, 7 months ago, someone on this same street invited you and you did the Iberostar tour at the Joia."]));
+        }
+        if (c.key === "trio"){
+          flag = "trio";
+          extra.push("You're traveling with two other couples, old friends. They're at a bar across the street.");
+          cues.push("Two other couples wave at them from a bar across the street.");
+        }
+        if (c.key === "leaving"){ leaveDays = 1; leave = "They fly home tomorrow morning. Hotel pickup is at 6:30 am."; canBook = false; bookNote = "They fly home tomorrow morning. That's the one objection you can't work."; }
+        if (c.key === "leaveEve"){ leaveDays = 1; leave = "They fly home tomorrow at 7 pm. Hotel pickup is at 4 pm."; bookNote = "They fly home tomorrow evening, with a 4 pm pickup. 8 o'clock tomorrow still works: they're done by 11."; }
+        break;
+      }
+      case "young": {
+        usHome();
+        const his = intR(r, 22, 27);
+        ages = [his, Math.max(21, his + pickR(r, [-2, -1, 0, 1, 2]))];
+        jobs = [pickR(r, JOBS_US), pickR(r, JOBS_US)];
+        break;
+      }
+      case "out": {
+        const [city, ctry] = pickR(r, OUT);
+        region = "out"; country = ctry; home = `${city}, ${ctry}`; names = NAMES.lat;
+        if (!es) speak = "Both speak Spanish, and good English.";
+        const his = intR(r, 40, 58);
+        ages = [his, partnerAge(r, his)];
+        jobs = latJobs(2);
+        card = pickR(r, ["Visa", "Mastercard"]);
+        break;
+      }
+      case "local": {
+        region = "aw"; country = "Aruba"; home = `${pickR(r, AW)}, Aruba`; names = NAMES.aw; stayKind = "home";
+        speak = "Both speak Papiamento, English, Spanish and Dutch.";
+        const his = intR(r, 35, 55);
+        ages = [his, partnerAge(r, his)];
+        jobs = [pickR(r, ["works at the airport", "a police officer", "a teacher", "works at a bank"]), pickR(r, ["a nurse", "works at a bank", "a teacher"])];
+        extra.push("You live here in Aruba. You're out for a walk and an ice cream.");
+        break;
+      }
+      case "eu": {
+        const [city, ctry, tongue] = pickR(r, EU);
+        region = "eu"; country = ctry; home = `${city}, ${ctry}`; names = NAMES.eu;
+        speak = tongue === "English" ? "Both speak English." : `Both speak ${tongue} and good English.`;
+        if (tongue !== "English") cues.push(`They're speaking ${tongue} to each other.`);
+        const his = intR(r, 36, 62);
+        ages = [his, partnerAge(r, his)];
+        jobs = [pickR(r, JOBS_US), pickR(r, JOBS_US)];
+        card = pickR(r, ["Visa", "Mastercard"]);
+        break;
+      }
+      case "free": case "cruise": {
+        usHome();
+        const his = intR(r, 36, 64);
+        ages = [his, partnerAge(r, his)];
+        jobs = usJobs(2, his);
+        stayKind = c.key;
+        if (c.key === "cruise"){ canBook = false; leaveDays = 0; leave = "Their cruise ship sails at 5 pm today."; bookNote = "They sail tonight, so there's no time, and cruise guests aren't staying at a hotel here."; cues.push("They wear cruise ship lanyards with their key cards."); }
+        break;
+      }
+      case "langMix": {
+        usHome();
+        const his = intR(r, 38, 60);
+        ages = [his, partnerAge(r, his)];
+        jobs = usJobs(2, his);
+        sameLang = false;
+        speak = "He speaks only English. She speaks only Spanish (she grew up in Colombia). She answers in Spanish, and he translates now and then.";
+        cues.push("He talks to her in English. She answers in Spanish.");
+        break;
+      }
+    }
+
+    if (!es && c.g !== "NQ" && region === "latam" && r() < .3) cues.push("They're speaking Spanish to each other.");
+    if (es && (region === "latam" || region === "ar" || region === "out")) cues.push("They're speaking Spanish to each other.");
+    if (sexes.length === 1 && mood === "split") mood = "friendly";
+
+    const used = new Set();
+    const people = sexes.map((s, i) => {
+      let n = pickR(r, names[s]);
+      while (used.has(n)) n = pickR(r, names[s]);
+      used.add(n);
+      return { name: n, age: ages[i], sex: s, job: jobs[i] || "", look: "" };
+    });
+    if (sexes.length === 2 && sexes[0] === sexes[1]){
+      const looks = [...LOOKS].sort(() => r() - .5);
+      people[0].look = looks[0]; people[1].look = looks[1];
+    }
+
+    let stay = "", allIn = false;
+    if (stayKind === "hotel"){ const [h, ai] = pickR(r, HOTELS); allIn = ai; stay = `${h}${ai ? ", all-inclusive" : ""}. They paid for it.`;
+      if (ai && r() < .7) cues.push(`${people.length > 1 && r() < .5 ? people[1].name : people[0].name} has an all-inclusive bracelet from ${h}.`); }
+    if (stayKind === "timeshare"){ const t = pickR(r, TIMESHARES); stay = `${t}, their own timeshare week. They pay the yearly fees.`; if (r() < .6) cues.push(`Their beach bag says ${t.replace(/^the /, "")}.`); }
+    if (stayKind === "rental"){ stay = `${pickR(r, RENTALS)}. They paid for it.`; if (r() < .4) cues.push("He's carrying grocery bags from Ling & Sons."); }
+    if (stayKind === "free") stay = `${pickR(r, FREE)}.`;
+    if (stayKind === "cruise") stay = "the cruise ship docked in Oranjestad, in port today only.";
+    if (stayKind === "home") stay = "their own home. They live here.";
+    // Cues name people by look, not name: the promoter doesn't know names yet.
+    for (let i = 0; i < cues.length; i++) for (const p of people)
+      cues[i] = cues[i].replace(p.name, people.length === 1 || sexes[0] !== sexes[1] ? (p.sex === "m" ? "He" : "She") : `The one ${p.look}`);
+    if (capLook && r() < .5 && sexes.includes("m") && !(sexes.length === 2 && sexes[0] === sexes[1])) cues.push(capLook);
+
+    if (!leave){
+      leave = leaveDays === 1 ? "They fly home tomorrow." : `They fly home in ${leaveDays} days.`;
+      if (region === "aw") leave = "They live here.";
+    }
+    let plans = stayKind === "cruise" ? "Tomorrow the ship is at sea, on the way to Curaçao."
+      : c.key === "leaving" ? "Tomorrow morning they fly home."
+      : region === "aw" ? "Tomorrow: work as usual."
+      : "Tomorrow: nothing planned yet. Maybe the beach.";
+    if (canBook && region !== "aw" && c.key !== "leaveEve"){
+      const p = weighted(r, [["none", 4], ["afternoon", 3], ["morning", leaveDays >= 3 ? 2 : 0], ["dinner", 1]]);
+      if (p === "afternoon") plans = `Tomorrow at 1 pm: a ${pickR(r, ["jeep tour", "catamaran sail", "horseback ride"])}, already paid.`;
+      if (p === "dinner") plans = "Tomorrow night: dinner at Gianni's. The morning is free.";
+      if (p === "morning"){ plans = "Tomorrow at 9 am: a snorkel trip, already paid. The day after tomorrow is free."; bookNote = "Tomorrow morning they have a prepaid trip, so tomorrow doesn't work. The day after is free: book that day."; }
+    }
+
+    const m = MOODS[mood];
+    const objections = [];
+    const nObj = focus === "objections" ? 2 : mood === "skeptical" || mood === "split" ? 1 + (r() < .4 ? 1 : 0) : r() < .5 ? 1 : 0;
+    const pool = [...m.pool];
+    if (stayKind === "timeshare" || extra.some(e => /timeshare week in Orlando/.test(e))) pool.push("own_ts", "own_ts");
+    if (allIn) pool.push("breakfast");
+    const busy = /already paid|dinner/.test(plans);
+    if (busy) pool.push("plans", "plans");
+    if (focus === "objections") pool.push("own_ts", "commit", "scam", "time90", ...(busy ? ["plans"] : []));
+    while (objections.length < nObj && pool.length){
+      const k = pool.splice(Math.floor(r() * pool.length), 1)[0];
+      if (k === "own_ts" && stayKind !== "timeshare" && !extra.some(e => /timeshare/.test(e))) extra.push("You own a timeshare week in Orlando that you rarely use.");
+      if (!objections.includes(OBJ[k])) objections.push(OBJ[k]);
+    }
+    const keen = mood === "split" && people.length > 1 ? (r() < .5 ? 0 : 1) : -1;
+    const moodCue = {
+      friendly: "They're smiling and in no rush.", chatty: "They're laughing about something as they walk.",
+      skeptical: "They look at you, then look away.", hurry: "They're walking fast and checking the time.",
+      brush: "They avoid eye contact and keep walking.", split: "One of them slows down to look at you. The other keeps walking."
+    };
+    cues.unshift(moodCue[mood]);
+
+    const [time, heads] = pickR(r, TIMES);
+    let heading = pickR(r, heads);
+    if (mood === "hurry") heading = pickR(r, ["to a dinner reservation at 6:30", "to catch a sunset sail", "to meet friends for dinner"]);
+    if (stayKind === "cruise") heading = "back toward the cruise port";
+    const scene = { place: pickR(r, PLACES), time: stayKind === "cruise" ? "2:30 pm" : mood === "hurry" ? "6:10 pm" : time, heading };
+
+    const facts = { region, country, home: home || country, together, working, retired, card, stayKind, sameLang, flag };
+    const graded = rules(facts, people);
+    const kind = c.g === "NQ" ? `NQ: ${c.key}` : c.key === "leaving" ? "Q: leaving tomorrow" : `${c.g}: ${c.key}`;
+    return {
+      v: 1, lang, focus, mood, kind, people, ...facts,
+      stay, allIn, leave, plans, speak, extra, objections, fake: r() < m.fake, start: keen > -1 ? 4 : m.start, patience: m.patience, keen,
+      scene, cues: cues.slice(0, 3), grade: graded.g, why: graded.why, canBook, bookNote
+    };
+  }
+  /* The grade a case was built for, for tests. */
+  const intended = c => c.kind.startsWith("NQ") ? "NQ" : c.kind.startsWith("CT") ? "CT" : "Q";
+  const cardText = c => c === "debit" ? "a debit card, no credit card" : c === "Amex" ? "an Amex" : `a ${c}`;
+  const fromText = c => c.home + (c.region === "us" ? ", USA" : c.region === "ca" ? ", Canada" : "");
+
+  function moodText(c){
+    const [a, b] = c.people.map(p => p.name);
+    switch (c.mood){
+      case "friendly": return "friendly and relaxed. You like meeting locals.";
+      case "chatty": return "chatty. You love telling stories about your trip and ask the promoter questions about Aruba.";
+      case "skeptical": return "skeptical. You've been warned about timeshare pitches and street scams. You warm up only to honest, clear answers.";
+      case "hurry": return "in a hurry. You're on your way somewhere and keep an eye on the time. You like it short.";
+      case "brush": return "you don't want to talk to street promoters. You say \"no thanks\" and keep walking unless the opener really catches you.";
+      default: return c.keen === 0 ? `${a} is keen (interest 6) and likes free breakfasts. ${b} is reluctant (interest 2) and wants a real reason before giving up a morning.`
+                                   : `${b} is keen (interest 6) and likes free breakfasts. ${a} is reluctant (interest 2) and wants a real reason before giving up a morning.`;
+    }
+  }
+
+  /* What the couple reads: the facts in plain sentences. */
+  function brief(c){
+    const ids = ["A", "B"];
+    const rel = c.together === "single" ? "Traveling alone." : c.together === "married" ? "Married." : "Living together, not married.";
+    return [
+      "COUPLE BRIEF",
+      `Scene: ${c.scene.time}, ${c.scene.place}. You're walking ${c.scene.heading}. A street promoter steps up to you.`,
+      ...c.people.map((p, i) => `${ids[i]}: ${p.name}, ${p.sex === "m" ? "man" : "woman"}, ${p.age}, ${p.job || "doesn't work"}.${p.look ? ` (The one ${p.look}.)` : ""}`),
+      `${rel} Home: ${fromText(c)}.`,
+      `Staying at: ${c.stay}`,
+      c.leave,
+      c.plans,
+      `Credit card: ${cardText(c.card)}.`,
+      `Language: ${c.speak} ${c.lang === "es" ? "Speak Spanish." : c.sameLang ? "Speak English." : "He speaks English. She speaks Spanish."}`,
+      ...(c.extra.length ? [`Other facts: ${c.extra.join(" ")}`] : []),
+      `Mood: ${moodText(c)}`,
+      `Start interest: ${c.start}. Patience: ${c.patience <= 2 ? "almost none: after 2 lines from the promoter you walk on, unless your interest has climbed to 4 or more" : c.patience <= 4 ? "short: after about 4 lines from the promoter you need to go, unless your interest is 7 or more" : `about ${c.patience} lines from the promoter before you want to move on`}.`,
+      `On your mind (say these in your own words when they fit): ${c.objections.length ? c.objections.map(o => `"${o}"`).join(" ") : "nothing special."}`,
+      `Yes-sayers: ${c.fake ? "yes. You say yes easily to be polite, but you only really mean maybe until the promoter checks again." : "no. When you say yes, you mean it."}`,
+      `What the promoter can see: ${c.cues.join(" ")}`
+    ].join("\n");
+  }
+
+  /* What the phone shows when the chat starts: the scene, what can be seen, who talks. */
+  const sceneOut = c => ({ lang: c.lang, place: c.scene.place, time: c.scene.time, heading: c.scene.heading, cues: c.cues,
+    people: c.people.map(p => ({ name: p.name, sex: p.sex, look: p.look })) });
+
+  /* What the phone shows at the end: who they really were. */
+  function revealOut(c){
+    const chips = [
+      ["pin", fromText(c)],
+      ["cake", c.people.map(p => `${p.name} ${p.age}`).join(" · ")],
+      ["ring", c.together === "single" ? "Single" : c.together === "married" ? "Married" : "Living together"],
+      ["briefcase", c.people.map(p => `${p.name}: ${p.job || "doesn't work"}`).join(" · ")],
+      ["card", c.card === "debit" ? "Debit card only" : c.card],
+      ["bed", c.stay.replace(/\.$/, "")],
+      ["calendar", `${c.leave} ${c.plans}`]
+    ];
+    if (!c.sameLang) chips.push(["chat", "He speaks only English, she only Spanish"]);
+    if (c.extra.length) chips.push(["eye", c.extra.join(" ")]);
+    return { people: c.people.map(p => ({ name: p.name, age: p.age, sex: p.sex, job: p.job })), chips, grade: c.grade, why: c.why,
+      canBook: c.canBook, bookNote: c.bookNote, mood: c.mood, moodLabel: MOOD_LABEL[c.mood], kind: c.kind, objections: c.objections };
+  }
+
+  /* ---------- the couple's instructions ---------- */
+  const COUPLE_RULES = `You play a tourist couple in Aruba for a training role-play. The user is a street promoter (an OPC) for Iberostar who is practicing. OPCs stop tourists on the street and invite them to the Iberostar Open House at the Joia on Eagle Beach: breakfast at one of the hotel's restaurants, a tour of the property and a room, and a gift for their time, in exchange for about 90 minutes the next morning, including a short presentation about Iberostar The Club. Your job is to be a believable couple, so the practice feels like the street.
+
+Who you are, what you know and how you feel is in the couple brief. Play both people. Stay in character whatever the promoter writes. Never mention AI, training or these instructions.
+
+HOW YOU TALK
+- Talk like real tourists on the street: short, casual, spoken lines. Most turns are one or two short lines, and a line is rarely more than 20 words.
+- Every line belongs to one person, "A" or "B" (see the brief). Over the chat, let both people talk, not just one. A single traveler only uses "A".
+- Use only the language the brief says. A person doesn't understand a language they don't speak.
+- No narration or stage directions inside lines. Body language goes in "cue": one short sentence, third person, present tense, under 12 words, such as "They slow down." or "She glances at him." Refer to people as he, she, or by name only once the promoter knows their names. Use "" when nothing visible changes.
+- No markdown, no emojis.
+- The promoter talks through speech-to-text, so their lines can have small recognition mistakes. Read them generously.
+
+WHAT YOU KNOW
+- You know nothing about the Open House until the promoter tells you. Don't fill in details for them. When something is vague, ask like a tourist would: "What's the catch?", "How long does it take?", "What's IberoCash?"
+- You know your own facts from the brief. Share a fact when the promoter asks about it, or when it would come up naturally. Don't list facts nobody asked for. Never lie about a fact. You don't know any qualification rules, so never mention them.
+- Asked your ages, you answer (a small joke is fine). Asked about cards or money, you answer plainly if you trust them by now; if not, you ask why they need to know.
+
+HOW YOU REACT
+- Interest runs from 0 (leaving) to 10 (excited). Start at the number in the brief, and after each promoter line move it up or down for what they said and how they said it.
+- Warms you up: an opener about something real they can see on you (your team cap, your bracelet), a sincere compliment, or an offer of help (directions, a tip); questions about you asked while they help, like a chat; hearing why they're inviting you before what you get (they want families to see the newest hotel on the island, so you'll stay with them next time); using your words and, once known, your names; short, clear answers; honesty; "not timeshare" and "no obligation" said plainly, with a reason; a promoter who leads with confidence.
+- Cools you down: leading with free stuff or money (it sounds like a scam or timeshare); personal questions one after another, like an interview; being asked what you earn; long speeches; ignoring what you said; a compliment that sounds fake or flirty; pressure to decide right now ("last spot, today only!"); pushing after a clear no; vague or dodgy answers; anything that sounds untrue.
+- "Would you like an invitation?" is easy to say no to. "Let me get you an invitation" moves things along, unless you have an objection: then you say it.
+- Bring up the objections in the brief when they fit, usually when the invitation or the time comes up. Your objections are partly a test of the promoter: if they welcome the question and answer it plainly and truthfully, you relax; if they dodge, get defensive or say something untrue, your interest drops.
+- If the promoter hasn't made the morning clear (what you get, where, when, how long), you hesitate, with something like "Let us think about it."
+- Asked for a phone number with no reason, you hesitate. If they explain it (a short confirmation call this afternoon between 5 and 6, WhatsApp is fine), you give it when you're interested. Make up a realistic number for your country.
+- When they say how long it takes, react to the number they give. Never correct them: you don't know.
+- If the promoter says they only get credit, or a bonus, when you show up, and you like them, it makes you want to keep your word.
+- If interest drops to 1 or less, or your patience in the brief runs out, say a short goodbye and walk on: state "left".
+- You agree to come only when your interest is 6 or more, your objections got real answers, and the day and time fit your plans and your flight. Once you've agreed to a specific day and time, set "booked" to true, and keep it true unless you back out.
+- If you can't come at all (you leave too soon), say so when the invitation or the time comes up, and don't let yourself be talked into it.
+- If the promoter says you don't qualify, or lets you go, take it kindly and say goodbye: state "ended".
+
+YOUR REAL INTENTION
+- "intent" is whether you would really show up, right now: "no", "maybe" or "yes". It can differ from what you say out loud.
+- If the brief says you're yes-sayers, you may say "sure, we'll try" while your intent is only "maybe". Only when the promoter checks again (asks if you're sure, says other families want the spot, offers to give it to someone else) do you either commit for real (intent "yes") or admit you won't come.
+
+ENDING
+- "state" is "talking" while the conversation goes on, "left" when you walk off unhappy or not interested, and "ended" when you part on good terms, booked or not.
+- Once you're booked and the promoter has wrapped up, say goodbye and set "ended". If they keep talking long after you're booked, start leaving.`;
+
+  const TURN_FORMAT = `REPLY FORMAT
+Reply with only one JSON object, nothing before or after it:
+{"lines":[{"who":"A","text":"..."}],"cue":"","interest":5,"intent":"no","booked":false,"state":"talking"}
+- lines: one or two short spoken lines; "who" is "A" or "B".
+- cue: body language the promoter can see, or "".
+- interest: a whole number from 0 to 10. intent: "no", "maybe" or "yes".
+- booked: true once you've agreed to a day and time. state: "talking", "left" or "ended".`;
+
+  const TURN_SCHEMA = {
+    type: "object",
+    properties: {
+      lines: { type: "array", items: { type: "object", properties: { who: { type: "string", enum: ["A", "B"] }, text: { type: "string" } }, required: ["who", "text"], additionalProperties: false } },
+      cue: { type: "string" },
+      interest: { type: "integer" },
+      intent: { type: "string", enum: ["no", "maybe", "yes"] },
+      booked: { type: "boolean" },
+      state: { type: "string", enum: ["talking", "left", "ended"] }
+    },
+    required: ["lines", "cue", "interest", "intent", "booked", "state"],
+    additionalProperties: false
+  };
+  const STAGE_NOTE = "\n\n(Stage note, not said by the promoter: you have to go now. Wrap up and say goodbye in this turn.)";
+
+  const clean = (s, max) => String(s == null ? "" : s).replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+
+  /* Check and tidy one couple reply. null when it isn't usable. */
+  function normReply(raw, single){
+    if (!raw || typeof raw !== "object") return null;
+    const out = [];
+    for (const l of (Array.isArray(raw.lines) ? raw.lines : []).slice(0, 4)){
+      if (!l || typeof l !== "object") continue;
+      const t = clean(l.text, 400);
+      if (t) out.push({ who: l.who === "B" && !single ? "B" : "A", text: t });
+    }
+    const state = raw.state === "left" || raw.state === "ended" ? raw.state : "talking";
+    if (!out.length && state === "talking") return null;
+    const n = Math.round(Number(raw.interest));
+    return { lines: out, cue: clean(raw.cue, 160), interest: Number.isFinite(n) ? Math.max(0, Math.min(10, n)) : 5,
+      intent: raw.intent === "yes" || raw.intent === "no" ? raw.intent : "maybe", booked: raw.booked === true, state };
+  }
+
+  /* The API path: the promoter is "user", the couple is "assistant". Rules and brief go in the system prompt. */
+  function toMessages(log, next, wrapUp){
+    const msgs = log.map(e => "o" in e ? { role: "user", content: e.o } : { role: "assistant", content: JSON.stringify(e.c) });
+    msgs.push({ role: "user", content: wrapUp ? next + STAGE_NOTE : next });
+    return msgs;
+  }
+  /* The Claude-version path: no system prompt, so the rules and brief lead as the first user turn. */
+  function sampleTurns(c, log, next, wrapUp){
+    const lead = { role: "user", content: `${COUPLE_RULES}\n\n${brief(c)}\n\n${TURN_FORMAT}\n\nThe conversation starts now. Every user turn after this one is what the promoter says.` };
+    return [lead, ...toMessages(log, next, wrapUp)];
+  }
+
+  /* ---------- the coach ---------- */
+  /* Voice-note lines the coach can point to (ids match SCRIPT_LINES and NLP_LINES in the app). */
+  const LINES = [
+    ["s1a", "Inviting families to the newest hotel on the island, so next time you travel you'll want to stay with us."],
+    ["s1b", "Inviting as many people as we can to see our hotel; it also helps us spread the word."],
+    ["s2a", "It's an amazing promotion: a full branding experience, not just a quick look."],
+    ["s2b", "When you arrive, we treat you to breakfast at one of our five-star restaurants."],
+    ["s2c", "I see you have a bracelet from Riu... you're going to love our place, something new."],
+    ["s2d", "A personalized tour of the property: the facilities and the service."],
+    ["s2e", "They'll show you one of our rooms, so you can anticipate the quality."],
+    ["s2f", "We reward you for your time: IberoCash for restaurants, shopping and activities."],
+    ["s2g", "We partner with the best: Gianni's, Screaming Eagle, Daniel's Steakhouse."],
+    ["s2h", "We own Tierra del Sol, opened our first hotel, two more coming."],
+    ["s3a", "Let me get you an invitation."],
+    ["s4a", "Let me put you down for 8 o'clock."],
+    ["s5a", "We also do confirmation calls, between 5 and 6, WhatsApp is fine, just to see if you can still make it."],
+    ["s6a", "Make sure to bring this invitation, to confirm which gift you are offered."],
+    ["s6b", "A nice breakfast, a quick tour. We're not selling timeshare: no weeks, points or maintenance fees."],
+    ["s6c", "No obligation to be a member to stay there. Just like Hyatt, just like Hilton."],
+    ["s6d", "We only ask families for 90 minutes, and breakfast tends to eat about half of that."],
+    ["s7a", "So we see you guys tomorrow at 8 for sure?"],
+    ["s7b", "Sorry if I misunderstood, but I thought you were pretty sure you were coming."],
+    ["s7c", "A lot of families want to come; we wouldn't want to block a space if you're not sure."],
+    ["s7d", "Maybe I should give this invitation to somebody else."],
+    ["s7e", "I get a little $65 bonus just for you showing up. You don't have to book or buy anything."],
+    ["n1b", "Where are you guys from? First time in Aruba?"],
+    ["n2a", "When you come to breakfast tomorrow, bring this invitation."],
+    ["n2b", "Is WhatsApp or a regular call better for you guys?"],
+    ["n3a", "Beautiful day, right? Enjoying Eagle Beach? We're inviting families to see the newest hotel."],
+    ["n3b", "Picture the two of you tomorrow, breakfast at one of our five-star restaurants."],
+    ["n4a", "Perfect, then you already know how much a good vacation matters."]
+  ];
+  const LINE_IDS = LINES.map(l => l[0]);
+  const STEP_KEYS = ["open", "why", "news", "offer", "time", "number", "plan", "lockin"];
+  const ASKED = ["from", "age", "together", "work", "card", "stay", "leave", "plans", "tour"];
+
+  const COACH_RULES = `You are Shoco, the coach in Show-Up Academy, the training app for Iberostar's street team in Aruba. Street promoters (OPCs) invite tourist couples to the Iberostar Open House at the Joia on Eagle Beach. One of them just finished a practice chat with a role-played couple. Review it and give feedback they can use on the street tomorrow.
+
+THE 8 STEPS (what good looks like)
+1. open: Stop them and break the ice. Read them as they come (a team cap, a hotel bracelet, kids, a map in hand) and open with something real about them, a sincere compliment (never flirty) or an offer of help, with a smile. Ask about them while you help (where they're from, first time in Aruba), like a chat. Free stuff first is wrong.
+2. why: Say why you're inviting them, before any gift. "We're inviting families to come see the newest hotel on the island, so next time you travel you'll want to stay with us." Gift first ("free breakfast and $100!") sounds like a scam, not true, or timeshare.
+3. news: The good news, in this order: breakfast at one of our five-star restaurants, a personal tour of the property, one of our rooms, and a reward for their time (IberoCash for the best restaurants, activities and shopping; the taxi is on us both ways). Make it personal with what you see (a Riu bracelet: "you're eating breakfast at the same place every day"). Be specific, so they can picture the morning. Tie the reward to what they love (a great dinner: Gianni's or Daniel's; a tour: Rocka Beach Tours), and only promise what the invitation gives.
+4. offer: Say it, don't ask: "Let me get you an invitation." Not "Would you like one?" Objections come out here; work them (below).
+5. time: "Let me put you down for 8 o'clock." Too early? Offer 10. Check their plans and flight: they need 3 free hours that morning with nothing prepaid, and on departure day at least 4 hours before airport pickup.
+6. number: Write slowly and keep making a friend with small questions. Ask for the number with the reason: a manager calls this afternoon between 5 and 6, only to check they can still make it. WhatsApp is fine.
+7. plan: Bring this invitation to confirm the gift. Breakfast, a quick tour, and how to book direct through the loyalty club. Not timeshare (no weeks, points or maintenance fees): a full-service hotel like Hyatt or Hilton, no obligation to be a member. "We only ask families for 90 minutes, and breakfast tends to eat about half of that." Never say 45 minutes or break it into minutes. Every adult brings 2 IDs; one credit card is enough.
+8. lockin: "So we see you guys tomorrow at 8 for sure?" Read the answer. "We'll try" or "we'll see": ask again, lots of families want the spot; still unsure, offer to give it to another family. Making it yours helps: "I get a little bonus just for you showing up; you don't have to book or buy anything." A solid no beats a fake yes.
+
+WHO QUALIFIES
+- USA and Canada: the man's age counts (same-sex couple: either partner's). 32 to 70 is Q (full gift); 28 to 31 and 71+ is CT (half gift); under 28 is NQ (no gift). Married or living together. One works or is retired. Visa, Mastercard, Amex or Discover; a debit card is OK for CT. Single women: USA only, 40 to 65.
+- Central and South America and the Caribbean (Mexico counts as Central America): 40 to 60 is Q, any other age NQ. Couples only, one must work (no retirees), Visa, Mastercard or Amex (no Discover). Argentina: 45 to 55 Q, 35 to 44 and 56 to 70 CT, other ages NQ.
+- Always NQ: Aruba, Cuba, Venezuela, Haiti and Ecuador; anyone else, like Europeans; travel agents and tour operators; airline pilots and crew; active US military (the National Guard is OK); people who work for hotel, timeshare or vacation club companies; an Iberostar tour in the last 6 months in-house or 12 months from a street program; three couples or more traveling together; not paying for where they stay; not fluent in the same language.
+- Find out inside the small talk, never like an interview: where they're from, ages (with older couples, "are you retired yet?"), married or living together, work ("what do you do back home?"), card, where they're staying, when they leave and their plans, any recent Iberostar tour. Asking what they earn is never needed.
+- An NQ couple gets no invitation. The right move is to find out early and let them go with a smile. Never ask anyone to bend the truth to qualify.
+
+NLP AND STREET MOVES TO NOTICE
+- Rapport: match their energy and pace, use their words and names, ask easy questions, talk less than they do.
+- Assume the yes ("Let me get you an invitation", "When you come tomorrow"). Give the reason ("because"). Two yeses only for the call ("WhatsApp or a regular call?"), never for the time. Tag questions ("for sure?").
+- Pace and lead: two or three true things first, then lead. Future pacing: help them picture breakfast tomorrow.
+- Read the real answer: eye contact and questions mean yes; "we'll try", glances and short answers mean doubt.
+- Objections are tests. Welcome them ("Great question") and answer with the plain truth. "Let me think about it" usually means they can't picture the morning yet: paint it again, specifically. Reframes: own a timeshare ("then you know how much a good vacation matters; this is a hotel, no weeks or points"); don't want to commit ("no obligation to book or buy"); plans tomorrow ("what time? we start at 8 and you're done by 11"); sounds like a scam ("I get it, it sounds too good; that's why it's an Open House, come see it yourself"). Leaving tomorrow morning can't be worked.
+- Honest only. Never trade the truth for a yes. Tricks like holding an ID, a made-up "last spot" or confusing them on purpose are never OK: call them out in the note for that step.
+
+GRADING EACH STEP
+- "good": done well, in the spirit of the lines above. Their own words are fine.
+- "weak": done, but only partly, late, out of order, or in a way that hurt: gift first, an interview of questions, "would you like", minutes, the number with no reason, no second check after "we'll try", a pressure trick.
+- "missed": the chat reached the point where this step belonged, and they skipped it.
+- "na": the chat never got there (the couple walked away first), or the step didn't apply (an NQ couple the promoter rightly let go before inviting them, or a couple who can't come).
+- "qualify": "good" if they found out enough to know the right gift and that the time works, inside the small talk; "weak" if they found out part, or fired questions like an interview; "missed" if they barely asked; "na" only if the couple was gone within the first two lines.
+- "asked": which facts they found out, from: from, age, together, work, card, stay, leave, plans, tour. Count a fact if the couple said it, even unasked.
+
+WRITING THE FEEDBACK
+- Talk to the promoter as "you". Plain, short sentences a busy person reads in ten seconds. Kind and direct, never gushing. No jargon beyond the move names above.
+- Every note points at something they said or didn't say. Quote their words when it helps.
+- "try": one better line for that moment, ready to say, fitted to this couple (their hotel, their words). "" when the step was good or na.
+- "line": the id of the matching voice-note line from the list below when one fits, else "".
+- "headline": one sentence on how it went. "best": their best line, quoted exactly from the chat ("" if none stands out). "fix": the one habit to change next time.
+- "showup": would this couple really come? "solid", "shaky" or "no" if they were booked; "na" if they weren't.
+- Write notes in English. Quote the promoter in the language they used. Write "try" lines in the language of the chat.
+
+VOICE-NOTE LINES (id: line)
+${LINES.map(([id, t]) => `${id}: ${t}`).join("\n")}`;
+
+  const COACH_FORMAT = `REPLY FORMAT
+Reply with only one JSON object, nothing before or after it, shaped like this:
+{"headline":"...","steps":{${STEP_KEYS.map(k => `"${k}":{"status":"good","note":"...","try":"","line":""}`).join(",")}},"qualify":{"status":"weak","asked":["from","stay"],"note":"..."},"best":"...","fix":"...","showup":"shaky"}
+- Every step's status is "good", "weak", "missed" or "na". "line" is an id from the list above, or "".
+- "asked" uses only: ${ASKED.join(", ")}. "showup" is "solid", "shaky", "no" or "na".`;
+
+  const STEP = {
+    type: "object",
+    properties: { status: { type: "string", enum: ["good", "weak", "missed", "na"] }, note: { type: "string" }, try: { type: "string" }, line: { type: "string", enum: [...LINE_IDS, ""] } },
+    required: ["status", "note", "try", "line"],
+    additionalProperties: false
+  };
+  const COACH_SCHEMA = {
+    type: "object",
+    properties: {
+      headline: { type: "string" },
+      steps: { type: "object", properties: Object.fromEntries(STEP_KEYS.map(k => [k, STEP])), required: [...STEP_KEYS], additionalProperties: false },
+      qualify: { type: "object", properties: { status: { type: "string", enum: ["good", "weak", "missed", "na"] }, asked: { type: "array", items: { type: "string", enum: [...ASKED] } }, note: { type: "string" } },
+                 required: ["status", "asked", "note"], additionalProperties: false },
+      best: { type: "string" }, fix: { type: "string" },
+      showup: { type: "string", enum: ["solid", "shaky", "no", "na"] }
+    },
+    required: ["headline", "steps", "qualify", "best", "fix", "showup"],
+    additionalProperties: false
+  };
+
+  const ST = ["good", "weak", "missed", "na"];
+  function normCoach(raw){
+    if (!raw || typeof raw !== "object" || !raw.steps || typeof raw.steps !== "object") return null;
+    const steps = Object.fromEntries(STEP_KEYS.map(k => {
+      const s = raw.steps[k] || {};
+      return [k, { status: ST.includes(s.status) ? s.status : "na", note: clean(s.note, 400), try: clean(s.try, 300), line: LINE_IDS.includes(s.line) ? s.line : "" }];
+    }));
+    const q = raw.qualify || {};
+    return {
+      headline: clean(raw.headline, 200), steps,
+      qualify: { status: ST.includes(q.status) ? q.status : "missed", asked: Array.isArray(q.asked) ? [...new Set(q.asked.filter(a => ASKED.includes(a)))] : [], note: clean(q.note, 400) },
+      best: clean(raw.best, 300), fix: clean(raw.fix, 300),
+      showup: ["solid", "shaky", "no", "na"].includes(raw.showup) ? raw.showup : "na"
+    };
+  }
+
+  const CALL = { Q: "Q (full gift)", CT: "CT (half gift)", NQ: "NQ (no gift)", "?": "didn't find out" };
+  /* Everything the coach reads about one chat. The promoter never saw the couple's facts. */
+  function coachInput(c, log, call){
+    const name = w => (c.people[w === "B" ? 1 : 0] || c.people[0]).name;
+    const chat = [];
+    let last = null;
+    for (const e of log){
+      if ("o" in e){ chat.push(`OPC: ${e.o}`); continue; }
+      last = e.c;
+      for (const l of e.c.lines) chat.push(`${name(l.who)}: ${l.text}`);
+      chat.push(`   ${e.c.cue ? `(${e.c.cue}) ` : ""}[interest ${e.c.interest}, real intent ${e.c.intent}${e.c.booked ? ", booked" : ""}]`);
+    }
+    const end = !last ? "The promoter ended it before the couple said anything."
+      : last.state === "left" ? "The couple walked away."
+      : last.state === "ended" ? `They parted on good terms, ${last.booked ? "booked" : "not booked"}.`
+      : `The promoter ended the chat while it was still going, ${last.booked ? "with the couple booked" : "without a booking"}.`;
+    return [
+      "THE COUPLE (the promoter didn't see this)",
+      `${c.people.map((p, i) => `${i ? "B" : "A"}: ${p.name}, ${p.age}, ${p.job || "doesn't work"}`).join(". ")}. ${c.together === "single" ? "Traveling alone" : c.together === "married" ? "Married" : "Living together"}. From ${fromText(c)}.`,
+      `Staying at ${c.stay} ${c.leave} ${c.plans} Card: ${c.card === "debit" ? "debit only" : c.card}. ${c.speak}`,
+      c.extra.length ? `Other facts: ${c.extra.join(" ")}` : "",
+      `Mood: ${c.mood}. Objections they had in mind: ${c.objections.length ? c.objections.join(" / ") : "none"}. Yes-sayers: ${c.fake ? "yes" : "no"}.`,
+      `Their real gift: ${c.grade}. Why: ${c.why}`,
+      c.canBook ? (c.bookNote ? `Timing: ${c.bookNote}` : "Timing: tomorrow at 8 works.") : `Timing: they can't come. ${c.bookNote}`,
+      "",
+      `THE PROMOTER'S CALL: asked after the chat which gift this couple qualifies for, they said: ${CALL[call] || CALL["?"]}.`,
+      `HOW IT ENDED: ${end}`,
+      "",
+      `THE CHAT (in ${c.lang === "es" ? "Spanish" : "English"}; after each couple turn: what the promoter could see, then the couple's hidden interest and real intent)`,
+      ...chat
+    ].filter(s => s !== "").join("\n");
+  }
+  /* The Claude-version path: one user turn with the rules, the chat and the format. */
+  const coachPrompt = (c, log, call) => `${COACH_RULES}\n\n${coachInput(c, log, call)}\n\n${COACH_FORMAT}`;
+
+  const timelineOf = log => log.filter(e => "c" in e).map(e => [e.c.interest, e.c.intent]);
+  function endOf(log){ const t = log.filter(e => "c" in e); const last = t[t.length - 1]; return last ? { state: last.c.state, booked: last.c.booked } : { state: "talking", booked: false }; }
+
+  return { FOCUS, MOOD_LABEL, seeded, bandUSA, bandLat, bandArg, rules, makeCouple, intended, brief, sceneOut, revealOut,
+    COUPLE_RULES, TURN_FORMAT, TURN_SCHEMA, normReply, toMessages, sampleTurns,
+    LINES, LINE_IDS, STEP_KEYS, ASKED, COACH_RULES, COACH_FORMAT, COACH_SCHEMA, normCoach, coachInput, coachPrompt, timelineOf, endOf };
+})();
+/* =====================================================================
+   STREET PRACTICE
+   An AI tourist couple to pitch by voice or typing, then Shoco's score.
+   Two ways to run it, same couples and rules (street-core.js):
+   - In the Claude version of the app, the couple and Shoco run on the viewer's
+     own Claude account (the "sample" capability), so it's free for the team.
+     The phone can't reach the team list from there, so the score page offers a
+     link that adds the result to the team app.
+   - On the team link, the sua-roleplay Edge Function runs them with the owner's
+     API key. Until a key is added it answers "off", and the page points to the
+     Claude version instead.
+   ===================================================================== */
+const RP_URL = `${SB.url}/functions/v1/sua-roleplay`;
+const CLAUDE_URL = "https://claude.ai/artifact/Ejc8Grqk3BR9Y1avEkbAYY";
+const RP_FOCUS = [["any", "Surprise me"], ["friendly", "Friendly"], ["skeptical", "Skeptical"], ["hurry", "In a hurry"],
+  ["brush", "Don't want to talk"], ["objections", "Lots of objections"], ["nq", "Might not qualify"]];
+const RP_KEYS = RPCORE.STEP_KEYS;
+const RP_W = { open: 10, why: 10, news: 10, offer: 10, time: 10, number: 10, plan: 10, lockin: 15 };
+const RP_LABEL = Object.fromEntries(RP_KEYS.map((k, i) => [k, i ? MAP_STEPS[i - 1].t : "Stop them, break the ice"]));
+const RP_PTS = { good: 1, weak: .5, missed: 0 };
+const RP_ST = { good: ["Good", "good"], weak: ["Almost", "weak"], missed: ["Missed", "missed"], na: ["Didn't apply", "na"] };
+const RP_ASK = [["from", "Where from"], ["age", "Ages"], ["together", "Married or together"], ["work", "Work"], ["card", "Card"],
+  ["stay", "Where they stay"], ["leave", "When they leave"], ["plans", "Plans"], ["tour", "Recent tour"]];
+const RP_MOOD = RPCORE.MOOD_LABEL;
+const isMood = k => typeof k === "string" && Object.prototype.hasOwnProperty.call(RP_MOOD, k);
+const RP_CALL = { Q: "Q (full gift)", CT: "CT (half gift)", NQ: "NQ (no gift)", "?": "didn't find out" };
+const RP_MSG = {
+  off: "On this link, Street practice needs your manager to switch it on. It's free in the Claude version of the app.",
+  noclaude: "Claude isn't allowed to run here. Tap Allow when Claude asks, or check this page's permissions.",
+  claudelimit: "You've reached your Claude limit for now. Try again later.",
+  signin: "Sign in to Claude again, then try once more.",
+  limit: "That's all your practice chats for today. Come back tomorrow.",
+  team: "The team has used all of today's practice chats. Come back tomorrow.",
+  auth: "Your phone isn't on the team list yet. Check your name in Me, then try again.",
+  busy: "The couple didn't catch that. Try again in a moment.",
+  refused: "They didn't answer that. Say it another way.",
+  over: "This chat is over.",
+  net: "No connection. Check your internet and try again.",
+  error: "Something went wrong. Try again."
+};
+let RP = null;
+
+async function rpCall(op, body = {}){
+  ident();
+  let r;
+  try {
+    r = await fetch(RP_URL, { method: "POST", headers: { "Content-Type": "application/json", apikey: SB.key },
+      body: JSON.stringify({ op, device: S.sync.device, secret: S.sync.secret, ...body }) });
+  } catch(e){ throw Object.assign(new Error("net"), { code: "net" }); }
+  const j = await r.json().catch(() => null);
+  if (r.status === 404) throw Object.assign(new Error("off"), { code: "off" });
+  if (!r.ok || !j || j.err){ const code = j && RP_MSG[j.err] ? j.err : "error"; throw Object.assign(new Error(code), { code }); }
+  return j;
+}
+
+/* The Claude version: Claude's own "sample" capability, on the viewer's account. null elsewhere. */
+let RP_SAMPLE;
+function rpSampler(){
+  if (RP_SAMPLE !== undefined) return Promise.resolve(RP_SAMPLE);
+  const c = window.claude;
+  if (!c || typeof c.use !== "function") return Promise.resolve(RP_SAMPLE = null);
+  return Promise.resolve().then(() => c.use("sample")).then(fn => (RP_SAMPLE = fn || null), () => (RP_SAMPLE = null));
+}
+/* One call to Claude for JSON, with its error codes turned into ours. */
+async function rpAsk(input, opts){
+  try { return await RP_SAMPLE.json(input, opts); }
+  catch(e){
+    const code = e && e.code;
+    const ours = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code) ? "noclaude"
+      : code === "rate_limited" ? "claudelimit" : code === "session_expired" ? "signin" : code === "refused" ? "refused" : code === "cancelled" ? "cancelled" : "busy";
+    throw Object.assign(new Error(ours), { code: ours });
+  }
+}
+const rpMsg = e => RP_MSG[e && e.code] || RP_MSG.error;
+const capFirst = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+
+/* ---------- Their voices (read aloud) ---------- */
+const TTS = window.speechSynthesis || null;
+function stopSpeak(){ try { TTS && TTS.cancel(); } catch(e){} }
+function rpVoice(lang, sex){
+  const vs = (TTS ? TTS.getVoices() : []).filter(v => (v.lang || "").toLowerCase().startsWith(lang));
+  const fem = /female|samantha|victoria|karen|moira|tessa|fiona|allison|ava|susan|zira|monica|paulina|marisol|helena|sabina|lucia|laura|joana/i;
+  const male = /\bmale|alex|daniel|fred|tom\b|aaron|arthur|oliver|diego|jorge|juan|carlos|david|mark|rishi|reed|eddy/i;
+  return (sex === "f" ? vs.find(v => fem.test(v.name)) : vs.find(v => male.test(v.name) && !/female/i.test(v.name))) || vs[0] || null;
+}
+function speakLines(lines){
+  if (!TTS || S.rpVoice === false || !RP) return;
+  stopSpeak();
+  const lang = RP.scene.lang === "es" ? "es" : "en";
+  for (const l of lines){
+    const p = RP.scene.people[l.who === "B" ? 1 : 0] || RP.scene.people[0];
+    const u = new SpeechSynthesisUtterance(l.text), v = rpVoice(lang, p.sex);
+    if (v){ u.voice = v; u.lang = v.lang; } else u.lang = lang === "es" ? "es-MX" : "en-US";
+    u.pitch = p.sex === "m" ? .9 : 1.1; u.rate = 1.03;
+    try { TTS.speak(u); } catch(e){}
+  }
+}
+if (TTS) try { TTS.getVoices(); TTS.addEventListener?.("voiceschanged", () => {}); } catch(e){}
+
+/* ---------- Setup ---------- */
+async function rpReady(){
+  if (!S.name) return false;
+  if (!S.sync.ok) await pushSync();
+  return !!S.sync.ok;
+}
+function streetIntro(){
+  view = "street"; game = null; stopSpeak();
+  const f = S.rpFocus || "any", lang = S.rpLang || "en";
+  const inClaude = !!(window.claude && typeof window.claude.use === "function");
+  const chips = (name, list, cur) => list.map(([k, l]) => `<label class="pchip"><input type="radio" name="${name}" value="${k}"${k === cur ? " checked" : ""}><span>${esc(l)}</span></label>`).join("");
+  show(`<div class="lesson rp">
+    <div class="l-top"><button class="icon-btn" id="rpBack" aria-label="Back to games">${icon("x")}</button><h1>Street practice</h1><span></span></div>
+    <div class="say-row">${shoco("idle")}<div class="bubble">A couple walks by. Stop them, pitch, and book them. If they don't qualify, let them go nicely. I'll score you at the end.</div></div>
+    <fieldset class="rp-pick"><legend class="eyebrow">Who walks by?</legend><div class="pchips">${chips("focus", RP_FOCUS, f)}</div></fieldset>
+    <fieldset class="rp-pick"><legend class="eyebrow">Language</legend><div class="pchips">${chips("lang", [["en", "English"], ["es", "Español"]], lang)}</div></fieldset>
+    ${S.name || inClaude ? "" : `<div class="stack"><label for="rpName" class="eyebrow">Your name</label><input class="field" id="rpName" autocomplete="name" maxlength="30" placeholder="First name + last initial"><p class="small muted">Your manager sees your practice scores.</p></div>`}
+    <ul class="small rp-how">
+      <li>${SR ? "Tap the mic and talk. Tap it again to send. Or type, or use the mic on your keyboard." : "Type, or use the mic on your keyboard."}</li>
+      <li>Find out who they are on the way: where they're from, ages, work, card, hotel, when they leave.</li>
+      <li>Tap Done when you've finished. If they walk away, that's the end too.</li></ul>
+    <div class="l-foot rp-foot"><p class="small muted" id="rpLeft" aria-live="polite"></p><button class="btn wide" id="rpGo">Start</button></div>
+  </div>`, { full: true });
+  on("#rpBack", () => tab("games"));
+  const left = $("#rpLeft"), go = $("#rpGo");
+  const toClaude = () => { left.innerHTML = `${esc(RP_MSG.off)} <a href="${CLAUDE_URL}" target="_blank" rel="noopener">Open the Claude version</a>`; go.disabled = true; };
+  if (inClaude){
+    left.textContent = "Checking…"; go.disabled = true;
+    rpSampler().then(fn => {
+      if (view !== "street" || !$("#rpLeft")) return;
+      if (fn){ left.textContent = "Free: it runs on your own Claude account. The first time, Claude asks you to allow it."; go.disabled = false; }
+      else left.innerHTML = TEAM_HOST ? "" : `Street practice works in the Claude app, or on the team link: <a href="${TEAM_URL}">${esc(TEAM_URL)}</a>`;
+    });
+    on("#rpGo", () => {
+      const focus = app.querySelector("input[name=focus]:checked")?.value || "any", lg = app.querySelector("input[name=lang]:checked")?.value || "en";
+      S.rpFocus = focus; S.rpLang = lg; save(false);
+      const c = RPCORE.makeCouple(RPCORE.FOCUS.includes(focus) ? focus : "any", lg === "es" ? "es" : "en");
+      streetChat({ chat: "", max: 24, left: null, scene: RPCORE.sceneOut(c) }, c);
+    });
+    return;
+  }
+  if (!TEAM_HOST){ left.innerHTML = `Street practice works on the team link: <a href="${TEAM_URL}">${esc(TEAM_URL)}</a>`; go.disabled = true; return; }
+  if (S.name){
+    left.textContent = "Checking…";
+    rpReady().then(ok => ok ? rpCall("status") : Promise.reject({ code: "auth" }))
+      .then(j => { if (view !== "street" || !$("#rpLeft")) return; left.textContent = j.teamFull ? RP_MSG.team : j.left ? `${plural(j.left, "practice chat")} left today.` : RP_MSG.limit; if (!j.left || j.teamFull) go.disabled = true; })
+      .catch(e => { if (view !== "street" || !$("#rpLeft")) return; if (e.code === "off") return toClaude(); left.textContent = rpMsg(e); });
+  }
+  on("#rpGo", async () => {
+    const focus = app.querySelector("input[name=focus]:checked")?.value || "any", lg = app.querySelector("input[name=lang]:checked")?.value || "en";
+    S.rpFocus = focus; S.rpLang = lg;
+    if (!S.name){
+      const v = ($("#rpName")?.value || "").trim().slice(0, 30);
+      if (!v){ $("#rpName")?.focus(); left.textContent = "Add your name first."; return; }
+      S.name = v;
+    }
+    save(false);
+    go.disabled = true; go.textContent = "Starting…"; left.textContent = "";
+    try {
+      if (!await rpReady()) throw { code: navigator.onLine === false ? "net" : "auth" };
+      streetChat(await rpCall("start", { focus, lang: lg }));
+    } catch(e){
+      if (!$("#rpGo")) return;
+      go.textContent = "Start";
+      if (e.code === "off") return toClaude();
+      go.disabled = e.code === "limit" || e.code === "team"; left.textContent = rpMsg(e);
+    }
+  });
+}
+
+/* ---------- The chat ---------- */
+function rpWho(i){
+  const ppl = RP.scene.people, p = ppl[i] || ppl[0];
+  if (RP.known.has(i)) return p.name;
+  const base = p.sex === "m" ? "He" : "She";
+  return ppl.length === 2 && ppl[0].sex === ppl[1].sex && p.look ? `${base}, ${p.look}` : base;
+}
+function rpAvatar(i){ return RP.known.has(i) ? esc(RP.scene.people[i].name.slice(0, 1)) : icon("user"); }
+function rpLearn(text){
+  RP.scene.people.forEach((p, i) => {
+    if (RP.known.has(i) || !new RegExp(`(^|[^\\p{L}])${p.name}($|[^\\p{L}])`, "iu").test(text)) return;
+    RP.known.add(i);
+    app.querySelectorAll(`[data-p="${i}"] .rp-who`).forEach(el => el.textContent = p.name);
+    app.querySelectorAll(`[data-p="${i}"] .rp-av`).forEach(el => el.innerHTML = rpAvatar(i));
+  });
+}
+function rpAppend(html, cls){
+  const log = $("#rpLog"); if (!log) return null;
+  const el = document.createElement("div"); el.className = cls; el.innerHTML = html; log.appendChild(el);
+  el.scrollIntoView({ block: "end", behavior: reduced() ? "auto" : "smooth" });
+  return el;
+}
+const rpMe = text => rpAppend(`<p>${esc(text)}</p>`, "rp-msg me");
+function rpThem(l){
+  const i = l.who === "B" ? 1 : 0;
+  const el = rpAppend(`<span class="rp-av" aria-hidden="true">${rpAvatar(i)}</span><div class="rp-b"><b class="rp-who">${esc(rpWho(i))}</b><p>${esc(l.text)}</p></div>`, `rp-msg them p${i}`);
+  if (el) el.dataset.p = i;
+}
+const rpCue = text => rpAppend(`${icon("eye")}<span>${esc(text)}</span>`, "rp-cue");
+function rpHint(text){ const h = $("#rpHint"); if (h) h.textContent = text || (SR ? "Tap the mic and talk. Tap it again to send." : "Type your line, or use the mic on your keyboard."); }
+function rpComposer(on){
+  ["#rpText", "#rpSend", "#rpMic"].forEach(s => { const el = $(s); if (el) el.disabled = !on; });
+}
+function rpGrow(){ const t = $("#rpText"); if (!t) return; t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 150) + "px"; }
+
+function streetChat(j, couple){
+  RP = { chat: j.chat, max: j.max || 24, left: j.left == null ? null : Math.max(0, j.left - 1), scene: j.scene, log: [], busy: false, state: "talking", booked: false, turns: 0, known: new Set(), saved: false,
+    couple: couple || null, core: [] };
+  view = "street"; game = { kind: "street" };
+  const sc = j.scene, who = sc.people.length > 1 ? "A couple" : sc.people[0].sex === "m" ? "A man" : "A woman";
+  show(`<div class="lesson rp">
+    <div class="l-top"><button class="icon-btn" id="rpQuit" aria-label="Leave the chat">${icon("x")}</button>
+      <div class="rp-title"><p class="eyebrow">Street practice</p><h1>${esc(sc.time)}</h1></div>
+      <div class="rp-tools"><button class="icon-btn" id="rpVoice" aria-pressed="${S.rpVoice !== false}" aria-label="Read their lines aloud">${icon(S.rpVoice !== false ? "sound" : "mute")}</button>
+      <button class="btn small ghost" id="rpDone">Done</button></div></div>
+    <section class="rp-scene" aria-label="What you see">
+      <p class="tag-h">${icon("pin")}${esc(capFirst(sc.place))}</p>
+      <p>${who} walks toward you, heading ${esc(sc.heading)}.</p>
+      <ul>${sc.cues.map(c => `<li>${icon("eye")}<span>${esc(c)}</span></li>`).join("")}</ul>
+      ${sc.lang === "es" ? `<p class="small muted">This one is in Spanish. Pitch in Spanish.</p>` : ""}
+    </section>
+    <div class="rp-log" id="rpLog" role="log" aria-label="The conversation"></div>
+    <form class="l-foot rp-say" id="rpForm" autocomplete="off">
+      <label for="rpText" class="sr-only">Your line</label>
+      <textarea class="field" id="rpText" rows="1" maxlength="600" placeholder="Say your line…" enterkeyhint="send"></textarea>
+      ${SR ? `<button type="button" class="rp-mic" id="rpMic" aria-pressed="false" aria-label="Talk">${icon("mic")}</button>` : ""}
+      <button class="rp-send" id="rpSend" aria-label="Send">${icon("send")}</button>
+      <p class="small muted rp-hint" id="rpHint"></p>
+    </form>
+  </div><div class="sheet" id="sheet" aria-live="polite"></div>`, { full: true });
+  rpHint();
+  const box = $("#rpText");
+  box.addEventListener("input", rpGrow);
+  box.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing){ e.preventDefault(); rpSend(box.value); } });
+  $("#rpForm").addEventListener("submit", e => { e.preventDefault(); rpSend(box.value); });
+  on("#rpMic", rpMic);
+  on("#rpVoice", () => { S.rpVoice = S.rpVoice === false; save(false); const b = $("#rpVoice"); b.setAttribute("aria-pressed", String(S.rpVoice)); b.innerHTML = icon(S.rpVoice ? "sound" : "mute"); if (!S.rpVoice) stopSpeak(); });
+  on("#rpDone", () => rpEnd("done"));
+  on("#rpQuit", rpQuit);
+  timers.push(setTimeout(() => box.focus({ preventScroll: true }), 120));
+}
+
+async function rpSend(raw, retry){
+  const text = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 600);
+  if (!text || !RP || RP.busy || RP.state !== "talking") return;
+  RP.busy = true; stopSpeak(); rpComposer(false);
+  if (REC){ RP.sendOnEnd = false; stopRec(); }
+  let mine = retry;
+  if (!retry){ rpLearn(text); mine = rpMe(text); const b = $("#rpText"); if (b){ b.value = ""; rpGrow(); } }
+  else retry.querySelector(".rp-err")?.remove();
+  const typing = rpAppend(`<span class="rp-av" aria-hidden="true">${icon("user")}</span><div class="rp-b"><span class="dots" role="img" aria-label="They're answering"><i></i><i></i><i></i></span></div>`, "rp-msg them typing");
+  try {
+    const r = RP.couple ? await rpLocalTurn(text) : await rpCall("turn", { chat: RP.chat, text });
+    typing?.remove();
+    if (!RP || !$("#rpLog")) return;
+    RP.log.push({ me: text }, { them: r.lines, cue: r.cue });
+    RP.turns = r.turns; RP.state = r.state; RP.booked = !!r.booked;
+    r.lines.forEach(l => rpLearn(l.text));
+    r.lines.forEach(rpThem);
+    if (r.cue) rpCue(r.cue);
+    speakLines(r.lines);
+    sfx("tap");
+    if (RP.state !== "talking") timers.push(setTimeout(() => rpEnd(RP.state), 1400));
+    else rpHint(RP.max - RP.turns <= 4 ? `${plural(RP.max - RP.turns, "line")} left in this chat.` : "");
+  } catch(e){
+    typing?.remove();
+    if (!RP || !$("#rpLog")) return;
+    if (e.code === "refused"){ mine?.remove(); const b = $("#rpText"); if (b){ b.value = text; rpGrow(); } toast(RP_MSG.refused); }
+    else if (e.code === "over"){ RP.state = "ended"; rpEnd("ended"); }
+    else if (e.code === "cancelled") mine?.remove();
+    else if (["off", "limit", "team", "auth", "noclaude", "signin"].includes(e.code)){ RP.state = "ended"; toast(rpMsg(e)); timers.push(setTimeout(streetIntro, 2400)); }
+    else if (mine){
+      const err = document.createElement("p"); err.className = "rp-err";
+      err.innerHTML = `<span>${esc(rpMsg(e))}</span> <button type="button" class="link">${icon("refresh")}Send again</button>`;
+      err.querySelector("button").onclick = () => rpSend(text, mine);
+      mine.appendChild(err);
+    }
+  } finally {
+    if (RP){ RP.busy = false; rpComposer(RP.state === "talking"); if (RP.state === "talking") $("#rpText")?.focus({ preventScroll: true }); }
+  }
+}
+
+/* The Claude version: one quick call per turn, on the viewer's account. Same shape as the API's reply. */
+async function rpLocalTurn(text){
+  const wrap = RP.turns + 1 >= RP.max - 1;
+  const raw = await rpAsk(RPCORE.sampleTurns(RP.couple, RP.core, text, wrap), { modelTier: "quick", cache: false });
+  const reply = RPCORE.normReply(raw, RP.couple.people.length === 1);
+  if (!reply) throw Object.assign(new Error("busy"), { code: "busy" });
+  if (RP.turns + 1 >= RP.max && reply.state === "talking") reply.state = "ended";
+  RP.core.push({ o: text }, { c: reply });
+  return { lines: reply.lines, cue: reply.cue, state: reply.state, booked: reply.booked, turns: RP.turns + 1 };
+}
+
+/* Tap to talk, tap again to send. If the browser stops listening by itself, the words wait in the box. */
+function rpMic(){
+  const btn = $("#rpMic"), box = $("#rpText");
+  if (!btn || !RP || RP.busy) return;
+  if (REC){ RP.sendOnEnd = true; try { REC.stop(); } catch(e){} return; }
+  stopSpeak();
+  const before = box.value.trim();
+  try { REC = new SR(); } catch(e){ toast("This browser can't listen. Type your line instead."); return; }
+  const rec = REC;
+  rec.lang = RP.scene.lang === "es" ? "es-MX" : "en-US"; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1;
+  RP.sendOnEnd = false;
+  btn.classList.add("listening"); btn.setAttribute("aria-pressed", "true"); btn.setAttribute("aria-label", "Stop and send"); btn.innerHTML = icon("stop");
+  rpHint("Listening… tap the red button to send.");
+  rec.onresult = e => {
+    let said = "";
+    for (const r of e.results) said += r[0].transcript + (r.isFinal ? " " : "");
+    box.value = [before, said.trim()].filter(Boolean).join(" "); rpGrow();
+  };
+  rec.onerror = e => {
+    const m = { "not-allowed": "The microphone is blocked. Allow it in your browser settings, or type.", "service-not-allowed": "This browser won't listen here. Type your line instead.", "no-speech": "I didn't hear anything. Tap the mic and try again.", "language-not-supported": "This browser can't listen in that language. Type instead." }[e.error];
+    if (m) toast(m);
+  };
+  rec.onend = () => {
+    if (REC === rec) REC = null;
+    btn.classList.remove("listening"); btn.setAttribute("aria-pressed", "false"); btn.setAttribute("aria-label", "Talk"); btn.innerHTML = icon("mic");
+    if (!RP || !$("#rpLog")) return;
+    rpHint();
+    if (RP.sendOnEnd && box.value.trim()) rpSend(box.value);
+    else if (box.value.trim()) rpHint("Check your words, then send.");
+  };
+  try { rec.start(); sfx("tap"); } catch(e){ REC = null; btn.classList.remove("listening"); btn.innerHTML = icon("mic"); toast("Couldn't start the microphone."); }
+}
+
+function rpSheet(html, cls = "rp-sheet"){
+  const sheet = $("#sheet"); if (!sheet) return null;
+  sheet.className = `sheet ${cls}`; sheet.innerHTML = `<div class="sheet-in">${html}</div>`;
+  requestAnimationFrame(() => sheet.classList.add("show"));
+  return sheet;
+}
+function rpQuit(){
+  if (!RP || !RP.log.length) return streetIntro();
+  stopRec();
+  rpSheet(`<div class="say-row">${shoco("sad")}<div class="bubble">Leave without a score?${RP.couple ? "" : " This chat still counts as one of today's."}</div></div>
+    <button class="btn wide" id="rpStay">Keep talking</button><button class="btn wide ghost" id="rpLeave">Leave</button>`);
+  on("#rpStay", () => $("#sheet").classList.remove("show"));
+  on("#rpLeave", streetIntro);
+}
+
+/* The chat is over: ask what they wrote on the invitation, then get the score. */
+function rpEnd(how){
+  if (!RP) return;
+  stopRec();
+  if (!RP.log.some(e => e.them)) return streetIntro();
+  const talking = how === "done" && RP.state === "talking";
+  rpComposer(false);
+  const title = RP.state === "left" ? "They walked away." : RP.booked ? "They said yes." : RP.state === "ended" ? "They went on their way." : "You ended the chat.";
+  const sheet = rpSheet(`<div class="say-row">${shoco("think")}<div class="bubble">${esc(title)} Which gift do they qualify for?</div></div>
+    <div class="opts grid3 rp-call" role="group" aria-label="Their gift">${["Q", "CT", "NQ"].map(g => `<button class="opt grade" data-call="${g}"><b>${g}</b><span>${{ Q: "Full gift", CT: "Half gift", NQ: "No gift" }[g]}</span></button>`).join("")}</div>
+    <button class="btn wide ghost" data-call="?">I didn't find out</button>
+    ${talking ? `<button class="link" id="rpBackChat">Back to the chat</button>` : ""}`);
+  sheet.querySelectorAll("[data-call]").forEach(b => b.onclick = () => { sfx("tap"); rpCoach(b.dataset.call); });
+  on("#rpBackChat", () => { $("#sheet").classList.remove("show"); rpComposer(true); });
+  timers.push(setTimeout(() => sheet.querySelector("[data-call]")?.focus({ preventScroll: true }), 120));
+}
+async function rpCoach(call){
+  rpSheet(`<div class="say-row">${shoco("think")}<div class="bubble">Reading your chat… ${RP.couple ? "This can take up to a minute." : "This takes a few seconds."}</div></div>`);
+  try { RP.state = RP.state === "talking" ? "ended" : RP.state; streetScore(RP.couple ? await rpLocalCoach(call) : await rpCall("coach", { chat: RP.chat, call })); }
+  catch(e){
+    if (!$("#sheet")) return;
+    rpSheet(`<div class="say-row">${shoco("sad")}<div class="bubble">${esc(rpMsg(e))}</div></div><button class="btn wide" id="rpRetry">Try again</button><button class="btn wide ghost" id="rpSkip">Leave without a score</button>`);
+    on("#rpRetry", () => rpCoach(call)); on("#rpSkip", streetIntro);
+  }
+}
+
+async function rpLocalCoach(call){
+  const coach = RPCORE.normCoach(await rpAsk(RPCORE.coachPrompt(RP.couple, RP.core, call), { modelTier: "default" }));
+  if (!coach) throw Object.assign(new Error("busy"), { code: "busy" });
+  return { coach, call, reveal: RPCORE.revealOut(RP.couple), timeline: RPCORE.timelineOf(RP.core), end: RPCORE.endOf(RP.core) };
+}
+
+/* ---------- The score ---------- */
+function rpScore(coach, call, reveal, end){
+  let got = 0, max = 0;
+  for (const k of RP_KEYS){ const s = coach.steps[k] && coach.steps[k].status; if (s in RP_PTS){ max += RP_W[k]; got += RP_W[k] * RP_PTS[s]; } }
+  const q = coach.qualify && coach.qualify.status;
+  if (q in RP_PTS){ max += 15; if (call === reveal.grade) got += 15 * RP_PTS[q]; }
+  if (!max) return null;
+  let s = Math.round(got / max * 100);
+  if (end.booked && reveal.grade === "NQ") s = Math.min(s, 50);
+  if (end.booked && !reveal.canBook) s = Math.min(s, 60);
+  return s;
+}
+const RP_CODE = { good: "g", weak: "w", missed: "m", na: "n" };
+function streetScore(r){
+  const { coach, reveal, timeline, end, call } = r;
+  const score = rpScore(coach, call, reveal, end), right = call === reveal.grade;
+  if (!RP.saved){
+    const steps = RP_KEYS.map(k => RP_CODE[coach.steps[k].status] || "n").join("") + (RP_CODE[coach.qualify.status] || "n");
+    RP.saved = [Date.now(), score == null ? -1 : score, reveal.mood, reveal.grade, end.booked ? 1 : 0, right ? 1 : 0, steps];
+    rpRecord(RP.saved); save();
+  }
+  const handoff = !TEAM_HOST ? `${TEAM_URL}#rp=${rpEncode(RP.saved)}` : "";
+  view = "street"; game = null; stopSpeak();
+  const names = reveal.people.map(p => `${p.name}, ${p.age}`).join(" and ");
+  const asked = new Set(coach.qualify.asked);
+  const mood = score == null ? "think" : score >= 75 ? "cheer" : score >= 50 ? "happy" : "sad";
+  const stepRow = (k, i) => {
+    const s = coach.steps[k], [label, cls] = RP_ST[s.status] || RP_ST.na, L = SCRIPT_LINES[s.line];
+    return `<li class="rp-step s-${cls}"><span class="n" aria-hidden="true">${i + 1}</span><div class="stack" style="gap:6px">
+      <div class="rp-step-h"><b>${esc(RP_LABEL[k])}</b><span class="rp-st ${cls}">${label}</span></div>
+      ${s.note ? `<p class="small">${esc(s.note)}</p>` : ""}
+      ${s.try ? `<p class="rp-try"><span class="eyebrow">Try</span><span>${esc(s.try)}</span></p>` : ""}
+      ${L && L.clip ? `<div><button class="btn small ghost" data-seg="${L.clip}:${L.from}:${L.to}" data-key="rp-${s.line}" aria-label="Hear it from the voice notes">${icon("play")} Hear it</button></div>` : ""}
+    </div></li>`;
+  };
+  const people = reveal.people;
+  const nameOf = w => (people[w === "B" ? 1 : 0] || people[0]).name;
+  const chat = RP.log.map(e => e.me ? `<p class="me"><b>You:</b> ${esc(e.me)}</p>`
+    : e.them.map(l => `<p><b>${esc(nameOf(l.who))}:</b> ${esc(l.text)}</p>`).join("") + (e.cue ? `<p class="cue">${esc(e.cue)}</p>` : "")).join("");
+  const bars = timeline.map(([v, intent], i) => `<i class="b-${intent}" style="--h:${Math.max(6, v * 10)}%" title="After your line ${i + 1}: interest ${v} of 10, ${intent === "yes" ? "would come" : intent === "maybe" ? "maybe" : "wouldn't come"}"></i>`).join("");
+  show(`<div class="lesson rp rp-score">
+    <div class="l-top"><button class="icon-btn" id="rpClose" aria-label="Close">${icon("x")}</button><div class="rp-title"><p class="eyebrow">Street practice</p><h1>Your score</h1></div><span></span></div>
+    <section class="rp-hero">
+      ${shoco(mood)}
+      <div class="rp-ring" style="--p:${score == null ? 0 : score}" role="img" aria-label="${score == null ? "No score" : `Score ${score} of 100`}"><b>${score == null ? "–" : score}</b><span>${score == null ? "no score" : "of 100"}</span></div>
+    </section>
+    ${coach.headline ? `<p class="rp-headline">${esc(coach.headline)}</p>` : ""}
+    <section class="card rp-reveal" aria-labelledby="rvH">
+      <div class="rp-reveal-h"><span class="rp-grade g-${reveal.grade}">${reveal.grade}</span><div><p class="eyebrow">Who they really were</p><h2 id="rvH">${esc(names)}</h2></div></div>
+      <p class="rp-callline ${right ? "ok" : "no"}">${icon(right ? "check" : "x")}<span>You said ${esc(RP_CALL[call] || RP_CALL["?"])}. ${right ? "Right." : `They were ${esc(RP_CALL[reveal.grade])}.`}</span></p>
+      <p class="small">${esc(reveal.why)}</p>
+      ${reveal.bookNote ? `<p class="small muted">${esc(reveal.bookNote)}</p>` : ""}
+      <div class="chips">${reveal.chips.map(([ic, t]) => `<span class="chip">${icon(ic)}<span>${esc(capFirst(t))}</span></span>`).join("")}</div>
+      <p class="small muted">${esc(reveal.moodLabel)}${reveal.objections.length ? `. On their mind: ${reveal.objections.map(o => `"${esc(o)}"`).join(" ")}` : ""}</p>
+    </section>
+    ${handoff ? `<section class="card rp-handoff"><p>Your manager sees practice scores in the team app. Add this one there:</p><a class="btn wide sun" href="${esc(handoff)}" target="_blank" rel="noopener">${icon("share")} Add to my team record</a></section>` : ""}
+    <section class="card" aria-labelledby="stH"><h2 id="stH">Step by step</h2><ol class="rp-steps">${RP_KEYS.map(stepRow).join("")}</ol></section>
+    <section class="card" aria-labelledby="qfH"><h2 id="qfH">Finding out who they are</h2>
+      <ul class="rp-ask">${RP_ASK.map(([k, l]) => `<li class="${asked.has(k) ? "yes" : "no"}">${icon(asked.has(k) ? "check" : "x")}<span>${l}</span><span class="sr-only">${asked.has(k) ? ": found out" : ": not found out"}</span></li>`).join("")}</ul>
+      ${coach.qualify.note ? `<p class="small">${esc(coach.qualify.note)}</p>` : ""}</section>
+    ${timeline.length > 1 ? `<section class="card" aria-labelledby="ikH"><h2 id="ikH">How keen they were</h2>
+      <div class="rp-graph" role="img" aria-label="Interest after each of your lines, out of 10: ${timeline.map(t => t[0]).join(", ")}">${bars}</div>
+      <p class="rp-key small"><span><i class="b-no"></i>Wouldn't come</span><span><i class="b-maybe"></i>Maybe</span><span><i class="b-yes"></i>Would come</span></p>
+      <p class="small muted">Hidden during the chat. Each bar is after one of your lines: taller means keener. The color is whether they'd really show up.</p></section>` : ""}
+    ${coach.best ? `<section class="card"><p class="eyebrow">Your best line</p><p class="rp-quote">${icon("quote")}<span>${esc(coach.best)}</span></p></section>` : ""}
+    ${coach.fix ? `<section class="card rp-fix"><p class="eyebrow">Next time</p><p>${esc(coach.fix)}</p></section>` : ""}
+    <details class="card"><summary>Read the chat again</summary><div class="rp-transcript">${chat}</div></details>
+    <div class="stack rp-end-acts"><button class="btn wide" id="rpAgain">Practice again</button><button class="btn wide ghost" id="rpFinish">Done</button>
+      ${RP.left == null ? "" : `<p class="small muted" style="text-align:center">${RP.left ? `${plural(RP.left, "practice chat")} left today.` : "That was your last practice chat for today."}</p>`}</div>
+  </div>`, { full: true });
+  bindSegButtons(app);
+  on("#rpClose", () => tab("games")); on("#rpFinish", () => tab("games")); on("#rpAgain", streetIntro);
+  if (score != null && score >= 75){ sfx("win"); confetti(); } else sfx("ok");
+}
+
+/* ---------- Results: kept on the phone, sent to the team list with the rest of the progress ---------- */
+/* r = [time, score or -1, mood, gift, booked 0/1, called the gift right 0/1, step codes (8 steps + finding out)] */
+function rpRecord(r){
+  S.rp.n++; if (r[1] >= 0) S.rp.best = Math.max(S.rp.best, r[1]);
+  S.rp.res.push(r); S.rp.res.sort((a, b) => a[0] - b[0]); S.rp.res = S.rp.res.slice(-10);
+  S.log.push([r[0], "rp", r[2], Math.max(0, r[1]), r[5]]); S.log.sort((a, b) => a[0] - b[0]); S.log = S.log.slice(-25);
+  addXP(10 + Math.round(Math.max(0, r[1]) / 10)); markActive();
+}
+const rpEncode = r => btoa(unescape(encodeURIComponent(JSON.stringify(r)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+function rpDecode(code){
+  try {
+    const r = JSON.parse(decodeURIComponent(escape(atob(String(code).replace(/-/g, "+").replace(/_/g, "/")))));
+    const now = Date.now();
+    if (!Array.isArray(r) || r.length !== 7) return null;
+    const [t, sc, mood, g, booked, right, steps] = r;
+    if (!Number.isFinite(t) || t < now - 30 * DAY || t > now + DAY) return null;
+    if (!Number.isInteger(sc) || sc < -1 || sc > 100 || !isMood(mood) || !["Q", "CT", "NQ"].includes(g)) return null;
+    if (![0, 1].includes(booked) || ![0, 1].includes(right) || typeof steps !== "string" || !/^[gwmn]{9}$/.test(steps)) return null;
+    return [Math.round(t), sc, mood, g, booked, right, steps];
+  } catch(e){ return null; }
+}
+/* The Claude version links here with #rp=... to add a practice result to this phone's team record. */
+function rpImport(){
+  const m = /^#rp=([A-Za-z0-9_-]{10,600})$/.exec(location.hash);
+  if (!m) return false;
+  history.replaceState(null, "", location.pathname + location.search);
+  const r = rpDecode(m[1]);
+  if (!r){ toast("That practice link didn't work."); return true; }
+  if (S.rp.res.some(x => x[0] === r[0])){ toast("That practice score is already in your record."); return true; }
+  rpRecord(r); save();
+  toast(S.name ? "Practice score added. Your manager will see it." : "Practice score added. Add your name in Me so your manager sees it.");
+  return true;
+}
+/* =====================================================================
    MANAGER PANEL
    Who knows what, what each worker has done, and what the team should work on.
    Open it from Me > Manager panel, or with the team link plus #team.
@@ -2306,7 +3888,7 @@ document.addEventListener("keydown", e => {
    ===================================================================== */
 const num = (v, max) => Number.isFinite(+v) ? Math.max(0, Math.min(max, Math.round(+v))) : 0;
 const cleanName = v => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 40) || "No name";
-const LOG_KINDS = ["m", "r", "p", "f", "d", "lg"];
+const LOG_KINDS = ["m", "r", "p", "f", "d", "lg", "rp"];
 const LOG_IDS = new Set([...LEVEL_IDS, "daily", "lightning"]);
 const NUDGE_DAYS = 3;
 const AV = ["#00737a", "#b8325a", "#11709f", "#8f6600", "#2b7a1f", "#a12a4d", "#00636a"];
@@ -2326,11 +3908,15 @@ function cleanStats(p){
   const perLevel = (o, max) => Object.fromEntries(LEVEL_IDS.map(id => [id, num(obj(o)[id], max)]));
   const a = Object.fromEntries(LEVEL_IDS.map(id => { const v = obj(p.a)[id]; return [id, Array.isArray(v) ? [num(v[0], 1e6), num(v[1], 1e6), num(v[2], 1e6)] : [0, 0, 0]]; }));
   const w = Array.isArray(p.w) ? p.w.filter(x => Array.isArray(x) && typeof x[0] === "string" && QBY[x[0]]).map(x => [x[0], num(x[1], 9999)]).filter(x => x[1] > 0).slice(0, 20) : [];
-  const lg = Array.isArray(p.lg) ? p.lg.filter(e => Array.isArray(e) && LOG_KINDS.includes(e[1]) && LOG_IDS.has(e[2])).slice(-25)
+  const lg = Array.isArray(p.lg) ? p.lg.filter(e => Array.isArray(e) && LOG_KINDS.includes(e[1]) && (e[1] === "rp" ? isMood(e[2]) : LOG_IDS.has(e[2]))).slice(-25)
     .map(e => [num(e[0], maxT), e[1], e[2], num(e[3], 999), num(e[4], 999)]) : [];
   const dd = Array.isArray(p.dd) ? [...new Set(p.dd.filter(s => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s)))].slice(-60) : [];
+  // Street practice results: [time, score or -1, mood, gift, booked, called the gift right, step codes]
+  const rp = obj(p.rp), rs = Array.isArray(rp.s) ? rp.s.filter(x => Array.isArray(x) && isMood(x[2]) && ["Q", "CT", "NQ"].includes(x[3]) && typeof x[6] === "string" && /^[gwmn]{9}$/.test(x[6]))
+    .slice(-10).map(x => [num(x[0], maxT), x[1] === -1 ? -1 : num(x[1], 100), x[2], x[3], x[4] ? 1 : 0, x[5] ? 1 : 0, x[6]]) : [];
   return { v: num(p.v, 99), x: num(p.x, 1e7), m: perLevel(p.m, 999), ml: perLevel(p.ml, maxT), b: perLevel(p.b, 999), a,
-    l: num(p.l, 999), d: num(p.d, 9999), h: num(p.h, CLIPS.length), sl: num(p.sl, 999), w, lg, dd };
+    l: num(p.l, 999), d: num(p.d, 9999), h: num(p.h, CLIPS.length), sl: num(p.sl, 999), w, lg, dd,
+    rp: { n: Math.max(num(rp.n, 9999), rs.length), b: num(rp.b, 100), s: rs } };
 }
 function person(r){
   const st = cleanStats(r && r.stats), name = cleanName(r && r.name);
@@ -2339,7 +3925,7 @@ function person(r){
   const mastered = LEVEL_IDS.filter(id => st.m[id]).length;
   return { device: String((r && r.device) || ""), name, st, updated, mastered, ready: !!st.m.final, right, answers: right + wrong,
     due: LEVEL_IDS.filter(id => st.m[id] && st.ml[id] && dueAt(st.m[id], st.ml[id]) <= Date.now()),
-    started: mastered > 0 || LEVEL_IDS.some(id => st.b[id] || st.a[id][2]) || st.lg.length > 0,
+    started: mastered > 0 || LEVEL_IDS.some(id => st.b[id] || st.a[id][2]) || st.lg.length > 0 || st.rp.n > 0,
     idle: updated ? Math.floor((Date.now() - updated) / DAY) : Infinity };
 }
 function teamRows(rows){
@@ -2397,6 +3983,22 @@ function levelsToCoach(people){
   }).filter(x => x.trying > 0).sort((a, b) => (b.trying - a.trying) || (pct(a.right, a.answers) - pct(b.right, b.answers))).slice(0, 5);
 }
 
+/* Street practice: the steps people miss or only half do, across their recent chats. */
+const RP_ROWS = [...RP_KEYS.map((k, i) => [i, RP_LABEL[k]]), [RP_KEYS.length, "Finding out who they are"]];
+function rpSteps(results){
+  return RP_ROWS.map(([i, name]) => {
+    const codes = results.map(r => r[6][i]).filter(c => c !== "n");
+    const good = codes.filter(c => c === "g").length, weak = codes.filter(c => c === "w").length, missed = codes.filter(c => c === "m").length;
+    return { name, n: codes.length, good, weak, missed, bad: weak / 2 + missed };
+  }).filter(x => x.n).sort((a, b) => (b.bad / b.n) - (a.bad / a.n));
+}
+const rpAvg = list => { const sc = list.map(r => r[1]).filter(v => v >= 0); return sc.length ? Math.round(sc.reduce((a, b) => a + b, 0) / sc.length) : null; };
+function rpStepsHTML(rows){
+  return `<ul class="tp-list">${rows.slice(0, 4).map(x => `<li><p class="q">${esc(x.name)}</p>
+    <div class="tp-bar rp-sbar" role="img" aria-label="${x.good} good, ${x.weak} almost, ${x.missed} missed"><i style="width:${pct(x.good, x.n)}%"></i><i class="w" style="width:${pct(x.weak, x.n)}%"></i></div>
+    <p class="small muted">${x.missed ? `Missed in ${x.missed} of ${x.n}` : `Never missed`}${x.weak ? ` · almost in ${x.weak}` : ""}</p></li>`).join("")}</ul>`;
+}
+
 /* ---------- Screens ---------- */
 function teamTop(title, eyebrow, backId, extra = ""){
   return `<div class="l-top"><button class="icon-btn" id="${backId}" aria-label="${backId === "back" ? "Close the manager panel" : "Back to the team"}">${icon("x")}</button>
@@ -2435,6 +4037,9 @@ function renderPanel(keepScroll){
   const nudge = people.filter(p => !p.ready && (!p.started || p.idle >= NUDGE_DAYS));
   const right = people.reduce((s, p) => s + p.right, 0), answers = people.reduce((s, p) => s + p.answers, 0);
   const misses = teamMisses(people), coachLv = levelsToCoach(people);
+  const monthAgo = Date.now() - 30 * DAY, weekAgo = Date.now() - 7 * DAY;
+  const rpRecent = people.flatMap(p => p.st.rp.s.filter(r => r[0] >= monthAgo)), rpWeek = rpRecent.filter(r => r[0] >= weekAgo).length;
+  const rpWho = people.filter(p => p.st.rp.s.some(r => r[0] >= monthAgo)).length, rpCalls = rpRecent.filter(r => r[5]).length;
   const tile = (ic, cls, value, label, exp) => `<div class="tp-tile ${cls}"><p class="lbl">${icon(ic)}${label}</p><b>${value}</b><p class="exp">${exp}</p></div>`;
   show(`${teamTop("Your team", "Managers", "back", `<button class="icon-btn" id="refresh" aria-label="Refresh">${icon("refresh")}</button>`)}
   <p class="tp-meta">${ppl(n)} · updated ${TEAM.at ? ago(TEAM.at) : "never"}</p>
@@ -2465,6 +4070,15 @@ function renderPanel(keepScroll){
         <p class="small muted">${x.trying} still trying · ${x.done} mastered${x.answers >= 10 ? ` · ${pct(x.right, x.answers)}% right` : ""}</p></li>`; }).join("")}</ul>` : `<p class="muted">Nobody is stuck right now.</p>`}
     </section>
   </div>
+  <section class="tp-card" aria-labelledby="rpH"><div class="tp-card-h"><h2 id="rpH">Street practice</h2><span class="small muted">Last 30 days</span></div>
+    ${rpRecent.length ? `<div class="tp-tiles">
+      ${tile("couple", "t-sea", rpRecent.length, "Practice chats", `${ppl(rpWho)} · ${rpWeek} this week`)}
+      ${tile("star", "t-sun", rpAvg(rpRecent) ?? "–", "Average score", "Out of 100")}
+      ${tile("check", "t-good", `${pct(rpCalls, rpRecent.length)}%`, "Gift called right", "Q, CT or NQ, after the chat")}
+      ${tile("calendar", "t-fire", `${pct(rpRecent.filter(r => r[4]).length, rpRecent.length)}%`, "Couples booked", "They said yes to a time")}</div>
+      <h3 class="tp-sub">Steps to work on</h3>${rpStepsHTML(rpSteps(rpRecent))}<p class="small muted">From Shoco's feedback on every chat. Green is done well, yellow is almost.</p>`
+      : `<p class="muted">No practice chats yet. They're in Games > Street practice.</p>`}
+  </section>
   <section class="tp-card" aria-labelledby="ndH"><h2 id="ndH">Need a nudge</h2>
     ${nudge.length ? `<ul class="tp-people">${nudge.map(p => `<li><button data-open="${esc(p.device)}">${avatarHTML(p)}<span><span class="pname">${esc(p.name)}</span><span class="psub">${esc(p.started ? `${lastSeen(p)} · ${nextStep(p)}` : nextStep(p))}</span></span>${icon("play", "go")}</button></li>`).join("")}</ul>`
       : `<p class="muted">Everyone has done a lesson in the last ${NUDGE_DAYS} days.</p>`}
@@ -2475,6 +4089,7 @@ function renderPanel(keepScroll){
     <li>Ready: they passed the Final, 20 questions in a row.</li>
     <li>Need a nudge: not ready yet, and either no lessons yet or none in the last ${NUDGE_DAYS} days.</li>
     <li>Right answers: every answer they gave in lessons since this update.</li>
+    <li>Street practice: chats with an AI tourist couple. Shoco scores stopping them, each of the 7 pitch steps and finding out who they are, and checks the gift they called.</li>
     <li>Progress arrives from each phone after every answer, when it has internet.</li></ul></details>
   <details class="card"><summary>Change the manager code</summary><form class="name-form" id="newCode"><input class="field" id="nc" autocomplete="off" autocapitalize="characters" placeholder="New code, 6+ letters or numbers" aria-label="New manager code"><button class="btn small">Save</button></form><p class="small muted">Every manager will need the new code.</p></details>
   <p class="foot"><button class="link" id="forget">Forget the code on this phone</button></p>`, { full: true, wide: true, keepScroll });
@@ -2500,11 +4115,13 @@ function matrixHTML(people){
   return `<div class="kw-wrap"><table class="kw"><caption class="sr-only">Levels each person has mastered or started</caption>
     <colgroup><col class="cn">${groups(u => `<col span="${u.levels.length}">`, `<col class="cg">`)}</colgroup>
     <thead><tr><th scope="col"><span class="sr-only">Person</span></th>${groups(u => `<th scope="colgroup" colspan="${u.levels.length}" class="u c-${u.color}">${u.id === "final" ? `${icon("crown", "fin")}<span class="sr-only">Final</span>` : `<span>${esc(u.id === "pitch" ? "Pitch" : u.title)}</span>`}</th>`, `<th aria-hidden="true"></th>`)}</tr>
-    <tr class="kw-lv"><th></th>${groups(u => u.levels.map(id => `<th scope="col"><span>${esc(byId(id).name)}</span></th>`).join(""), `<th aria-hidden="true"></th>`)}</tr></thead>
+    <tr class="kw-lv"><th><span class="sr-only">Level</span></th>${groups(u => u.levels.map(id => `<th scope="col"><span>${esc(byId(id).name)}</span></th>`).join(""), `<th aria-hidden="true"></th>`)}</tr></thead>
     <tbody>${people.map(p => `<tr><th scope="row"><button class="kw-name" data-open="${esc(p.device)}"><span class="pname">${esc(p.name)}</span><span class="psub">${esc(sub(p))}</span></button></th>${groups(u => u.levels.map(id => cell(p, id)).join(""), `<td aria-hidden="true"></td>`)}</tr>`).join("")}</tbody></table></div>`;
 }
 function logText(e){
-  const [, k, id, v, n] = e, name = id === "daily" ? "Daily 10" : id === "lightning" ? "Lightning round" : `"${byId(id).name}"`;
+  const [, k, id, v, n] = e;
+  if (k === "rp") return `Street practice: ${RP_MOOD[id].toLowerCase()} couple, ${v} of 100${n ? "" : ", wrong gift"}`;
+  const name = id === "daily" ? "Daily 10" : id === "lightning" ? "Lightning round" : `"${byId(id).name}"`;
   return { m: `Mastered ${name}`, r: `Review done: ${name}`, p: `Practiced ${name}`, d: "Finished a Daily 10",
     f: `${name}: ${v} of ${n} in a row, then a mistake`, lg: `Lightning round: ${plural(v, "couple")}` }[k];
 }
@@ -2549,6 +4166,12 @@ function renderWorker(device, keepScroll){
           <li>${icon("headphones")}<span><b>${st.h} of ${CLIPS.length}</b> voice notes heard</span></li>
           <li>${icon("bolt")}<span><b>${plural(st.l, "couple")}</b> Lightning record</span></li></ul>
       </section>
+      <section class="tp-card" aria-labelledby="spH"><h2 id="spH">Street practice</h2>
+        ${st.rp.s.length ? `<p class="small muted">${plural(st.rp.n, "chat")} · best ${st.rp.b} · last 5 average ${rpAvg(st.rp.s.slice(-5))}</p>
+          <ul class="tp-log rp-res">${st.rp.s.slice().reverse().slice(0, 5).map(r => `<li><span><b>${r[1] >= 0 ? r[1] : "–"}</b> ${esc(RP_MOOD[r[2]])} couple, ${r[3]}${r[5] ? "" : " (called it wrong)"}${r[4] ? " · booked" : ""}</span><time>${esc(ago(r[0]))}</time></li>`).join("")}</ul>
+          <h3 class="tp-sub">Steps to work on</h3>${rpStepsHTML(rpSteps(st.rp.s))}`
+          : `<p class="muted">No practice chats yet.</p>`}
+      </section>
       <section class="tp-card" aria-labelledby="acH"><h2 id="acH">Activity</h2>
         ${st.dd.length ? `<div class="tp-days" role="img" aria-label="Active ${activeDays} of the last 14 days">${days.map(d => `<i class="${st.dd.includes(d) ? "on" : ""}"></i>`).join("")}</div>
           <p class="small muted">${activeDays} of the last 14 days. Today is on the right.</p>` : ""}
@@ -2570,10 +4193,13 @@ function renderWorker(device, keepScroll){
 /* =====================================================================
    BOOT
    The team link with #team at the end opens the manager panel.
+   #rp=... comes from the Claude version: a Street practice score to add here.
    ===================================================================== */
 buildTabs();
-if (location.hash === "#team") coach(); else tab(S.tab);
-addEventListener("hashchange", () => { if (location.hash === "#team") coach(); });
+if (location.hash === "#team") coach();
+else if (rpImport()) tab("games");
+else tab(S.tab);
+addEventListener("hashchange", () => { if (location.hash === "#team") coach(); else if (rpImport()) tab("games"); });
 if (S.name) queueSync();
 </script>
 </body>

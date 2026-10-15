@@ -34,11 +34,14 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   `assets/fonts/` holds the self-hosted Inter/Playfair Display woff2 files (see Fonts below).
 - `academy/` — **staff-only**, unlinked from the guest app (like `admin.html`): "Show-Up Academy",
   a Duolingo-style training game for OPCs on guest qualifications, the Open House invitation
-  pitch and NLP (rapport, wording, reading guests). Served at `https://victorfromaruba-stack.github.io/iberostar-club/academy/`. It shares
+  pitch, NLP (rapport, wording, reading guests) and street skills (mindset, stopping people, small talk,
+  objections: ideas from the Timeshare OPC University videos and the OPC Secrets By Suz audiobook, in our
+  own words and credited with links in each guidebook), plus Street practice, a role-play with an AI
+  tourist couple that Shoco scores afterwards. Served at `https://victorfromaruba-stack.github.io/iberostar-club/academy/`. It shares
   nothing with the guest app. **`academy/index.html` is built; don't edit it by hand.** The source
   is `academy/src/`: `levels.js` and `content-pre.js` (lessons and units; the writing rules for
   questions are at the top of `levels.js`), `content-post.js` (`MAP_STEPS`, the Script tab's lines
-  `SCRIPT`, the couple generator), `app.js` (engine), `team.js` (the manager panel), `boot.js`
+  `SCRIPT`, the couple generator), `app.js` (engine), `street-core.js` (Street practice's couples, rules and prompts, shared with the Edge Function), `street.js` (the Street practice screens), `team.js` (the manager panel), `boot.js`
   (start-up), `style.css`, `icons.js`, `mascot.js` (Shoco, the burrowing owl), and `clips.json` (the
   nine voice notes, transcribed with timings). Rebuild
   with `python3 academy/src/build.py --page`; the build fails if a Script line doesn't match the
@@ -47,18 +50,29 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   grammar slips, including in 300 generated guest cards) and whenever answer length would give
   the right option away (it may not be the longest by more than 5 characters, and may be the
   longest option in at most 35% of questions). Test with
-  `node academy/src/e2e.js <url> <outdir>` (Playwright; serve `academy/` with Range support, e.g.
-  `npx http-server academy`). Media: `academy/audio/` (voice notes, MP3), `academy/img/` (two slides
+  `node academy/src/e2e.js <url> <outdir>` and `node academy/src/street_e2e.js <url> <outdir>` (Playwright; serve `academy/`
+  with Range support, e.g. `npx http-server academy`, and use a `localhost` url). Media: `academy/audio/` (voice notes, MP3), `academy/img/` (two slides
   from the Open House pitch deck, `photos/`), `academy/video/` (golf loop, H.264 MP4). It has `noindex`. Progress is
   per device in `localStorage['showup.v1']`. Once a worker saves a name, the phone also sends its
   progress to Supabase project `cdkopyphjvfxjqhasrae` (tables `sua_people` and `sua_config`, closed
   to the public key and reachable only through the `sua_save`, `sua_team`, `sua_hide` and
   `sua_set_code` functions; the key in the page is a publishable key). Each phone sends its levels,
-  best runs, right and wrong answers per level, a log of its last lessons and its days active
-  (`payload()` in `app.js`; `sua_save` takes up to 16 KB). The manager panel (Me tab > Manager panel,
+  best runs, right and wrong answers per level, a log of its last lessons, its days active and its
+  Street practice results (`payload()` in `app.js`; `sua_save` takes up to 16 KB). The manager panel (Me tab > Manager panel,
   or the team link with `#team`) reads the team with the manager code, which is stored only as a
   hash and changed from the panel. Everything in the panel comes from other phones, so `team.js`
   escapes every name and clamps every number. There is no WhatsApp report any more.
+  Street practice runs two ways. The Claude version is a copy of the app published as a claude.ai artifact with the
+  `sample` capability (https://claude.ai/artifact/Ejc8Grqk3BR9Y1avEkbAYY; build it with `build.py` without `--page`): the
+  couple and Shoco run on each worker's own Claude account, free for the owner. That copy can't reach Supabase, so its
+  score page links to the team link with `#rp=...`, which adds the result on the phone (`rpImport()` in `street.js`).
+  On the team link, Street practice calls the Edge Function `sua-roleplay` (source in `academy/server/`: the function in
+  `sua-roleplay/`, the tables and functions in `migration.sql`). It uses the owner's Anthropic key from the Edge
+  Function secret `SUA_ANTHROPIC_KEY`; without it, it answers `off` and the page points to the Claude version. Optional
+  secrets: `SUA_RP_MODEL` (default `claude-haiku-5-5`), `SUA_RP_PER_DAY` (chats per phone per day, 6),
+  `SUA_RP_TEAM_DAY` (150). It runs with `verify_jwt` off because it checks each phone's device id and secret itself.
+  Chats are kept in `sua_rp_chats` (service role only) and wiped after 30 days. `build.py` keeps
+  `server/sua-roleplay/street-core.js` a copy of `src/street-core.js`. Never put the key in the page or the repo.
   Don't link it from guest pages.
 - `scripts/verify.js` — zero-dependency Node script, run with `node scripts/verify.js`. Checks
   every `gallery`/`pdf`/`video`/`partnerLogo`/`pdfs[]` path in `data.js` resolves to a real file,
