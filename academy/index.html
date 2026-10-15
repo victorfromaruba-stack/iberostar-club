@@ -3528,7 +3528,7 @@ function streetIntro(){
     rpSampler().then(fn => {
       if (view !== "street" || !$("#rpLeft")) return;
       if (fn){ left.textContent = "Free: it runs on your own Claude account. The first time, Claude asks you to allow it."; go.disabled = false; }
-      else left.innerHTML = TEAM_HOST ? "" : `Street practice works in the Claude app, or on the team link: <a href="${TEAM_URL}">${esc(TEAM_URL)}</a>`;
+      else left.innerHTML = TEAM_HOST ? "" : `Street practice needs Claude, and it can't run on this page. Sign in to your Claude account and open <a href="${CLAUDE_URL}" target="_blank" rel="noopener">the Claude version</a>.`;
     });
     on("#rpGo", () => {
       const focus = app.querySelector("input[name=focus]:checked")?.value || "any", lg = app.querySelector("input[name=lang]:checked")?.value || "en";

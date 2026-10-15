@@ -198,6 +198,16 @@ const TEAMROWS = [
   await s.waitForSelector(".rp-msg.them:not(.typing)"); await overflow(s, "320 chat");
   await s.screenshot({ path: `${out}/11-320-chat.png` });
 
+  /* 4a. A Claude page where Claude can't run (signed out, or opened outside the Claude app) */
+  const nctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await nctx.addInitScript(INIT); await nctx.addInitScript("window.claude = { use: async () => null };");
+  const nc = await nctx.newPage();
+  await nc.goto(OTHER, { waitUntil: "load" }); await nc.waitForTimeout(300);
+  await nc.click('.tabs button[data-tab="games"]'); await nc.click("#rp");
+  await nc.waitForSelector("#rpLeft a", { timeout: 4000 }).catch(() => {});
+  ok("no Claude here: says to sign in and open the Claude version, Start off", /can't run on this page/.test(await nc.textContent("#rpLeft")) && (await nc.getAttribute("#rpLeft a", "href").catch(() => "")) === "https://claude.ai/artifact/Ejc8Grqk3BR9Y1avEkbAYY" && await nc.isDisabled("#rpGo"));
+  await nctx.close();
+
   /* 4b. The Claude version: free, on the viewer's own account (sample mocked), on a host that isn't the team link */
   const SAMPLE = `window.__coachMock = ${JSON.stringify(COACH.coach)};
   window.claude = { use: async name => name === "sample" ? (() => {
