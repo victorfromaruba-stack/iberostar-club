@@ -153,7 +153,7 @@ export function makeHandler(d: Deps){
         if (d.voice && body.voice === true && reply.lines.length){
           const t0 = Date.now(), v = d.voice;
           voices = await Promise.all(reply.lines.map((l: Any) => { const i = l.who === "B" ? 1 : 0;
-            return speak(v, l.text, voiceFor(c, i), styleFor(c, i, reply.interest)).catch(e => { d.log({ what: "speak", error: (e as Error).message }); return null; }); }));
+            return speak(v, l.text, voiceFor(c, i), styleFor(c, i, reply.interest)).catch(e => { d.log({ what: "speak", error: (e as Error).message, detail: (e as Any).detail || "" }); return null; }); }));
           d.log({ what: "speak", model: v.tts, ms: Date.now() - t0, chars: reply.lines.reduce((n: number, l: Any) => n + l.text.length, 0), ok: voices.filter(Boolean).length });
         }
         return json({ lines: reply.lines, cue: reply.cue, state: reply.state, booked: reply.booked, turns: r.turns + 1, max: MAX_TURNS,
@@ -177,7 +177,7 @@ export function makeHandler(d: Deps){
       return json({ err: "bad" }, 400, h);
     } catch (e){
       if (e instanceof Fail) return json({ err: e.code }, e.status, h);
-      if (e instanceof VoiceFail){ d.log({ op, error: "voice-" + e.code }); return json({ err: e.code }, e.status, h); }
+      if (e instanceof VoiceFail){ d.log({ op, error: "voice-" + e.code, detail: e.detail }); return json({ err: e.code }, e.status, h); }
       if (d.errors.off.some(k => e instanceof k)){ d.log({ op, error: "anthropic-auth", status: (e as Any).status }); return json({ err: "off" }, 503, h); }
       if (d.errors.busy.some(k => e instanceof k)){ d.log({ op, error: "anthropic-busy", status: (e as Any).status }); return json({ err: "busy" }, 503, h); }
       d.log({ op, error: String((e as Error)?.message || e).slice(0, 300) });

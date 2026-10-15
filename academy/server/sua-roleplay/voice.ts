@@ -7,8 +7,8 @@ type Any = any;
 export interface VoiceCfg { key: string; stt: string; tts: string; fetch?: typeof fetch; base?: string }
 
 export class VoiceFail extends Error {
-  code: string; status: number;
-  constructor(code: string, status: number){ super(code); this.code = code; this.status = status; }
+  code: string; status: number; detail: string;
+  constructor(code: string, status: number, detail = ""){ super(code); this.code = code; this.status = status; this.detail = detail; }
 }
 
 const TYPES: Record<string, string> = { "audio/mp4": "mp4", "audio/x-m4a": "m4a", "audio/m4a": "m4a", "audio/aac": "m4a",
@@ -28,7 +28,14 @@ export function toB64(buf: ArrayBuffer): string {
   return btoa(s);
 }
 
-const fail = (status: number) => status === 401 || status === 403 ? new VoiceFail("noear", 503) : new VoiceFail("busy", 503);
+/* OpenAI said no. The log gets its status and error code (never the key) so a wrong model name or an empty
+   balance shows up in the function logs. */
+async function fail(r: Response): Promise<VoiceFail> {
+  let why = "";
+  try { const j = await r.json(); why = [j?.error?.code, j?.error?.type, String(j?.error?.message || "").slice(0, 160)].filter(Boolean).join(" | "); } catch { /* not JSON */ }
+  const detail = `openai ${r.status}${why ? ": " + why : ""}`;
+  return r.status === 401 || r.status === 403 ? new VoiceFail("noear", 503, detail) : new VoiceFail("busy", 503, detail);
+}
 
 /* The promoter's words. Names, places and the pitch's own words help the model spell them right. */
 export async function transcribe(v: VoiceCfg, a: { bytes: Uint8Array; ext: string; type: string }, c: Any): Promise<string> {
@@ -43,7 +50,7 @@ export async function transcribe(v: VoiceCfg, a: { bytes: Uint8Array; ext: strin
     r = await (v.fetch || fetch)(`${v.base || "https://api.openai.com"}/v1/audio/transcriptions`,
       { method: "POST", headers: { Authorization: `Bearer ${v.key}` }, body: f, signal: AbortSignal.timeout(25_000) });
   } catch { throw new VoiceFail("busy", 503); }   // timeout or no connection
-  if (!r.ok) throw fail(r.status);
+  if (!r.ok) throw await fail(r);
   const j = await r.json().catch(() => null);
   return String(j?.text ?? "").replace(/\s+/g, " ").trim();
 }
@@ -79,6 +86,6 @@ export async function speak(v: VoiceCfg, text: string, voice: string, instructio
     body: JSON.stringify({ model: v.tts, voice, input: text.slice(0, 1000), instructions, response_format: "mp3" }),
     signal: AbortSignal.timeout(25_000)
   });
-  if (!r.ok) throw fail(r.status);
+  if (!r.ok) throw await fail(r);
   return toB64(await r.arrayBuffer());
 }
