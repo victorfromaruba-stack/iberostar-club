@@ -660,6 +660,7 @@ details[open]>summary::after{transform:rotate(-135deg) translateY(-3px)}
 .rp-sees .ic{width:16px;height:16px;flex:none}
 .rp-said{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:7px 12px;text-align:left;font-size:16px}
 .rp-said b{font-weight:900}
+.rp-said.me{background:var(--sea-soft);border-color:color-mix(in srgb,var(--sea) 45%,var(--line))}
 .rp-err-call{color:var(--bad-ink);font-weight:800}
 .rp-heard{min-height:1.4em;max-width:min(100%,34ch);font-size:16px;font-style:italic;color:var(--muted);overflow-wrap:anywhere}
 .rp-heard:not(:empty)::before{content:"\201C"} .rp-heard:not(:empty)::after{content:"\201D"}
@@ -667,7 +668,7 @@ details[open]>summary::after{transform:rotate(-135deg) translateY(-3px)}
 .rp-bigmic{width:clamp(64px,10dvh,80px);aspect-ratio:1;border-radius:50%;border:0;display:grid;place-items:center;background:var(--sea);color:var(--on-sea);box-shadow:0 5px 0 var(--sea-2);transition:transform .08s,box-shadow .08s}
 .rp-bigmic .ic{width:42%;height:42%}
 .rp-bigmic:active{transform:translateY(4px);box-shadow:none}
-.rp-bigmic.listening{background:var(--bad);color:var(--on-bad);box-shadow:0 5px 0 var(--bad-2);animation:pulseb .9s ease-in-out infinite}
+.rp-bigmic.listening{background:var(--bad);color:var(--on-bad);box-shadow:0 5px 0 var(--bad-2),0 0 0 calc(var(--lvl,0) * 18px) color-mix(in srgb,var(--bad) 30%,transparent);transition:box-shadow .08s linear;animation:pulseb .9s ease-in-out infinite}
 .rp-miclabel{font:800 14px/1.2 var(--f-body);color:var(--muted)}
 .rp-callopts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
 .rp-opt{display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:800 14px/1 var(--f-body)}

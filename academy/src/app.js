@@ -408,7 +408,7 @@ function show(html, opts = {}){
   cancelAnimationFrame(rafId); rafId = 0; stopFx();
   timers.forEach(clearTimeout); timers = [];
   if (!opts.keepAudio) stopAudio();
-  stopRec();
+  stopRec(); if (typeof rpHush === "function") rpHush();
   try { window.speechSynthesis && speechSynthesis.cancel(); } catch(e){}
   document.querySelectorAll(".combo,.plus").forEach(n => n.remove());
   app.innerHTML = html;

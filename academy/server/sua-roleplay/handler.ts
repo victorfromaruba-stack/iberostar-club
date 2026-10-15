@@ -1,6 +1,7 @@
 /* Street practice: the request handler. index.ts wires in the Anthropic SDK and the database;
    tests wire in mocks. Every reply to the phone is { err } or the data it asked for. */
 import "./street-core.js";
+import { type VoiceCfg, VoiceFail, MAX_AUDIO_B64, audioIn, transcribe, speak, voiceFor, styleFor } from "./voice.ts";
 
 // deno-lint-ignore no-explicit-any
 const RP = (globalThis as any).RPCORE;
@@ -17,6 +18,7 @@ export interface Deps {
   claude: Any | null;                               // Anthropic client; null while no key is set
   errors: { off: Any[]; busy: Any[]; bad: Any };    // SDK error classes, checked with instanceof
   db: (fn: string, args: Record<string, unknown>) => Promise<Any>;
+  voice?: VoiceCfg | null;                          // OpenAI audio: hears the promoter, speaks the couple; null = the phone does it
   model: string; coachModel: string; mine: number; team: number;
   log: (o: Record<string, unknown>) => void;
 }
@@ -36,6 +38,7 @@ const json = (data: unknown, status: number, h: Record<string, string>) =>
   new Response(JSON.stringify(data), { status, headers: { ...h, "Content-Type": "application/json" } });
 const clean = (s: unknown, max: number) => String(s ?? "").replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
 const ERR_STATUS: Record<string, number> = { auth: 401, limit: 429, team: 429, nochat: 404, over: 409, busy: 503, off: 503 };
+const MAX_BODY = MAX_AUDIO_B64 + 4000;
 
 export function makeHandler(d: Deps){
   /* Opus and Sonnet can hand a declined request to another model; Haiku 5.5 can't, so it gets no fallbacks. */
@@ -99,7 +102,7 @@ export function makeHandler(d: Deps){
     let body: Any;
     try {
       const raw = await req.text();
-      if (raw.length > 20000) return json({ err: "bad" }, 413, h);
+      if (raw.length > MAX_BODY) return json({ err: "bad" }, 413, h);
       body = JSON.parse(raw);
     } catch { return json({ err: "bad" }, 400, h); }
     if (!body || typeof body !== "object") return json({ err: "bad" }, 400, h);
@@ -112,30 +115,49 @@ export function makeHandler(d: Deps){
     try {
       if (op === "status"){
         const u = dbErr(await d.db("sua_rp_status", who));
-        return json({ on: true, left: Math.max(0, d.mine - Number(u.mine || 0)), teamFull: Number(u.team || 0) >= d.team }, 200, h);
+        return json({ on: true, voice: !!d.voice, left: Math.max(0, d.mine - Number(u.mine || 0)), teamFull: Number(u.team || 0) >= d.team }, 200, h);
       }
 
       if (op === "start"){
         const focus = RP.FOCUS.includes(body.focus) ? body.focus : "any";
         const c = RP.makeCouple(focus, body.lang === "es" ? "es" : "en");
         const r = dbErr(await d.db("sua_rp_start", { ...who, p_couple: c, p_mine: d.mine, p_team: d.team }));
-        return json({ chat: r.chat, left: r.left, max: MAX_TURNS, scene: RP.sceneOut(c) }, 200, h);
+        return json({ chat: r.chat, left: r.left, max: MAX_TURNS, voice: !!d.voice, scene: RP.sceneOut(c) }, 200, h);
       }
 
       const chat = String(body.chat || "");
       if (!UUID.test(chat)) return json({ err: "bad" }, 400, h);
 
       if (op === "turn"){
-        const text = clean(body.text, 600);
-        if (!text) return json({ err: "bad" }, 400, h);
+        // The promoter's line comes as text, or as a recording when the phone records and this server listens.
+        const audio = body.audio != null ? audioIn(body.audio, body.mime) : null;
+        if (body.audio != null && (!audio || !d.voice)) return json({ err: d.voice ? "bad" : "noear" }, d.voice ? 400 : 503, h);
+        let text = audio ? "" : clean(body.text, 600);
+        if (!audio && !text) return json({ err: "bad" }, 400, h);
         const r = dbErr(await d.db("sua_rp_load", { ...who, p_chat: chat, p_mine: d.mine, p_team: d.team }));
         if (r.state !== "talking" || r.turns >= MAX_TURNS) throw new Fail("over", 409);
         const c = r.couple as Couple, log = (r.log || []) as LogEntry[];
+        if (audio && d.voice){
+          const t0 = Date.now();
+          text = clean(await transcribe(d.voice, audio, c), 600);
+          d.log({ what: "hear", model: d.voice.stt, ms: Date.now() - t0, bytes: audio.bytes.length, chars: text.length });
+          // Nothing but noise: no turn used, the phone just listens again.
+          if (!/[\p{L}\p{N}]/u.test(text)) return json({ err: "unheard" }, 422, h);
+        }
         const reply = await askCouple(c, log, text, r.turns + 1 >= MAX_TURNS - 1);
         if (r.turns + 1 >= MAX_TURNS && reply.state === "talking") reply.state = "ended";
         const ok = await d.db("sua_rp_save", { p_chat: chat, p_turns: r.turns, p_log: [...log, { o: text }, { c: reply }], p_state: reply.state });
         if (ok !== true) throw new Fail("busy", 409);
-        return json({ lines: reply.lines, cue: reply.cue, state: reply.state, booked: reply.booked, turns: r.turns + 1, max: MAX_TURNS }, 200, h);
+        // Their lines in natural voices, all at once. A line whose voice fails comes back null and the phone reads it itself.
+        let voices: (string | null)[] | undefined;
+        if (d.voice && body.voice === true && reply.lines.length){
+          const t0 = Date.now(), v = d.voice;
+          voices = await Promise.all(reply.lines.map((l: Any) => { const i = l.who === "B" ? 1 : 0;
+            return speak(v, l.text, voiceFor(c, i), styleFor(c, i, reply.interest)).catch(e => { d.log({ what: "speak", error: (e as Error).message }); return null; }); }));
+          d.log({ what: "speak", model: v.tts, ms: Date.now() - t0, chars: reply.lines.reduce((n: number, l: Any) => n + l.text.length, 0), ok: voices.filter(Boolean).length });
+        }
+        return json({ lines: reply.lines, cue: reply.cue, state: reply.state, booked: reply.booked, turns: r.turns + 1, max: MAX_TURNS,
+                      ...(audio ? { heard: text } : {}), ...(voices ? { audio: voices } : {}) }, 200, h);
       }
 
       if (op === "coach"){
@@ -155,6 +177,7 @@ export function makeHandler(d: Deps){
       return json({ err: "bad" }, 400, h);
     } catch (e){
       if (e instanceof Fail) return json({ err: e.code }, e.status, h);
+      if (e instanceof VoiceFail){ d.log({ op, error: "voice-" + e.code }); return json({ err: e.code }, e.status, h); }
       if (d.errors.off.some(k => e instanceof k)){ d.log({ op, error: "anthropic-auth", status: (e as Any).status }); return json({ err: "off" }, 503, h); }
       if (d.errors.busy.some(k => e instanceof k)){ d.log({ op, error: "anthropic-busy", status: (e as Any).status }); return json({ err: "busy" }, 503, h); }
       d.log({ op, error: String((e as Error)?.message || e).slice(0, 300) });

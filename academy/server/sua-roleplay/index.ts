@@ -4,6 +4,9 @@
    Optional secrets: SUA_RP_MODEL (default claude-haiku-5-5, the cheapest; claude-opus-5-5 coaches better),
    SUA_COACH_MODEL (default: same), SUA_RP_PER_DAY (chats per person per day, default 6),
    SUA_RP_TEAM_DAY (chats per day for everyone, default 150).
+   Voice: with SUA_OPENAI_KEY set, the phone records the promoter and this function transcribes it
+   (SUA_STT_MODEL, default gpt-4o-mini-transcribe) and reads the couple's lines in natural voices
+   (SUA_TTS_MODEL, default gpt-4o-mini-tts). Without it, phones use their own speech recognition and voices.
    street-core.js is a copy of academy/src/street-core.js, made by build.py. */
 import Anthropic from "npm:@anthropic-ai/sdk@0.133.0";
 import { makeHandler } from "./handler.ts";
@@ -26,7 +29,7 @@ async function db(fn: string, args: Record<string, unknown>){
   return text ? JSON.parse(text) : null;
 }
 
-const key = env("SUA_ANTHROPIC_KEY");
+const key = env("SUA_ANTHROPIC_KEY"), openai = env("SUA_OPENAI_KEY");
 const model = env("SUA_RP_MODEL") || "claude-haiku-5-5";
 Deno.serve(makeHandler({
   claude: key ? new Anthropic({ apiKey: key, maxRetries: 1, timeout: 90_000 }) : null,
@@ -35,6 +38,7 @@ Deno.serve(makeHandler({
     busy: [Anthropic.RateLimitError, Anthropic.InternalServerError, Anthropic.APIConnectionError],
     bad: Anthropic.BadRequestError
   },
+  voice: openai ? { key: openai, stt: env("SUA_STT_MODEL") || "gpt-4o-mini-transcribe", tts: env("SUA_TTS_MODEL") || "gpt-4o-mini-tts" } : null,
   db, model, coachModel: env("SUA_COACH_MODEL") || model,
   mine: num(env("SUA_RP_PER_DAY"), 6, 1, 50), team: num(env("SUA_RP_TEAM_DAY"), 150, 1, 5000),
   log: o => console.log(JSON.stringify(o))

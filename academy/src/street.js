@@ -35,6 +35,8 @@ const RP_MSG = {
   busy: "The couple didn't catch that. Try again in a moment.",
   refused: "They didn't answer that. Say it another way.",
   over: "This chat is over.",
+  unheard: "Didn't catch that. Say it again.",
+  noear: "Voice isn't working right now. Type your line instead.",
   net: "No connection. Check your internet and try again.",
   error: "Something went wrong. Try again."
 };
@@ -74,9 +76,18 @@ async function rpAsk(input, opts){
 const rpMsg = e => RP_MSG[e && e.code] || RP_MSG.error;
 const capFirst = s => s ? s[0].toUpperCase() + s.slice(1) : s;
 
-/* ---------- Their voices (read aloud) ---------- */
+/* ---------- Their voices (read aloud) ----------
+   With the server's voice on, each line comes back as an mp3 in a natural voice and plays here.
+   Otherwise (or if one fails), the phone's own voice reads it. */
 const TTS = window.speechSynthesis || null;
-function stopSpeak(){ try { TTS && TTS.cancel(); } catch(e){} }
+const SILENT = "data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
+let SPEAK_ID = 0, PLAYER = null;
+function stopSpeak(){
+  SPEAK_ID++;
+  try { TTS && TTS.cancel(); } catch(e){}
+  try { PLAYER && PLAYER.pause(); } catch(e){}
+  if (RP) RP.playing = false;
+}
 function rpVoice(lang, sex){
   const vs = (TTS ? TTS.getVoices() : []).filter(v => (v.lang || "").toLowerCase().startsWith(lang));
   const fem = /female|samantha|victoria|karen|moira|tessa|fiona|allison|ava|susan|zira|monica|paulina|marisol|helena|sabina|lucia|laura|joana/i;
@@ -85,26 +96,175 @@ function rpVoice(lang, sex){
   vs.sort((a, b) => good(b) - good(a));
   return (sex === "f" ? vs.find(v => fem.test(v.name)) : vs.find(v => male.test(v.name) && !/female/i.test(v.name))) || vs[0] || null;
 }
-/* done() runs once they've finished speaking (or right away when voices are off): talk mode listens again then. */
-function speakLines(lines, done){
-  const fin = () => { const d = done; done = null; if (d) d(); };
-  if (!TTS || S.rpVoice === false || !RP){ if (done) timers.push(setTimeout(fin, 400)); return; }
+/* Phones only play sound after a tap. Every tap that can lead to their answer calls this first. */
+function earUnlock(){
+  earCtx();
+  if (!PLAYER){ PLAYER = new Audio(); PLAYER.setAttribute("playsinline", ""); PLAYER.preload = "auto"; }
+  if (!PLAYER.dataset.ok){ PLAYER.dataset.ok = "1"; PLAYER.src = SILENT; const p = PLAYER.play(); p && p.catch(() => { PLAYER.dataset.ok = ""; }); }
+}
+/* One line in the phone's own voice. Some phones never say they've finished: check every half second, up to 30 seconds. */
+function sayPhone(l, cb){
+  let over = false; const end = () => { if (!over){ over = true; cb(); } };
+  if (!TTS || !RP){ timers.push(setTimeout(end, 400)); return; }
+  const lang = RP.scene.lang === "es" ? "es" : "en", p = RP.scene.people[l.who === "B" ? 1 : 0] || RP.scene.people[0];
+  const u = new SpeechSynthesisUtterance(l.text), v = rpVoice(lang, p.sex);
+  if (v){ u.voice = v; u.lang = v.lang; } else u.lang = lang === "es" ? "es-MX" : "en-US";
+  u.pitch = p.sex === "m" ? .9 : 1.1; u.rate = 1.03;
+  u.onend = u.onerror = end;
+  try { TTS.speak(u); } catch(e){ return end(); }
+  let n = 0; const check = () => { if (over) return; if ((TTS.speaking || TTS.pending) && ++n < 60) timers.push(setTimeout(check, 500)); else end(); };
+  timers.push(setTimeout(check, 900));
+}
+/* One line in a natural voice. cb(false) if it can't play, so the phone's voice takes over. */
+function sayNatural(b64, cb){
+  let over = false, url = "";
+  const end = ok => { if (over) return; over = true; PLAYER.onended = PLAYER.onerror = null; try { URL.revokeObjectURL(url); } catch(e){} cb(ok); };
+  try { const bin = atob(b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); url = URL.createObjectURL(new Blob([u8], { type: "audio/mpeg" })); }
+  catch(e){ return cb(false); }
+  PLAYER.onended = () => end(true);
+  PLAYER.onerror = () => end(false);
+  PLAYER.src = url;
+  const p = PLAYER.play(); p && p.catch(() => end(false));
+  timers.push(setTimeout(() => end(true), 30000));
+}
+/* done() runs once they've finished speaking (or right away when voices are off): talk mode listens again then.
+   Stopping them (a new line, a tap on the mic) cancels done(). */
+function speakLines(lines, done, audios){
   stopSpeak();
-  const lang = RP.scene.lang === "es" ? "es" : "en";
-  for (const l of lines){
-    const p = RP.scene.people[l.who === "B" ? 1 : 0] || RP.scene.people[0];
-    const u = new SpeechSynthesisUtterance(l.text), v = rpVoice(lang, p.sex);
-    if (v){ u.voice = v; u.lang = v.lang; } else u.lang = lang === "es" ? "es-MX" : "en-US";
-    u.pitch = p.sex === "m" ? .9 : 1.1; u.rate = 1.03;
-    const i = l.who === "B" ? 1 : 0;
-    u.onstart = () => { rpTalking(i); rpStatus(`${rpWho(i)} is talking…`, "talk"); };
-    if (l === lines[lines.length - 1]) u.onend = u.onerror = () => { rpTalking(-1); fin(); };
-    try { TTS.speak(u); } catch(e){}
+  const id = SPEAK_ID;
+  const fin = () => { if (id !== SPEAK_ID) return; SPEAK_ID++; if (RP) RP.playing = false; rpTalking(-1); if (done) done(); };
+  if (S.rpVoice === false || !RP || (!TTS && !audios)){ timers.push(setTimeout(fin, 400)); return; }
+  RP.playing = true;
+  // Only the phone's voice: queue every line at once (iPhones speak a queue more reliably than one line per callback).
+  if (!audios || !audios.some(Boolean)){
+    if (!TTS) return fin();
+    const lang = RP.scene.lang === "es" ? "es" : "en";
+    lines.forEach((l, j) => {
+      const i = l.who === "B" ? 1 : 0, p = RP.scene.people[i] || RP.scene.people[0];
+      const u = new SpeechSynthesisUtterance(l.text), v = rpVoice(lang, p.sex);
+      if (v){ u.voice = v; u.lang = v.lang; } else u.lang = lang === "es" ? "es-MX" : "en-US";
+      u.pitch = p.sex === "m" ? .9 : 1.1; u.rate = 1.03;
+      u.onstart = () => { if (id === SPEAK_ID){ rpTalking(i); rpStatus(`${rpWho(i)} is talking…`, "talk"); } };
+      if (j === lines.length - 1) u.onend = u.onerror = fin;
+      try { TTS.speak(u); } catch(e){}
+    });
+    if (lines[0]){ const i = lines[0].who === "B" ? 1 : 0; rpTalking(i); rpStatus(`${rpWho(i)} is talking…`, "talk"); }
+    let n = 0; const check = () => { if (id !== SPEAK_ID) return; if ((TTS.speaking || TTS.pending) && ++n < 80) timers.push(setTimeout(check, 500)); else fin(); };
+    timers.push(setTimeout(check, 900));
+    return;
   }
-  // Some phones never fire onend: check every half second, give up after 40 seconds.
-  if (done){ let n = 0; const check = () => { if (!done) return; if ((TTS.speaking || TTS.pending) && ++n < 80) timers.push(setTimeout(check, 500)); else fin(); }; timers.push(setTimeout(check, 700)); }
+  let k = 0;
+  const next = () => {
+    if (id !== SPEAK_ID || !RP) return;
+    if (k >= lines.length) return fin();
+    const l = lines[k], a = audios && audios[k]; k++;
+    const i = l.who === "B" ? 1 : 0;
+    rpTalking(i); rpStatus(`${rpWho(i)} is talking…`, "talk");
+    const phone = () => { if (id === SPEAK_ID) sayPhone(l, next); };
+    if (a && PLAYER) sayNatural(a, ok => ok === false ? phone() : next()); else phone();
+  };
+  next();
 }
 if (TTS) try { TTS.getVoices(); TTS.addEventListener?.("voiceschanged", () => {}); } catch(e){}
+
+/* ---------- Your voice, heard by the server ----------
+   When the server listens (RP.ear), the phone records with its own microphone and works out when you've
+   stopped talking: 1.2 seconds of quiet after at least a moment of speech. Nothing is sent if you said nothing. */
+const EAR_OK = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+const EAR = { ctx: null, rec: null, stream: null, src: null, chunks: [], send: false, spoke: 0, tick: 0, gen: 0, opening: false };
+let RP_EAR = false;
+function earCtx(){
+  const C = window.AudioContext || window.webkitAudioContext;
+  if (!EAR.ctx && C) try { EAR.ctx = new C(); } catch(e){}
+  try { if (EAR.ctx && EAR.ctx.state !== "running") EAR.ctx.resume(); } catch(e){}
+  return EAR.ctx;
+}
+function earLevel(v){ const b = $("#rpTalk"); if (b) b.style.setProperty("--lvl", v.toFixed(2)); }
+async function earListen(){
+  if (!RP || !RP.ear || RP.busy || RP.state !== "talking" || EAR.rec || EAR.opening) return;
+  stopSpeak();
+  EAR.opening = true;
+  rpMicUI(true); rpHint("Listening… just talk. It sends when you pause.");
+  rpStatus("Listening…", "listen"); const heard = $("#rpHeard"); if (heard) heard.textContent = "";
+  let stream = null;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } }); }
+  catch(e){
+    EAR.opening = false;
+    if (!RP) return;
+    RP.talk = false; rpMicUI(false);
+    const m = e && e.name === "NotAllowedError" ? "The microphone is blocked. Allow it for this site in your phone's settings, or type." : "Couldn't start the microphone. Type your line instead.";
+    rpStatus(m); toast(m); return;
+  }
+  EAR.opening = false;
+  if (!RP || !RP.talk || RP.busy || RP.state !== "talking" || !$("#rpLog")){ stream.getTracks().forEach(t => t.stop()); if (RP) rpMicUI(false); return; }
+  // iPhones record AAC in mp4 best; everything else, Opus in webm.
+  const apple = /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Android/.test(navigator.userAgent);
+  const type = (apple ? ["audio/mp4", "audio/webm;codecs=opus", "audio/webm"] : ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"]).find(t => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) || "";
+  let rec;
+  try { rec = new MediaRecorder(stream, { ...(type ? { mimeType: type } : {}), audioBitsPerSecond: 48000 }); }
+  catch(e){ try { rec = new MediaRecorder(stream); } catch(e2){ stream.getTracks().forEach(t => t.stop()); RP.talk = false; rpMicUI(false); toast("This phone can't record here. Type your line instead."); return; } }
+  const gen = ++EAR.gen;
+  Object.assign(EAR, { rec, stream, chunks: [], send: false, spoke: 0 });
+  rec.ondataavailable = e => { if (e.data && e.data.size && EAR.gen === gen) EAR.chunks.push(e.data); };
+  rec.onstop = () => earDone(gen, rec);
+  let an = null;
+  const ctx = earCtx();
+  if (ctx) try { EAR.src = ctx.createMediaStreamSource(stream); an = ctx.createAnalyser(); an.fftSize = 1024; EAR.src.connect(an); } catch(e){ an = null; }
+  try { rec.start(250); } catch(e){ earStop(false); RP.talk = false; toast("Couldn't start the microphone."); return; }
+  sfx("tap");
+  if (!an){ rpMicUI(true, true); return; }   // no level meter: tap the mic when you've finished
+  const buf = new Float32Array(an.fftSize), t0 = performance.now();
+  let floor = 0.006, last = t0, loud = 0;
+  const tick = () => {
+    if (EAR.gen !== gen || !EAR.rec) return;
+    const now = performance.now(), dt = now - last; last = now;
+    an.getFloatTimeDomainData(buf);
+    let sum = 0; for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+    const lvl = Math.sqrt(sum / buf.length);
+    const thr = Math.max(0.012, floor * 2.6);
+    if (lvl > thr){ EAR.spoke += dt; loud = now; }
+    floor = lvl < floor ? floor * .7 + lvl * .3 : floor * .995 + lvl * .005;   // follows the street noise: down fast, up slowly
+    earLevel(Math.min(1, lvl / (thr * 3)));
+    if (EAR.spoke > 300 && now - loud > 1200) return earStop(true);   // you paused: send it
+    if (EAR.spoke <= 300 && now - t0 > 9000) return earStop(false);   // nothing said
+    if (now - t0 > 40000) return earStop(true);                        // long enough
+    EAR.tick = setTimeout(tick, 50);
+  };
+  tick();
+}
+function earStop(send){
+  clearTimeout(EAR.tick);
+  if (!EAR.rec){ if (EAR.stream){ EAR.stream.getTracks().forEach(t => t.stop()); EAR.stream = null; } return; }
+  EAR.send = send;
+  try { if (EAR.rec.state !== "inactive") EAR.rec.stop(); else earDone(EAR.gen, EAR.rec); } catch(e){ earDone(EAR.gen, EAR.rec); }
+}
+function earDone(gen, rec){
+  if (gen !== EAR.gen || EAR.rec !== rec) return;
+  const send = EAR.send, chunks = EAR.chunks, type = rec.mimeType || (chunks[0] && chunks[0].type) || "audio/mp4";
+  EAR.rec = null; EAR.chunks = [];
+  try { EAR.src && EAR.src.disconnect(); } catch(e){} EAR.src = null;
+  if (EAR.stream){ EAR.stream.getTracks().forEach(t => t.stop()); EAR.stream = null; }
+  earLevel(0);
+  if (!RP || !$("#rpLog")) return;
+  const blob = send && chunks.length ? new Blob(chunks, { type }) : null;
+  if (blob && blob.size > 1200){
+    rpMicUI(false);
+    const fr = new FileReader();
+    fr.onload = () => { const b64 = String(fr.result || "").split(",")[1] || ""; if (RP && b64) rpSend("", null, { audio: b64, mime: type }); };
+    fr.readAsDataURL(blob);
+    return;
+  }
+  // Nothing heard: listen once more, then wait for a tap.
+  if (RP.talk && RP.state === "talking" && !RP.busy){
+    if (++RP.idle <= 1){ timers.push(setTimeout(earListen, 200)); return; }
+    RP.talk = false; rpMicUI(false); rpHint("Talk mode paused. Tap the mic to keep talking."); rpStatus("Didn't hear you. Tap the mic to talk."); return;
+  }
+  rpMicUI(false); rpHint();
+}
+/* Everything quiet: no voices, no microphone. show() calls it whenever the screen changes. */
+function rpHush(){ stopSpeak(); stopRec(); if (EAR.rec || EAR.stream){ EAR.gen++; const r = EAR.rec; EAR.rec = null; clearTimeout(EAR.tick); try { r && r.state !== "inactive" && r.stop(); } catch(e){} try { EAR.src && EAR.src.disconnect(); } catch(e){} EAR.src = null; if (EAR.stream){ EAR.stream.getTracks().forEach(t => t.stop()); EAR.stream = null; } } }
+/* After their answer: in talk mode, listen again. */
+function rpResume(){ if (RP && RP.talk && RP.state === "talking" && !RP.busy) (RP.ear ? earListen() : rpListen()); }
 
 /* ---------- Setup ---------- */
 async function rpReady(){
@@ -124,7 +284,7 @@ function streetIntro(){
     <fieldset class="rp-pick"><legend class="eyebrow">Language</legend><div class="pchips">${chips("lang", [["en", "English"], ["es", "Español"]], lang)}</div></fieldset>
     ${S.name || inClaude ? "" : `<div class="stack"><label for="rpName" class="eyebrow">Your name</label><input class="field" id="rpName" autocomplete="name" maxlength="30" placeholder="First name + last initial"><p class="small muted">Your manager sees your practice scores.</p></div>`}
     <ul class="small rp-how">
-      <li>${SR ? "It's a voice call: tap the mic once and talk, like on the street. They answer out loud, then it listens again. Turn on captions or type if it's loud." : "Type, or use the mic on your keyboard."}</li>
+      <li>${SR || EAR_OK ? "It's a voice call: tap the mic once and talk, like on the street. They answer out loud, then it listens again. Turn on captions or type if it's loud." : "Type, or use the mic on your keyboard."}</li>
       <li>Find out who they are on the way: where they're from, ages, work, card, hotel, when they leave.</li>
       <li>Tap Done when you've finished. If they walk away, that's the end too.</li></ul>
     <div class="l-foot rp-foot"><p class="small muted" id="rpLeft" aria-live="polite"></p><button class="btn wide" id="rpGo">Start</button></div>
@@ -151,12 +311,13 @@ function streetIntro(){
   if (S.name){
     left.textContent = "Checking…";
     rpReady().then(ok => ok ? rpCall("status") : Promise.reject({ code: "auth" }))
-      .then(j => { if (view !== "street" || !$("#rpLeft")) return; left.textContent = j.teamFull ? RP_MSG.team : j.left ? `${plural(j.left, "practice chat")} left today.` : RP_MSG.limit; if (!j.left || j.teamFull) go.disabled = true; })
+      .then(j => { RP_EAR = !!j.voice; if (view !== "street" || !$("#rpLeft")) return; left.textContent = j.teamFull ? RP_MSG.team : j.left ? `${plural(j.left, "practice chat")} left today.` : RP_MSG.limit; if (!j.left || j.teamFull) go.disabled = true; })
       .catch(e => { if (view !== "street" || !$("#rpLeft")) return; if (e.code === "off") return toClaude(); left.textContent = rpMsg(e); });
   }
   // No name yet: still ask the function, so a switched-off practice says so before anyone types a name.
   else rpCall("status").catch(e => { if (e.code === "off" && view === "street" && $("#rpLeft")) toClaude(); });
   on("#rpGo", async () => {
+    earUnlock();   // the Start tap: lets their voices play later
     const focus = app.querySelector("input[name=focus]:checked")?.value || "any", lg = app.querySelector("input[name=lang]:checked")?.value || "en";
     S.rpFocus = focus; S.rpLang = lg;
     if (!S.name){
@@ -168,7 +329,8 @@ function streetIntro(){
     go.disabled = true; go.textContent = "Starting…"; left.textContent = "";
     try {
       if (!await rpReady()) throw { code: navigator.onLine === false ? "net" : "auth" };
-      streetChat(await rpCall("start", { focus, lang: lg }));
+      const j = await rpCall("start", { focus, lang: lg }); RP_EAR = !!j.voice;
+      streetChat(j);
     } catch(e){
       if (!$("#rpGo")) return;
       go.textContent = "Start";
@@ -213,20 +375,22 @@ const rpCue = text => rpAppend(`${icon("eye")}<span>${esc(text)}</span>`, "rp-cu
 function rpStageEnd(){ const st = $(".rp-stage"); if (st && st.scrollHeight > st.clientHeight) st.scrollTop = st.scrollHeight; }
 function rpStatus(t, state = ""){ const el = $("#rpStatus"); if (el){ el.textContent = t; el.dataset.state = state; rpStageEnd(); } }
 function rpTalking(i){ app.querySelectorAll(".rp-person").forEach(el => el.classList.toggle("talking", +el.dataset.p === i)); }
-function rpCaption(lines, cue){
+function rpCaption(lines, cue, me){
   const cap = $("#rpCap"); if (!cap) return;
-  const said = (S.rpCC || S.rpVoice === false) ? lines.map(l => `<span class="rp-said"><b>${esc(rpWho(l.who === "B" ? 1 : 0))}:</b> ${esc(l.text)}</span>`).join("") : "";
-  cap.innerHTML = (cue ? `<span class="rp-sees">${icon("eye")}${esc(cue)}</span>` : "") + said;
+  const cc = S.rpCC || S.rpVoice === false;
+  const mine = cc && me ? `<span class="rp-said me"><b>You:</b> ${esc(me)}</span>` : "";
+  const said = cc ? lines.map(l => `<span class="rp-said"><b>${esc(rpWho(l.who === "B" ? 1 : 0))}:</b> ${esc(l.text)}</span>`).join("") : "";
+  cap.innerHTML = mine + (cue ? `<span class="rp-sees">${icon("eye")}${esc(cue)}</span>` : "") + said;
   rpStageEnd();
 }
 function rpMode(call){
   const root = app.querySelector(".rp"); if (!root || !RP) return;
   RP.call = call; S.rpMode = call ? "voice" : "text"; save(false);
   root.classList.toggle("call", call);
-  if (!call && (RP.talk || REC)){ RP.talk = false; RP.sendOnEnd = false; stopRec(); rpMicUI(false); }
+  if (!call && (RP.talk || REC || EAR.rec)){ RP.talk = false; RP.sendOnEnd = false; stopRec(); if (EAR.rec) earStop(false); rpMicUI(false); }
   if (!call) timers.push(setTimeout(() => { $("#rpText")?.focus({ preventScroll: true }); $("#rpLog")?.lastElementChild?.scrollIntoView({ block: "end" }); }, 50));
 }
-function rpHint(text){ const h = $("#rpHint"); if (h) h.textContent = text || (SR ? "Tap the mic once and just talk. It sends when you pause and listens again after they answer." : "Type your line, or use the mic on your keyboard."); }
+function rpHint(text){ const h = $("#rpHint"); if (h) h.textContent = text || (RP && (RP.ear || SR) ? "Tap the mic once and just talk. It sends when you pause and listens again after they answer." : "Type your line, or use the mic on your keyboard."); }
 function rpComposer(on){
   ["#rpText", "#rpSend", "#rpMic"].forEach(s => { const el = $(s); if (el) el.disabled = !on; });
 }
@@ -234,7 +398,11 @@ function rpGrow(){ const t = $("#rpText"); if (!t) return; t.style.height = "aut
 
 function streetChat(j, couple){
   RP = { chat: j.chat, max: j.max || 24, left: j.left == null ? null : Math.max(0, j.left - 1), scene: j.scene, log: [], busy: false, state: "talking", booked: false, turns: 0, known: new Set(), saved: false,
-    couple: couple || null, core: [], call: !!SR && S.rpMode !== "text" };
+    couple: couple || null, core: [], playing: false, idle: 0 };
+  RP.ear = !RP.couple && RP_EAR && EAR_OK;   // the server hears you and speaks for them
+  RP.tts = !RP.couple && RP_EAR;              // natural voices, even when typing
+  const talkable = RP.ear || !!SR;
+  RP.call = talkable && S.rpMode !== "text";
   view = "street"; game = { kind: "street" };
   const sc = j.scene, who = sc.people.length > 1 ? "A couple" : sc.people[0].sex === "m" ? "A man" : "A woman";
   show(`<div class="lesson rp${RP.call ? " call" : ""}">
@@ -248,7 +416,7 @@ function streetChat(j, couple){
       <ul>${sc.cues.map(c => `<li>${icon("eye")}<span>${esc(c)}</span></li>`).join("")}</ul>
       ${sc.lang === "es" ? `<p class="small muted">This one is in Spanish. Pitch in Spanish.</p>` : ""}
     </section>
-    ${SR ? `<section class="rp-stage" aria-label="The call">
+    ${talkable ? `<section class="rp-stage" aria-label="The call">
       <div class="rp-people">${sc.people.map((p, i) => `<div class="rp-person p${i}" data-p="${i}"><span class="rp-face" aria-hidden="true">${rpAvatar(i)}</span><b class="rp-who">${esc(rpWho(i))}</b><span class="rp-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>`).join("")}</div>
       <p class="rp-cap" id="rpCap"></p>
       <p class="rp-status" id="rpStatus" aria-live="polite">Tap the mic and say hello.</p>
@@ -263,10 +431,10 @@ function streetChat(j, couple){
     <form class="l-foot rp-say" id="rpForm" autocomplete="off">
       <label for="rpText" class="sr-only">Your line</label>
       <textarea class="field" id="rpText" rows="1" maxlength="600" placeholder="Say your line…" enterkeyhint="send"></textarea>
-      ${SR ? `<button type="button" class="rp-mic" id="rpMic" aria-pressed="false" aria-label="Talk">${icon("mic")}</button>` : ""}
+      ${talkable ? `<button type="button" class="rp-mic" id="rpMic" aria-pressed="false" aria-label="Talk">${icon("mic")}</button>` : ""}
       <button class="rp-send" id="rpSend" aria-label="Send">${icon("send")}</button>
       <p class="small muted rp-hint" id="rpHint"></p>
-      ${SR ? `<button type="button" class="link rp-tocall" id="rpToCall">${icon("mic")} Switch to a voice call</button>` : ""}
+      ${talkable ? `<button type="button" class="link rp-tocall" id="rpToCall">${icon("mic")} Switch to a voice call</button>` : ""}
     </form>
   </div><div class="sheet" id="sheet" aria-live="polite"></div>`, { full: true });
   rpHint();
@@ -279,51 +447,67 @@ function streetChat(j, couple){
   on("#rpType", () => rpMode(false));
   on("#rpToCall", () => rpMode(true));
   on("#rpCC", () => { S.rpCC = !S.rpCC; save(false); $("#rpCC").setAttribute("aria-pressed", String(S.rpCC));
-    const last = [...RP.log].reverse().find(e => e.them); if (last) rpCaption(last.them, last.cue); });
-  on("#rpVoice", () => { S.rpVoice = S.rpVoice === false; save(false); const b = $("#rpVoice"); b.setAttribute("aria-pressed", String(S.rpVoice)); b.innerHTML = icon(S.rpVoice ? "sound" : "mute"); if (!S.rpVoice) stopSpeak(); });
+    const k = RP.log.map(e => !!e.them).lastIndexOf(true); if (k >= 0) rpCaption(RP.log[k].them, RP.log[k].cue, RP.ear && RP.log[k - 1] ? RP.log[k - 1].me : ""); });
+  on("#rpVoice", () => { S.rpVoice = S.rpVoice === false; save(false); const b = $("#rpVoice"); b.setAttribute("aria-pressed", String(S.rpVoice)); b.innerHTML = icon(S.rpVoice ? "sound" : "mute");
+    if (S.rpVoice) earUnlock(); else if (RP.playing){ stopSpeak(); rpTalking(-1); rpStatus(RP.talk ? "" : "Your turn."); rpResume(); } });
   on("#rpDone", () => rpEnd("done"));
   on("#rpQuit", rpQuit);
   if (!RP.call) timers.push(setTimeout(() => box.focus({ preventScroll: true }), 120));
 }
 
-async function rpSend(raw, retry){
-  const text = String(raw || "").replace(/\s+/g, " ").trim().slice(0, 600);
-  if (!text || !RP || RP.busy || RP.state !== "talking") return;
+/* Your line: typed (raw), sent again after an error (retry, the bubble), or recorded (clip: { audio, mime }) for the server to hear. */
+async function rpSend(raw, retry, clip){
+  const text = clip ? "" : String(raw || "").replace(/\s+/g, " ").trim().slice(0, 600);
+  if ((!text && !clip) || !RP || RP.busy || RP.state !== "talking") return;
   RP.busy = true; stopSpeak(); rpComposer(false);
+  if (!clip) earUnlock();   // typing and tapping Send is a tap too
   if (REC){ RP.sendOnEnd = false; stopRec(); }
   let mine = retry;
-  if (!retry){ rpLearn(text); mine = rpMe(text); const b = $("#rpText"); if (b){ b.value = ""; rpGrow(); } }
+  if (clip) mine = null;
+  else if (!retry){ rpLearn(text); mine = rpMe(text); const b = $("#rpText"); if (b){ b.value = ""; rpGrow(); } }
   else retry.querySelector(".rp-err")?.remove();
   rpStatus("They're thinking…", "think"); const cap0 = $("#rpCap"); if (cap0) cap0.textContent = "";
   const typing = rpAppend(`<span class="rp-av" aria-hidden="true">${icon("user")}</span><div class="rp-b"><span class="dots" role="img" aria-label="They're answering"><i></i><i></i><i></i></span></div>`, "rp-msg them typing");
+  const voice = !!RP.tts && S.rpVoice !== false;
   try {
-    const r = RP.couple ? await rpLocalTurn(text) : await rpCall("turn", { chat: RP.chat, text });
+    const r = RP.couple ? await rpLocalTurn(text) : await rpCall("turn", clip ? { chat: RP.chat, audio: clip.audio, mime: clip.mime, voice } : { chat: RP.chat, text, voice });
     typing?.remove();
     if (!RP || !$("#rpLog")) return;
-    RP.log.push({ me: text }, { them: r.lines, cue: r.cue });
+    const said = clip ? String(r.heard || "").slice(0, 600) : text;
+    if (clip){ rpLearn(said); rpMe(said); }
+    RP.log.push({ me: said }, { them: r.lines, cue: r.cue });
     RP.turns = r.turns; RP.state = r.state; RP.booked = !!r.booked;
     r.lines.forEach(l => rpLearn(l.text));
     r.lines.forEach(rpThem);
     if (r.cue) rpCue(r.cue);
-    rpCaption(r.lines, r.cue); const heard = $("#rpHeard"); if (heard) heard.textContent = "";
+    rpCaption(r.lines, r.cue, clip ? said : ""); const heard = $("#rpHeard"); if (heard) heard.textContent = "";
     rpStatus(RP.state === "talking" ? (S.rpVoice === false ? "Your turn." : "") : "");
     RP.idle = 0;
-    speakLines(r.lines, () => { if (RP && RP.talk && RP.state === "talking" && !RP.busy) rpListen(); });
+    speakLines(r.lines, rpResume, Array.isArray(r.audio) ? r.audio : null);
     sfx("tap");
     if (RP.state !== "talking") timers.push(setTimeout(() => rpEnd(RP.state), 1400));
     else rpHint(RP.max - RP.turns <= 4 ? `${plural(RP.max - RP.turns, "line")} left in this chat.` : "");
   } catch(e){
     typing?.remove();
     if (!RP || !$("#rpLog")) return;
+    // Only noise in the recording: nothing was used up, just listen again.
+    if (e.code === "unheard"){
+      RP.busy = false;
+      rpStatus(RP_MSG.unheard);
+      if (RP.talk && ++RP.idle <= 2){ timers.push(setTimeout(earListen, 900)); return; }
+      RP.talk = false; rpMicUI(false); rpStatus(RP_MSG.unheard); return;
+    }
+    // The server's ears broke (say, a bad key): carry on with the phone's own, or typing.
+    if (e.code === "noear"){ RP.ear = false; RP.tts = false; RP.talk = false; rpMicUI(false); toast(RP_MSG.noear); if (!SR) rpMode(false); rpStatus(SR ? "Tap the mic to talk." : ""); return; }
     RP.talk = false; rpMicUI(false);
     if (RP.call && !["refused", "over", "cancelled", "off", "limit", "team", "auth", "noclaude", "signin"].includes(e.code)){
       const cap = $("#rpCap");
       if (cap){ cap.innerHTML = `<span class="rp-err-call">${esc(rpMsg(e))}</span> <button type="button" class="link" id="rpRetry">${icon("refresh")}Send again</button>`;
-        on("#rpRetry", () => { cap.textContent = ""; rpSend(text, mine); }); }
+        on("#rpRetry", () => { cap.textContent = ""; clip ? rpSend("", null, clip) : rpSend(text, mine); }); }
       rpStatus("");
     }
     if (RP.call && e.code === "refused") rpStatus("Say that a different way.");
-    if (e.code === "refused"){ mine?.remove(); const b = $("#rpText"); if (b){ b.value = text; rpGrow(); } toast(RP_MSG.refused); }
+    if (e.code === "refused"){ mine?.remove(); const b = $("#rpText"); if (b && text){ b.value = text; rpGrow(); } toast(RP_MSG.refused); }
     else if (e.code === "over"){ RP.state = "ended"; rpEnd("ended"); }
     else if (e.code === "cancelled") mine?.remove();
     else if (["off", "limit", "team", "auth", "noclaude", "signin"].includes(e.code)){ RP.state = "ended"; toast(rpMsg(e)); timers.push(setTimeout(streetIntro, 2400)); }
@@ -333,8 +517,12 @@ async function rpSend(raw, retry){
       err.querySelector("button").onclick = () => rpSend(text, mine);
       mine.appendChild(err);
     }
+    else if (clip && !RP.call){
+      const err = rpAppend(`<span>${esc(rpMsg(e))}</span> <button type="button" class="link">${icon("refresh")}Send again</button>`, "rp-err");
+      if (err) err.querySelector("button").onclick = () => { err.remove(); rpSend("", null, clip); };
+    }
   } finally {
-    if (RP){ RP.busy = false; rpComposer(RP.state === "talking"); if (RP.state === "talking") $("#rpText")?.focus({ preventScroll: true }); }
+    if (RP){ RP.busy = false; rpComposer(RP.state === "talking"); if (RP.state === "talking" && !RP.call) $("#rpText")?.focus({ preventScroll: true }); }
   }
 }
 
@@ -349,17 +537,28 @@ async function rpLocalTurn(text){
   return { lines: reply.lines, cue: reply.cue, state: reply.state, booked: reply.booked, turns: RP.turns + 1 };
 }
 
-/* Talk mode: tap the mic once and talk. A pause of 1.6 seconds sends the line; after their answer is read aloud,
-   the mic listens again by itself. Tap the mic again to stop (anything already heard is sent). */
-function rpMicUI(on){
+/* Talk mode: tap the mic once and talk. A pause sends the line; after their answer is read aloud,
+   the mic listens again by itself. Tap the mic again to stop (anything already heard is sent).
+   With RP.ear the phone records and the server listens (earListen); otherwise the browser's own
+   speech recognition does (rpListen). */
+function rpMicUI(on, manual){
   ["#rpMic", "#rpTalk"].forEach(sel => { const btn = $(sel); if (!btn) return;
     btn.classList.toggle("listening", on); btn.setAttribute("aria-pressed", String(on));
-    btn.setAttribute("aria-label", on ? "Stop talking" : "Talk"); btn.innerHTML = icon(on ? "stop" : "mic"); });
-  const lab = $("#rpMicLabel"); if (lab) lab.textContent = on ? "Listening · tap to pause" : "Tap to talk";
-  if (!on && RP && !RP.busy && RP.state === "talking" && !REC) rpStatus(RP.talk ? "Your turn." : "Tap the mic to talk.");
+    btn.setAttribute("aria-label", on ? (manual ? "Send" : "Stop talking") : "Talk"); btn.innerHTML = icon(on ? (manual ? "send" : "stop") : "mic"); });
+  const lab = $("#rpMicLabel"); if (lab) lab.textContent = on ? (manual ? "Recording · tap when you're done" : "Listening · tap to pause") : "Tap to talk";
+  if (!on && RP && !RP.busy && RP.state === "talking" && !REC && !EAR.rec && !RP.playing) rpStatus(RP.talk ? "Your turn." : "Tap the mic to talk.");
 }
 function rpMic(){
-  if (!RP || !$("#rpMic")) return;
+  if (!RP || !($("#rpMic") || $("#rpTalk"))) return;
+  earUnlock();
+  // While they're talking, a tap cuts in: they stop and it listens.
+  if (RP.playing && !RP.busy && RP.state === "talking"){ stopSpeak(); rpTalking(-1); RP.talk = true; RP.idle = 0; return RP.ear ? earListen() : rpListen(); }
+  if (RP.ear){
+    if (EAR.rec || EAR.opening){ RP.talk = false; if (EAR.rec) earStop(EAR.spoke > 300 || !EAR.src); else rpMicUI(false); rpHint(); return; }
+    if (RP.talk){ RP.talk = false; rpMicUI(false); rpHint(); return; }
+    if (RP.busy || RP.state !== "talking") return;
+    RP.talk = true; RP.idle = 0; earListen(); return;
+  }
   if (RP.talk || REC){ RP.talk = false; if (REC){ RP.sendOnEnd = true; try { REC.stop(); } catch(e){} } else { rpMicUI(false); rpHint(); } return; }
   if (RP.busy || RP.state !== "talking") return;
   RP.talk = true; RP.idle = 0; rpListen();
@@ -378,6 +577,7 @@ function rpListen(){
   rec.onresult = e => {
     let said = "";
     for (const r of e.results) said += r[0].transcript + (r.isFinal ? " " : "");
+    if (said.trim()) RP.srHeard = true;
     box.value = [before, said.trim()].filter(Boolean).join(" "); rpGrow();
     if (heard) heard.textContent = box.value;
     clearTimeout(RP.quiet);
@@ -397,7 +597,10 @@ function rpListen(){
     // The phone stopped listening on its own with nothing heard: try again twice, then wait for a tap.
     if (RP.talk && RP.state === "talking"){
       if (++RP.idle <= 2){ timers.push(setTimeout(rpListen, 250)); return; }
-      RP.talk = false; rpMicUI(false); rpHint("Talk mode paused. Tap the mic to keep talking."); rpStatus("Didn't hear you. Tap the mic to keep talking."); return;
+      RP.talk = false; rpMicUI(false);
+      // Some phones (iPhones, often) never pass speech to the page: after that, typing with the keyboard's mic works better.
+      if (!RP.srHeard){ toast("This phone isn't passing your voice to the page. Use the mic on your keyboard instead."); rpMode(false); rpHint("Tap the box, then the mic on your keyboard, and talk."); return; }
+      rpHint("Talk mode paused. Tap the mic to keep talking."); rpStatus("Didn't hear you. Tap the mic to keep talking."); return;
     }
     rpMicUI(false); rpHint();
   };
