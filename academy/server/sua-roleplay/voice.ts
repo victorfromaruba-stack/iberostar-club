@@ -28,6 +28,18 @@ export function toB64(buf: ArrayBuffer): string {
   return btoa(s);
 }
 
+/* One POST to OpenAI. A hiccup on their side (5xx, a dropped connection) gets one more try after a short wait;
+   anything else (bad key, no credits, bad request) comes straight back. The body is rebuilt for each try. */
+async function post(v: VoiceCfg, path: string, init: () => RequestInit): Promise<Response> {
+  for (let i = 0; ; i++){
+    let r: Response | null = null;
+    try { r = await (v.fetch || fetch)(`${v.base || "https://api.openai.com"}${path}`, { ...init(), signal: AbortSignal.timeout(25_000) }); }
+    catch { if (i) throw new VoiceFail("busy", 503, "openai: no answer"); }
+    if (r && (r.ok || r.status < 500 || i)) return r;
+    await new Promise(res => setTimeout(res, 400));
+  }
+}
+
 /* OpenAI said no. The log gets its status and error code (never the key) so a wrong model name or an empty
    balance shows up in the function logs. */
 async function fail(r: Response): Promise<VoiceFail> {
@@ -47,11 +59,7 @@ export async function transcribe(v: VoiceCfg, a: { bytes: Uint8Array; ext: strin
   f.append("language", c.lang === "es" ? "es" : "en");
   f.append("prompt", `A street promoter in Aruba talks to tourists${c.people?.length ? ` (${c.people.map((p: Any) => p.name).join(", ")})` : ""}. ` +
     "Words you may hear: Iberostar, Open House, timeshare, Palm Beach, Eagle Beach, Oranjestad, Riu, Hilton, Marriott, Hyatt, all-inclusive, breakfast, gift.");
-  let r: Response;
-  try {
-    r = await (v.fetch || fetch)(`${v.base || "https://api.openai.com"}/v1/audio/transcriptions`,
-      { method: "POST", headers: { Authorization: `Bearer ${v.key}` }, body: f, signal: AbortSignal.timeout(25_000) });
-  } catch { throw new VoiceFail("busy", 503); }   // timeout or no connection
+  const r = await post(v, "/v1/audio/transcriptions", () => ({ method: "POST", headers: { Authorization: `Bearer ${v.key}` }, body: f }));
   if (!r.ok) throw await fail(r);
   const j = await r.json().catch(() => null);
   return String(j?.text ?? "").replace(/\s+/g, " ").trim();
@@ -83,11 +91,10 @@ export function styleFor(c: Any, i: number, interest?: number): string {
 }
 
 export async function speak(v: VoiceCfg, text: string, voice: string, instructions: string): Promise<string> {
-  const r = await (v.fetch || fetch)(`${v.base || "https://api.openai.com"}/v1/audio/speech`, {
+  const r = await post(v, "/v1/audio/speech", () => ({
     method: "POST", headers: { Authorization: `Bearer ${v.key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: v.tts, voice, input: text.slice(0, 1000), instructions, response_format: "mp3" }),
-    signal: AbortSignal.timeout(25_000)
-  });
+    body: JSON.stringify({ model: v.tts, voice, input: text.slice(0, 1000), instructions, response_format: "mp3" })
+  }));
   if (!r.ok) throw await fail(r);
   return toB64(await r.arrayBuffer());
 }
