@@ -250,11 +250,12 @@ const TEAMROWS = [
   await c.click('#sheet [data-call="NQ"]');
   await c.waitForSelector(".rp-score", { timeout: 5000 });
   const ccalls = (await c.evaluate(() => window.__sampleCalls)).filter(x => x.kind === "coach");
-  ok("claude: coach runs on the default tier", ccalls.length === 1 && ccalls[0].tier === "default" && ccalls[0].first.startsWith("You are Shoco"));
+  ok("claude: coach runs on the quick tier too", ccalls.length === 1 && ccalls[0].tier === "quick" && ccalls[0].first.startsWith("You are Shoco"));
   const href = await c.getAttribute(".rp-handoff a", "href");
   ok("claude: score page offers the team link with the result", !!href && href.startsWith("https://victorfromaruba-stack.github.io/iberostar-club/academy/#rp="), href || "none");
   await axe(c, "claude score"); await c.screenshot({ path: `${out}/15-claude-score.png`, fullPage: true });
   ok("claude: never called the paid function, no errors", c.errors.length === 0, c.errors.join(" | "));
+  ok("claude: a booked couple who doesn't qualify scores 40 at most", await c.evaluate(() => RP.couple.grade !== "NQ" || !RP.saved[4] || RP.saved[1] <= 40), await c.evaluate(() => JSON.stringify([RP.couple.grade, RP.saved && RP.saved[1], RP.saved && RP.saved[4]])));
   // The handoff link opens the team app, which adds the result
   const code = href.split("#rp=")[1];
   const t2 = await mk();

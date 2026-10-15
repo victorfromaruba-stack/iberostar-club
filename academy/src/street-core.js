@@ -649,7 +649,7 @@ THE 8 STEPS (what good looks like)
 4. offer: Say it, don't ask: "Let me get you an invitation." Not "Would you like one?" Objections come out here; work them (below).
 5. time: "Let me put you down for 8 o'clock." Too early? Offer 10. Check their plans and flight: they need 3 free hours that morning with nothing prepaid, and on departure day at least 4 hours before airport pickup.
 6. number: Write slowly and keep making a friend with small questions. Ask for the number with the reason: a manager calls this afternoon between 5 and 6, only to check they can still make it. WhatsApp is fine.
-7. plan: Bring this invitation to confirm the gift. Breakfast, a quick tour, and how to book direct through the loyalty club. Not timeshare (no weeks, points or maintenance fees): a full-service hotel like Hyatt or Hilton, no obligation to be a member. "We only ask families for 90 minutes, and breakfast tends to eat about half of that." Never say 45 minutes or break it into minutes. Every adult brings 2 IDs; one credit card is enough.
+7. plan: Bring this invitation to confirm the gift. Breakfast, a quick tour, and how to book direct through the loyalty club. Not timeshare (no weeks, points or maintenance fees): a full-service hotel like Hyatt or Hilton, no obligation to be a member. "We only ask families for 90 minutes, and breakfast tends to eat about half of that." Never say 45 minutes or break it into minutes. Be open that there is a short presentation about the club ("a little information about the club"); never tell them to hide it. Every adult brings 2 IDs; one credit card is enough.
 8. lockin: "So we see you guys tomorrow at 8 for sure?" Read the answer. "We'll try" or "we'll see": ask again, lots of families want the spot; still unsure, offer to give it to another family. Making it yours helps: "I get a little bonus just for you showing up; you don't have to book or buy anything." A solid no beats a fake yes.
 
 WHO QUALIFIES
@@ -671,6 +671,7 @@ GRADING EACH STEP
 - "good": done well, in the spirit of the lines above. Their own words are fine.
 - "weak": done, but only partly, late, out of order, or in a way that hurt: gift first, an interview of questions, "would you like", minutes, the number with no reason, no second check after "we'll try", a pressure trick.
 - "missed": the chat reached the point where this step belonged, and they skipped it.
+- "lockin" is "good" only when they asked a real check ("So we see you guys tomorrow at 8 for sure?") and read the answer. A plain goodbye like "See you at 8!" is "weak".
 - "na": the chat never got there (the couple walked away first), or the step didn't apply (an NQ couple the promoter rightly let go before inviting them, or a couple who can't come).
 - "qualify": "good" if they found out enough to know the right gift and that the time works, inside the small talk; "weak" if they found out part, or fired questions like an interview; "missed" if they barely asked; "na" only if the couple was gone within the first two lines.
 - "asked": which facts they found out, from: from, age, together, work, card, stay, leave, plans, tour. Count a fact if the couple said it, even unasked.

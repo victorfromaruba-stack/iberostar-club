@@ -367,7 +367,7 @@ async function rpCoach(call){
 }
 
 async function rpLocalCoach(call){
-  const coach = RPCORE.normCoach(await rpAsk(RPCORE.coachPrompt(RP.couple, RP.core, call), { modelTier: "default" }));
+  const coach = RPCORE.normCoach(await rpAsk(RPCORE.coachPrompt(RP.couple, RP.core, call), { modelTier: "quick" }));
   if (!coach) throw Object.assign(new Error("busy"), { code: "busy" });
   return { coach, call, reveal: RPCORE.revealOut(RP.couple), timeline: RPCORE.timelineOf(RP.core), end: RPCORE.endOf(RP.core) };
 }
@@ -380,8 +380,8 @@ function rpScore(coach, call, reveal, end){
   if (q in RP_PTS){ max += 15; if (call === reveal.grade) got += 15 * RP_PTS[q]; }
   if (!max) return null;
   let s = Math.round(got / max * 100);
-  if (end.booked && reveal.grade === "NQ") s = Math.min(s, 50);
-  if (end.booked && !reveal.canBook) s = Math.min(s, 60);
+  if (end.booked && reveal.grade === "NQ") s = Math.min(s, 40);
+  if (end.booked && !reveal.canBook) s = Math.min(s, 45);
   return s;
 }
 const RP_CODE = { good: "g", weak: "w", missed: "m", na: "n" };
