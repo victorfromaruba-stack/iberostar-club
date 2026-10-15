@@ -4,7 +4,7 @@
 
 // deno-lint-ignore no-explicit-any
 type Any = any;
-export interface VoiceCfg { key: string; stt: string; tts: string; fetch?: typeof fetch; base?: string }
+export interface VoiceCfg { key: string; stt: string; tts: string; live?: string; fetch?: typeof fetch; base?: string }
 
 export class VoiceFail extends Error {
   code: string; status: number; detail: string;
@@ -97,4 +97,36 @@ export async function speak(v: VoiceCfg, text: string, voice: string, instructio
   }));
   if (!r.ok) throw await fail(r);
   return toB64(await r.arrayBuffer());
+}
+
+/* A live call: an ephemeral key for one speech-to-speech session (OpenAI Realtime). The phone connects to OpenAI
+   with it directly (WebRTC), so the audio never passes through here. The key can only start a session for the
+   next minute; the session itself carries the couple's instructions and can't be changed into anything else. */
+export async function liveKey(v: VoiceCfg, o: { instructions: string; voice: string; lang: string; names: string[]; tool: Any }): Promise<{ key: string; expires: number; model: string }> {
+  const model = v.live || "gpt-realtime-2.1-mini";
+  const session = (effort: boolean) => ({
+    expires_after: { anchor: "created_at", seconds: 60 },
+    session: {
+      type: "realtime", model, instructions: o.instructions, output_modalities: ["audio"], max_output_tokens: 600,
+      ...(effort ? { reasoning: { effort: "minimal" } } : {}),
+      audio: {
+        input: {
+          noise_reduction: { type: "near_field" },
+          transcription: { model: v.stt, language: o.lang === "es" ? "es" : "en",
+            prompt: `A street promoter in Aruba talks to tourists (${o.names.join(", ")}). Iberostar, Open House, timeshare, Palm Beach, Eagle Beach, Joia, breakfast, gift.` },
+          turn_detection: { type: "semantic_vad", eagerness: "high", create_response: true, interrupt_response: true }
+        },
+        output: { voice: o.voice }
+      },
+      tools: [o.tool], tool_choice: "auto"
+    }
+  });
+  let r = await post(v, "/v1/realtime/client_secrets", () => ({ method: "POST", headers: { Authorization: `Bearer ${v.key}`, "Content-Type": "application/json" }, body: JSON.stringify(session(true)) }));
+  // Some models take no reasoning setting: ask once more without it.
+  if (r.status === 400) r = await post(v, "/v1/realtime/client_secrets", () => ({ method: "POST", headers: { Authorization: `Bearer ${v.key}`, "Content-Type": "application/json" }, body: JSON.stringify(session(false)) }));
+  if (!r.ok) throw await fail(r);
+  const j = await r.json().catch(() => null);
+  const key = String(j?.value || j?.client_secret?.value || "");
+  if (!key) throw new VoiceFail("busy", 503, "openai: no client secret in reply");
+  return { key, expires: Number(j?.expires_at || 0), model };
 }

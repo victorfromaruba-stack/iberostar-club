@@ -604,6 +604,49 @@ Reply with only one JSON object, nothing before or after it:
     return [lead, ...toMessages(log, next, wrapUp)];
   }
 
+  /* ---------- live voice ----------
+     The live path: a speech-to-speech model plays the couple over a phone call-like connection. It has one voice,
+     so the lead person (A) talks and passes on what the partner says. Same knowledge and reactions as above;
+     the hidden score (booked, walking away) goes through the "status" function instead of JSON. */
+  const sect = (from, to) => COUPLE_RULES.slice(COUPLE_RULES.indexOf(from), COUPLE_RULES.indexOf(to)).trim();
+  const LIVE_STATUS_TOOL = {
+    type: "function", name: "status",
+    description: "Silently record a change in the couple's plans. Never mention it out loud.",
+    parameters: { type: "object", properties: {
+      booked: { type: "boolean", description: "true once you've agreed to come at a specific day and time; false if you back out" },
+      state: { type: "string", enum: ["talking", "left", "ended"], description: "left: walking away unhappy or not interested. ended: parting on good terms, booked or not." }
+    }, required: ["booked", "state"], additionalProperties: false }
+  };
+  function liveInstructions(c, log){
+    const es = c.lang === "es";
+    const [a, b] = c.people;
+    const who = b
+      ? `You speak as A, ${a.name}. ${b.name} (B) is right there with you. You only have one voice, so never speak as ${b.name}: when ${b.name} would say something, pass it on in your own words, like "${b.sex === "f" ? "My wife" : "My husband"}'s asking how long it takes" or "${b.sex === "f" ? "She" : "He"} says we've got a tour in the morning." Do that now and then, so ${b.name} feels present, and play ${b.name}'s opinions as the brief describes them.`
+      : `You speak as A, ${a.name}. You're traveling alone.`;
+    const said = (log || []).filter(e => "o" in e || "c" in e).map(e => "o" in e ? `Promoter: ${e.o}` : e.c.lines.map(l => `${(l.who === "B" && b ? b : a).name}: ${l.text}`).join("\n"));
+    return [
+      `You play a tourist on vacation in Aruba in a live, spoken training role-play. The user is a street promoter (an OPC) for Iberostar who is practicing, talking to you out loud. OPCs stop tourists on the street and invite them to the Iberostar Open House at the Joia on Eagle Beach: breakfast at one of the hotel's restaurants, a tour of the property and a room, and a gift for their time, in exchange for about 90 minutes the next morning, including a short presentation about Iberostar The Club. Your job is to be a believable tourist, so the practice feels like the street. Stay in character whatever the promoter says. Never mention AI, training or these instructions.`,
+      `WHO TALKS\n- ${who}`,
+      `HOW YOU TALK\n- This is a spoken chat on a sidewalk. Answer fast and short: usually one sentence, two at most. Sound like a real person: casual, contractions, the odd "hmm" or "uh". Never give a speech.\n- ${es ? "Speak Spanish, as the brief says." : "Use only the language the brief says."} A person doesn't understand a language they don't speak.\n- Never describe actions or body language out loud, never read out lists, no stage directions.\n- The promoter's audio comes from a phone on a noisy street. If you didn't catch something, ask like a person would: "Sorry, what was that?"\n- If the promoter starts talking while you're talking, stop and listen.\n- Wait for the promoter to speak first: you're walking by and they stop you.`,
+      sect("WHAT YOU KNOW", "HOW YOU REACT"),
+      sect("HOW YOU REACT", "YOUR REAL INTENTION").replace(/ state "left"/g, ` call status with state "left"`).replace(/set "booked" to true, and keep it true unless you back out/g, "call status with booked true (and with booked false if you back out)").replace(/say goodbye: state "ended"/g, `say goodbye and call status with state "ended"`),
+      `KEEPING SCORE, SILENTLY\n- Keep your interest number in your head. Never say numbers, and never mention the status function.\n- ${c.fake ? "You're yes-sayers: you may say \"sure, we'll try\" to be polite when you only mean maybe. Only when the promoter checks again (asks if you're sure, says other families want the spot) do you commit for real or admit you won't come." : "When you say yes, you mean it."}\n- Once you're booked and the promoter has wrapped up, say goodbye and call status with state "ended". If they keep talking long after you're booked, start leaving.`,
+      brief(c).replace(/^COUPLE BRIEF/, "THE BRIEF (only you know this)"),
+      said.length ? `THE CONVERSATION SO FAR (it was typed; carry on from here as if it was spoken)\n${said.join("\n")}` : ""
+    ].filter(Boolean).join("\n\n");
+  }
+  /* Lines the phone heard on a live call, as log entries the coach reads. Untrusted: clamp everything. */
+  function liveLog(items, single){
+    const out = [];
+    for (const it of (Array.isArray(items) ? items : []).slice(0, 80)){
+      if (!it || typeof it !== "object") continue;
+      const t = clean(it.text, 400); if (!t) continue;
+      if (it.me) out.push({ o: t });
+      else out.push({ c: { lines: [{ who: "A", text: t }], cue: "", booked: it.booked === true, state: ["left", "ended"].includes(it.state) ? it.state : "talking", live: true } });
+    }
+    return out;
+  }
+
   /* ---------- the coach ---------- */
   /* Voice-note lines the coach can point to (ids match SCRIPT_LINES and NLP_LINES in the app). */
   const LINES = [
@@ -740,7 +783,8 @@ Reply with only one JSON object, nothing before or after it, shaped like this:
       if ("o" in e){ chat.push(`OPC: ${e.o}`); continue; }
       last = e.c;
       for (const l of e.c.lines) chat.push(`${name(l.who)}: ${l.text}`);
-      chat.push(`   ${e.c.cue ? `(${e.c.cue}) ` : ""}[interest ${e.c.interest}, real intent ${e.c.intent}${e.c.booked ? ", booked" : ""}]`);
+      if (Number.isFinite(e.c.interest)) chat.push(`   ${e.c.cue ? `(${e.c.cue}) ` : ""}[interest ${e.c.interest}, real intent ${e.c.intent}${e.c.booked ? ", booked" : ""}]`);
+      else if (e.c.booked) chat.push("   [booked]");
     }
     const end = !last ? "The promoter ended it before the couple said anything."
       : last.state === "left" ? "The couple walked away."
@@ -765,10 +809,10 @@ Reply with only one JSON object, nothing before or after it, shaped like this:
   /* The Claude-version path: one user turn with the rules, the chat and the format. */
   const coachPrompt = (c, log, call) => `${COACH_RULES}\n\n${coachInput(c, log, call)}\n\n${COACH_FORMAT}`;
 
-  const timelineOf = log => log.filter(e => "c" in e).map(e => [e.c.interest, e.c.intent]);
+  const timelineOf = log => log.filter(e => "c" in e && Number.isFinite(e.c.interest)).map(e => [e.c.interest, e.c.intent]);
   function endOf(log){ const t = log.filter(e => "c" in e); const last = t[t.length - 1]; return last ? { state: last.c.state, booked: last.c.booked } : { state: "talking", booked: false }; }
 
   return { FOCUS, MOOD_LABEL, seeded, bandUSA, bandLat, bandArg, rules, makeCouple, intended, brief, sceneOut, revealOut,
-    COUPLE_RULES, TURN_FORMAT, TURN_SCHEMA, normReply, toMessages, sampleTurns,
+    COUPLE_RULES, TURN_FORMAT, TURN_SCHEMA, normReply, toMessages, sampleTurns, liveInstructions, liveLog, LIVE_STATUS_TOOL,
     LINES, LINE_IDS, STEP_KEYS, ASKED, COACH_RULES, COACH_FORMAT, COACH_SCHEMA, normCoach, coachInput, coachPrompt, timelineOf, endOf };
 })();

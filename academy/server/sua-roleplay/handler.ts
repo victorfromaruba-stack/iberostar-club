@@ -1,7 +1,7 @@
 /* Street practice: the request handler. index.ts wires in the Anthropic SDK and the database;
    tests wire in mocks. Every reply to the phone is { err } or the data it asked for. */
 import "./street-core.js";
-import { type VoiceCfg, VoiceFail, MAX_AUDIO_B64, audioIn, transcribe, speak, voiceFor, styleFor } from "./voice.ts";
+import { type VoiceCfg, VoiceFail, MAX_AUDIO_B64, audioIn, transcribe, speak, voiceFor, styleFor, liveKey } from "./voice.ts";
 
 // deno-lint-ignore no-explicit-any
 const RP = (globalThis as any).RPCORE;
@@ -9,6 +9,7 @@ const RP = (globalThis as any).RPCORE;
 type Couple = any; type LogEntry = any; type Reply = any; type Coach = any;
 
 export const MAX_TURNS = 24;
+export const LIVE_BEFORE = 6;   // a live call can start until this many turns (each call and each save is one)
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ORIGINS = ["https://victorfromaruba-stack.github.io", "http://localhost", "http://127.0.0.1"];
 
@@ -115,14 +116,14 @@ export function makeHandler(d: Deps){
     try {
       if (op === "status"){
         const u = dbErr(await d.db("sua_rp_status", who));
-        return json({ on: true, voice: !!d.voice, left: Math.max(0, d.mine - Number(u.mine || 0)), teamFull: Number(u.team || 0) >= d.team }, 200, h);
+        return json({ on: true, voice: !!d.voice, live: !!d.voice, left: Math.max(0, d.mine - Number(u.mine || 0)), teamFull: Number(u.team || 0) >= d.team }, 200, h);
       }
 
       if (op === "start"){
         const focus = RP.FOCUS.includes(body.focus) ? body.focus : "any";
         const c = RP.makeCouple(focus, body.lang === "es" ? "es" : "en");
         const r = dbErr(await d.db("sua_rp_start", { ...who, p_couple: c, p_mine: d.mine, p_team: d.team }));
-        return json({ chat: r.chat, left: r.left, max: MAX_TURNS, voice: !!d.voice, scene: RP.sceneOut(c) }, 200, h);
+        return json({ chat: r.chat, left: r.left, max: MAX_TURNS, voice: !!d.voice, live: !!d.voice, scene: RP.sceneOut(c) }, 200, h);
       }
 
       const chat = String(body.chat || "");
@@ -158,6 +159,33 @@ export function makeHandler(d: Deps){
         }
         return json({ lines: reply.lines, cue: reply.cue, state: reply.state, booked: reply.booked, turns: r.turns + 1, max: MAX_TURNS,
                       ...(audio ? { heard: text } : {}), ...(voices ? { audio: voices } : {}) }, 200, h);
+      }
+
+      /* A live call: mint the phone a key for one speech-to-speech session with this couple. The chat is marked
+         used first (one turn), so calls count toward the daily limits even if nothing is saved after. */
+      if (op === "live"){
+        if (!d.voice) return json({ err: "noear" }, 503, h);
+        const r = dbErr(await d.db("sua_rp_load", { ...who, p_chat: chat, p_mine: d.mine, p_team: d.team }));
+        if (r.state !== "talking" || r.turns >= LIVE_BEFORE) throw new Fail("over", 409);
+        const c = r.couple as Couple, log = (r.log || []) as LogEntry[];
+        const ok = await d.db("sua_rp_save", { p_chat: chat, p_turns: r.turns, p_log: log, p_state: "talking" });
+        if (ok !== true) throw new Fail("busy", 409);
+        const t0 = Date.now();
+        const k = await liveKey(d.voice, { instructions: RP.liveInstructions(c, log), voice: voiceFor(c, 0), lang: c.lang, names: c.people.map((p: Any) => p.name), tool: RP.LIVE_STATUS_TOOL });
+        d.log({ what: "live", model: k.model, ms: Date.now() - t0 });
+        return json({ key: k.key, expires: k.expires, model: k.model, turns: r.turns + 1 }, 200, h);
+      }
+
+      /* What was said on a live call, as the phone heard it, added to the chat for the coach (and for typing on). */
+      if (op === "live_save"){
+        const r = dbErr(await d.db("sua_rp_load", { ...who, p_chat: chat, p_mine: d.mine, p_team: d.team }));
+        if (r.state !== "talking") throw new Fail("over", 409);
+        const add = RP.liveLog(body.items, (r.couple as Couple).people.length === 1);
+        const state = ["left", "ended"].includes(body.state) ? body.state : "talking";
+        const log = [...((r.log || []) as LogEntry[]), ...add];
+        const ok = await d.db("sua_rp_save", { p_chat: chat, p_turns: r.turns, p_log: log, p_state: state });
+        if (ok !== true) throw new Fail("busy", 409);
+        return json({ ok: true, turns: r.turns + 1, state, added: add.length }, 200, h);
       }
 
       if (op === "coach"){

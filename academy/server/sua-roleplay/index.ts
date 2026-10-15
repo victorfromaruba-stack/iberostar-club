@@ -6,7 +6,9 @@
    SUA_RP_TEAM_DAY (chats per day for everyone, default 150).
    Voice: with SUA_OPENAI_KEY set, the phone records the promoter and this function transcribes it
    (SUA_STT_MODEL, default gpt-4o-mini-transcribe) and reads the couple's lines in natural voices
-   (SUA_TTS_MODEL, default gpt-4o-mini-tts). Without it, phones use their own speech recognition and voices.
+   (SUA_TTS_MODEL, default gpt-4o-mini-tts). The same key runs live calls: the phone talks straight to OpenAI's
+   speech-to-speech model (SUA_LIVE_MODEL, default gpt-realtime-2.1-mini) with a one-minute key from here, and
+   Claude scores the call after. Without it, phones use their own speech recognition and voices.
    street-core.js is a copy of academy/src/street-core.js, made by build.py. */
 import Anthropic from "npm:@anthropic-ai/sdk@0.133.0";
 import { makeHandler } from "./handler.ts";
@@ -38,7 +40,7 @@ Deno.serve(makeHandler({
     busy: [Anthropic.RateLimitError, Anthropic.InternalServerError, Anthropic.APIConnectionError],
     bad: Anthropic.BadRequestError
   },
-  voice: openai ? { key: openai, stt: env("SUA_STT_MODEL") || "gpt-4o-mini-transcribe", tts: env("SUA_TTS_MODEL") || "gpt-4o-mini-tts" } : null,
+  voice: openai ? { key: openai, stt: env("SUA_STT_MODEL") || "gpt-4o-mini-transcribe", tts: env("SUA_TTS_MODEL") || "gpt-4o-mini-tts", live: env("SUA_LIVE_MODEL") || "gpt-realtime-2.1-mini" } : null,
   db, model, coachModel: env("SUA_COACH_MODEL") || model,
   mine: num(env("SUA_RP_PER_DAY"), 6, 1, 50), team: num(env("SUA_RP_TEAM_DAY"), 150, 1, 5000),
   log: o => console.log(JSON.stringify(o))
