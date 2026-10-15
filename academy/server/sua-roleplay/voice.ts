@@ -34,7 +34,9 @@ async function fail(r: Response): Promise<VoiceFail> {
   let why = "";
   try { const j = await r.json(); why = [j?.error?.code, j?.error?.type, String(j?.error?.message || "").slice(0, 160)].filter(Boolean).join(" | "); } catch { /* not JSON */ }
   const detail = `openai ${r.status}${why ? ": " + why : ""}`;
-  return r.status === 401 || r.status === 403 ? new VoiceFail("noear", 503, detail) : new VoiceFail("busy", 503, detail);
+  // A bad key or an empty balance won't fix itself in a moment: the phone switches to its own voice or typing.
+  const dead = r.status === 401 || r.status === 403 || /insufficient_quota|credit_balance_exhausted|billing/i.test(why);
+  return new VoiceFail(dead ? "noear" : "busy", 503, detail);
 }
 
 /* The promoter's words. Names, places and the pitch's own words help the model spell them right. */
