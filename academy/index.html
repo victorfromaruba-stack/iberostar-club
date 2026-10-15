@@ -645,36 +645,68 @@ details[open]>summary::after{transform:rotate(-135deg) translateY(-3px)}
 /* Street practice as a voice call */
 .rp.call .rp-log,.rp.call .rp-say{display:none}
 .rp:not(.call) .rp-stage,.rp:not(.call) .rp-callbar{display:none}
-.rp.call .rp-scene{padding:10px 12px}
-.rp-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:8px 0;text-align:center}
-.rp-people{display:flex;gap:clamp(18px,8vw,40px);justify-content:center}
-.rp-person{display:flex;flex-direction:column;align-items:center;gap:8px}
-.rp-face{width:clamp(84px,26vw,112px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:var(--flamingo);color:var(--on-flamingo);font:800 40px/1 var(--f-display);transition:transform .15s,box-shadow .15s}
-.rp-face .ic{width:46%;height:46%}
-.rp-person.p1 .rp-face{background:var(--sea);color:var(--on-sea)}
-.rp-person.talking .rp-face{transform:scale(1.07);box-shadow:0 0 0 9px var(--flamingo-soft);animation:talkpulse 1s ease-in-out infinite}
-.rp-person.p1.talking .rp-face{box-shadow:0 0 0 9px var(--sea-soft)}
-.rp-person .rp-who{font-size:13px}
-.rp-person.p1 .rp-who{color:var(--sea-ink)}
-.rp-cap{min-height:1.4em;display:flex;flex-direction:column;gap:6px;align-items:center;max-width:34ch;font-size:16px}
+.rp.call{gap:12px}
+.rp.call .rp-scene{padding:10px 14px 12px;gap:6px;border-bottom-width:2px}
+.rp.call .rp-scene>p{font-size:15px}
+.rp.call .rp-scene li{font-size:14px;grid-template-columns:18px 1fr}
+.rp.call .rp-scene li .ic{width:18px;height:18px}
+.lesson.rp.call{height:calc(100dvh - 24px);min-height:0}
+.rp-stage{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:14px;padding:4px 0 8px;text-align:center}
+.rp-stage>:first-child{margin-top:auto} .rp-stage>:last-child{margin-bottom:auto}
+.rp-people{display:flex;gap:clamp(20px,9vw,44px);justify-content:center}
+.rp-person{display:flex;flex-direction:column;align-items:center;gap:6px;--c:var(--flamingo);--t:var(--on-flamingo);--k:var(--flamingo-ink)}
+.rp-person.p1{--c:var(--sea);--t:var(--on-sea);--k:var(--sea-ink)}
+.rp-face{width:min(26vw,13dvh,104px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:var(--c);color:var(--t);font:800 38px/1 var(--f-display);
+  box-shadow:0 0 0 4px var(--surface),0 0 0 6px var(--line);transition:transform .2s,box-shadow .2s}
+.rp-face .ic{width:44%;height:44%}
+.rp-person.talking .rp-face{transform:scale(1.06);box-shadow:0 0 0 4px var(--surface),0 0 0 9px var(--c)}
+.rp-person .rp-who{font-size:13px;color:var(--k)}
+.rp-wave{display:flex;gap:3px;align-items:flex-end;height:14px;color:var(--c);opacity:0;transition:opacity .2s}
+.rp-wave i{width:4px;height:5px;border-radius:2px;background:currentColor}
+.rp-person.talking .rp-wave{opacity:1}
+.rp-person.talking .rp-wave i{animation:wave .9s ease-in-out infinite}
+.rp-wave i:nth-child(2){animation-delay:-.6s!important} .rp-wave i:nth-child(3){animation-delay:-.3s!important} .rp-wave i:nth-child(4){animation-delay:-.75s!important}
+@keyframes wave{0%,100%{height:4px}50%{height:14px}}
+.rp-status{display:inline-flex;align-items:center;gap:9px;padding:8px 16px 8px 13px;border-radius:999px;background:var(--surface);border:2px solid var(--line);font:800 16px/1.2 var(--f-body);min-height:40px}
+.rp-status:empty{visibility:hidden}
+.rp-status::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--line-2);flex:none}
+.rp-status[data-state="listen"]::before{background:var(--bad);animation:pulseb .9s ease-in-out infinite}
+.rp-status[data-state="think"]::before{background:var(--sun)}
+.rp-status[data-state="talk"]::before{background:var(--good)}
+.rp-cap{display:flex;flex-direction:column;gap:6px;align-items:center;max-width:min(100%,36ch);font-size:15px}
 .rp-cap:empty{display:none}
 .rp-sees{display:inline-flex;gap:6px;align-items:center;font-style:italic;color:var(--muted)}
 .rp-sees .ic{width:16px;height:16px;flex:none}
+.rp-said{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:7px 12px;text-align:left;font-size:16px}
 .rp-said b{font-weight:900}
 .rp-err-call{color:var(--bad-ink);font-weight:800}
-.rp-status{font:800 19px/1.3 var(--f-body);min-height:1.3em}
-.rp-heard{min-height:1.4em;max-width:34ch;font-size:16px;color:var(--muted);overflow-wrap:anywhere}
-.rp-callbar{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:auto}
-.rp-bigmic{width:84px;height:84px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--sea);color:var(--on-sea);box-shadow:0 5px 0 var(--sea-2);transition:transform .08s,box-shadow .08s}
-.rp-bigmic .ic{width:36px;height:36px}
+.rp-heard{min-height:1.4em;max-width:min(100%,34ch);font-size:16px;font-style:italic;color:var(--muted);overflow-wrap:anywhere}
+.rp-heard:not(:empty)::before{content:"\201C"} .rp-heard:not(:empty)::after{content:"\201D"}
+.rp-callbar{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:auto;border-top-color:transparent}
+.rp-bigmic{width:clamp(64px,10dvh,80px);aspect-ratio:1;border-radius:50%;border:0;display:grid;place-items:center;background:var(--sea);color:var(--on-sea);box-shadow:0 5px 0 var(--sea-2);transition:transform .08s,box-shadow .08s}
+.rp-bigmic .ic{width:42%;height:42%}
 .rp-bigmic:active{transform:translateY(4px);box-shadow:none}
 .rp-bigmic.listening{background:var(--bad);color:var(--on-bad);box-shadow:0 5px 0 var(--bad-2);animation:pulseb .9s ease-in-out infinite}
-.rp-callopts{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
-.rp-callopts .link,.rp-tocall{min-height:44px}
-.rp-tocall{grid-column:1/-1;justify-self:start;display:inline-flex;gap:6px;align-items:center}
+.rp-miclabel{font:800 14px/1.2 var(--f-body);color:var(--muted)}
+.rp-callopts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.rp-opt{display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:6px 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:800 14px/1 var(--f-body)}
+.rp-opt .ic{width:17px;height:17px;color:var(--sea)}
+.rp-opt .cc{font:900 10px/1 var(--f-body);letter-spacing:.04em;border:2px solid currentColor;border-radius:4px;padding:2px 3px;color:var(--sea)}
+.rp-opt[aria-pressed="true"]{background:var(--sea-soft);border-color:var(--sea);color:var(--sea-ink)}
+.rp-tocall{grid-column:1/-1;justify-self:start;display:inline-flex;gap:6px;align-items:center;min-height:44px}
 .rp-tocall .ic{width:18px;height:18px}
-@keyframes talkpulse{50%{transform:scale(1.12)}}
-@media (prefers-reduced-motion:reduce){.rp-person.talking .rp-face,.rp-bigmic.listening{animation:none}}
+@media (max-width:359px){.rp.call .rp-title .eyebrow{display:none}}
+@media (max-height:700px){
+  .rp.call{gap:10px}
+  .rp-stage{gap:8px}
+  .rp-face{width:min(22vw,11dvh,104px)}
+  .rp-person{gap:4px}
+  .rp-status{min-height:36px;padding-block:6px;font-size:15px}
+  .rp-callbar{gap:4px;padding-top:8px}
+  .rp-bigmic{width:60px}
+  .rp-opt{min-height:40px}
+}
+@media (prefers-reduced-motion:reduce){.rp-person.talking .rp-wave i,.rp-bigmic.listening,.rp-status::before{animation:none}}
 </style>
 </head>
 <body>
@@ -3442,7 +3474,7 @@ function speakLines(lines, done){
     if (v){ u.voice = v; u.lang = v.lang; } else u.lang = lang === "es" ? "es-MX" : "en-US";
     u.pitch = p.sex === "m" ? .9 : 1.1; u.rate = 1.03;
     const i = l.who === "B" ? 1 : 0;
-    u.onstart = () => { rpTalking(i); rpStatus(`${rpWho(i)} is talking…`); };
+    u.onstart = () => { rpTalking(i); rpStatus(`${rpWho(i)} is talking…`, "talk"); };
     if (l === lines[lines.length - 1]) u.onend = u.onerror = () => { rpTalking(-1); fin(); };
     try { TTS.speak(u); } catch(e){}
   }
@@ -3554,12 +3586,15 @@ function rpThem(l){
 const rpCue = text => rpAppend(`${icon("eye")}<span>${esc(text)}</span>`, "rp-cue");
 /* The voice call: faces, a status line and captions instead of chat bubbles. The bubbles still fill the
    hidden log, so "Type instead" shows the whole conversation so far. */
-function rpStatus(t){ const el = $("#rpStatus"); if (el) el.textContent = t; }
+/* On short phones the stage scrolls; keep the newest words in view. */
+function rpStageEnd(){ const st = $(".rp-stage"); if (st && st.scrollHeight > st.clientHeight) st.scrollTop = st.scrollHeight; }
+function rpStatus(t, state = ""){ const el = $("#rpStatus"); if (el){ el.textContent = t; el.dataset.state = state; rpStageEnd(); } }
 function rpTalking(i){ app.querySelectorAll(".rp-person").forEach(el => el.classList.toggle("talking", +el.dataset.p === i)); }
 function rpCaption(lines, cue){
   const cap = $("#rpCap"); if (!cap) return;
   const said = (S.rpCC || S.rpVoice === false) ? lines.map(l => `<span class="rp-said"><b>${esc(rpWho(l.who === "B" ? 1 : 0))}:</b> ${esc(l.text)}</span>`).join("") : "";
   cap.innerHTML = (cue ? `<span class="rp-sees">${icon("eye")}${esc(cue)}</span>` : "") + said;
+  rpStageEnd();
 }
 function rpMode(call){
   const root = app.querySelector(".rp"); if (!root || !RP) return;
@@ -3591,14 +3626,15 @@ function streetChat(j, couple){
       ${sc.lang === "es" ? `<p class="small muted">This one is in Spanish. Pitch in Spanish.</p>` : ""}
     </section>
     ${SR ? `<section class="rp-stage" aria-label="The call">
-      <div class="rp-people">${sc.people.map((p, i) => `<div class="rp-person p${i}" data-p="${i}"><span class="rp-face" aria-hidden="true">${rpAvatar(i)}</span><b class="rp-who">${esc(rpWho(i))}</b></div>`).join("")}</div>
+      <div class="rp-people">${sc.people.map((p, i) => `<div class="rp-person p${i}" data-p="${i}"><span class="rp-face" aria-hidden="true">${rpAvatar(i)}</span><b class="rp-who">${esc(rpWho(i))}</b><span class="rp-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>`).join("")}</div>
       <p class="rp-cap" id="rpCap"></p>
       <p class="rp-status" id="rpStatus" aria-live="polite">Tap the mic and say hello.</p>
       <p class="rp-heard" id="rpHeard"></p>
     </section>
     <div class="l-foot rp-callbar">
       <button type="button" class="rp-bigmic" id="rpTalk" aria-pressed="false" aria-label="Talk">${icon("mic")}</button>
-      <div class="rp-callopts"><button type="button" class="link" id="rpCC" aria-pressed="${!!S.rpCC}">Captions: ${S.rpCC ? "on" : "off"}</button><button type="button" class="link" id="rpType">Type instead</button></div>
+      <p class="rp-miclabel" id="rpMicLabel" aria-hidden="true">Tap to talk</p>
+      <div class="rp-callopts"><button type="button" class="rp-opt" id="rpCC" aria-pressed="${!!S.rpCC}"><span class="cc">CC</span>Captions</button><button type="button" class="rp-opt" id="rpType">${icon("chat")}Type instead</button></div>
     </div>` : ""}
     <div class="rp-log" id="rpLog" role="log" aria-label="The conversation"></div>
     <form class="l-foot rp-say" id="rpForm" autocomplete="off">
@@ -3619,7 +3655,7 @@ function streetChat(j, couple){
   on("#rpTalk", rpMic);
   on("#rpType", () => rpMode(false));
   on("#rpToCall", () => rpMode(true));
-  on("#rpCC", () => { S.rpCC = !S.rpCC; save(false); const b = $("#rpCC"); b.setAttribute("aria-pressed", String(S.rpCC)); b.textContent = `Captions: ${S.rpCC ? "on" : "off"}`;
+  on("#rpCC", () => { S.rpCC = !S.rpCC; save(false); $("#rpCC").setAttribute("aria-pressed", String(S.rpCC));
     const last = [...RP.log].reverse().find(e => e.them); if (last) rpCaption(last.them, last.cue); });
   on("#rpVoice", () => { S.rpVoice = S.rpVoice === false; save(false); const b = $("#rpVoice"); b.setAttribute("aria-pressed", String(S.rpVoice)); b.innerHTML = icon(S.rpVoice ? "sound" : "mute"); if (!S.rpVoice) stopSpeak(); });
   on("#rpDone", () => rpEnd("done"));
@@ -3635,7 +3671,7 @@ async function rpSend(raw, retry){
   let mine = retry;
   if (!retry){ rpLearn(text); mine = rpMe(text); const b = $("#rpText"); if (b){ b.value = ""; rpGrow(); } }
   else retry.querySelector(".rp-err")?.remove();
-  rpStatus("They're thinking…"); const cap0 = $("#rpCap"); if (cap0) cap0.textContent = "";
+  rpStatus("They're thinking…", "think"); const cap0 = $("#rpCap"); if (cap0) cap0.textContent = "";
   const typing = rpAppend(`<span class="rp-av" aria-hidden="true">${icon("user")}</span><div class="rp-b"><span class="dots" role="img" aria-label="They're answering"><i></i><i></i><i></i></span></div>`, "rp-msg them typing");
   try {
     const r = RP.couple ? await rpLocalTurn(text) : await rpCall("turn", { chat: RP.chat, text });
@@ -3696,6 +3732,7 @@ function rpMicUI(on){
   ["#rpMic", "#rpTalk"].forEach(sel => { const btn = $(sel); if (!btn) return;
     btn.classList.toggle("listening", on); btn.setAttribute("aria-pressed", String(on));
     btn.setAttribute("aria-label", on ? "Stop talking" : "Talk"); btn.innerHTML = icon(on ? "stop" : "mic"); });
+  const lab = $("#rpMicLabel"); if (lab) lab.textContent = on ? "Listening · tap to pause" : "Tap to talk";
   if (!on && RP && !RP.busy && RP.state === "talking" && !REC) rpStatus(RP.talk ? "Your turn." : "Tap the mic to talk.");
 }
 function rpMic(){
@@ -3714,7 +3751,7 @@ function rpListen(){
   rec.lang = RP.scene.lang === "es" ? "es-MX" : "en-US"; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 1;
   RP.sendOnEnd = false;
   rpMicUI(true); rpHint("Listening… just talk. I send it when you pause.");
-  rpStatus("Listening…"); const heard = $("#rpHeard"); if (heard) heard.textContent = "";
+  rpStatus("Listening…", "listen"); const heard = $("#rpHeard"); if (heard) heard.textContent = "";
   rec.onresult = e => {
     let said = "";
     for (const r of e.results) said += r[0].transcript + (r.isFinal ? " " : "");
