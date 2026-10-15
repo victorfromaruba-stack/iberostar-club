@@ -622,3 +622,37 @@ details[open]>summary::after{transform:rotate(-135deg) translateY(-3px)}
 @media (max-width:380px){.stats{gap:6px}.stat .v{font-size:20px;gap:4px;padding-inline:2px}.stat .v .ic{width:18px;height:18px}.opts.grid3{gap:6px}
   .tile-card{grid-template-columns:44px 1fr auto;gap:10px}.tile-card .ico{width:44px;height:44px;border-radius:12px}.tile-card .ico .ic{width:26px;height:26px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* Street practice as a voice call */
+.rp.call .rp-log,.rp.call .rp-say{display:none}
+.rp:not(.call) .rp-stage,.rp:not(.call) .rp-callbar{display:none}
+.rp.call .rp-scene{padding:10px 12px}
+.rp-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:8px 0;text-align:center}
+.rp-people{display:flex;gap:clamp(18px,8vw,40px);justify-content:center}
+.rp-person{display:flex;flex-direction:column;align-items:center;gap:8px}
+.rp-face{width:clamp(84px,26vw,112px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:var(--flamingo);color:var(--on-flamingo);font:800 40px/1 var(--f-display);transition:transform .15s,box-shadow .15s}
+.rp-face .ic{width:46%;height:46%}
+.rp-person.p1 .rp-face{background:var(--sea);color:var(--on-sea)}
+.rp-person.talking .rp-face{transform:scale(1.07);box-shadow:0 0 0 9px var(--flamingo-soft);animation:talkpulse 1s ease-in-out infinite}
+.rp-person.p1.talking .rp-face{box-shadow:0 0 0 9px var(--sea-soft)}
+.rp-person .rp-who{font-size:13px}
+.rp-person.p1 .rp-who{color:var(--sea-ink)}
+.rp-cap{min-height:1.4em;display:flex;flex-direction:column;gap:6px;align-items:center;max-width:34ch;font-size:16px}
+.rp-cap:empty{display:none}
+.rp-sees{display:inline-flex;gap:6px;align-items:center;font-style:italic;color:var(--muted)}
+.rp-sees .ic{width:16px;height:16px;flex:none}
+.rp-said b{font-weight:900}
+.rp-err-call{color:var(--bad-ink);font-weight:800}
+.rp-status{font:800 19px/1.3 var(--f-body);min-height:1.3em}
+.rp-heard{min-height:1.4em;max-width:34ch;font-size:16px;color:var(--muted);overflow-wrap:anywhere}
+.rp-callbar{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:auto}
+.rp-bigmic{width:84px;height:84px;border-radius:50%;border:0;display:grid;place-items:center;background:var(--sea);color:var(--on-sea);box-shadow:0 5px 0 var(--sea-2);transition:transform .08s,box-shadow .08s}
+.rp-bigmic .ic{width:36px;height:36px}
+.rp-bigmic:active{transform:translateY(4px);box-shadow:none}
+.rp-bigmic.listening{background:var(--bad);color:var(--on-bad);box-shadow:0 5px 0 var(--bad-2);animation:pulseb .9s ease-in-out infinite}
+.rp-callopts{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+.rp-callopts .link,.rp-tocall{min-height:44px}
+.rp-tocall{grid-column:1/-1;justify-self:start;display:inline-flex;gap:6px;align-items:center}
+.rp-tocall .ic{width:18px;height:18px}
+@keyframes talkpulse{50%{transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.rp-person.talking .rp-face,.rp-bigmic.listening{animation:none}}

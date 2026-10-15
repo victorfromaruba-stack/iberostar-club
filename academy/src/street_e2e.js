@@ -65,6 +65,7 @@ const TEAMROWS = [
     });
     await p.goto(url, { waitUntil: "load" });
     await p.waitForTimeout(300);
+    await p.evaluate(m => { S.rpMode = m; save(false); }, mode.voice ? "voice" : "text");
     return p;
   };
   const axe = async (p, label) => {
@@ -166,6 +167,39 @@ const TEAMROWS = [
   await p.screenshot({ path: `${out}/07-me.png`, fullPage: true });
   ok("no errors in flow", p.errors.length === 0, p.errors.join(" | "));
 
+  /* 1b. The voice call: faces and a status line, no chat bubbles */
+  const v = await mk({}, { voice: true });
+  await v.evaluate(() => { S.name = "Voice T."; S.sync.ok = true; S.rpCC = false; save(false); });
+  await v.click('.tabs button[data-tab="games"]'); await v.click("#rp"); await v.click("#rpGo");
+  await v.waitForSelector("#rpTalk", { timeout: 4000 });
+  ok("call: opens as a voice call, no text box", !!(await v.$(".rp.call")) && await v.isVisible("#rpTalk") && !(await v.isVisible("#rpText")) && (await v.$$(".rp-person")).length === 2);
+  ok("call: says what to do", (await v.textContent("#rpStatus")).includes("Tap the mic"));
+  await axe(v, "voice call"); await overflow(v, "voice call");
+  await v.screenshot({ path: `${out}/05-call.png` });
+  await v.evaluate(() => { window.__sayText = "Good morning folks! Where are you from?"; });
+  await v.click("#rpTalk"); await v.waitForTimeout(150);
+  ok("call: shows the words it hears, live", (await v.textContent("#rpHeard")).includes("Where are you from") && (await v.textContent("#rpStatus")).includes("Listening"));
+  await v.waitForFunction(() => document.querySelectorAll(".rp-msg.me").length === 1, null, { timeout: 4000 });
+  await v.evaluate(() => { window.__sayText = ""; });
+  ok("call: a pause sends it", true);
+  await v.waitForFunction(() => document.querySelectorAll(".rp-msg.them:not(.typing)").length >= 1, null, { timeout: 4000 });
+  await v.waitForTimeout(200);
+  const cap = await v.textContent("#rpCap");
+  ok("call: shows what you'd see, not their words (captions off)", cap.includes("They slow down") && !cap.includes("We're good"), cap);
+  ok("call: their lines are spoken", (await v.evaluate(() => window.__spoken.length)) >= 2);
+  await v.waitForFunction(() => document.querySelector("#rpTalk").getAttribute("aria-pressed") === "true", null, { timeout: 4000 }).catch(() => {});
+  ok("call: listens again after they answer", (await v.getAttribute("#rpTalk", "aria-pressed")) === "true");
+  await v.screenshot({ path: `${out}/06-call-listening.png` });
+  await v.click("#rpTalk"); await v.waitForTimeout(200);
+  ok("call: tap the mic to pause", (await v.getAttribute("#rpTalk", "aria-pressed")) === "false" && (await v.textContent("#rpStatus")).includes("Tap the mic"));
+  await v.click("#rpCC");
+  ok("call: captions show their words", (await v.textContent("#rpCap")).includes("We're good"));
+  await v.click("#rpType");
+  ok("call: type instead shows the whole chat", !(await v.$(".rp.call")) && await v.isVisible("#rpText") && (await v.$$(".rp-msg.them:not(.typing)")).length >= 2);
+  await v.click("#rpToCall");
+  ok("call: and back to the call", !!(await v.$(".rp.call")));
+  ok("no errors in the call", v.errors.length === 0, v.errors.join(" | "));
+
   /* 2. Off: the owner hasn't added the key */
   const q = await mk({}, { off: true });
   await q.evaluate(() => { S.name = "Off Test"; S.sync.ok = true; save(false); });
@@ -233,6 +267,7 @@ const TEAMROWS = [
   c.on("pageerror", e => c.errors.push("pageerror: " + e.message));
   await c.route("**/functions/v1/**", r => { c.errors.push("called the function: " + r.request().url()); r.abort(); });
   await c.goto(OTHER, { waitUntil: "load" }); await c.waitForTimeout(300);
+  await c.evaluate(() => { S.rpMode = "text"; save(false); });
   await c.click('.tabs button[data-tab="games"]'); await c.click("#rp");
   await c.waitForFunction(() => /Free: it runs on your own Claude account/.test(document.querySelector("#rpLeft")?.textContent || ""), null, { timeout: 4000 });
   ok("claude: intro says free on your own account", true);
