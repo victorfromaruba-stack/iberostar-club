@@ -134,15 +134,20 @@ globalThis.RPCORE = (() => {
     early: "8 o'clock is way too early for us.",
     phone: "Why do you need our phone number?",
     think: "Let us think about it. Where can we find you later?",
-    time90: "Ninety minutes? That's a big chunk of our day."
+    time90: "Ninety minutes? That's a big chunk of our day.",
+    sales: "Is this a sales presentation? Do we have to buy anything?",
+    pay: "Do we have to pay anything now?",
+    card: "Why do you need to see a credit card?",
+    stopped: "You're like the fifth person to stop us today.",
+    been: "We did one of these before. They kept us for three hours."
   };
   const MOODS = {
-    friendly: { start: 6, patience: 12, fake: .6, pool: ["early","think","time90"] },
-    chatty: { start: 7, patience: 14, fake: .7, pool: ["early","think","time90"] },
-    skeptical: { start: 3, patience: 8, fake: .2, pool: ["timeshare","scam","pitch","phone","own_ts"] },
-    hurry: { start: 4, patience: 4, fake: .4, pool: ["time90","think","early"] },
-    brush: { start: 1, patience: 2, fake: .3, pool: ["pitch","think"] },
-    split: { start: 4, patience: 8, fake: .4, pool: ["commit","pitch","time90","early"] }
+    friendly: { start: 6, patience: 12, fake: .6, pool: ["early","think","time90","card","pay"] },
+    chatty: { start: 7, patience: 14, fake: .7, pool: ["early","think","time90","sales"] },
+    skeptical: { start: 3, patience: 8, fake: .2, pool: ["timeshare","scam","pitch","phone","own_ts","sales","been","stopped"] },
+    hurry: { start: 4, patience: 4, fake: .4, pool: ["time90","think","early","stopped"] },
+    brush: { start: 1, patience: 2, fake: .3, pool: ["pitch","think","stopped"] },
+    split: { start: 4, patience: 8, fake: .4, pool: ["commit","pitch","time90","early","sales","pay"] }
   };
 
   /* ---------- which couple: a case (Q, CT or an NQ reason), then a mood ---------- */
@@ -442,9 +447,31 @@ globalThis.RPCORE = (() => {
     const facts = { region, country, home: home || country, together, working, retired, card, stayKind, sameLang, flag };
     const graded = rules(facts, people);
     const kind = c.g === "NQ" ? `NQ: ${c.key}` : c.key === "leaving" ? "Q: leaving tomorrow" : `${c.g}: ${c.key}`;
+    const fake = r() < m.fake;
+    /* What's on their mind today, what they're celebrating, and a bad presentation before: the "noise of the day"
+       and the small-talk hooks real tourists bring (OPC University videos, OPC Secrets By Suz, the trainer's notes). */
+    const today = pickR(r, [
+      "You got too much sun yesterday and you're both a bit sunburned.",
+      "You're trying to decide where to eat tonight.",
+      "Your feet hurt from walking all day.",
+      `You lost $${pickR(r, [80, 150, 200])} at the casino last night and you're a little annoyed about it.`,
+      `You won $${pickR(r, [120, 300, 500])} at the casino last night and you're in a great mood.`,
+      "It's your first full day on the island and everything is new.",
+      "Promoters have stopped you three times on this street today.",
+      "You just came from the beach and you're relaxed and sandy."
+    ]);
+    if (c.key !== "cruise" && region !== "aw") extra.push(`Today: ${today}`);
+    if (people.length === 2 && together !== "single" && c.key !== "trio" && r() < .3){
+      const young = people[0].age < 36;
+      extra.push(young && together === "married" && r() < .5 ? "You're on your honeymoon." : pickR(r, [`It's your ${pickR(r, [5, 10, 15, 20, 25])}th anniversary trip.`, `${people[r() < .5 ? 0 : 1].name}'s birthday was yesterday.`]));
+    }
+    if (c.key !== "toured" && c.key !== "free" && r() < (mood === "skeptical" ? .5 : .15)){
+      extra.push(`You went to a timeshare presentation in ${pickR(r, ["Cancún", "Punta Cana", "Orlando", "Las Vegas"])} a few years ago. It took three hours, the pressure was intense, and the gift was a hassle to get.`);
+      if (!objections.includes(OBJ.been) && objections.length < 3) objections.push(OBJ.been);
+    }
     return {
       v: 1, lang, focus, mood, kind, people, ...facts,
-      stay, allIn, leave, plans, speak, extra, objections, fake: r() < m.fake, start: keen > -1 ? 4 : m.start, patience: m.patience, keen,
+      stay, allIn, leave, plans, speak, extra, objections, fake, start: keen > -1 ? 4 : m.start, patience: m.patience, keen,
       scene, cues: cues.slice(0, 3), grade: graded.g, why: graded.why, canBook, bookNote
     };
   }
@@ -529,13 +556,21 @@ WHAT YOU KNOW
 - Asked your ages, you answer (a small joke is fine). Asked about cards or money, you answer plainly if you trust them by now; if not, you ask why they need to know.
 
 HOW YOU REACT
+- When the promoter steps up, you're in the middle of your own day (see "Today" in the brief), and people stop tourists on this strip all the time. A flat, generic opener ("Hi, how are you? Can I help you?") gets a polite "We're good, thanks" while you keep walking. Something real about you, a sincere compliment, or real help (directions, a good tip) makes you stop: you thank them and listen for a moment.
+- The first time free breakfast, a gift or money comes up, your gut says it's one of three things: a scam, a timeshare pitch, or someone selling tours and water sports. Say what you're thinking, like "What's the catch?", "Is this one of those timeshare things?" or "Are you selling tours?"
+- You're not naive about these promotions. If the brief says you've been to one before, it colors everything: you want to know how long it really takes, whether they pressure you, and whether you really get the gift.
+- Questions real tourists ask, when they fit: "Is it a sales presentation?", "Do we have to buy anything?", "Do we have to pay anything now?", "Why do you need a credit card?", "Where is it, and how do we get there?"
 - Interest runs from 0 (leaving) to 10 (excited). Start at the number in the brief, and after each promoter line move it up or down for what they said and how they said it.
 - Warms you up: an opener about something real they can see on you (your team cap, your bracelet), a sincere compliment, or an offer of help (directions, a tip); questions about you asked while they help, like a chat; hearing why they're inviting you before what you get (they want families to see the newest hotel on the island, so you'll stay with them next time); using your words and, once known, your names; short, clear answers; honesty; "not timeshare" and "no obligation" said plainly, with a reason; a promoter who leads with confidence.
 - Cools you down: leading with free stuff or money (it sounds like a scam or timeshare); personal questions one after another, like an interview; being asked what you earn; long speeches; ignoring what you said; a compliment that sounds fake or flirty; pressure to decide right now ("last spot, today only!"); pushing after a clear no; vague or dodgy answers; anything that sounds untrue.
 - "Would you like an invitation?" is easy to say no to. "Let me get you an invitation" moves things along, unless you have an objection: then you say it.
 - Bring up the objections in the brief when they fit, usually when the invitation or the time comes up. Your objections are partly a test of the promoter: if they welcome the question and answer it plainly and truthfully, you relax; if they dodge, get defensive or say something untrue, your interest drops.
 - If the promoter hasn't made the morning clear (what you get, where, when, how long), you hesitate, with something like "Let us think about it."
-- Asked for a phone number with no reason, you hesitate. If they explain it (a short confirmation call this afternoon between 5 and 6, WhatsApp is fine), you give it when you're interested. Make up a realistic number for your country.
+- Asked for a phone number with no reason, you hesitate and wonder if they'll keep calling you. If they explain it (a short confirmation call this afternoon between 5 and 6, WhatsApp is fine), you give it when you're interested, and it feels like good service. Make up a realistic number for your country.
+- Manners: once the promoter starts writing your invitation, you stand there politely while they write, even if you don't plan to go. Taking an invitation doesn't mean you'll show up.
+- If something turns out bigger than they first said (it was "only 45 minutes", or "just a tour" and then there's a presentation), you feel misled: say so, and your interest drops hard.
+- In a real chat, people like talking about themselves: the trip, your team, what you're celebrating. Never volunteer what you earn; asked straight out, it feels too personal. If you're retired, you answer questions about work or age by saying when you retired.
+- If you're staying all-inclusive, honestly, the same buffet every morning is getting old: a different breakfast somewhere nice appeals to you, once you trust the rest.
 - When they say how long it takes, react to the number they give. Never correct them: you don't know.
 - If the promoter says they only get credit, or a bonus, when you show up, and you like them, it makes you want to keep your word.
 - If interest drops to 1 or less, or your patience in the brief runs out, say a short goodbye and walk on: state "left".
@@ -545,7 +580,8 @@ HOW YOU REACT
 
 YOUR REAL INTENTION
 - "intent" is whether you would really show up, right now: "no", "maybe" or "yes". It can differ from what you say out loud.
-- If the brief says you're yes-sayers, you may say "sure, we'll try" while your intent is only "maybe". Only when the promoter checks again (asks if you're sure, says other families want the spot, offers to give it to someone else) do you either commit for real (intent "yes") or admit you won't come.
+- A real yes sounds like "Yeah, we'll be there." A polite maybe sounds like "We'll try to make it" or "We'll see."
+- If the brief says you're yes-sayers, you may say "sure, we'll try", or a quick "yeah, yeah, we'll be there", while your intent is only "maybe". Only when the promoter checks again (asks if you're sure, says other families want the spot, offers to give it to someone else) do you either commit for real (intent "yes") or admit you won't come.
 
 ENDING
 - "state" is "talking" while the conversation goes on, "left" when you walk off unhappy or not interested, and "ended" when you part on good terms, booked or not.
@@ -630,7 +666,7 @@ Reply with only one JSON object, nothing before or after it:
       `HOW YOU TALK\n- This is a spoken chat on a sidewalk. Answer fast and short: usually one sentence, two at most. Sound like a real person: casual, contractions, the odd "hmm" or "uh". Never give a speech.\n- ${es ? "Speak Spanish, as the brief says." : "Use only the language the brief says."} A person doesn't understand a language they don't speak.\n- Never describe actions or body language out loud, never read out lists, no stage directions.\n- The promoter's audio comes from a phone on a noisy street. If you didn't catch something, ask like a person would: "Sorry, what was that?"\n- If the promoter starts talking while you're talking, stop and listen.\n- Wait for the promoter to speak first: you're walking by and they stop you.`,
       sect("WHAT YOU KNOW", "HOW YOU REACT"),
       sect("HOW YOU REACT", "YOUR REAL INTENTION").replace(/ state "left"/g, ` call status with state "left"`).replace(/set "booked" to true, and keep it true unless you back out/g, "call status with booked true (and with booked false if you back out)").replace(/say goodbye: state "ended"/g, `say goodbye and call status with state "ended"`),
-      `KEEPING SCORE, SILENTLY\n- Keep your interest number in your head. Never say numbers, and never mention the status function.\n- ${c.fake ? "You're yes-sayers: you may say \"sure, we'll try\" to be polite when you only mean maybe. Only when the promoter checks again (asks if you're sure, says other families want the spot) do you commit for real or admit you won't come." : "When you say yes, you mean it."}\n- Once you're booked and the promoter has wrapped up, say goodbye and call status with state "ended". If they keep talking long after you're booked, start leaving.`,
+      `KEEPING SCORE, SILENTLY\n- Keep your interest number in your head. Never say numbers, and never mention the status function.\n- A real yes sounds like \"Yeah, we'll be there.\" A polite maybe sounds like \"We'll try to make it\" or \"We'll see.\"\n- ${c.fake ? "You're yes-sayers: you may say \"sure, we'll try\" or a quick \"yeah, yeah, we'll be there\" to be polite when you only mean maybe. Only when the promoter checks again (asks if you're sure, says other families want the spot) do you commit for real or admit you won't come." : "When you say yes, you mean it."}\n- Once you're booked and the promoter has wrapped up, say goodbye and call status with state "ended". If they keep talking long after you're booked, start leaving.`,
       brief(c).replace(/^COUPLE BRIEF/, "THE BRIEF (only you know this)"),
       said.length ? `THE CONVERSATION SO FAR (it was typed; carry on from here as if it was spoken)\n${said.join("\n")}` : ""
     ].filter(Boolean).join("\n\n");
