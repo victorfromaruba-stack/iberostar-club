@@ -113,11 +113,16 @@ const TEAMROWS = [
   await p.evaluate(() => { window.__sayText = "We're inviting families to come see the newest hotel on the island."; });
   await p.click("#rpMic");
   await p.waitForTimeout(150);
-  ok("mic fills the box while listening", (await p.inputValue("#rpText")).includes("newest hotel") && (await p.getAttribute("#rpMic", "aria-pressed")) === "true");
-  await p.click("#rpMic");
-  await p.waitForFunction(() => document.querySelectorAll(".rp-msg.me").length === 2, null, { timeout: 3000 });
-  ok("tapping the mic again sends", true);
+  ok("talk mode: mic fills the box while listening", (await p.inputValue("#rpText")).includes("newest hotel") && (await p.getAttribute("#rpMic", "aria-pressed")) === "true");
+  await p.waitForFunction(() => document.querySelectorAll(".rp-msg.me").length === 2, null, { timeout: 4000 });
+  ok("talk mode: a pause sends the line by itself", true);
+  await p.evaluate(() => { window.__sayText = ""; });
   await p.waitForFunction(() => document.querySelectorAll(".rp-msg.them:not(.typing)").length === 3, null, { timeout: 4000 });
+  await p.waitForFunction(() => document.querySelector("#rpMic").getAttribute("aria-pressed") === "true", null, { timeout: 4000 }).catch(() => {});
+  ok("talk mode: after they answer, the mic listens again", (await p.getAttribute("#rpMic", "aria-pressed")) === "true");
+  await p.click("#rpMic");
+  await p.waitForTimeout(200);
+  ok("talk mode: tapping the mic stops it, nothing extra sent", (await p.getAttribute("#rpMic", "aria-pressed")) === "false" && (await p.$$(".rp-msg.me")).length === 2);
   const labels2 = await p.$$eval(".rp-msg.them .rp-who", els => els.map(e => e.textContent));
   ok("names appear once said, earlier labels too", labels2.join(",") === "Mike,Linda,Mike", labels2.join(","));
   // a failed send, then send again
