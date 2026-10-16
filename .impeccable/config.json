@@ -38,6 +38,15 @@
         ],
         "createdAt": "2026-10-16T20:12:30.638Z",
         "reason": "Playfair Display carries the display personality here; Inter is the deliberate body workhorse, self-hosted, chosen for legibility on a phone in hard Caribbean sun. Model judgment, not the user's -- Victor can overturn it."
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "css/styles.css"
+        ],
+        "createdAt": "2026-10-16T22:13:23.224Z",
+        "reason": "The only border-accent finding in this file is .image-spinner: a 44px circle with border:4px translucent plus one gold border-top, rotated. The radius and the single coloured side ARE the spinner technique, not an accent bar on a card. Exact-value ignore did not match, so scoping by file as with the other two."
       }
     ]
   }
