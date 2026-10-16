@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- maximum-scale / user-scalable=no removed: it blocks pinch-zoom, which
+         guests reading a menu or a price list need, and older eyes need most.
+         iOS has ignored it since iOS 10, so the app has always run with zoom
+         available on iPhone -- this only stops Android being the worse one. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Iberostar Aruba">
@@ -18,6 +22,19 @@
     <link rel="preload" href="assets/fonts/playfair-700.woff2" as="font" type="font/woff2" crossorigin>
 
     <title>Iberostar Aruba</title>
+
+    <!-- The app has a share button, so this link gets sent in WhatsApp all day.
+         Without these it arrived as a bare grey URL with no picture and no
+         words. og:image wants an absolute URL and a landscape shot; swap the
+         file below for a different photo any time. -->
+    <meta name="description" content="Hotels, restaurants, spa, golf and tours at Iberostar Aruba — opening times, menus, prices and photos, all in one place.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Iberostar Aruba">
+    <meta property="og:title" content="Iberostar Aruba">
+    <meta property="og:description" content="Hotels, restaurants, spa, golf and tours — opening times, menus, prices and photos, all in one place.">
+    <meta property="og:url" content="https://victorfromaruba-stack.github.io/iberostar-club/">
+    <meta property="og:image" content="https://victorfromaruba-stack.github.io/iberostar-club/assets/Hotels/Tierra/golf_tierra_1.jpg">
+    <meta name="twitter:card" content="summary_large_image">
 
     <script src="js/image-utils.js" defer></script>
     <script src="js/data.js" defer></script>
