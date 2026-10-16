@@ -166,7 +166,16 @@
         
         .greeting-wrap { text-align: right; cursor: pointer; transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); flex-shrink: 0; }
         .greeting-wrap:active { transform: scale(0.92); }
-        .greeting { font-family: var(--font-body); font-size: clamp(1.1rem, 2.5vw, 1.35rem); text-transform: uppercase; letter-spacing: 3px; color: var(--gold); font-weight: 800; text-shadow: 0 2px 12px rgba(255,255,255,0.4); line-height: 1.2; margin-bottom: 4px; white-space: nowrap; }
+        /* The greeting was the weakest text on the page in BOTH themes: mid-gold
+           on a pale sky by day, the same mid-gold on a mid-blue sky at night,
+           and a WHITE glow behind it in both -- which blurs the letters rather
+           than separating them from the sky. Measured 1.07:1 against the evening
+           gradient, where body text wants 4.5:1.
+           One gold does not work on two skies, so each theme gets the end of the
+           brand ramp that suits it, and a shadow that contrasts with what is
+           actually behind it. */
+        .greeting { font-family: var(--font-body); font-size: clamp(1.1rem, 2.5vw, 1.35rem); text-transform: uppercase; letter-spacing: 3px; color: var(--gold); font-weight: 800; text-shadow: 0 1px 3px rgba(4,16,30,0.45); line-height: 1.2; margin-bottom: 4px; white-space: nowrap; }
+        body.dark-theme .greeting { color: var(--gold-light); text-shadow: 0 1px 3px rgba(4,16,30,0.8); }
         .date-display { font-family: var(--font-body); font-size: clamp(0.9rem, 2vw, 1.05rem); color: var(--text-muted); font-weight: 600; transition: color 1s; line-height: 1.2; white-space: nowrap; letter-spacing: 0.3px; }
 
         /* In-house mode was invisible: the only way to know which mode a phone
@@ -187,10 +196,29 @@
         h1 { font-family: var(--font-head); font-size: 4.8rem; font-weight: 700; color: var(--text-main); margin: 0; letter-spacing: -2px; opacity: 0; animation: fadeUp 0.8s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; position: relative; display: inline-block; transition: color 1s; line-height: 1.05; text-shadow: 0 2px 30px rgba(255,255,255,0.35); }
         h1::after { content: attr(data-text); position: absolute; left: 0; top: 0; color: transparent; background-size: 200% 100%; background-clip: text; -webkit-background-clip: text; animation: shimmer 6s infinite linear; pointer-events: none; mix-blend-mode: overlay; background-image: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.9) 45%, #fff 50%, rgba(255,255,255,0.9) 55%, transparent 70%); }
         body.dark-theme h1::after { background-image: linear-gradient(110deg, transparent 30%, var(--gold) 45%, #FFF8E7 50%, var(--gold) 55%, transparent 70%); }
+        /* By day the h1 is near-black and the white halo lifts it off the sky.
+           At night the h1 is white, so a white halo adds nothing and softens its
+           own edges -- a serif at 4.8rem wants crisp stems. Dark shadow instead. */
+        body.dark-theme h1 { text-shadow: 0 2px 16px rgba(4,16,30,0.55); }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
         .subtitle { font-family: var(--font-body); font-size: 1.35rem; color: var(--text-muted); margin-top: 14px; max-width: 650px; font-weight: 500; opacity: 0; animation: fadeUp 0.8s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; transition: color 1s; line-height: 1.5; letter-spacing: 0.1px; }
-        body.dark-theme .subtitle { color: rgba(255,255,255,0.85); }
+        body.dark-theme .subtitle { color: rgba(255,255,255,0.96); text-shadow: 0 1px 6px rgba(4,16,30,0.5); }
+
+        /* The IBEROCASH line. Same gold family as the card badges so a tourist
+           reads the badge on every card and this line as one promise, not two
+           decorations. Quieter than a badge: this is a sentence, not a stamp. */
+        .cash-line { display: inline-flex; align-items: baseline; gap: 8px;
+            margin-top: 18px; padding: 9px 16px 9px 15px; white-space: nowrap;
+            font-family: var(--font-body); font-size: clamp(0.78rem, 3.3vw, 0.95rem); font-weight: 700;
+            letter-spacing: 0.2px; color: var(--gold-text); border-radius: 999px;
+            background: rgba(212,175,55,0.16); border: 1px solid rgba(212,175,55,0.5);
+            opacity: 0; animation: fadeUp 0.8s 0.34s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .cash-line b { font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; }
+        .cash-line[hidden] { display: none; }
+        body.dark-theme .cash-line { color: #FFF1C9;
+            background: rgba(212,175,55,0.2); border-color: rgba(238,210,132,0.55);
+            text-shadow: 0 1px 3px rgba(4,16,30,0.6); }
         
         .search-container { margin-top: 40px; position: relative; max-width: 520px; opacity: 0; animation: fadeUp 0.8s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; display: none; }
         .search-input { width: 100%; padding: 20px 45px 20px 60px; border-radius: 28px; border: 1px solid var(--glass-border); background: var(--glass-card-light); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); font-size: 1.1rem; color: var(--text-main); font-family: var(--font-body); font-weight: 500; box-shadow: var(--shadow-soft); transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); outline: none; }

@@ -86,6 +86,74 @@
             const b = document.getElementById('modeBadge');
             if (b) b.hidden = !inHouseMode;
         }
+
+        // Counts the places that actually carry an IBEROCASH badge -- the same
+        // test the card renderer uses (anything that is not a club), so the
+        // number on screen and the badges on the cards can never disagree.
+        // Real count, read from the catalog: never a typed-in figure.
+        function showCashCount() {
+            const el = document.getElementById('cashLine');
+            if (!el) return;
+            const n = Object.values(appData || {}).filter((i) => i && i.type !== 'club').length;
+            if (!n) return;
+            el.innerHTML = '<b>Iberocash</b> accepted at ' + n + ' places';
+            el.hidden = false;
+        }
+
+        // THE WATER ANSWERS YOU.
+        //
+        // Victor, 2026-10-16: "I want it to be alive." Ten ambient layers were
+        // already drifting here -- waves, clouds, fish, a dolphin, birds, a
+        // boat on the horizon, fireflies, stars -- and not one of them knew
+        // the guest existed. They ran on their own timers. Scenery, not life.
+        //
+        // The page scrolls inside #mainContainer, so those body-level layers
+        // sit still while the content slides over them: flat, whatever the
+        // fish are doing. Giving each layer its own fraction of the scroll
+        // separates them into planes -- sky barely stirs, the sea moves, the
+        // palm shadows nearest the eye move most -- so depth comes from
+        // parallax rather than from a drop shadow.
+        //
+        // Every one of those layers animates `transform` in its keyframes, so
+        // setting transform here would be overridden by its own animation.
+        // `translate` is an independent property: it composes with transform
+        // instead of fighting it, and a browser without it simply ignores us.
+        //
+        // Travel is clamped to one viewport: depth is a hero effect, and a
+        // layer still accelerating on screen six would just drift off.
+        function initLivingDepth() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (!(window.CSS && CSS.supports && CSS.supports('translate', '0px 1px'))) return;
+            const scroller = document.getElementById('mainContainer');
+            if (!scroller) return;
+
+            const planes = [
+                ['stars', 0.03], ['nightGlow', 0.04], ['clouds', 0.09],
+                ['boat', 0.12], ['birds', 0.16], ['fish', 0.24],
+                ['dolphin', 0.28], ['palmShadows', 0.42]
+            ].map(([id, depth]) => [document.getElementById(id), depth])
+             .filter(([el]) => el);
+
+            const waves = document.querySelector('.ocean-waves');
+            if (waves) planes.push([waves, 0.32]);
+            if (!planes.length) return;
+
+            planes.forEach(([el]) => { el.style.willChange = 'translate'; });
+
+            let queued = false;
+            const paint = () => {
+                const limit = window.innerHeight;
+                const y = Math.min(scroller.scrollTop, limit);
+                for (const [el, depth] of planes) {
+                    el.style.translate = '0px ' + (-y * depth).toFixed(1) + 'px';
+                }
+                queued = false;
+            };
+            scroller.addEventListener('scroll', () => {
+                if (!queued) { queued = true; requestAnimationFrame(paint); }
+            }, { passive: true });
+            paint();
+        }
         let fsVideoTimeoutId = null;
         let currentPdfBlobUrl = null;
         
@@ -119,6 +187,8 @@
                 setTimeout(() => showToast(inHouseMode ? 'In-house mode on' : 'Off-site mode on'), 1400);
             }
             updateInHouseBadge();
+            initLivingDepth();
+            showCashCount();
 
             let ticking = false;
             document.addEventListener('mousemove', (e) => {
