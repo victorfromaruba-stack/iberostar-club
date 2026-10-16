@@ -87,16 +87,39 @@
             if (b) b.hidden = !inHouseMode;
         }
 
-        // Counts the places that actually carry an IBEROCASH badge -- the same
-        // test the card renderer uses (anything that is not a club), so the
-        // number on screen and the badges on the cards can never disagree.
-        // Real count, read from the catalog: never a typed-in figure.
-        function showCashCount() {
+        // THE PITCH FOLLOWS YOU THROUGH THE APP.
+        //
+        // Only the home screen said anything about Iberocash, so on the five
+        // section screens -- the ones an OPC actually scrolls while talking --
+        // the thing being sold went silent. Each section now states its own
+        // real count, taken from the list that was just rendered, so it matches
+        // what the tourist is looking at. On Discover that means the count
+        // follows in-house mode too: Red Sail's tours in house, Rocka Beach's
+        // off site, never the total of both.
+        //
+        // Nothing here is typed in. A number a guest can count on screen has to
+        // be the number on screen.
+        const CASH_NOUN = {
+            food: ['restaurant', 'restaurants'],
+            fun: ['tour', 'tours'],
+            spa: ['spa experience', 'spa experiences'],
+            golf: ['place', 'places'],
+            store: ['shop', 'shops']
+        };
+
+        function updateCashLine(type, shown) {
             const el = document.getElementById('cashLine');
             if (!el) return;
-            const n = Object.values(appData || {}).filter((i) => i && i.type !== 'club').length;
-            if (!n) return;
-            el.innerHTML = '<b>Iberocash</b> accepted at ' + n + ' places';
+            let n = shown;
+            let noun = CASH_NOUN[type];
+            if (type === 'club') {
+                // The hotels are where they stay, not where they spend, so this
+                // screen carries the whole promise instead of a count of four.
+                n = Object.values(appData || {}).filter((i) => i && i.type !== 'club').length;
+                noun = ['place', 'places'];
+            }
+            if (!n || !noun) { el.hidden = true; return; }
+            el.innerHTML = '<b>Iberocash</b> accepted at ' + n + ' ' + (n === 1 ? noun[0] : noun[1]);
             el.hidden = false;
         }
 
@@ -188,7 +211,6 @@
             }
             updateInHouseBadge();
             initLivingDepth();
-            showCashCount();
 
             let ticking = false;
             document.addEventListener('mousemove', (e) => {
@@ -380,6 +402,8 @@
                 }
             }
             
+            updateCashLine(type, itemsToShow.length);
+
             itemsToShow.forEach((item, index) => {
                 let logoHtml = ''; if(item.partnerLogo) logoHtml = `<img src="${item.partnerLogo}" class="partner-badge" alt="${item.sub} logo" onerror="this.style.display='none'">`;
                 const mainImg = item.gallery && item.gallery[0];
