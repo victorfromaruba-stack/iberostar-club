@@ -216,6 +216,18 @@
             opacity: 0; animation: fadeUp 0.8s 0.34s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         .cash-line b { font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; }
         .cash-line[hidden] { display: none; }
+
+        /* The same promise, on the screen it gets made on. Sits under the place
+           name so it is read with the name, not hunted for. */
+        .cash-here { display: inline-flex; align-items: baseline; gap: 7px;
+            margin-top: 14px; padding: 7px 14px; white-space: nowrap;
+            font-family: var(--font-body); font-size: 0.82rem; font-weight: 700;
+            letter-spacing: 0.2px; color: var(--gold-text); border-radius: 999px;
+            background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.5); }
+        .cash-here b { font-weight: 900; letter-spacing: 1.1px; text-transform: uppercase; }
+        .cash-here[hidden] { display: none; }
+        body.dark-theme .cash-here, .modal .cash-here { color: #FFE9A8;
+            background: rgba(212,175,55,0.18); border-color: rgba(238,210,132,0.5); }
         body.dark-theme .cash-line { color: #FFF1C9;
             background: rgba(212,175,55,0.2); border-color: rgba(238,210,132,0.55);
             text-shadow: 0 1px 3px rgba(4,16,30,0.6); }

@@ -525,6 +525,10 @@
             }
 
             document.getElementById('dTitle').innerText = item.title;
+            // Same test the card badge uses, so the grid and this screen can
+            // never say different things about the same place.
+            const dCash = document.getElementById('dCash');
+            if (dCash) dCash.hidden = item.type === 'club';
             document.getElementById('dSub').innerText = item.sub;
             document.getElementById('dDesc').innerHTML = item.desc;
 
