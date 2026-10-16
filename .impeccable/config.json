@@ -20,6 +20,24 @@
         ],
         "createdAt": "2026-10-16T20:06:20.330Z",
         "reason": "h1::after is a shimmer HIGHLIGHT sweeping over solid-coloured text (mix-blend-mode:overlay), not gradient-filled type: the h1 itself is color:var(--text-main). Pre-existing brand decoration, and the prefers-reduced-motion block already stops it via *::after."
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "border-top: 4px solid",
+        "files": [
+          "css/styles.css"
+        ],
+        "createdAt": "2026-10-16T20:12:30.588Z",
+        "reason": "This is .image-spinner: the standard CSS spinner built from a 44px circle with border:4px translucent and one gold border-top, rotated. The radius and the single coloured side ARE the technique, not an accent border on a card."
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          "css/styles.css"
+        ],
+        "createdAt": "2026-10-16T20:12:30.638Z",
+        "reason": "Playfair Display carries the display personality here; Inter is the deliberate body workhorse, self-hosted, chosen for legibility on a phone in hard Caribbean sun. Model judgment, not the user's -- Victor can overturn it."
       }
     ]
   }
