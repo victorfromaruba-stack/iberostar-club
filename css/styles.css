@@ -168,6 +168,20 @@
         .greeting-wrap:active { transform: scale(0.92); }
         .greeting { font-family: var(--font-body); font-size: clamp(1.1rem, 2.5vw, 1.35rem); text-transform: uppercase; letter-spacing: 3px; color: var(--gold); font-weight: 800; text-shadow: 0 2px 12px rgba(255,255,255,0.4); line-height: 1.2; margin-bottom: 4px; white-space: nowrap; }
         .date-display { font-family: var(--font-body); font-size: clamp(0.9rem, 2vw, 1.05rem); color: var(--text-muted); font-weight: 600; transition: color 1s; line-height: 1.2; white-space: nowrap; letter-spacing: 0.3px; }
+
+        /* In-house mode was invisible: the only way to know which mode a phone
+           was in was to open Activities and already know which tours belonged
+           to which mode. A quiet gold rule under the date -- the house colour,
+           not a new one -- so the mode is readable at a glance and silent when
+           it is off. */
+        .mode-badge { display: inline-block; margin-top: 6px; padding: 3px 10px;
+            font-family: var(--font-body); font-size: 0.68rem; font-weight: 800;
+            letter-spacing: 1.4px; text-transform: uppercase; white-space: nowrap;
+            color: var(--gold-text); background: rgba(212,175,55,0.14);
+            border: 1px solid rgba(212,175,55,0.45); border-radius: 999px; }
+        body.dark-theme .mode-badge { color: var(--gold-light);
+            background: rgba(212,175,55,0.18); border-color: rgba(238,210,132,0.5); }
+        .mode-badge[hidden] { display: none; }
         body.dark-theme .date-display { color: rgba(255,255,255,0.9); }
 
         h1 { font-family: var(--font-head); font-size: 4.8rem; font-weight: 700; color: var(--text-main); margin: 0; letter-spacing: -2px; opacity: 0; animation: fadeUp 0.8s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; position: relative; display: inline-block; transition: color 1s; line-height: 1.05; text-shadow: 0 2px 30px rgba(255,255,255,0.35); }

@@ -60,6 +60,10 @@
                 <div class="greeting-wrap" onclick="toggleTimeMode()" role="button" tabindex="0" aria-label="Toggle time-of-day theme" onkeydown="if(event.key==='Enter')toggleTimeMode()">
                     <div class="greeting" id="greeting">Bon Bini</div>
                     <div class="date-display" id="dateDisplay">...</div>
+                    <!-- Shown only in in-house mode. Until now the mode was
+                         invisible unless you opened Activities and already knew
+                         which tours belonged to which mode. -->
+                    <div class="mode-badge" id="modeBadge" hidden>In-house</div>
                 </div>
             </div>
 

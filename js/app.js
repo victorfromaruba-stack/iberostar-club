@@ -62,6 +62,30 @@
         let currentGallery = [];
         let currentImgIndex = 0;
         let inHouseMode = localStorage.getItem('ib_in_house') === 'true';
+
+        // A LINK THAT ARRIVES IN THE RIGHT MODE.
+        // Victor, 2026-10-16: "I need a in house mode but a specific link to
+        // make it easier." The only way in was tapping the greeting three
+        // times: undiscoverable, and impossible to tell someone over a phone.
+        //   ?inhouse=1   arrives in-house (Red Sail tours)
+        //   ?inhouse=0   goes back off-site (Rocka Beach)
+        // Both write the same localStorage key the tap uses, so the choice
+        // sticks on that phone and the three-tap still works afterwards.
+        // The way back is not optional: the mode persists, so a guest handed
+        // only the in-house link would have no way out of it short of clearing
+        // their browser.
+        const inHouseLink = new URLSearchParams(location.search).get('inhouse');
+        if (inHouseLink !== null) {
+            inHouseMode = inHouseLink === '1' || inHouseLink === 'true' || inHouseLink === 'yes';
+            localStorage.setItem('ib_in_house', inHouseMode);
+        }
+
+        // Keeps the badge honest whichever way the mode was set -- link or
+        // three-tap. Safe to call before the element exists.
+        function updateInHouseBadge() {
+            const b = document.getElementById('modeBadge');
+            if (b) b.hidden = !inHouseMode;
+        }
         let fsVideoTimeoutId = null;
         let currentPdfBlobUrl = null;
         
@@ -88,7 +112,14 @@
                 setTimeout(() => splash.style.display = 'none', 500); 
             }, 800);
             renderApp('portfolio');
-            
+            // Say so when a link set the mode. Without it the only proof the
+            // link worked is buried in the Activities tab, which is not where
+            // anyone lands.
+            if (inHouseLink !== null) {
+                setTimeout(() => showToast(inHouseMode ? 'In-house mode on' : 'Off-site mode on'), 1400);
+            }
+            updateInHouseBadge();
+
             let ticking = false;
             document.addEventListener('mousemove', (e) => {
                 if (!ticking && !document.documentElement.classList.contains('device-mobile')) { 
@@ -138,6 +169,7 @@
                     inHouseMode = !inHouseMode;
                     localStorage.setItem('ib_in_house', inHouseMode);
                     showToast(inHouseMode ? "Mode: In-House Only" : "Mode: Full Off-Site");
+                    updateInHouseBadge();
 
                     if (currentSection === 'activities') {
                         renderApp('activities');

@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-10-16T20:05:41.880Z",
+        "reason": "img#dImg and the modal/lightbox imgs carry no src by design: openDetails() and updateFsImage() set it at runtime, and handleImgError/handleImgLoad provide the branded fallback. Documented in CLAUDE.md under 'Image error recovery'."
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "css/styles.css"
+        ],
+        "createdAt": "2026-10-16T20:06:20.330Z",
+        "reason": "h1::after is a shimmer HIGHLIGHT sweeping over solid-coloured text (mix-blend-mode:overlay), not gradient-filled type: the h1 itself is color:var(--text-main). Pre-existing brand decoration, and the prefers-reduced-motion block already stops it via *::after."
+      }
+    ]
+  }
+}
