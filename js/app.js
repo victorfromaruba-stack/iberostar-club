@@ -272,6 +272,51 @@
             el.hidden = false;
         }
 
+        // CARDS ARRIVE AS YOU REACH THEM.
+        //
+        // The old entrance ran on render: every card in the section animated at
+        // once, including the ones ten screens down, so the motion was spent
+        // before anyone scrolled to it and the list felt static on the way
+        // down. Each card now waits until it is actually approaching the
+        // viewport, then rises.
+        //
+        // The stagger is applied per batch rather than per card index, so a
+        // screenful arriving together ripples instead of snapping, and a card
+        // scrolled to on its own still moves immediately. Each card is released
+        // from the observer once it has arrived: it is an entrance, not a thing
+        // that replays every time you scroll past.
+        function initCardReveal() {
+            const host = document.getElementById('appContent');
+            if (!host) return;
+            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const showAll = () => host.querySelectorAll('.card:not(.in)').forEach((c) => c.classList.add('in'));
+
+            if (reduced || !('IntersectionObserver' in window)) {
+                showAll();
+                new MutationObserver(showAll).observe(host, { childList: true, subtree: true });
+                return;
+            }
+
+            const io = new IntersectionObserver((entries) => {
+                let n = 0;
+                for (const entry of entries) {
+                    if (!entry.isIntersecting) continue;
+                    const el = entry.target;
+                    el.style.transitionDelay = (n++ * 55) + 'ms';
+                    el.classList.add('in');
+                    io.unobserve(el);
+                }
+            }, { root: document.getElementById('mainContainer'), rootMargin: '0px 0px -6% 0px', threshold: 0.06 });
+
+            const wire = () => host.querySelectorAll('.card:not(.in)').forEach((c) => {
+                if (c.dataset.rv) return;
+                c.dataset.rv = '1';
+                io.observe(c);
+            });
+            wire();
+            new MutationObserver(wire).observe(host, { childList: true, subtree: true });
+        }
+
         // THE WATER ANSWERS YOU.
         //
         // Victor, 2026-10-16: "I want it to be alive." Ten ambient layers were
@@ -312,12 +357,29 @@
 
             planes.forEach(([el]) => { el.style.willChange = 'translate'; });
 
+            // The headline and its line give way as you scroll into the places:
+            // they lift a little faster than the page and dim, so cards arrive
+            // into clear space rather than sliding under a headline still
+            // shouting. Everything below them -- search, the Iberocash line,
+            // the QR button -- is left alone, because those are needed while
+            // talking and a control that fades is a control you cannot tap.
+            const hero = [document.querySelector('h1'), document.querySelector('.subtitle')].filter(Boolean);
+
             let queued = false;
             const paint = () => {
                 const limit = window.innerHeight;
                 const y = Math.min(scroller.scrollTop, limit);
                 for (const [el, depth] of planes) {
                     el.style.translate = '0px ' + (-y * depth).toFixed(1) + 'px';
+                }
+                const t = Math.min(scroller.scrollTop / (limit * 0.55), 1);
+                for (const el of hero) {
+                    el.style.translate = '0px ' + (-t * 42).toFixed(1) + 'px';
+                    // Both run fadeUp with fill forwards, and a filled animation
+                    // outranks an inline style, so a plain assignment here is
+                    // silently ignored. translate above is safe because it is an
+                    // independent property the animation never touches.
+                    el.style.setProperty('opacity', (1 - t * 0.85).toFixed(3), 'important');
                 }
                 queued = false;
             };
@@ -360,6 +422,7 @@
             }
             updateInHouseBadge();
             initLivingDepth();
+            initCardReveal();
 
             let ticking = false;
             document.addEventListener('mousemove', (e) => {

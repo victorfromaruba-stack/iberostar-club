@@ -363,8 +363,13 @@
         .card { 
             background: var(--glass-card-light); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); 
             border: 1px solid var(--glass-border); border-radius: 36px; position: relative; cursor: pointer; 
-            user-select: none; -webkit-user-select: none; transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, filter 0.3s ease; 
-            box-shadow: var(--shadow-soft); opacity: 0; animation: cardEnter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; transform-origin: center bottom;
+            user-select: none; -webkit-user-select: none; transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s ease-out, box-shadow 0.4s ease, filter 0.3s ease;
+            /* Cards used to run cardEnter on render -- every card at once,
+               including the ones ten screens down. By the time you reached them
+               the motion had already played to an empty room, so scrolling felt
+               dead. They now wait, and rise as they come into view. */
+            box-shadow: var(--shadow-soft); opacity: 0;
+            transform: translateY(26px) scale(0.985); transform-origin: center bottom;
             
             overflow: hidden; isolation: isolate; transform: translateZ(0); 
             -webkit-mask-image: -webkit-radial-gradient(white, black); mask-image: radial-gradient(white, black);
@@ -373,7 +378,15 @@
 
         @keyframes cardEnter { from { opacity: 0; transform: translateY(40px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         
-        .card:hover { box-shadow: var(--shadow-hover); transform: translateY(-10px); border-color: rgba(212, 175, 55, 0.6); }
+        .card.in { opacity: 1; transform: translateY(0) scale(1); }
+        .card.in:hover { box-shadow: var(--shadow-hover); transform: translateY(-10px); border-color: rgba(212, 175, 55, 0.6); }
+
+        /* The hero gives way as you scroll into the places: it lifts a little
+           faster than the page and dims, so the cards arrive into clear space
+           instead of sliding under a headline that is still shouting. The
+           controls below it -- search, the Iberocash line, the QR button --
+           never move or fade, because they are needed mid-pitch. */
+        h1, .subtitle { will-change: opacity, translate; }
         /* Premium Native Tap State */
         .card:active { transform: scale(0.98) !important; filter: brightness(0.95); transition: transform 0.1s, filter 0.1s; }
         body.dark-theme .card:active { filter: brightness(1.1); }
