@@ -157,7 +157,13 @@
         main::-webkit-scrollbar { display: none; }
 
         /* HEADER & GREETING */
-        header { margin-bottom: 50px; }
+        /* Measured on a 390x844 phone: the header block ran to 449px and then
+           added 50px of nothing, so the first place card began at 499 and the
+           tab bar covered it from 758. A guest being shown the app saw 259px
+           of a 409px card -- one photo, with 59% of the screen spent on chrome
+           before a single place appeared. On a tool that is turned around to a
+           tourist mid-sentence, the goods have to be on screen. */
+        header { margin-bottom: 22px; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; gap: 15px; }
         
         .header-logo { height: 90px; max-width: 50%; cursor: pointer; transition: transform 0.2s, filter 0.5s; object-fit: contain; object-position: left; margin-top: -5px; }
@@ -202,7 +208,11 @@
         body.dark-theme h1 { text-shadow: 0 2px 16px rgba(4,16,30,0.55); }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        .subtitle { font-family: var(--font-body); font-size: 1.35rem; color: var(--text-muted); margin-top: 14px; max-width: 650px; font-weight: 500; opacity: 0; animation: fadeUp 0.8s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; transition: color 1s; line-height: 1.5; letter-spacing: 0.1px; }
+        /* 1.35rem wrapped to three lines on a phone and cost 100px to say
+           something the tourist does not need. Scales with the screen now, and
+           the Iberocash line below it -- the one that is doing the selling --
+           keeps its size. */
+        .subtitle { font-family: var(--font-body); font-size: clamp(1.02rem, 4.4vw, 1.35rem); color: var(--text-muted); margin-top: 10px; max-width: 650px; font-weight: 500; opacity: 0; animation: fadeUp 0.8s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; transition: color 1s; line-height: 1.4; letter-spacing: 0.1px; }
         body.dark-theme .subtitle { color: rgba(255,255,255,0.96); text-shadow: 0 1px 6px rgba(4,16,30,0.5); }
 
         /* The IBEROCASH line. Same gold family as the card badges so a tourist
@@ -273,7 +283,7 @@
             text-shadow: 0 1px 3px rgba(4,16,30,0.6); }
         
         .search-container { margin-top: 40px; position: relative; max-width: 520px; opacity: 0; animation: fadeUp 0.8s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; display: none; }
-        .search-input { width: 100%; padding: 20px 45px 20px 60px; border-radius: 28px; border: 1px solid var(--glass-border); background: var(--glass-card-light); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); font-size: 1.1rem; color: var(--text-main); font-family: var(--font-body); font-weight: 500; box-shadow: var(--shadow-soft); transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); outline: none; }
+        .search-input { width: 100%; padding: 15px 45px 15px 60px; border-radius: 28px; border: 1px solid var(--glass-border); background: var(--glass-card-light); backdrop-filter: blur(25px) saturate(180%); -webkit-backdrop-filter: blur(25px) saturate(180%); font-size: 1.1rem; color: var(--text-main); font-family: var(--font-body); font-weight: 500; box-shadow: var(--shadow-soft); transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); outline: none; }
         .search-input::placeholder { color: #8898AA; font-weight: 500; }
         .search-input:focus { background: #FFFFFF; border-color: var(--gold); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.15); transform: translateY(-2px); }
         body.dark-theme .search-input { backdrop-filter: blur(25px) saturate(120%); -webkit-backdrop-filter: blur(25px) saturate(120%); }
