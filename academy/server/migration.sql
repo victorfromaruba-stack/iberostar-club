@@ -135,3 +135,43 @@ grant execute on function public.sua_rp_start(uuid, text, jsonb, int, int) to se
 grant execute on function public.sua_rp_load(uuid, text, uuid, int, int) to service_role;
 grant execute on function public.sua_rp_save(uuid, int, jsonb, text) to service_role;
 grant execute on function public.sua_rp_coach_save(uuid, jsonb) to service_role;
+
+-- ---------------------------------------------------------------------------
+-- The board every worker sees.
+--
+-- sua_team hands a manager the whole team: names, per-level stats, answer
+-- counts, activity logs and device ids. That is why it is behind the manager
+-- code. This returns a name and two numbers and nothing else, so it is safe
+-- to open to the publishable key.
+--
+-- Only people who have actually set a record appear. A board padded with
+-- zeroes tells half the floor they are last, which is the opposite of what a
+-- board is for.
+--
+-- Written defensively on purpose: the score is read out of the stats payload,
+-- so it is regex-guarded before casting (a malformed value would otherwise
+-- fail the whole query), capped, and the hidden flag is read through
+-- to_jsonb() so this still works whether or not that column exists.
+-- ---------------------------------------------------------------------------
+create or replace function public.sua_board()
+returns table (name text, lightning int, gauntlet int)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select p.name, b.l, b.g
+  from public.sua_people p,
+  lateral (select
+    case when p.stats->>'l'  ~ '^[0-9]{1,6}$' then (p.stats->>'l')::int  else 0 end as l,
+    case when p.stats->>'gt' ~ '^[0-9]{1,6}$' then (p.stats->>'gt')::int else 0 end as g
+  ) b
+  where coalesce((to_jsonb(p) ->> 'hidden')::boolean, false) = false
+    and coalesce(p.name, '') <> ''
+    and (b.l > 0 or b.g > 0)
+  order by greatest(b.l, b.g) desc
+  limit 50;
+$$;
+
+revoke all on function public.sua_board() from public;
+grant execute on function public.sua_board() to anon, authenticated;

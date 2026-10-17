@@ -921,6 +921,59 @@ function lgPace(){
   return Math.min(LG_SLOW_MS, Math.max(LG_HARD_MS, Math.round(median * 0.8)));
 }
 const lgWindow = (score) => Math.max(lgPace(), LG_START_MS - score * LG_STEP_MS);
+/* ---------- Team board ---------- */
+/* Victor, 2026-10-17: "make the board so everyone in the company can see it."
+   The manager panel's board is built from sua_team, which needs the manager
+   code because it carries everyone's whole record. This screen calls
+   sua_board instead, which returns a name and two numbers, so it can be open
+   to every phone. A scoreboard only drives anything if the people competing
+   can see it without asking a manager. */
+const BOARD = { rows: null, at: 0, err: "", game: "l" };
+const BOARD_TTL = 6e4;
+async function loadBoard(force){
+  if (BOARD.rows && !force && Date.now() - BOARD.at < BOARD_TTL) return;
+  try { BOARD.rows = await rpc("sua_board", {}); BOARD.at = Date.now(); BOARD.err = ""; }
+  catch(e){ BOARD.err = /could not find|does not exist|HTTP 40[04]/i.test(e.message) ? "off" : "net"; }
+}
+async function boardScreen(){
+  view = "board"; game = null;
+  renderBoard(true);
+  await loadBoard();
+  if (view === "board") renderBoard(false);
+}
+function boardRows(){
+  const key = BOARD.game === "gt" ? "gauntlet" : "lightning";
+  return (Array.isArray(BOARD.rows) ? BOARD.rows : [])
+    .map(r => ({ name: String((r && r.name) || "").slice(0, 40), v: Math.max(0, Math.min(999999, parseInt(r && r[key], 10) || 0)) }))
+    .filter(r => r.name && r.v > 0)
+    .sort((a, b) => b.v - a.v)
+    .slice(0, 10);
+}
+function renderBoard(loading){
+  const rows = boardRows(), mine = (S.name || "").trim().toLowerCase();
+  const own = BOARD.game === "gt" ? (S.gaunt || 0) : (S.lightning || 0);
+  const place = rows.findIndex(r => r.name.trim().toLowerCase() === mine && mine);
+  const tabBtn = (k, label) => `<button data-bg="${k}" aria-pressed="${BOARD.game === k}">${label}</button>`;
+  const body = loading && !BOARD.rows ? `<div class="say-row">${shoco("think")}<div class="bubble">Getting the board…</div></div>`
+    : BOARD.err === "off" ? `<div class="say-row">${shoco("idle")}<div class="bubble">The board isn't switched on yet. Ask Victor.</div></div>`
+    : BOARD.err ? `<div class="say-row">${shoco("sad")}<div class="bubble">Couldn't reach the board. Check the internet and pull to refresh.</div></div>`
+    : !rows.length ? `<div class="say-row">${shoco("idle")}<div class="bubble">Nobody has set a record yet. First one on the board takes it.</div></div>`
+    : `<ol class="lb">${rows.map((r, i) => `<li class="${i < 3 ? "top " : ""}${i === place ? "me" : ""}"><span class="rk">${["🥇","🥈","🥉"][i] || i + 1}</span>
+        <span class="nm">${esc(r.name)}${i === place ? " <small>you</small>" : ""}</span><span class="sc">${r.v}</span></li>`).join("")}</ol>
+      ${place < 0 && own > 0 ? `<p class="small muted">Your best is ${own}. Not in the top ten yet.</p>`
+        : place < 0 ? `<p class="small muted">Play a round and get your name up there.</p>` : ""}`;
+  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button>
+    <div><p class="eyebrow">Everyone</p><h1>Team board</h1></div>
+    <button class="icon-btn" id="rf" aria-label="Refresh">${icon("refresh")}</button></div>
+  <div class="tp-sort" role="group" aria-label="Which game">${tabBtn("l", "Lightning")}${tabBtn("gt", "Gauntlet")}</div>
+  <section class="tp-card">${body}</section>
+  <p class="small muted">${BOARD.game === "gt" ? "Gauntlet: questions answered before the three lives ran out." : "Lightning round: couples qualified in a row."} Updates when your phone has internet.</p>`,
+    { full: true, wide: true });
+  on("#back", () => tab("games"));
+  on("#rf", () => { BOARD.at = 0; boardScreen(); });
+  app.querySelectorAll("[data-bg]").forEach(b => b.onclick = () => { BOARD.game = b.dataset.bg; renderBoard(false); });
+}
+
 function lightningIntro(){
   view = "lightning"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><span></span><span></span></div>
@@ -1068,8 +1121,9 @@ function renderGames(){
   <article class="tile-card c-good"><div class="ico">${icon("flame")}</div><div><h2>Gauntlet</h2><p class="small muted">${gauntOpen() ? `No last question. Three lives, anything from the whole course including what you haven't studied yet, and harder the longer you last. Record: ${S.gaunt||0}.` : "Opens once you've mastered three levels."}</p></div>${gauntOpen() ? `<button class="btn small good" id="gt">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-sun"><div class="ico">${icon("calendar")}</div><div><h2>Daily 10</h2><p class="small muted">${dailyOpen() ? (S.daily.last === today() ? "Done today. Play again for practice." : "Ten questions. Your misses come back more.") : "Opens after your first mastered level."}</p></div>${dailyOpen() ? `<button class="btn small sun" id="dy">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-flamingo"><div class="ico">${icon("route")}</div><div><h2>Pitch map</h2><p class="small muted">${unlocked("map") ? "Put the pitch in order, then the lines." : `Opens after "${byId(before("map")).name}"`}</p></div>${unlocked("map") ? `<button class="btn small flamingo" id="mp">Play</button>` : icon("lock")}</article>
+  <article class="tile-card c-sun" style="--c:var(--sun);--soft:var(--sun-soft)"><div class="ico">${icon("trophy")}</div><div><h2>Team board</h2><p class="small muted">Where you stand against the whole floor. Lightning and Gauntlet.</p></div><button class="btn small sun" id="bd">Open</button></article>
   <article class="tile-card"><div class="ico">${icon("headphones")}</div><div><h2>Voice notes</h2><p class="small muted">${CLIPS.filter(c => S.listened[c.id]).length} of ${CLIPS.length} heard</p></div><button class="btn small ghost" id="vn">Listen</button></article>`);
-  on("#rp", streetIntro); on("#lg", lightningIntro); on("#gt", startGauntlet); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
+  on("#rp", streetIntro); on("#lg", lightningIntro); on("#gt", startGauntlet); on("#bd", boardScreen); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
 }
 
 /* ---------- Me tab ---------- */
