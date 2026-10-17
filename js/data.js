@@ -115,7 +115,7 @@ const defaultData = {
         "title": "Luxury Catamaran Sail",
         "sub": "Red Sail Sports Aruba",
         "desc": "Experience the beautiful Caribbean waters aboard a luxury catamaran. Includes premium snorkeling stops at the famous Antilla shipwreck and vibrant coral reefs, complete with an open bar and snacks. <div class=\"price-box\"><div class=\"price-row\"><span>Adult Ticket</span><strong>$107.00</strong></div><div class=\"price-row\"><span>Child Ticket</span><strong>$65.00</strong></div></div>",
-        "gallery": [],
+        "gallery": ["assets/Activities/RedSail/act_redsail_sail_1.jpg","assets/Activities/RedSail/act_redsail_sail_2.jpg","assets/Activities/RedSail/act_redsail_sail_3.jpg","assets/Activities/RedSail/act_redsail_sail_4.jpg"],
         "duration": "4 Hours",
         "time": "Morning & Afternoon Departures"
     },
@@ -124,7 +124,7 @@ const defaultData = {
         "title": "Sunset Cruise",
         "sub": "Red Sail Sports Aruba",
         "desc": "Enjoy a romantic and relaxing sunset sail along the stunning Aruban coastline. Sip on premium cocktails and enjoy hors d'oeuvres while watching the sun dip below the horizon. <div class=\"price-box\"><div class=\"price-row\"><span>Adult Ticket</span><strong>$69.00</strong></div><div class=\"price-row\"><span>Child Ticket</span><strong>$45.00</strong></div></div>",
-        "gallery": [],
+        "gallery": ["assets/Activities/RedSail/act_redsail_sunset_1.jpg","assets/Activities/RedSail/act_redsail_sunset_2.jpg","assets/Activities/RedSail/act_redsail_sunset_3.jpg"],
         "duration": "2 Hours",
         "time": "5:30 PM"
     },
