@@ -90,18 +90,7 @@ const defaultData = {
         "title": "Aruba Aloe",
         "sub": "Local Skincare & Gifts",
         "desc": "Discover the healing power of Aruban Aloe. Founded in 1890, Aruba Aloe is one of the oldest aloe companies in the world, offering premium sun care, lotions, and locally made gifts perfect for bringing a piece of Aruba home.",
-        "gallery": [
-            "assets/Store/ArubaAloe/store_aloe_1.jpg",
-            "assets/Store/ArubaAloe/store_aloe_2.jpg",
-            "assets/Store/ArubaAloe/store_aloe_3.jpg",
-            "assets/Store/ArubaAloe/store_aloe_4.jpg",
-            "assets/Store/ArubaAloe/store_aloe_5.jpg",
-            "assets/Store/ArubaAloe/store_aloe_6.jpg",
-            "assets/Store/ArubaAloe/store_aloe_7.jpg",
-            "assets/Store/ArubaAloe/store_aloe_8.jpg",
-            "assets/Store/ArubaAloe/store_aloe_9.jpg",
-            "assets/Store/ArubaAloe/store_aloe_10.jpg"
-        ]
+        "gallery": ["assets/Store/ArubaAloe/store_aloe_2.jpg","assets/Store/ArubaAloe/store_aloe_3.jpg","assets/Store/ArubaAloe/store_aloe_4.jpg","assets/Store/ArubaAloe/store_aloe_5.jpg","assets/Store/ArubaAloe/store_aloe_6.jpg","assets/Store/ArubaAloe/store_aloe_7.jpg","assets/Store/ArubaAloe/store_aloe_8.jpg","assets/Store/ArubaAloe/store_aloe_9.jpg","assets/Store/ArubaAloe/store_aloe_10.jpg","assets/Store/ArubaAloe/store_aloe_1.jpg"]
     },
     "KaysJewelry": {
         "type": "store",
@@ -380,21 +369,7 @@ const defaultData = {
         "title": "GAIA House of Grill",
         "sub": "Joia Aruba • Open-Air Grill",
         "desc": "An open-air grill at the front of the hotel overlooking Eagle Beach, named for the Greek goddess of the Earth. Executive Chef Alejandro Camurri leads a menu built around a balance of land and sea, with bold, smoky, Caribbean-inflected flavors. Saturdays after 10pm, GAIA transforms into an intimate lounge with handcrafted cocktails and a live DJ.",
-        "gallery": [
-            "assets/Restaurants/Gaia/rest_gaia_1.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_2.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_3.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_4.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_5.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_6.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_7.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_8.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_9.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_10.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_11.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_12.jpg",
-            "assets/Restaurants/Gaia/rest_gaia_13.jpg"
-        ],
+        "gallery": ["assets/Restaurants/Gaia/rest_gaia_2.jpg","assets/Restaurants/Gaia/rest_gaia_3.jpg","assets/Restaurants/Gaia/rest_gaia_4.jpg","assets/Restaurants/Gaia/rest_gaia_5.jpg","assets/Restaurants/Gaia/rest_gaia_6.jpg","assets/Restaurants/Gaia/rest_gaia_7.jpg","assets/Restaurants/Gaia/rest_gaia_8.jpg","assets/Restaurants/Gaia/rest_gaia_9.jpg","assets/Restaurants/Gaia/rest_gaia_10.jpg","assets/Restaurants/Gaia/rest_gaia_11.jpg","assets/Restaurants/Gaia/rest_gaia_12.jpg","assets/Restaurants/Gaia/rest_gaia_13.jpg","assets/Restaurants/Gaia/rest_gaia_1.jpg"],
         "pdfs": [
             { "label": "Menu", "url": "assets/Restaurants/Gaia/menu_gaia_english.pdf" }
         ]
