@@ -278,6 +278,15 @@
         .search-input:focus { background: #FFFFFF; border-color: var(--gold); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.15); transform: translateY(-2px); }
         body.dark-theme .search-input { backdrop-filter: blur(25px) saturate(120%); -webkit-backdrop-filter: blur(25px) saturate(120%); }
         body.dark-theme .search-input:focus { background: rgba(8, 20, 36, 0.95); color: white; }
+        /* On a 320px phone the placeholder was 190px of text in a 175px box, so
+           every small screen read "Search experiences, shops, t". The wording is
+           shorter now, and on the narrowest phones the type steps down and the
+           icon gutter tightens rather than the words being cut off.
+           This sits AFTER the base rule on purpose: a media query carries no
+           extra specificity, so declared earlier it simply lost. */
+        @media (max-width: 360px) {
+            .search-input { font-size: 0.95rem; padding-left: 50px; padding-right: 36px; }
+        }
         
         .search-icon { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; fill: var(--gold); pointer-events: none; }
         
