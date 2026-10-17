@@ -40,7 +40,10 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   tourist couple that Shoco scores afterwards. Served at `https://victorfromaruba-stack.github.io/iberostar-club/academy/`. It shares
   nothing with the guest app. **`academy/index.html` is built; don't edit it by hand.** The source
   is `academy/src/`: `levels.js` and `content-pre.js` (lessons and units; the writing rules for
-  questions are at the top of `levels.js`), `content-post.js` (`MAP_STEPS`, the Script tab's lines
+  questions are at the top of `levels.js`. **Adding a level is a three-file change**: the level
+  itself, its unit in `content-pre.js`, and both `ORDER` and `LEVEL_IDS` in `app.js` — a level in
+  one and not the other crashed the manager panel on 2026-10-17 and silently locked the Final.
+  `lint_content.js` now fails the build on it), `content-post.js` (`MAP_STEPS`, the Script tab's lines
   `SCRIPT`, the couple generator), `app.js` (engine), `street-core.js` (Street practice's couples, rules and prompts, shared with the Edge Function), `street.js` (the Street practice screens), `team.js` (the manager panel), `boot.js`
   (start-up), `style.css`, `icons.js`, `mascot.js` (Shoco, the burrowing owl), and `clips.json` (the
   nine voice notes, transcribed with timings). Rebuild
@@ -52,11 +55,27 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   longest option in at most 35% of questions). Test with
   `node academy/src/e2e.js <url> <outdir>` and `node academy/src/street_e2e.js <url> <outdir>`, `node academy/src/ear_e2e.js <url> <outdir>`, `node academy/src/live_e2e.js <url> <outdir>` and `node academy/src/gauntlet_e2e.js <url>` (the Gauntlet's lives/score loop), `node academy/src/board_e2e.js <url>` (the team board), `node academy/src/panel_e2e.js <url>` (the manager panel against old-shape rows) and `node academy/src/account_e2e.js <url>` (getting your progress back on a new phone) (Playwright; serve `academy/`
   with Range support, e.g. `npx http-server academy`, and use a `localhost` url). Media: `academy/audio/` (voice notes, MP3), `academy/img/` (two slides
-  from the Open House pitch deck, `photos/`), `academy/video/` (golf loop, H.264 MP4). It has `noindex`. Progress is
-  per device in `localStorage['showup.v1']`. Once a worker saves a name, the phone also sends its
-  progress to Supabase project `cdkopyphjvfxjqhasrae` (tables `sua_people` and `sua_config`, closed
-  to the public key and reachable only through the `sua_save`, `sua_team`, `sua_hide` and
-  `sua_set_code` functions; the key in the page is a publishable key). Each phone sends its levels,
+  from the Open House pitch deck, `photos/`), `academy/video/` (golf loop, H.264 MP4). It has `noindex`. Progress lives in
+  `localStorage['showup.v1']` and is mirrored to Supabase project `cdkopyphjvfxjqhasrae` once a
+  worker saves a name (tables `sua_people` and `sua_config`, closed to the public key and reachable
+  only through `sua_save`, `sua_team`, `sua_hide`, `sua_set_code`, `sua_board`, `sua_claim` and
+  `sua_set_pin`; the key in the page is a publishable key).
+  **Accounts (2026-10-17):** a worker is a name plus a four digit code, not a phone. `sua_set_pin`
+  stores `pin_hash` on their row; on a new phone `sua_claim` verifies name+code, repoints
+  `device_id`/`secret_hash` at that phone (killing the old id so two handsets cannot both write)
+  and returns the stats, which `restoreFrom()` in `app.js` turns back into local progress. Everyone
+  who was already using it was set to **1234**; `sua_claim` returns `must_change` and the app sends
+  them straight to choosing their own. Two things cannot be restored because they are only ever
+  synced as counts: which voice notes were played and which practice lines were said.
+  **Team board:** open to every phone via `sua_board`, which deliberately returns only a name and
+  four numbers (levels, xp, lightning, gauntlet) — `sua_team` stays behind the manager code because
+  it carries everything. It drops test-looking names and merges one person's devices into a single
+  row; the page filters test names again (`TEST_NAME`) because only Victor can change the database.
+  **Gauntlet:** endless run in Games, three lives, dealt from every question, leaning harder on
+  couple cards and the phone's own past misses as the run grows.
+  The SQL for all of this is in `academy/server/migration.sql` and is **not** applied from here —
+  Victor runs it at `https://supabase.com/dashboard/project/cdkopyphjvfxjqhasrae/sql/new`.
+  Changing a function's return columns needs `drop function` first (Postgres 42P13). Each phone sends its levels,
   best runs, right and wrong answers per level, a log of its last lessons, its days active and its
   Street practice results (`payload()` in `app.js`; `sua_save` takes up to 16 KB). The manager panel (Me tab > Manager panel,
   or the team link with `#team`) reads the team with the manager code, which is stored only as a

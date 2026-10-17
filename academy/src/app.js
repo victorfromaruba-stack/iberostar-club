@@ -1041,6 +1041,10 @@ const BOARD_GAMES = { lv: { key: "levels", label: "Levels", foot: "Levels master
                       l:  { key: "lightning", label: "Lightning", foot: "Lightning round: couples qualified in a row." },
                       gt: { key: "gauntlet", label: "Gauntlet", foot: "Gauntlet: questions answered before the three lives ran out." } };
 const BOARD = { rows: null, at: 0, err: "", game: "lv" };
+/* Also filtered here, not only in sua_board. Somebody trying the app out puts
+   a name like "Test phone" on the floor's board, and the database can only be
+   changed by hand from the SQL editor — the page can drop it today. */
+const TEST_NAME = /^(test|tester|testing|demo|prueba)\b/i;
 const BOARD_TTL = 6e4;
 async function loadBoard(force){
   if (BOARD.rows && !force && Date.now() - BOARD.at < BOARD_TTL) return;
@@ -1057,7 +1061,7 @@ function boardRows(){
   const key = (BOARD_GAMES[BOARD.game] || BOARD_GAMES.lv).key;
   return (Array.isArray(BOARD.rows) ? BOARD.rows : [])
     .map(r => ({ name: String((r && r.name) || "").slice(0, 40), v: Math.max(0, Math.min(999999, parseInt(r && r[key], 10) || 0)) }))
-    .filter(r => r.name && r.v > 0)
+    .filter(r => r.name && r.v > 0 && !TEST_NAME.test(r.name.trim()))
     .sort((a, b) => b.v - a.v);
 }
 /* The two lines that make a board worth reopening: where you moved since you
