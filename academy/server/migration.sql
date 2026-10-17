@@ -154,23 +154,26 @@ grant execute on function public.sua_rp_coach_save(uuid, jsonb) to service_role;
 -- to_jsonb() so this still works whether or not that column exists.
 -- ---------------------------------------------------------------------------
 create or replace function public.sua_board()
-returns table (name text, lightning int, gauntlet int)
+returns table (name text, levels int, xp int, lightning int, gauntlet int)
 language sql
 stable
 security definer
 set search_path = public
 as $$
-  select p.name, b.l, b.g
+  select p.name, b.lv, b.xp, b.l, b.g
   from public.sua_people p,
   lateral (select
+    (select count(*)::int from jsonb_each(coalesce(p.stats->'m', '{}'::jsonb)) e
+       where jsonb_typeof(e.value) = 'number' and (e.value)::text::numeric > 0) as lv,
+    case when p.stats->>'x'  ~ '^[0-9]{1,9}$' then (p.stats->>'x')::int  else 0 end as xp,
     case when p.stats->>'l'  ~ '^[0-9]{1,6}$' then (p.stats->>'l')::int  else 0 end as l,
     case when p.stats->>'gt' ~ '^[0-9]{1,6}$' then (p.stats->>'gt')::int else 0 end as g
   ) b
   where coalesce((to_jsonb(p) ->> 'hidden')::boolean, false) = false
     and coalesce(p.name, '') <> ''
-    and (b.l > 0 or b.g > 0)
-  order by greatest(b.l, b.g) desc
-  limit 50;
+    and (b.lv > 0 or b.xp > 0 or b.l > 0 or b.g > 0)
+  order by b.lv desc, b.xp desc
+  limit 60;
 $$;
 
 revoke all on function public.sua_board() from public;

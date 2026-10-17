@@ -2560,7 +2560,14 @@ const lgWindow = (score) => Math.max(lgPace(), LG_START_MS - score * LG_STEP_MS)
    sua_board instead, which returns a name and two numbers, so it can be open
    to every phone. A scoreboard only drives anything if the people competing
    can see it without asking a manager. */
-const BOARD = { rows: null, at: 0, err: "", game: "l" };
+/* Levels first, and it is the default on purpose. The board opened on
+   Lightning and showed two names out of a floor of staff, because most people
+   do lessons and never open the games — a board nobody appears on is worse
+   than no board. Everyone who has mastered anything is on the Levels one. */
+const BOARD_GAMES = { lv: { key: "levels", label: "Levels", foot: "Levels mastered, out of 18." },
+                      l:  { key: "lightning", label: "Lightning", foot: "Lightning round: couples qualified in a row." },
+                      gt: { key: "gauntlet", label: "Gauntlet", foot: "Gauntlet: questions answered before the three lives ran out." } };
+const BOARD = { rows: null, at: 0, err: "", game: "lv" };
 const BOARD_TTL = 6e4;
 async function loadBoard(force){
   if (BOARD.rows && !force && Date.now() - BOARD.at < BOARD_TTL) return;
@@ -2574,7 +2581,7 @@ async function boardScreen(){
   if (view === "board") renderBoard(false);
 }
 function boardRows(){
-  const key = BOARD.game === "gt" ? "gauntlet" : "lightning";
+  const key = (BOARD_GAMES[BOARD.game] || BOARD_GAMES.lv).key;
   return (Array.isArray(BOARD.rows) ? BOARD.rows : [])
     .map(r => ({ name: String((r && r.name) || "").slice(0, 40), v: Math.max(0, Math.min(999999, parseInt(r && r[key], 10) || 0)) }))
     .filter(r => r.name && r.v > 0)
@@ -2583,23 +2590,25 @@ function boardRows(){
 }
 function renderBoard(loading){
   const rows = boardRows(), mine = (S.name || "").trim().toLowerCase();
-  const own = BOARD.game === "gt" ? (S.gaunt || 0) : (S.lightning || 0);
+  const own = BOARD.game === "gt" ? (S.gaunt || 0)
+            : BOARD.game === "l" ? (S.lightning || 0)
+            : LEVEL_IDS.filter(id => S.mastered[id]).length;
   const place = rows.findIndex(r => r.name.trim().toLowerCase() === mine && mine);
   const tabBtn = (k, label) => `<button data-bg="${k}" aria-pressed="${BOARD.game === k}">${label}</button>`;
   const body = loading && !BOARD.rows ? `<div class="say-row">${shoco("think")}<div class="bubble">Getting the board…</div></div>`
     : BOARD.err === "off" ? `<div class="say-row">${shoco("idle")}<div class="bubble">The board isn't switched on yet. Ask Victor.</div></div>`
     : BOARD.err ? `<div class="say-row">${shoco("sad")}<div class="bubble">Couldn't reach the board. Check the internet and pull to refresh.</div></div>`
-    : !rows.length ? `<div class="say-row">${shoco("idle")}<div class="bubble">Nobody has set a record yet. First one on the board takes it.</div></div>`
+    : !rows.length ? `<div class="say-row">${shoco("idle")}<div class="bubble">${BOARD.game === "lv" ? "Nobody has mastered a level yet. First one on the board takes it." : "Nobody has played this one yet. First one on the board takes it."}</div></div>`
     : `<ol class="lb">${rows.map((r, i) => `<li class="${i < 3 ? "top " : ""}${i === place ? "me" : ""}"><span class="rk">${["🥇","🥈","🥉"][i] || i + 1}</span>
         <span class="nm">${esc(r.name)}${i === place ? " <small>you</small>" : ""}</span><span class="sc">${r.v}</span></li>`).join("")}</ol>
-      ${place < 0 && own > 0 ? `<p class="small muted">Your best is ${own}. Not in the top ten yet.</p>`
-        : place < 0 ? `<p class="small muted">Play a round and get your name up there.</p>` : ""}`;
+      ${place < 0 && own > 0 ? `<p class="small muted">${BOARD.game === "lv" ? `You've mastered ${own}.` : `Your best is ${own}.`} Not in the top ten yet.</p>`
+        : place < 0 ? `<p class="small muted">${BOARD.game === "lv" ? "Master a level and your name goes up there." : "Play a round and get your name up there."}</p>` : ""}`;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button>
     <div><p class="eyebrow">Everyone</p><h1>Team board</h1></div>
     <button class="icon-btn" id="rf" aria-label="Refresh">${icon("refresh")}</button></div>
-  <div class="tp-sort" role="group" aria-label="Which game">${tabBtn("l", "Lightning")}${tabBtn("gt", "Gauntlet")}</div>
+  <div class="tp-sort" role="group" aria-label="Which board">${Object.keys(BOARD_GAMES).map(k => tabBtn(k, BOARD_GAMES[k].label)).join("")}</div>
   <section class="tp-card">${body}</section>
-  <p class="small muted">${BOARD.game === "gt" ? "Gauntlet: questions answered before the three lives ran out." : "Lightning round: couples qualified in a row."} Updates when your phone has internet.</p>`,
+  <p class="small muted">${(BOARD_GAMES[BOARD.game] || BOARD_GAMES.lv).foot} Updates when your phone has internet.</p>`,
     { full: true, wide: true });
   on("#back", () => tab("games"));
   on("#rf", () => { BOARD.at = 0; boardScreen(); });

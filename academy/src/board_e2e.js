@@ -6,9 +6,9 @@ const URL = process.argv[2];
 const fail = m => { console.log("FAIL  " + m); process.exit(1); };
 
 const ROWS = [
-  { name: "Maria G.",  lightning: 21, gauntlet: 8 },
-  { name: "Luigi V.",  lightning: 14, gauntlet: 31 },
-  { name: "Jayson K.", lightning: 9,  gauntlet: 0 }
+  { name: "Maria G.",  levels: 11, xp: 900, lightning: 21, gauntlet: 8 },
+  { name: "Luigi V.",  levels: 6,  xp: 500, lightning: 14, gauntlet: 31 },
+  { name: "Jayson K.", levels: 2,  xp: 120, lightning: 9,  gauntlet: 0 }
 ];
 
 (async () => {
@@ -16,7 +16,8 @@ const ROWS = [
   const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
   await ctx.addInitScript(() => {
     try { localStorage.setItem('showup.v1', JSON.stringify({
-      name: "Luigi V.", intro: true, tab: "games", sound: false, lightning: 14, gaunt: 31
+      name: "Luigi V.", intro: true, tab: "games", sound: false, lightning: 14, gaunt: 31,
+      mastered: { q: { count: 1, last: Date.now() } }
     })); } catch (e) { /* private mode */ }
   });
   const page = await ctx.newPage();
@@ -43,10 +44,17 @@ const ROWS = [
   await page.waitForFunction(() => document.querySelectorAll('.lb li').length > 0, { timeout: 15000 })
     .catch(() => fail("board never rendered any rows"));
 
+  /* Levels is the default, and everyone who has mastered anything is on it. */
   let rows = await page.$$eval('.lb li', ls => ls.map(l => l.innerText.replace(/\n/g, ' ').trim()));
+  if (rows.length !== 3) fail(`Levels board should show all 3, got ${rows.length}`);
+  if (!/Maria G\./.test(rows[0]) || !/11/.test(rows[0])) fail("Levels order wrong: " + rows[0]);
+  if (!/you/i.test(rows[1])) fail("the viewer's own row is not marked: " + rows[1]);
+
+  await page.click('[data-bg="l"]');
+  await page.waitForTimeout(250);
+  rows = await page.$$eval('.lb li', ls => ls.map(l => l.innerText.replace(/\n/g, ' ').trim()));
   if (rows.length !== 3) fail(`Lightning board should show 3, got ${rows.length}`);
   if (!/Maria G\./.test(rows[0]) || !/21/.test(rows[0])) fail("Lightning order wrong: " + rows[0]);
-  if (!/you/i.test(rows[1])) fail("the viewer's own row is not marked: " + rows[1]);
 
   /* 3. Switching game re-sorts, and drops the person with no Gauntlet score. */
   await page.click('[data-bg="gt"]');
