@@ -2747,10 +2747,11 @@ const lgWindow = (score) => Math.max(lgPace(), LG_START_MS - score * LG_STEP_MS)
    Lightning and showed two names out of a floor of staff, because most people
    do lessons and never open the games — a board nobody appears on is worse
    than no board. Everyone who has mastered anything is on the Levels one. */
-const BOARD_GAMES = { lv: { key: "levels", label: "Levels", foot: "Levels mastered, out of 18." },
+const BOARD_GAMES = { xp: { key: "xp", label: "Points", foot: "Points earned from every lesson, review and game." },
+                      lv: { key: "levels", label: "Levels", get foot(){ return `Levels mastered, out of ${LEVEL_IDS.length}.`; } },
                       l:  { key: "lightning", label: "Lightning", foot: "Lightning round: couples qualified in a row." },
                       gt: { key: "gauntlet", label: "Gauntlet", foot: "Gauntlet: questions answered before the three lives ran out." } };
-const BOARD = { rows: null, at: 0, err: "", game: "lv" };
+const BOARD = { rows: null, at: 0, err: "", game: "xp" };
 /* Also filtered here, not only in sua_board. Somebody trying the app out puts
    a name like "Test phone" on the floor's board, and the database can only be
    changed by hand from the SQL editor — the page can drop it today. */
@@ -2768,7 +2769,7 @@ async function boardScreen(){
   if (view === "board") renderBoard(false);
 }
 function boardRows(){
-  const key = (BOARD_GAMES[BOARD.game] || BOARD_GAMES.lv).key;
+  const key = (BOARD_GAMES[BOARD.game] || BOARD_GAMES.xp).key;
   return (Array.isArray(BOARD.rows) ? BOARD.rows : [])
     .map(r => ({ name: String((r && r.name) || "").slice(0, 40), v: Math.max(0, Math.min(999999, parseInt(r && r[key], 10) || 0)) }))
     .filter(r => r.name && r.v > 0 && !TEST_NAME.test(r.name.trim()))
@@ -2782,7 +2783,7 @@ function rankLine(all, myRank){
   const was = (S.rank || {})[BOARD.game];
   const moved = typeof was === "number" && was !== myRank ? was - myRank : 0;
   const above = all[myRank - 1], me = all[myRank];
-  const unit = BOARD.game === "lv" ? "level" : "point";
+  const unit = BOARD.game === "lv" ? "level" : BOARD.game === "xp" ? "point" : "point";
   const chase = above ? `${plural(above.v - me.v, unit)} behind ${esc(above.name)}.` : "Nobody above you. Hold it.";
   const move = moved > 0 ? `<b style="color:var(--good-ink)">▲ Up ${moved} since you last looked.</b> `
              : moved < 0 ? `<b style="color:var(--fire-ink)">▼ Down ${-moved} since you last looked.</b> ` : "";
@@ -2792,6 +2793,7 @@ function renderBoard(loading){
   const all = boardRows(), rows = all.slice(0, 10), mine = (S.name || "").trim().toLowerCase();
   const own = BOARD.game === "gt" ? (S.gaunt || 0)
             : BOARD.game === "l" ? (S.lightning || 0)
+            : BOARD.game === "xp" ? (S.xp || 0)
             : LEVEL_IDS.filter(id => S.mastered[id]).length;
   const myRank = mine ? all.findIndex(r => r.name.trim().toLowerCase() === mine) : -1;
   const place = myRank < 10 ? myRank : -1;
@@ -2799,19 +2801,19 @@ function renderBoard(loading){
   const body = loading && !BOARD.rows ? `<div class="say-row">${shoco("think")}<div class="bubble">Getting the board…</div></div>`
     : BOARD.err === "off" ? `<div class="say-row">${shoco("idle")}<div class="bubble">The board isn't switched on yet. Ask Victor.</div></div>`
     : BOARD.err ? `<div class="say-row">${shoco("sad")}<div class="bubble">Couldn't reach the board. Check the internet and pull to refresh.</div></div>`
-    : !rows.length ? `<div class="say-row">${shoco("idle")}<div class="bubble">${BOARD.game === "lv" ? "Nobody has mastered a level yet. First one on the board takes it." : "Nobody has played this one yet. First one on the board takes it."}</div></div>`
+    : !rows.length ? `<div class="say-row">${shoco("idle")}<div class="bubble">${BOARD.game === "lv" ? "Nobody has mastered a level yet. First one on the board takes it." : BOARD.game === "xp" ? "Nobody has started yet. First one on the board takes it." : "Nobody has played this one yet. First one on the board takes it."}</div></div>`
     : `<ol class="lb">${rows.map((r, i) => `<li class="${i < 3 ? "top " : ""}${i === place ? "me" : ""}"><span class="rk">${["🥇","🥈","🥉"][i] || i + 1}</span>
         <span class="nm">${esc(r.name)}${i === place ? " <small>you</small>" : ""}</span><span class="sc">${r.v}</span></li>`).join("")}</ol>
       ${rankLine(all, myRank)}
       ${myRank >= 10 ? `<p class="small muted">You're ${ord(myRank + 1)} of ${all.length}.</p>`
-        : myRank < 0 && own > 0 ? `<p class="small muted">${BOARD.game === "lv" ? `You've mastered ${own}.` : `Your best is ${own}.`} Not on the board yet — check the name on your phone matches.</p>`
-        : myRank < 0 ? `<p class="small muted">${BOARD.game === "lv" ? "Master a level and your name goes up there." : "Play a round and get your name up there."}</p>` : ""}`;
+        : myRank < 0 && own > 0 ? `<p class="small muted">${BOARD.game === "lv" ? `You've mastered ${own}.` : BOARD.game === "xp" ? `You have ${own} points.` : `Your best is ${own}.`} Not on the board yet — check the name on your phone matches.</p>`
+        : myRank < 0 ? `<p class="small muted">${BOARD.game === "lv" ? "Master a level and your name goes up there." : BOARD.game === "xp" ? "Do one lesson and your name goes up there." : "Play a round and get your name up there."}</p>` : ""}`;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button>
     <div><p class="eyebrow">Everyone</p><h1>Team board</h1></div>
     <button class="icon-btn" id="rf" aria-label="Refresh">${icon("refresh")}</button></div>
   <div class="tp-sort" role="group" aria-label="Which board">${Object.keys(BOARD_GAMES).map(k => tabBtn(k, BOARD_GAMES[k].label)).join("")}</div>
   <section class="tp-card">${body}</section>
-  <p class="small muted">${(BOARD_GAMES[BOARD.game] || BOARD_GAMES.lv).foot} Updates when your phone has internet.</p>`,
+  <p class="small muted">${(BOARD_GAMES[BOARD.game] || BOARD_GAMES.xp).foot} Updates when your phone has internet.</p>`,
     { full: true, wide: true });
   on("#back", () => tab("games"));
   on("#rf", () => { BOARD.at = 0; boardScreen(); });

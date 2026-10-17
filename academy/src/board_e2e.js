@@ -9,6 +9,8 @@ const ROWS = [
   { name: "Maria G.",  levels: 11, xp: 900, lightning: 21, gauntlet: 8 },
   { name: "Luigi V.",  levels: 6,  xp: 500, lightning: 14, gauntlet: 31 },
   { name: "Jayson K.", levels: 2,  xp: 120, lightning: 9,  gauntlet: 0 },
+  /* Started, but has not finished a level yet. Must still be on the Points board. */
+  { name: "Petty",     levels: 0,  xp: 90,  lightning: 0,  gauntlet: 0 },
   /* Someone trying the app out. The page drops it even when the database
      still has it, because only Victor can change the database. */
   { name: "Test phone", levels: 9, xp: 800, lightning: 30, gauntlet: 40 }
@@ -47,12 +49,20 @@ const ROWS = [
   await page.waitForFunction(() => document.querySelectorAll('.lb li').length > 0, { timeout: 15000 })
     .catch(() => fail("board never rendered any rows"));
 
-  /* Levels is the default, and everyone who has mastered anything is on it. */
+  /* Points is the default, and it is the only board somebody who has not
+     finished a level yet still appears on. */
   let rows = await page.$$eval('.lb li', ls => ls.map(l => l.innerText.replace(/\n/g, ' ').trim()));
-  if (rows.length !== 3) fail(`Levels board should show 3 real people and drop the test row, got ${rows.length}: ${JSON.stringify(rows)}`);
+  if (rows.length !== 4) fail(`Points board should show all 4 real people, got ${rows.length}: ${JSON.stringify(rows)}`);
   if (/test/i.test(rows.join(" "))) fail("a test entry reached the board: " + rows.join(" | "));
-  if (!/Maria G\./.test(rows[0]) || !/11/.test(rows[0])) fail("Levels order wrong: " + rows[0]);
+  if (!/Maria G\./.test(rows[0]) || !/900/.test(rows[0])) fail("Points order wrong: " + rows[0]);
+  if (!/Petty/.test(rows[3])) fail("someone with no mastered level fell off the Points board: " + rows.join(" | "));
   if (!/you/i.test(rows[1])) fail("the viewer's own row is not marked: " + rows[1]);
+
+  await page.click('[data-bg="lv"]');
+  await page.waitForTimeout(250);
+  rows = await page.$$eval('.lb li', ls => ls.map(l => l.innerText.replace(/\n/g, ' ').trim()));
+  if (rows.length !== 3) fail(`Levels board should drop the 0 and show 3, got ${rows.length}`);
+  if (!/Maria G\./.test(rows[0]) || !/11/.test(rows[0])) fail("Levels order wrong: " + rows[0]);
 
   await page.click('[data-bg="l"]');
   await page.waitForTimeout(250);
