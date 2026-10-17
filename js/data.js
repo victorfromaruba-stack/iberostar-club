@@ -133,6 +133,7 @@ const defaultData = {
     },
     "UTV": {
         "type": "fun",
+        "offRoad": true,
         "title": "UTV & ATV Adventure Tours",
         "sub": "Rocka Beach Tours",
         "desc": "Guided off-road safari to Aruba's wild north coast. Includes water, snacks, and a professional tour guide. <div class=\"price-box\"><div class=\"price-row\"><span>ATV Single</span><strong>$160.00</strong></div><div class=\"price-row\"><span>ATV Double</span><strong>$200.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater</span><strong>$480.00</strong></div></div>",
@@ -185,6 +186,7 @@ const defaultData = {
     },
     "Rentals": {
         "type": "fun",
+        "offRoad": true,
         "title": "UTV & ATV Rentals",
         "sub": "Rocka Beach Tours",
         "desc": "Freedom to explore at your own pace — ATV & UTV drop-off and pickup available at all hotels. Security Deposit: $500 per vehicle required. <div class=\"price-box\"><div class=\"price-row\"><span>UTV 2-Seater (4 hr)</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater (8 hr)</span><strong>$275.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (4 hr)</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater (8 hr)</span><strong>$320.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (4 hr)</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater (8 hr)</span><strong>$395.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (4 hr)</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater (8 hr)</span><strong>$435.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (4 hr)</span><strong>$480.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater (8 hr)</span><strong>$495.00</strong></div></div>",
@@ -510,6 +512,7 @@ const defaultData = {
     },
     "JeepTourA": {
         "type": "fun",
+        "offRoad": true,
         "title": "Jeep Tour A: Northshore Safari",
         "sub": "Rocka Beach Tours",
         "desc": "Open-air Jeep safari along Aruba's rugged north coast, with dramatic oceanfront views. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$97.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$75.00</strong></div></div>",
@@ -542,6 +545,7 @@ const defaultData = {
     },
     "JeepTourB": {
         "type": "fun",
+        "offRoad": true,
         "title": "Jeep Tour B: Natural Pool, Caves & Baby Beach",
         "sub": "Rocka Beach Tours",
         "desc": "Open-air Jeep safari through Arikok National Park to the island's natural pool and caves, with a professional guide. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$115.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$85.00</strong></div></div>",
@@ -593,6 +597,7 @@ const defaultData = {
     },
     "UTVJeepNaturalPool": {
         "type": "fun",
+        "offRoad": true,
         "title": "UTV & Safari Jeep Natural Pool Adventure",
         "sub": "Rocka Beach Tours",
         "desc": "A hybrid tour: drive your own UTV to the Natural Pool, then swap into a guided Jeep safari for the rest of the route. Includes a meal with a drink and national park entrance. <div class=\"price-box\"><div class=\"price-row\"><span>2-Seater UTV</span><strong>$285.00</strong></div></div>",

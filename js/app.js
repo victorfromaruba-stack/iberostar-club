@@ -425,7 +425,7 @@
         let currentPdfBlobUrl = null;
         
         // Bump whenever js/data.js's schema or paths change, to flush stale localStorage copies.
-        const DATA_VERSION = 315;
+        const DATA_VERSION = 316;
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
@@ -646,12 +646,20 @@
             
             let itemsToShow = Object.keys(appData).map(key => ({ key, ...appData[key] })).filter(i => i.type === type);
             
-            if (type === 'fun') {
-                if (inHouseMode) {
-                    itemsToShow = itemsToShow.filter(i => i.sub && i.sub.toLowerCase().includes('red sail'));
-                } else {
-                    itemsToShow = itemsToShow.filter(i => i.sub && i.sub.toLowerCase().includes('rocka'));
-                }
+            // Victor, 2026-10-17: "Red sail is anything that's not off road."
+            //
+            // This used to match the partner name in `sub` -- "red sail" for
+            // in-house, "rocka" for everyone else. That was wrong twice over.
+            // It showed in-house guests only two tours when ten are fine for
+            // them, and it is unsafe as a rule: Red Sail themselves resell UTV
+            // and jeep trips, so a future tour booked through them would walk
+            // straight past the restriction.
+            //
+            // The restriction is about what a tour IS. Off-road wrecks the
+            // burrows of the shoco, Aruba's burrowing owl, so our own guests
+            // are never offered it. Everyone else sees everything.
+            if (type === 'fun' && inHouseMode) {
+                itemsToShow = itemsToShow.filter(i => !i.offRoad);
             }
             
             updateCashLine(type, itemsToShow.length);
