@@ -542,6 +542,11 @@ const LEVELS = [
       "Most objections mean \"tell me more\" or \"show me I can trust you.\"",
       "Welcome it: \"Great question.\" Then answer with the plain truth.",
       "Couldn't answer one? Write it down, work out an answer at home, and bring it to the team meeting." ] },
+    { h: "\"We went to one before and they kept us three hours\"", li: [
+      "Do not argue with what they remember. It happened.",
+      "Agree with them first, then tell them what is different now.",
+      "No high pressure any more. It is one couple at a time and we work out what actually fits the family.",
+      "Ninety minutes, and nobody is held past it." ] },
     { h: "\"Let me think about it\"", li: [
       "It usually means they can't picture the morning yet.",
       "Paint it again: breakfast at one of our five-star restaurants, the tour, one of our rooms, and IberoCash for a dinner out.",
@@ -564,6 +569,9 @@ const LEVELS = [
     Q("st4d","They say \"Let me think about it.\" What does it usually mean?","They can't picture the morning yet",["They've already decided not to come","They want you to raise the gift","They need to check with their kids"],"Go back and paint the picture: breakfast, the tour, a room, the IberoCash."),
     Q("st4e","How do you make the morning easy to picture?","Be specific: what, where, when, how long",["Repeat \"it's free\" a few more times","Say \"it's amazing\" over and over again","Talk faster so they hear every detail"],"People say yes to what they can see in their heads."),
     Q("st4f","You couldn't answer an objection today. What now?","Write it down and work out an answer",["Forget it. That couple was never coming","Avoid couples who look like that one","Blame the offer and ask for a new one"],"Your objection notebook turns today's no into tomorrow's yes."),
+    Q("st4g","\"We went to one of these before. They kept us three hours.\" What first?","Agree it was bad, then say what changed",["Promise this one will be much quicker","Tell them that never happens with us","Move on and talk about the gift again"],"Never argue with what they remember. Accept it, then tell them what is different now."),
+    Q("st4h","What do you tell them is different now?","No high pressure, and it is personal",["The gift is worth a lot more today","The talk is half the length it was","A manager sits in on every one"],"One couple at a time, working out what fits their family, and nobody is held past the 90 minutes."),
+    Q("st4i","Why does believing in the Open House yourself matter?","They believe it when you do",["It makes the morning go quicker","It gets you a better rotation spot","It stops them asking you questions"],"If you are not sure about it, they hear that. Sell yourself on it before you sell anyone else."),
     Q("st4j","They're booked and leaving. What do you go over before they go?","Where, when, what to bring, the call",["Only the gift they'll get tomorrow","Nothing. They can ask the hostess","The rules for getting a bigger gift"],"Button it up: the place, the time, 1 ID each and one card, and the confirmation call.")
   ]
 },
@@ -614,6 +622,39 @@ const LEVELS = [
     Q("h4","Which one of these is off-road?","Jeep safari to the north",["Catamaran snorkel sail","Karting at the speedway","Island tour by minibus"],"Jeeps, UTVs and ATVs are off-road. The others are not."),
     Q("h5","A guest at a hotel down the road asks about ATVs.","Offer it: off-site guests can have it",["Refuse, nobody is offered off-road","Offer it only if they are over 40","Give them the in-house list instead"],"The restriction only covers guests staying with us."),
     Q("h6","Red Sail also sell a jeep safari. Can an in-house guest take that one?","No, it is off-road whoever sells it",["Yes, Red Sail is the in-house partner","Yes, as long as the guest asks first","Only on the early morning departure"],"The rule is about what the tour is, never about who books it.")
+  ]
+},
+{
+  id: "close", name: "Close it properly", sub: "The last minute before they walk away", icon: "check",
+  notes: [
+    { h: "The last minute decides whether they show", li: [
+      "Say the qualifications out loud: the ages, the work, the credit card, both of them.",
+      "Say where to go, what time, and how they get there.",
+      "Say what it is: a 90 minute presentation, breakfast included.",
+      "A guest who knows exactly what is coming is a guest who turns up." ] },
+    { h: "Never tell them it is not a sales presentation", li: [
+      "They find out in the first five minutes anyway.",
+      "A guest who feels tricked stops listening, and you are the one who lied to them.",
+      "Say it plainly and they arrive ready to listen." ] },
+    { h: "If they ask why we need a credit card", li: [
+      "Do not get awkward about it. The honest answer is a good answer.",
+      "We put the promotion in front of guests who could really come and stay with us.",
+      "Say it that way and it stops sounding like a test they might fail." ] },
+    { h: "Hand them over well", li: [
+      "Tomorrow they meet someone else. Ask them to give that person a fair chance.",
+      "Ninety minutes of listening, then it is their decision and nobody else's.",
+      "You built the trust. If you do not pass it on, the rep starts from nothing." ] },
+    { h: "Where this comes from", li: [
+      "The closing step in the Timeshare OPC University video \"Bottom Up\", in our own words and fitted to our floor.",
+      "youtube.com/channel/UCpSASqNj-Q7vSrimzaibkCQ" ] }
+  ],
+  qs: [
+    Q("cl1","A guest asks you straight out: is this a sales presentation?","Tell them yes, plainly",["Tell them it is only a welcome talk","Move them back onto the gift instead","Tell them it is an island tour first"],"They find out in the first five minutes. A guest who feels tricked stops listening, and you become the liar."),
+    Q("cl2","They ask why they need a credit card. What do you say?","It shows they could really stay with us",["The resort needs it to serve breakfast","It holds their place on the morning list","The taxi company keeps it on file"],"We put the promotion in front of guests who could come back and stay. Said that way, it stops sounding like a test."),
+    Q("cl3","What do you tell them about how long it takes?","90 minutes, and breakfast is included",["About an hour, maybe a bit longer","As long as they feel like staying","Most of the morning, so keep it free"],"90 minutes with breakfast. Promise shorter and they feel held; promise longer and they never come."),
+    Q("cl4","How does the guest get to the resort in the morning?","They take a taxi and we pay on arrival",["We send a driver to their hotel","They make their own way at their cost","The ride goes on their room bill"],"We do not arrange it. They take a taxi themselves, and it is paid for when they arrive."),
+    Q("cl5","Just before they walk away, what do you say about tomorrow's rep?","Give that person a fair chance",["Warn them the rep will push hard","Tell them to say no to everything","Nothing, that part is not your job"],"You built the trust. Hand it over or the rep starts from nothing."),
+    Q("cl6","Why go over the qualifications again before they leave?","So nothing surprises them at the desk",["To fill the time while you write","To show them you know the rules","Because the front desk asks you to"],"A guest turned away at check-in is a lost tour and an angry guest. Say the rules while they are still in front of you.")
   ]
 }
 ];
