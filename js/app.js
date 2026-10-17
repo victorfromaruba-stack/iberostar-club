@@ -272,6 +272,39 @@
             el.hidden = false;
         }
 
+        // THE GOLD TRAVELS BETWEEN TABS.
+        //
+        // It used to be painted onto whichever button was active, so it blinked
+        // off one tab and on at another -- the one piece of the interface a
+        // thumb follows, and it was the only thing not moving.
+        //
+        // Measured off the live buttons rather than hard-coded, so the vertical
+        // rail a tablet switches to needs no second code path. The first placing
+        // skips the transition: otherwise the pill flies in from the corner on
+        // load, which looks like a bug rather than an entrance.
+        function moveNavPill(firstPlace) {
+            const nav = document.getElementById('mainNav');
+            const pill = document.getElementById('navPill');
+            if (!nav || !pill) return;
+            const active = nav.querySelector('.nav-btn.active');
+            if (!active) { pill.style.opacity = '0'; return; }
+            const n = nav.getBoundingClientRect();
+            const a = active.getBoundingClientRect();
+            if (!a.width) return;
+            if (firstPlace) pill.style.transition = 'none';
+            pill.style.width = a.width + 'px';
+            pill.style.height = a.height + 'px';
+            pill.style.transform = 'translate(' + Math.round(a.left - n.left) + 'px,' +
+                Math.round(a.top - n.top) + 'px)';
+            pill.style.opacity = '1';
+            if (firstPlace) requestAnimationFrame(() => { pill.style.transition = ''; });
+        }
+
+        // A tablet rotating turns the bar into a rail and back, which moves every
+        // button. Re-measure rather than leave the gold behind.
+        window.addEventListener('resize', () => moveNavPill(true));
+        window.addEventListener('orientationchange', () => setTimeout(() => moveNavPill(true), 180));
+
         // CARDS ARRIVE AS YOU REACH THEM.
         //
         // The old entrance ran on render: every card in the section animated at
@@ -423,6 +456,7 @@
             updateInHouseBadge();
             initLivingDepth();
             initCardReveal();
+            requestAnimationFrame(() => moveNavPill(true));
 
             let ticking = false;
             document.addEventListener('mousemove', (e) => {
@@ -691,6 +725,7 @@
                 const activeBtn = document.getElementById(activeId);
                 activeBtn.classList.add('active');
                 activeBtn.setAttribute('aria-current', 'page');
+                moveNavPill();
             }
         }
 

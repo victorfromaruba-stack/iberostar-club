@@ -144,7 +144,19 @@
 
         .nav-btn { width: 56px; height: 56px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1); position: relative; flex-shrink: 0; }
         .nav-btn:hover { background: rgba(212, 175, 55, 0.1); color: var(--gold-deep); }
-        .nav-btn.active { background: var(--gold-gradient); color: white; box-shadow: var(--shadow-gold); }
+        /* The gold used to be painted onto whichever button was active, so it
+           blinked off one tab and on at another. It is now one element that
+           travels, which is the part a thumb actually follows.
+           Every nav button is the same fixed size, so the pill only ever
+           translates: no width or height animation, nothing that triggers
+           layout mid-move. The same measurement drives the vertical rail on a
+           tablet without a second code path. */
+        .nav-pill { position: absolute; top: 0; left: 0; width: 56px; height: 56px;
+            border-radius: 20px; background: var(--gold-gradient);
+            box-shadow: var(--shadow-gold); opacity: 0; pointer-events: none; z-index: 0;
+            transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease; }
+        .nav-btn { position: relative; z-index: 1; }
+        .nav-btn.active { background: transparent; color: white; box-shadow: none; }
         .nav-btn svg { width: 24px; height: 24px; fill: currentColor; transition: transform 0.4s; pointer-events: none; }
         .nav-btn.active svg { transform: scale(1.1); fill: #06121E; }
 
