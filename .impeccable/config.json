@@ -61,6 +61,15 @@
         ],
         "createdAt": "2026-10-17T14:49:52.220Z",
         "reason": "Speech-bubble tails (.bubble::before, .start-tag::after) are rotated squares with two borders, not card accents; .line and .rp-try use a green left edge to mark the line to actually say, which is semantic in this app"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "width .45s cubic-bezier(.2,.9,.2,1)",
+        "files": [
+          "academy/src/style.css"
+        ],
+        "createdAt": "2026-10-17T15:00:07.700Z",
+        "reason": "Single-element progress bar, one transition per question, no siblings or text reflow; scaleX would distort the inset gloss pill in .l-bar i::after"
       }
     ]
   }
