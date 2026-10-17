@@ -870,7 +870,7 @@ const UNITS = [
   { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "cash", "house", "solid", "words", "close", "map"] },
   { id: "nlp", n: 3, title: "NLP", sub: "Rapport, words that lead, reading people", color: "sea", levels: ["nlp1", "nlp2", "nlp3", "nlp4"], after: "why" },
   { id: "street", n: 4, title: "Street skills", sub: "Stopping people, small talk, objections", color: "good", levels: ["ready", "st2", "st3", "st4"], after: "q" },
-  { id: "tips", n: 5, title: "Tips and tricks", sub: "From the street, with the videos", color: "sun", levels: ["tip1", "tip2", "tip3"] },
+  { id: "tips", n: 5, title: "Tips and tricks", sub: "From the street, with the videos", color: "sun", levels: ["tip1", "tip2", "tip3", "tip4"] },
   { id: "final", n: 6, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
 ];
 const TRACKS = UNITS.filter(u => u.id !== "final");
@@ -1662,6 +1662,38 @@ const LEVELS = [
     Q("p6","\"How long before we can go?\" What do you say?","Ninety minutes, plus breakfast",["It depends on the morning","Until you have seen it all","As long as you want to stay"],"Ninety minutes and breakfast. Then it is their decision and nobody holds them."),
     Q("p7","You're not sure of the answer to something they ask.","Say so, then find out",["Give your best guess quickly","Move them on to the gift","Tell them the desk will know"],"A guess that turns out wrong is found out tomorrow, and it was your name on the invitation.")
   ]
+},
+{
+  id: "tip4", name: "Closing tricks", sub: "Small moves that save a booking", icon: "hand",
+  notes: [
+    { h: "Aim the compliment carefully", li: [
+      "Compliment the woman if you are a woman, the man if you are a man.",
+      "A warm compliment aimed across a couple makes the other one uncomfortable, and uncomfortable people do not book.",
+      "Something they chose: the hat, the bag, the shirt. Never their body." ] },
+    { h: "Never go quiet while you write", li: [
+      "Silence while you fill in the invitation is where they start having second thoughts.",
+      "Keep talking. Tomorrow's breakfast, the drive over, what they will do after.",
+      "The pen moving and your voice going are the same move." ] },
+    { h: "Two times, not an open question", li: [
+      "\"Which is better, eight or ten?\" instead of \"when are you free?\"",
+      "An open question invites a no. A choice between two times only has two answers, and both of them are yes." ] },
+    { h: "Ask where they dream of going", li: [
+      "Before they walk away: the three places they would most like to see.",
+      "They stop being someone collecting a gift and start being someone planning holidays.",
+      "It also hands tomorrow's rep something real to talk about." ] },
+    { h: "Where this comes from", li: [
+      "Ideas from \"OPC Secrets By Suz\" by Suzanne R. Angeles, in our own words and fitted to our rules.",
+      "Several of its tactics are deliberately NOT here: holding gift back as a bargaining chip, inventing scarcity, deposits and signatures on the street. They are not how we work." ] }
+  ],
+  qs: [
+    Q("x1","You're complimenting a couple. Who do you aim it at?","The one of your own gender",["Whichever of them looks friendlier","The one holding the money","Both of them, one after the other"],"A compliment across a couple makes the partner uncomfortable, and uncomfortable people don't book."),
+    Q("x2","What do you compliment?","Something they chose to wear",["Their figure, to make them smile",'How young they both look',"The money they must have spent"],"The hat, the bag, the shirt. Something they picked, never their body."),
+    Q("x3","You're filling in the invitation. What are you doing with your voice?","Still talking to them",["Nothing, so you don't misspell","Reading the fields out loud","Asking them to wait a second"],"Silence while you write is where second thoughts arrive. The pen and the voice move together."),
+    Q("x4","How do you ask what time they'll come?","\"Is eight or ten better?\"",["\"When are you free that day?\"","\"What time suits you best?\"","\"Could you make the morning?\""],"An open question invites a no. Two times have two answers and both are yes."),
+    Q("x5","Before they walk away, what else do you ask?","The three places they dream of",["Whether they liked the island","If they have friends here too","What they do most evenings"],"It turns them from someone taking a gift into someone planning a holiday, and gives tomorrow's rep something real."),
+    Q("x6","They're wavering. Do you offer a bigger gift to save it?","No. The gift is set by who they are",["Yes, a little more usually works","Only if they ask for more first","Offer it, then clear it later"],"Our gift comes from the qualification, not from the conversation. Promising more is a broken promise at the desk."),
+    Q("x7","Can you tell them the slots are nearly gone to hurry them?","No, not unless it's true",["Yes, it's a normal sales line","Only with couples who stall","Yes, there's always a queue"],"We promise no pressure, and an invented queue is found out. Say what is true or say nothing.")
+  ]
 }
 ];
 
@@ -1831,8 +1863,8 @@ const GOAL = 50;
    2026-10-17. ORDER is the learning sequence and decides what a worker is
    pointed at next; a level missing there is never offered and silently locks
    the Final, which needs every unit finished. */
-const ORDER = ["q","why","ready","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","tip1","tip2","tip3","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","ready","st2","st3","st4","tip1","tip2","tip3","final"];
+const ORDER = ["q","why","ready","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","tip1","tip2","tip3","tip4","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","ready","st2","st3","st4","tip1","tip2","tip3","tip4","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];

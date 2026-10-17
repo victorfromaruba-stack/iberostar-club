@@ -17,8 +17,8 @@ const GOAL = 50;
    2026-10-17. ORDER is the learning sequence and decides what a worker is
    pointed at next; a level missing there is never offered and silently locks
    the Final, which needs every unit finished. */
-const ORDER = ["q","why","ready","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","tip1","tip2","tip3","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","ready","st2","st3","st4","tip1","tip2","tip3","final"];
+const ORDER = ["q","why","ready","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","tip1","tip2","tip3","tip4","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","ready","st2","st3","st4","tip1","tip2","tip3","tip4","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];

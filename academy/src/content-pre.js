@@ -24,7 +24,7 @@ const UNITS = [
   { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "cash", "house", "solid", "words", "close", "map"] },
   { id: "nlp", n: 3, title: "NLP", sub: "Rapport, words that lead, reading people", color: "sea", levels: ["nlp1", "nlp2", "nlp3", "nlp4"], after: "why" },
   { id: "street", n: 4, title: "Street skills", sub: "Stopping people, small talk, objections", color: "good", levels: ["ready", "st2", "st3", "st4"], after: "q" },
-  { id: "tips", n: 5, title: "Tips and tricks", sub: "From the street, with the videos", color: "sun", levels: ["tip1", "tip2", "tip3"] },
+  { id: "tips", n: 5, title: "Tips and tricks", sub: "From the street, with the videos", color: "sun", levels: ["tip1", "tip2", "tip3", "tip4"] },
   { id: "final", n: 6, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
 ];
 const TRACKS = UNITS.filter(u => u.id !== "final");
