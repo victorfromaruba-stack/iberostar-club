@@ -41,6 +41,7 @@ const today = () => dstr(new Date());
 const fmtT = s => { s = Math.max(0, Math.floor(s||0)); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; };
 const nf = n => Number(n||0).toLocaleString("en-US");
 const plural = (n, w) => `${n} ${w}${n===1?"":"s"}`;
+const ord = n => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ["th","st","nd","rd"][n % 10] || "th");
 const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 function ago(t){
   const ms = t ? new Date(t).getTime() : NaN;
@@ -60,7 +61,7 @@ function levelTotal(L){ return L.map ? MAP_STEPS.length*2 : (L.count || (L.qs||[
 const KEY = "showup.v1";
 const blank = () => ({ name:"", mastered:{}, best:{}, misses:{}, sound:true, xp:0, lightning:0, daily:{ last:"", streak:0, best:0 },
   listened:{}, intro:false, days:[], today:{ d:"", xp:0 }, said:{}, sync:{ device:"", secret:"", last:0, ok:null }, mgr:"", tab:"learn",
-  lv:{}, log:[], gaunt:0, rp:{ n:0, best:0, res:[] }, rpVoice:true, rpFocus:"any", rpLang:"en" });
+  lv:{}, log:[], gaunt:0, rank:{}, rp:{ n:0, best:0, res:[] }, rpVoice:true, rpFocus:"any", rpLang:"en" });
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e){}
 for (const [k, v] of Object.entries(blank())) if (typeof S[k] !== typeof v || (Array.isArray(v) && !Array.isArray(S[k]))) S[k] = v;
@@ -814,9 +815,11 @@ function celebrate(o){
     ${o.L && o.L.final ? `<div class="cert"><p class="eyebrow">Show-Up Academy certificate</p><p class="who">${esc(S.name || "Show-Up Pro")}</p><p>Passed the final: ${o.row} questions in a row on the qualifications, the pitch and NLP, with no mistakes.</p><p class="small muted">${esc(date)}</p></div><p class="small muted">Your manager sees this on the team view too.</p>` : ""}
     ${gap ? `<p class="muted">Come back in ${plural(gap,"day")} for a quick review. Spacing it out makes it stick.</p>` : ""}
     <button class="btn wide" id="cont">Continue</button>
+    <button class="link" id="seeBoard">${icon("trophy")} See where you are on the team board</button>
   </section>`, { full: true });
   countUp($("#cxp"), o.xp); sfx("win"); buzz([30,40,30,40,80]); confetti();
   on("#cont", () => o.extended ? streakScreen() : tab("learn"));
+  on("#seeBoard", () => { BOARD.game = o.L === GAUNTLET ? "gt" : "lv"; BOARD.at = 0; boardScreen(); });
   timers.push(setTimeout(() => $("#cont")?.focus({ preventScroll:true }), 80));
 }
 function streakScreen(){
@@ -953,15 +956,29 @@ function boardRows(){
   return (Array.isArray(BOARD.rows) ? BOARD.rows : [])
     .map(r => ({ name: String((r && r.name) || "").slice(0, 40), v: Math.max(0, Math.min(999999, parseInt(r && r[key], 10) || 0)) }))
     .filter(r => r.name && r.v > 0)
-    .sort((a, b) => b.v - a.v)
-    .slice(0, 10);
+    .sort((a, b) => b.v - a.v);
+}
+/* The two lines that make a board worth reopening: where you moved since you
+   last looked, and exactly how far the next person is. "2 behind Jaydon" is a
+   thing you can go and do something about tonight; a list of names is not. */
+function rankLine(all, myRank){
+  if (myRank < 0) return "";
+  const was = (S.rank || {})[BOARD.game];
+  const moved = typeof was === "number" && was !== myRank ? was - myRank : 0;
+  const above = all[myRank - 1], me = all[myRank];
+  const unit = BOARD.game === "lv" ? "level" : "point";
+  const chase = above ? `${plural(above.v - me.v, unit)} behind ${esc(above.name)}.` : "Nobody above you. Hold it.";
+  const move = moved > 0 ? `<b style="color:var(--good-ink)">▲ Up ${moved} since you last looked.</b> `
+             : moved < 0 ? `<b style="color:var(--fire-ink)">▼ Down ${-moved} since you last looked.</b> ` : "";
+  return `<p class="bd-chase">${move}${chase}</p>`;
 }
 function renderBoard(loading){
-  const rows = boardRows(), mine = (S.name || "").trim().toLowerCase();
+  const all = boardRows(), rows = all.slice(0, 10), mine = (S.name || "").trim().toLowerCase();
   const own = BOARD.game === "gt" ? (S.gaunt || 0)
             : BOARD.game === "l" ? (S.lightning || 0)
             : LEVEL_IDS.filter(id => S.mastered[id]).length;
-  const place = rows.findIndex(r => r.name.trim().toLowerCase() === mine && mine);
+  const myRank = mine ? all.findIndex(r => r.name.trim().toLowerCase() === mine) : -1;
+  const place = myRank < 10 ? myRank : -1;
   const tabBtn = (k, label) => `<button data-bg="${k}" aria-pressed="${BOARD.game === k}">${label}</button>`;
   const body = loading && !BOARD.rows ? `<div class="say-row">${shoco("think")}<div class="bubble">Getting the board…</div></div>`
     : BOARD.err === "off" ? `<div class="say-row">${shoco("idle")}<div class="bubble">The board isn't switched on yet. Ask Victor.</div></div>`
@@ -969,8 +986,10 @@ function renderBoard(loading){
     : !rows.length ? `<div class="say-row">${shoco("idle")}<div class="bubble">${BOARD.game === "lv" ? "Nobody has mastered a level yet. First one on the board takes it." : "Nobody has played this one yet. First one on the board takes it."}</div></div>`
     : `<ol class="lb">${rows.map((r, i) => `<li class="${i < 3 ? "top " : ""}${i === place ? "me" : ""}"><span class="rk">${["🥇","🥈","🥉"][i] || i + 1}</span>
         <span class="nm">${esc(r.name)}${i === place ? " <small>you</small>" : ""}</span><span class="sc">${r.v}</span></li>`).join("")}</ol>
-      ${place < 0 && own > 0 ? `<p class="small muted">${BOARD.game === "lv" ? `You've mastered ${own}.` : `Your best is ${own}.`} Not in the top ten yet.</p>`
-        : place < 0 ? `<p class="small muted">${BOARD.game === "lv" ? "Master a level and your name goes up there." : "Play a round and get your name up there."}</p>` : ""}`;
+      ${rankLine(all, myRank)}
+      ${myRank >= 10 ? `<p class="small muted">You're ${ord(myRank + 1)} of ${all.length}.</p>`
+        : myRank < 0 && own > 0 ? `<p class="small muted">${BOARD.game === "lv" ? `You've mastered ${own}.` : `Your best is ${own}.`} Not on the board yet — check the name on your phone matches.</p>`
+        : myRank < 0 ? `<p class="small muted">${BOARD.game === "lv" ? "Master a level and your name goes up there." : "Play a round and get your name up there."}</p>` : ""}`;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button>
     <div><p class="eyebrow">Everyone</p><h1>Team board</h1></div>
     <button class="icon-btn" id="rf" aria-label="Refresh">${icon("refresh")}</button></div>
@@ -981,6 +1000,9 @@ function renderBoard(loading){
   on("#back", () => tab("games"));
   on("#rf", () => { BOARD.at = 0; boardScreen(); });
   app.querySelectorAll("[data-bg]").forEach(b => b.onclick = () => { BOARD.game = b.dataset.bg; renderBoard(false); });
+  /* Remembered only after it has been shown, so the arrow reports the move
+     since the last time he actually saw the board, not since the last fetch. */
+  if (!loading && myRank >= 0){ S.rank = S.rank || {}; if (S.rank[BOARD.game] !== myRank){ S.rank[BOARD.game] = myRank; save(false); } }
 }
 
 function lightningIntro(){
@@ -1082,10 +1104,12 @@ function endLightning(wrong){
     <div class="stats"><div class="stat c-lagoon"><div class="h">This round</div><div class="v">${g.score}</div></div><div class="stat c-sun"><div class="h">Record</div><div class="v">${icon("bolt")}${S.lightning}</div></div><div class="stat"><div class="h">XP</div><div class="v">${icon("star")}${g.score*5}</div></div></div>
     ${wrong ? `<div class="card" style="text-align:left;width:100%"><p class="eyebrow">The couple</p>${scenarioHTML({ chips: g.cur.chips, q: g.cur.q })}<p>You said <b>${esc(GRADE[wrong])}</b>. Right answer: <b>${esc(GRADE[g.cur.g])}</b>.</p><p class="muted">${esc(g.cur.why)}</p></div>` : ""}
     <button class="btn wide sea" id="again">Play again</button>
+    <button class="link" id="seeBoard">${icon("trophy")} See the Lightning board</button>
     <button class="btn wide ghost" id="home">Back</button>
   </section>`, { full: true });
   if (record) confetti();
   on("#back", () => tab("games")); on("#home", () => extended ? streakScreen() : tab("games")); on("#again", startLightning);
+  on("#seeBoard", () => { BOARD.game = "l"; BOARD.at = 0; boardScreen(); });
   $("#again").focus({ preventScroll: true });
 }
 

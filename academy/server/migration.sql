@@ -153,7 +153,12 @@ grant execute on function public.sua_rp_coach_save(uuid, jsonb) to service_role;
 -- fail the whole query), capped, and the hidden flag is read through
 -- to_jsonb() so this still works whether or not that column exists.
 -- ---------------------------------------------------------------------------
-create or replace function public.sua_board()
+-- The return columns changed, and create-or-replace cannot change a return
+-- type (Postgres 42P13), so the old one is dropped first. The app treats a
+-- missing function as "not switched on yet", so the gap is harmless.
+drop function if exists public.sua_board();
+
+create function public.sua_board()
 returns table (name text, levels int, xp int, lightning int, gauntlet int)
 language sql
 stable
