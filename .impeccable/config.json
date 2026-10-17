@@ -47,6 +47,20 @@
         ],
         "createdAt": "2026-10-16T22:13:23.224Z",
         "reason": "The only border-accent finding in this file is .image-spinner: a 44px circle with border:4px translucent plus one gold border-top, rotated. The radius and the single coloured side ARE the spinner technique, not an accent bar on a card. Exact-value ignore did not match, so scoping by file as with the other two."
+      },
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(.2, 1.6, .4, 1)",
+        "createdAt": "2026-10-17T14:49:35.505Z"
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "academy/src/style.css"
+        ],
+        "createdAt": "2026-10-17T14:49:52.220Z",
+        "reason": "Speech-bubble tails (.bubble::before, .start-tag::after) are rotated squares with two borders, not card accents; .line and .rp-try use a green left edge to mark the line to actually say, which is semantic in this app"
       }
     ]
   }
