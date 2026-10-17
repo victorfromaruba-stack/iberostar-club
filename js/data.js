@@ -103,6 +103,20 @@ const defaultData = {
             "assets/Store/ArubaAloe/store_aloe_10.jpg"
         ]
     },
+    "KaysJewelry": {
+        "type": "store",
+        "title": "Kay's Fine Jewelry",
+        "sub": "Downtown Oranjestad • Jewelry",
+        "desc": "A family-run boutique jeweller on Weststraat 8, in the heart of downtown Oranjestad. Diamonds, coloured gemstones, designer pieces and luxury watches, with craftsmen on site for sizing and setting. <br><br><b>Say \"Aruba Blues\" in store for a free Aruba necklace.</b><br>Ask about their complimentary ride downtown.",
+        "gallery": [
+            "assets/Store/Kays/store_kays_1.jpg",
+            "assets/Store/Kays/store_kays_2.jpg",
+            "assets/Store/Kays/store_kays_3.jpg",
+            "assets/Store/Kays/store_kays_4.jpg",
+            "assets/Store/Kays/store_kays_5.jpg",
+            "assets/Store/Kays/store_kays_6.jpg"
+        ]
+    },
     "MoreRetail": {
         "type": "store",
         "title": "More Retail Partners",
@@ -424,7 +438,8 @@ const defaultData = {
             "assets/Restaurants/Zima/rest_zima_11.jpg",
             "assets/Restaurants/Zima/rest_zima_12.jpg",
             "assets/Restaurants/Zima/rest_zima_13.jpg"
-        ]
+        ],
+        "pdf": "assets/Restaurants/Zima/zima_menu.pdf"
     },
     "Bucatini": {
         "type": "food",
