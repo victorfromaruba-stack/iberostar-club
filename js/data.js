@@ -149,6 +149,9 @@ const defaultData = {
         "desc": "Guided off-road safari to Aruba's wild north coast. Includes water, snacks, and a professional tour guide. <div class=\"price-box\"><div class=\"price-row\"><span>ATV Single</span><strong>$160.00</strong></div><div class=\"price-row\"><span>ATV Double</span><strong>$200.00</strong></div><div class=\"price-row\"><span>UTV 2-Seater</span><strong>$230.00</strong></div><div class=\"price-row\"><span>UTV 3-Seater</span><strong>$305.00</strong></div><div class=\"price-row\"><span>UTV 4-Seater</span><strong>$380.00</strong></div><div class=\"price-row\"><span>UTV 5-Seater</span><strong>$420.00</strong></div><div class=\"price-row\"><span>UTV 6-Seater</span><strong>$480.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_utv_1.jpg"
+        ,
+            "assets/Activities/Rockabeach/act_utv_2.jpg",
+            "assets/Activities/Rockabeach/act_utv_3.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4 Hours",
@@ -180,6 +183,8 @@ const defaultData = {
         "desc": "Outdoor karting at Bushiri Karting Speedway: a safety briefing, 1 practice race, 1 lap-position race, and 1 final race, with medals and champagne for the winners. Hotel pickup/drop-off, water, and snacks included. <div class=\"price-box\"><div class=\"price-row\"><span>Race Experience (Adult)</span><strong>$85.00</strong></div><div class=\"price-row\"><span>Race Experience (Child)</span><strong>$60.00</strong></div><div class=\"price-row\"><span>Arrive & Drive (Adult)</span><strong>$25.00</strong></div><div class=\"price-row\"><span>Arrive & Drive (Child)</span><strong>$25.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_gokart_1.jpg"
+        ,
+            "assets/Activities/Rockabeach/act_gokart_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "2 Hours",
@@ -567,6 +572,8 @@ const defaultData = {
         "desc": "Open-air Jeep safari through Arikok National Park to the island's natural pool and caves, with a professional guide. <div class=\"price-box\"><div class=\"price-row\"><span>Adult</span><strong>$115.00</strong></div><div class=\"price-row\"><span>Child (4-12)</span><strong>$85.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_jeepb_1.jpg"
+        ,
+            "assets/Activities/Rockabeach/act_jeepb_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4-6 Hours",

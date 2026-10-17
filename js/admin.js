@@ -32,7 +32,7 @@ function showAdmin() {
 }
 
 let appData = {};
-const DATA_VERSION = 313;
+const DATA_VERSION = 314;
 
 function loadAppData() {
     const saved = localStorage.getItem('ib_app_data');
