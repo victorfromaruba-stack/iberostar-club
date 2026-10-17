@@ -847,7 +847,7 @@ const LISTEN = (id, clip, from, to, q, a, w, why) => ({ id, type: "listen", clip
 
 const UNITS = [
   { id: "qualify", n: 1, title: "Qualify", sub: "Who gets which gift", color: "lagoon", levels: ["q", "ctnq", "who"] },
-  { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "solid", "words", "map"] },
+  { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "cash", "house", "solid", "words", "map"] },
   { id: "nlp", n: 3, title: "NLP", sub: "Rapport, words that lead, reading people", color: "sea", levels: ["nlp1", "nlp2", "nlp3", "nlp4"], after: "why" },
   { id: "street", n: 4, title: "Street skills", sub: "Stopping people, small talk, objections", color: "good", levels: ["st2", "st3", "st4"], after: "q" },
   { id: "final", n: 5, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
@@ -1422,7 +1422,55 @@ const LEVELS = [
     Q("st4j","They're booked and leaving. What do you go over before they go?","Where, when, what to bring, the call",["Only the gift they'll get tomorrow","Nothing. They can ask the hostess","The rules for getting a bigger gift"],"Button it up: the place, the time, 1 ID each and one card, and the confirmation call.")
   ]
 },
-{ id: "final", name: "Final run", sub: "Everything mixed: 20 in a row", icon: "trophy", final: true, count: 20, notes: [] }
+{ id: "final", name: "Final run", sub: "Everything mixed: 20 in a row", icon: "trophy", final: true, count: 20, notes: [] },
+{
+  id: "cash", name: "Where the gift works", sub: "What Iberocash actually buys", icon: "gift",
+  notes: [
+    { h: "More than 30 places take it", li: [
+      "Restaurants, tours, the spa, golf and shops, all over the island.",
+      "Twelve restaurants, from the kitchens at Joia to places downtown.",
+      "Tours on the water, karting, and island tours by bus.",
+      "Spa Sensations, and golf at Tierra del Sol.",
+      "Aruba Aloe, and Kay's Fine Jewelry in downtown Oranjestad." ] },
+    { h: "Kay's Fine Jewelry", li: [
+      "Weststraat 8, in the middle of downtown Oranjestad.",
+      "Say \"Aruba Blues\" in the store and the Aruba necklace is free.",
+      "Ask them about the complimentary ride downtown." ] },
+    { h: "Why this matters on the street", li: [
+      "A guest who can picture dinner, a sail and a necklace hears a real gift.",
+      "A guest who only hears an amount hears a coupon." ] }
+  ],
+  qs: [
+    Q("ic1","A guest asks where they can spend the gift. What do you say?","Restaurants, tours, the spa, golf and shops",["Only at the restaurants inside the hotel","Only on tours that we book for them","Anywhere on the island that takes cards"],"More than thirty partner places take it, right across the island."),
+    Q("ic2","Roughly how many places take Iberocash?","More than thirty","Around ten, all at the resort|Just under twenty, tours only|About a hundred, island wide".split("|"),"The list runs past thirty and partners keep joining."),
+    Q("ic3","A guest wants to spend the gift on jewelry. Where do they go?","Kay's Fine Jewelry, downtown",["Aruba Aloe, downtown","The gift shop inside Joia","The pro shop at Tierra del Sol"],"Kay's on Weststraat 8 takes Iberocash."),
+    Q("ic4","What do guests say in Kay's to get the free Aruba necklace?","Aruba Blues",["Island Gift","Open House","Dushi Aruba"],"Those two words in the store and the necklace is theirs."),
+    Q("ic5","A couple says they love the water. Which partners suit them?","Snorkel trips and sunset sails",["Karting and the island bus","The spa and the golf course","The aloe shop and jewelry"],"Several sailing partners take the gift: snorkel, sunset and dinner sails."),
+    Q("ic6","Why name real places when you offer the gift?","They can picture it, so it feels real",["It fills the time while they decide","It shows them we know the island","It stops them asking the price"],"A named restaurant turns an amount into an afternoon they can see.")
+  ]
+},
+{
+  id: "house", name: "In-house or off-site", sub: "What our own guests are offered", icon: "home",
+  notes: [
+    { h: "Two kinds of guest", li: [
+      "In-house: staying at an Iberostar property.",
+      "Off-site: staying anywhere else on the island." ] },
+    { h: "In-house guests are never offered off-road", li: [
+      "No UTV, no ATV, no jeep safari.",
+      "Off-road driving destroys the burrows of the shoco, Aruba's own burrowing owl.",
+      "Everything else is fine: sailing, snorkel, sunset, karting, the island bus." ] },
+    { h: "Off-site guests", li: [
+      "They can be offered the whole list, off-road included." ] }
+  ],
+  qs: [
+    Q("h1","A guest staying at Joia asks about the UTV tour.","Offer something else, not off-road",["Book it, the tour is open to everyone","Book it, but only the morning run","Send them to another tour company"],"Guests staying with us are never offered off-road."),
+    Q("h2","Why are our own guests not offered off-road?","It destroys the shoco's burrows",["The tours are booked up too far ahead","The insurance will not cover them","Those roads are closed to hotel guests"],"The shoco is Aruba's burrowing owl and it nests in the ground."),
+    Q("h3","An in-house couple want a sunset sail. Can they?","Yes, there is nothing off-road about it",["No, in-house guests get the spa only","No, the sails are for off-site guests","Only if they book it on their own"],"The rule is about off-road, not about which partner sells it."),
+    Q("h4","Which one of these is off-road?","Jeep safari to the north",["Catamaran snorkel sail","Karting at the speedway","Island tour by minibus"],"Jeeps, UTVs and ATVs are off-road. The others are not."),
+    Q("h5","A guest at a hotel down the road asks about ATVs.","Offer it: off-site guests can have it",["Refuse, nobody is offered off-road","Offer it only if they are over 40","Give them the in-house list instead"],"The restriction only covers guests staying with us."),
+    Q("h6","Red Sail also sell a jeep safari. Can an in-house guest take that one?","No, it is off-road whoever sells it",["Yes, Red Sail is the in-house partner","Yes, as long as the guest asks first","Only on the early morning departure"],"The rule is about what the tour is, never about who books it.")
+  ]
+}
 ];
 
 /* NLP practice lines for Say it, taken from the guidebook notes that have a sayId.

@@ -14,7 +14,7 @@ const LISTEN = (id, clip, from, to, q, a, w, why) => ({ id, type: "listen", clip
 
 const UNITS = [
   { id: "qualify", n: 1, title: "Qualify", sub: "Who gets which gift", color: "lagoon", levels: ["q", "ctnq", "who"] },
-  { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "solid", "words", "map"] },
+  { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "cash", "house", "solid", "words", "map"] },
   { id: "nlp", n: 3, title: "NLP", sub: "Rapport, words that lead, reading people", color: "sea", levels: ["nlp1", "nlp2", "nlp3", "nlp4"], after: "why" },
   { id: "street", n: 4, title: "Street skills", sub: "Stopping people, small talk, objections", color: "good", levels: ["st2", "st3", "st4"], after: "q" },
   { id: "final", n: 5, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
