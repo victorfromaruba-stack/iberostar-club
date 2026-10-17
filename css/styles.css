@@ -226,6 +226,55 @@
             opacity: 0; animation: fadeUp 0.8s 0.34s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         .cash-line b { font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; }
         .cash-line[hidden] { display: none; }
+        /* It is a button now, so it must look pressable without becoming a
+           second primary action competing with the cards. */
+        .cash-line { cursor: pointer; appearance: none; -webkit-appearance: none;
+            transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        .cash-line:active { transform: scale(0.97); }
+
+        /* WHAT YOUR IBEROCASH IS WORTH.
+           Dark card, not the white of the QR sheet: that one is white because a
+           camera reads a code by contrast. This one is read by a person, so it
+           stays in the app's own world. */
+        .worth-sheet { position: fixed; inset: 0; z-index: 400; display: flex;
+            align-items: flex-end; justify-content: center;
+            background: rgba(4,16,30,0.72); backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px); }
+        .worth-sheet[hidden] { display: none; }
+        .worth-card { position: relative; width: 100%; max-width: 560px;
+            max-height: 88vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+            background: linear-gradient(180deg, #0C2033 0%, #081726 100%);
+            border: 1px solid rgba(212,175,55,0.35);
+            border-radius: 28px 28px 0 0; padding: 26px 20px calc(26px + env(safe-area-inset-bottom)); }
+        @media (min-width: 560px) { .worth-card { border-radius: 28px; margin-bottom: 5vh; } }
+        .worth-card h3 { font-family: var(--font-head); font-size: 1.5rem;
+            color: #FFFFFF; margin: 0 0 16px; padding-right: 36px; line-height: 1.15; }
+        .worth-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+        .worth-chip { flex: 1 1 auto; min-width: 62px; padding: 11px 6px; cursor: pointer;
+            font-family: var(--font-body); font-size: 1rem; font-weight: 800;
+            color: #FFE9A8; background: rgba(212,175,55,0.12);
+            border: 1px solid rgba(212,175,55,0.4); border-radius: 14px;
+            transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        .worth-chip:active { transform: scale(0.94); }
+        .worth-chip.on { background: var(--gold); color: #06121E; border-color: var(--gold); }
+        .worth-count { font-family: var(--font-body); font-size: 0.95rem; font-weight: 700;
+            color: #FFE9A8; margin: 0 0 14px; line-height: 1.35; }
+        .worth-row { display: flex; align-items: center; justify-content: space-between;
+            gap: 14px; padding: 12px 2px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .worth-row:last-child { border-bottom: 0; }
+        .worth-what { display: flex; flex-direction: column; min-width: 0; }
+        .worth-what b { font-family: var(--font-body); font-size: 1rem; font-weight: 700;
+            color: #FFFFFF; }
+        .worth-what span { font-family: var(--font-body); font-size: 0.85rem;
+            color: rgba(255,255,255,0.72); margin-top: 2px; }
+        .worth-price { font-family: var(--font-body); font-size: 1.05rem; font-weight: 800;
+            color: var(--gold-light); font-variant-numeric: tabular-nums; flex: none; }
+        .worth-empty, .worth-foot { font-family: var(--font-body); font-size: 0.8rem;
+            color: rgba(255,255,255,0.6); line-height: 1.45; }
+        .worth-foot { margin: 16px 0 0; }
+        .worth-close { position: absolute; top: 12px; right: 14px; width: 38px; height: 38px;
+            border-radius: 50%; border: 0; background: rgba(255,255,255,0.1);
+            font-size: 24px; line-height: 1; color: #FFFFFF; cursor: pointer; }
 
         /* The same promise, on the screen it gets made on. Sits under the place
            name so it is read with the name, not hunted for. */

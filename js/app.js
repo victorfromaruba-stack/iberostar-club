@@ -87,6 +87,102 @@
             if (b) b.hidden = !inHouseMode;
         }
 
+        // WHAT IS MY IBEROCASH ACTUALLY WORTH?
+        //
+        // The whole pitch rests on a number a tourist cannot picture. "You get
+        // $200 in Iberocash" means nothing on a street corner; the next thing
+        // out of their mouth is some version of "and what does that get me?"
+        // Until now the honest answer was to scroll the app and hope they did
+        // the arithmetic themselves.
+        //
+        // Every tour already carries its real prices as markup -- .price-box,
+        // one .price-row per option, label and amount -- so the app can answer
+        // the question outright: pick the amount they were offered, see every
+        // option it covers in full. Nothing is estimated and nothing is typed
+        // in; if a price is not in the catalog it cannot appear here.
+        //
+        // The amounts are the gift tiers that actually get written on the
+        // Premanifest: 50, 100, 150, 200.
+        const CASH_TIERS = [50, 100, 150, 200, 300];
+
+        function priceIndex() {
+            const out = [];
+            for (const item of Object.values(appData || {})) {
+                if (!item || !item.desc) continue;
+                let doc;
+                try { doc = new DOMParser().parseFromString('<div>' + item.desc + '</div>', 'text/html'); }
+                catch (e) { continue; }
+                doc.querySelectorAll('.price-row').forEach((row) => {
+                    const label = ((row.querySelector('span') || {}).textContent || '').trim();
+                    const raw = (row.querySelector('strong') || {}).textContent || '';
+                    const price = parseFloat(raw.replace(/[^0-9.]/g, ''));
+                    if (!isFinite(price) || price <= 0) return;
+                    // A lobster add-on is not an afternoon out, and a security
+                    // deposit is not a thing anyone buys. Left in, the $50 tier
+                    // led with "Add-on: Rock Lobster Tail" -- which reads as the
+                    // gift buying a garnish.
+                    if (/\badd[\s-]?on\b|\bdeposit\b|\binsurance\b|\bsurcharge\b|\bper extra\b/i.test(label)) return;
+                    out.push({ place: item.title, label, price });
+                });
+            }
+            return out.sort((a, b) => b.price - a.price);
+        }
+
+        let worthAmount = 200;
+
+        function openWorth() {
+            const s = document.getElementById('worthSheet');
+            if (!s) return;
+            worthLastFocus = document.activeElement;
+            renderWorth();
+            s.hidden = false;
+            const f = s.querySelector('.worth-close');
+            if (f) f.focus();
+        }
+
+        let worthLastFocus = null;
+
+        function closeWorth() {
+            const s = document.getElementById('worthSheet');
+            if (!s) return;
+            s.hidden = true;
+            if (worthLastFocus && worthLastFocus.focus) worthLastFocus.focus();
+            worthLastFocus = null;
+        }
+
+        function setWorth(amount) { worthAmount = amount; renderWorth(); }
+
+        function renderWorth() {
+            const chips = document.getElementById('worthChips');
+            const body = document.getElementById('worthBody');
+            const head = document.getElementById('worthCount');
+            if (!chips || !body) return;
+
+            chips.innerHTML = CASH_TIERS.map((n) =>
+                '<button class="worth-chip' + (n === worthAmount ? ' on' : '') +
+                '" onclick="setWorth(' + n + ')">$' + n + '</button>').join('');
+
+            const all = priceIndex();
+            const covered = all.filter((p) => p.price <= worthAmount);
+            head.textContent = covered.length
+                ? '$' + worthAmount + ' covers ' + covered.length + ' of the ' + all.length + ' things we list a price for'
+                : 'Nothing we list a price for comes in under $' + worthAmount;
+
+            body.innerHTML = covered.length
+                ? covered.map((p) =>
+                    '<div class="worth-row"><div class="worth-what"><b>' + esc(p.place) + '</b>' +
+                    (p.label ? '<span>' + esc(p.label) + '</span>' : '') +
+                    '</div><div class="worth-price">$' + p.price.toFixed(0) + '</div></div>').join('')
+                : '<p class="worth-empty">The cheapest option we list is $' +
+                  (all.length ? all[all.length - 1].price.toFixed(0) : '0') + '.</p>';
+        }
+
+        // Shared by both sheets so markup cannot smuggle itself into either.
+        function esc(s) {
+            return String(s).replace(/[&<>"']/g, (c) =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
         // THE QR, BACK WHERE IT GETS USED.
         //
         // Victor, 2026-10-16: "I want to bring back the QR code for them to
@@ -287,6 +383,9 @@
                 } else if(!document.getElementById('qrSheet').hidden) {
                     if(e.key === 'Escape') closeQr();
                     if(e.key === 'Tab') trapFocus(document.querySelector('.qr-card'), e);
+                } else if(!document.getElementById('worthSheet').hidden) {
+                    if(e.key === 'Escape') closeWorth();
+                    if(e.key === 'Tab') trapFocus(document.querySelector('.worth-card'), e);
                 }
             });
 

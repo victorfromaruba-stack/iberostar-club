@@ -97,7 +97,7 @@
                  nothing said how MANY places take it, which is the argument.
                  Counted at runtime from the catalog, never typed in, so it
                  cannot go stale when a restaurant is added. -->
-            <p class="cash-line" id="cashLine" hidden></p>
+            <button type="button" class="cash-line" id="cashLine" hidden onclick="openWorth()" aria-haspopup="dialog"></button>
 
             <div class="search-container" id="searchBox">
                 <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
@@ -164,6 +164,20 @@
             </svg></div>
         <a class="qr-wa" id="qrWa" href="#" target="_blank" rel="noopener">Send on WhatsApp</a>
         <button class="qr-copy" id="qrCopy" onclick="copyGuideLink(this)">Copy link</button>
+      </div>
+    </div>
+
+    <!-- What the gift is actually worth. Opens from the Iberocash line, which
+         is on every screen, because the question always comes right after that
+         line is read aloud. -->
+    <div class="worth-sheet" id="worthSheet" hidden role="dialog" aria-modal="true" aria-labelledby="worthHead" onclick="if(event.target===this)closeWorth()">
+      <div class="worth-card">
+        <button class="worth-close" onclick="closeWorth()" aria-label="Close">&times;</button>
+        <h3 id="worthHead">What your Iberocash is worth</h3>
+        <div class="worth-chips" id="worthChips"></div>
+        <p class="worth-count" id="worthCount"></p>
+        <div class="worth-body" id="worthBody"></div>
+        <p class="worth-foot">Real prices from the places themselves. Anything without a listed price is not shown.</p>
       </div>
     </div>
 </body>
