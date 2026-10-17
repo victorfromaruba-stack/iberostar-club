@@ -234,6 +234,8 @@ const defaultData = {
         "desc": "A 3-hour sunset sail with a 3-course dinner and premium open bar. Choose one appetizer and one main course per guest, plus two shared side dishes; dessert included. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$850.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$200.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1,600.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_coral_1.jpg"
+        ,
+            "assets/Activities/Rockabeach/act_coral_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "3 Hours",
@@ -249,6 +251,8 @@ const defaultData = {
         "desc": "A 4-hour snorkel sail with lunch or a 4-course dinner and premium open bar. Choose from two rounds of tapas plus a main course per guest, with shared sides and dessert. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,100.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$250.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$2,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_blueparrot_1.jpg"
+        ,
+            "assets/Activities/Rockabeach/act_blueparrot_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "4 Hours",
@@ -264,6 +268,8 @@ const defaultData = {
         "desc": "A 7-hour snorkel charter to the Spanish Lagoon, Boca Catalina, and the Antilla shipwreck, with a 4-course lunch or early dinner and premium open bar. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$1,500.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$400.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$3,100.00</strong></div><div class=\"price-row\"><span>Add-on: 4oz Rock Lobster Tail or 4pc Jumbo Shrimp</span><strong>$25.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_tropicaldream_1.jpg"
+        ,
+            "assets/Activities/Rockabeach/act_tropicaldream_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "7 Hours",
@@ -592,6 +598,8 @@ const defaultData = {
         "desc": "A 3-hour snorkel sail with brunch-style tapas and a premium open bar with mimosas. Private charter — the boat is exclusively yours. <div class=\"price-box\"><div class=\"price-row\"><span>1-2 Guests</span><strong>$700.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 6)</span><strong>$150.00</strong></div><div class=\"price-row\"><span>6 Guests</span><strong>$1300.00</strong></div><div class=\"price-row\"><span>Each Additional Guest (up to 15)</span><strong>$100.00</strong></div></div>",
         "gallery": [
             "assets/Activities/Rockabeach/act_angelfish_1.jpg"
+        ,
+            "assets/Activities/Rockabeach/act_angelfish_2.jpg"
         ],
         "partnerLogo": "assets/Logos/logo_rocka.png",
         "duration": "3 Hours",

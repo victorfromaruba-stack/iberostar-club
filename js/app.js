@@ -234,7 +234,7 @@
         let currentPdfBlobUrl = null;
         
         // Bump whenever js/data.js's schema or paths change, to flush stale localStorage copies.
-        const DATA_VERSION = 312;
+        const DATA_VERSION = 313;
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');
