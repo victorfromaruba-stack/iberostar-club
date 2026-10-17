@@ -860,7 +860,7 @@ const UNITS = [
   { id: "qualify", n: 1, title: "Qualify", sub: "Who gets which gift", color: "lagoon", levels: ["q", "ctnq", "who"] },
   { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "cash", "house", "solid", "words", "close", "map"] },
   { id: "nlp", n: 3, title: "NLP", sub: "Rapport, words that lead, reading people", color: "sea", levels: ["nlp1", "nlp2", "nlp3", "nlp4"], after: "why" },
-  { id: "street", n: 4, title: "Street skills", sub: "Stopping people, small talk, objections", color: "good", levels: ["st2", "st3", "st4"], after: "q" },
+  { id: "street", n: 4, title: "Street skills", sub: "Stopping people, small talk, objections", color: "good", levels: ["ready", "st2", "st3", "st4"], after: "q" },
   { id: "final", n: 5, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
 ];
 const TRACKS = UNITS.filter(u => u.id !== "final");
@@ -1393,6 +1393,8 @@ const LEVELS = [
     Q("st3a","When do you ask about them?","While you help with directions or tips",["Only after they have agreed to come","Before you say anything else at all","Never. Personal questions scare people"],"Give first, then ask. It feels like a chat, not an interview."),
     Q("st3b","Which way of asking about work feels friendly?","\"What do you guys do back home?\"",["\"Are you employed? What's your job?\"","\"Do you earn enough to qualify?\"","\"Tell me your job title and salary.\""],"A friendly question gets a friendly answer, and tells you if they work."),
     Q("st3c","An older couple. What's an easy way into their ages?","\"Are you retired yet, or still working?\"",["\"How old are you both, exactly?\"","\"You two look over seventy, right?\"","\"Can we see your IDs, for your ages?\""],"Retirement opens the topic. Then you can ask how long ago, or how long to go."),
+    Q("st3k","He says he is not retired yet. How do you get to his age?","Ask when he plans to retire",["Ask him straight out how old he is","Guess from how he looks and move on","Ask his wife while he is not listening"],"\"When do you think you'll retire?\" then \"how many years is that?\" Do the maths in your head while you keep talking."),
+    Q("st3l","How do you find out what they earn?","You don't. Assume it out there",["Ask what they do and what it pays","Ask if they own their home","Ask which card they travel with"],"Income is the one you never ask for out there. It comes up later, at the desk."),
     Q("st3d","What should small talk never feel like?","An interview, one question after another",["A friendly chat between new friends","A conversation about their vacation","A talk where they ask you questions"],"Ask, listen, share something, then ask the next question."),
     Q("st3e","They're from Venezuela, and they love the offer. What now?","Let them go nicely. They don't qualify",["Write it up and hope no one checks","Ask them to say they're from Colombia","Book them for 10 instead of 8"],"Venezuela is one of the five countries left out. Wish them a great trip."),
     Q("st3f","Why never ask a guest to bend the truth to qualify?","It comes out at the hostess desk anyway",["Guests always refuse to do it anyway","It only works for Canadian couples","The gift is the same either way"],"Guests show IDs and a card at check-in. Honest bookings are the only ones that count."),
@@ -1465,6 +1467,7 @@ const LEVELS = [
     Q("ic3","A guest wants to spend the gift on jewelry. Where do they go?","Kay's Fine Jewelry, downtown",["Aruba Aloe, downtown","The gift shop inside Joia","The pro shop at Tierra del Sol"],"Kay's on Weststraat 8 takes Iberocash."),
     Q("ic4","What do guests say in Kay's to get the free Aruba necklace?","Aruba Blues",["Island Gift","Open House","Dushi Aruba"],"Those two words in the store and the necklace is theirs."),
     Q("ic5","A couple says they love the water. Which partners suit them?","Snorkel trips and sunset sails",["Karting and the island bus","The spa and the golf course","The aloe shop and jewelry"],"Several sailing partners take the gift: snorkel, sunset and dinner sails."),
+    Q("ic7","You're new and can't remember thirty partners. What do you do?","Learn three to five really well",["Carry the full list and read it out","Name the ones nearest the hotel","Say \"over thirty places\" and leave it"],"Pick a few you like, learn them properly and make them yours. The rest come with time."),
     Q("ic6","Why name real places when you offer the gift?","They can picture it, so it feels real",["It fills the time while they decide","It shows them we know the island","It stops them asking the price"],"A named restaurant turns an amount into an afternoon they can see.")
   ]
 },
@@ -1520,7 +1523,40 @@ const LEVELS = [
     Q("cl3","What do you tell them about how long it takes?","90 minutes, and breakfast is included",["About an hour, maybe a bit longer","As long as they feel like staying","Most of the morning, so keep it free"],"90 minutes with breakfast. Promise shorter and they feel held; promise longer and they never come."),
     Q("cl4","How does the guest get to the resort in the morning?","They take a taxi and we pay on arrival",["We send a driver to their hotel","They make their own way at their cost","The ride goes on their room bill"],"We do not arrange it. They take a taxi themselves, and it is paid for when they arrive."),
     Q("cl5","Just before they walk away, what do you say about tomorrow's rep?","Give that person a fair chance",["Warn them the rep will push hard","Tell them to say no to everything","Nothing, that part is not your job"],"You built the trust. Hand it over or the rep starts from nothing."),
+    Q("cl7","You start writing the invitation and they don't stop you. What is that?","They've accepted it",["A sign to slow down and ask","Nothing yet. Keep explaining","A reason to offer a bigger gift"],"If they were not coming they would have stopped you. Keep writing and keep talking."),
+    Q("cl8","What's the easiest way to get their name on the invitation?","Ask how they spell their last name",["Ask if they'd like to give a name","Ask them to write it themselves","Ask for an ID and copy it off"],"\"How do you spell your last name?\" is answered without thinking. \"Can I take your name?\" invites a no."),
     Q("cl6","Why go over the qualifications again before they leave?","So nothing surprises them at the desk",["To fill the time while you write","To show them you know the rules","Because the front desk asks you to"],"A guest turned away at check-in is a lost tour and an angry guest. Say the rules while they are still in front of you.")
+  ]
+},
+{
+  id: "ready", name: "Before you open your mouth", sub: "The work that happens before the first guest", icon: "shield",
+  notes: [
+    { h: "They decide in seconds", li: [
+      "Clean, uniform on, ID where they can see it.",
+      "People buy from people they like, and they make their mind up before you finish a sentence.",
+      "Smile before you need to. A flat greeting gets a flat answer." ] },
+    { h: "Everything in reach", li: [
+      "Pen and invitations in your hand, not in a bag.",
+      "A couple ready to book while you hunt for a pen is a couple you lose.",
+      "Know the restaurants, the shops, the beaches and how to get to them. Helping first is what buys you the conversation." ] },
+    { h: "The slow corner", li: [
+      "\"It's not the cage, it's the monkey.\" A slow spot still walks people past you all morning.",
+      "One couple is all you need, and you only need them to stop once.",
+      "The best corner is where people get comfortable. Make the quiet one work and everyone will want it." ] },
+    { h: "Go out aiming at something", li: [
+      "Decide your number before the shift, not after it.",
+      "Stopping them is the hardest part of this job and the part everything else depends on." ] },
+    { h: "Where this comes from", li: [
+      "The Timeshare OPC University videos \"How To Book A Couple\" and \"Necessary Steps To Be A Successful OPC\", in our own words.",
+      "youtube.com/channel/UCpSASqNj-Q7vSrimzaibkCQ" ] }
+  ],
+  qs: [
+    Q("r1","You get the slowest corner today. What does that mean?","Nothing. One couple is all you need",["You'll book less. That's the spot","Ask the supervisor to move you","Save your energy for tomorrow"],"It's not the cage, it's the monkey. A slow corner still walks people past you all morning."),
+    Q("r2","Which part of this job is the hardest?","Getting them to stop at all",["Writing the invitation correctly","Explaining the whole gift","Getting them past the hostess"],"Stopping them is most of the job. Everything after it is easier."),
+    Q("r3","Why does how you look matter out there?","They decide if they like you fast",["The hostesses check the uniform","It is in the staff handbook","Guests ask to see your ID"],"Clean, uniform, ID showing. People buy from people they like and they decide in seconds."),
+    Q("r4","What is ready before your shift starts?","Pen, invitations and a number",["A list of couples to avoid","The gift amounts written out","Your break times for the day"],"Hunting for a pen in front of a couple loses them. And go out aiming at a number, not hoping for one."),
+    Q("r5","A guest asks where the nearest good beach is. You don't know.","You just lost their trust",["No harm, send them to a hostess","Name any beach, they won't check","Tell them you only do invitations"],"Know the beaches, the shops, the restaurants. Helping first is what earns the conversation."),
+    Q("r6","Two people say the same opener. Why does only one book?","It's not what you say, it's how",["One of them had a better corner","One of them talks much faster","One of them was simply luckier"],"Nobody stops for a flat \"hi, how are you\". Say it like you mean it.")
   ]
 }
 ];
@@ -1691,8 +1727,8 @@ const GOAL = 50;
    2026-10-17. ORDER is the learning sequence and decides what a worker is
    pointed at next; a level missing there is never offered and silently locks
    the Final, which needs every unit finished. */
-const ORDER = ["q","why","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","st2","st3","st4","final"];
+const ORDER = ["q","why","ready","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","ready","st2","st3","st4","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];

@@ -153,9 +153,9 @@ grant execute on function public.sua_rp_coach_save(uuid, jsonb) to service_role;
 -- fail the whole query), capped, and the hidden flag is read through
 -- to_jsonb() so this still works whether or not that column exists.
 -- ---------------------------------------------------------------------------
--- The return columns changed, and create-or-replace cannot change a return
--- type (Postgres 42P13), so the old one is dropped first. The app treats a
--- missing function as "not switched on yet", so the gap is harmless.
+-- Replaced whenever the shape changes; create-or-replace cannot change a
+-- return type (Postgres 42P13), and the app treats a missing function as
+-- "not switched on yet", so the gap is harmless.
 drop function if exists public.sua_board();
 
 create function public.sua_board()
@@ -165,19 +165,35 @@ stable
 security definer
 set search_path = public
 as $$
-  select p.name, b.lv, b.xp, b.l, b.g
-  from public.sua_people p,
-  lateral (select
-    (select count(*)::int from jsonb_each(coalesce(p.stats->'m', '{}'::jsonb)) e
-       where jsonb_typeof(e.value) = 'number' and (e.value)::text::numeric > 0) as lv,
-    case when p.stats->>'x'  ~ '^[0-9]{1,9}$' then (p.stats->>'x')::int  else 0 end as xp,
-    case when p.stats->>'l'  ~ '^[0-9]{1,6}$' then (p.stats->>'l')::int  else 0 end as l,
-    case when p.stats->>'gt' ~ '^[0-9]{1,6}$' then (p.stats->>'gt')::int else 0 end as g
-  ) b
-  where coalesce((to_jsonb(p) ->> 'hidden')::boolean, false) = false
-    and coalesce(p.name, '') <> ''
-    and (b.lv > 0 or b.xp > 0 or b.l > 0 or b.g > 0)
-  order by b.lv desc, b.xp desc
+  with scored as (
+    select p.name, b.lv, b.xp, b.l, b.g
+    from public.sua_people p,
+    lateral (select
+      (select count(*)::int from jsonb_each(coalesce(p.stats->'m', '{}'::jsonb)) e
+         where jsonb_typeof(e.value) = 'number' and (e.value)::text::numeric > 0) as lv,
+      case when p.stats->>'x'  ~ '^[0-9]{1,9}$' then (p.stats->>'x')::int  else 0 end as xp,
+      case when p.stats->>'l'  ~ '^[0-9]{1,6}$' then (p.stats->>'l')::int  else 0 end as l,
+      case when p.stats->>'gt' ~ '^[0-9]{1,6}$' then (p.stats->>'gt')::int else 0 end as g
+    ) b
+    where coalesce((to_jsonb(p) ->> 'hidden')::boolean, false) = false
+      and coalesce(p.name, '') <> ''
+      -- Test entries keep themselves off the floor's board. Someone trying the
+      -- app out should not have to be hidden by hand afterwards, and nobody on
+      -- this team is called Test.
+      and lower(btrim(p.name)) !~ '^(test|tester|testing|demo|prueba)[0-9 .]*$'
+      and (b.lv > 0 or b.xp > 0 or b.l > 0 or b.g > 0)
+  ),
+  merged as (
+    -- One row per person. A second phone or a reinstall creates a second
+    -- device row, and the same face appearing twice on a leaderboard reads as
+    -- broken. Their best in each column wins, so nothing is lost.
+    select (array_agg(name order by lv desc, xp desc))[1] as name,
+           max(lv) as lv, max(xp) as xp, max(l) as l, max(g) as g
+    from scored
+    group by lower(btrim(name))
+  )
+  select name, lv, xp, l, g from merged
+  order by lv desc, xp desc
   limit 60;
 $$;
 
