@@ -597,6 +597,14 @@ body.wide #app{max-width:1080px}
 .rp-transcript .cue{font-style:italic;color:var(--muted);font-size:14px}
 .rp-end-acts{padding-bottom:12px}
 .tp-sub{font-size:16px;margin-top:4px}
+.lb{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.lb li{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;min-height:44px;padding:8px 0;border-top:1px solid var(--line)}
+.lb li:first-child{border-top:0;padding-top:0}
+.lb .rk{text-align:center;font-weight:900;color:var(--muted)}
+.lb .nm{font-weight:900;overflow-wrap:anywhere}
+.lb .sc{font-weight:900;font-variant-numeric:tabular-nums}
+.lb .top .rk{font-size:19px}
+.lb .top .sc{color:var(--good-ink)}
 .tp-bar.rp-sbar{display:flex}
 .rp-sbar i{border-radius:0} .rp-sbar i.w{background:var(--sun)}
 

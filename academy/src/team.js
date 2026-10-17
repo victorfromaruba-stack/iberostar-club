@@ -171,6 +171,9 @@ function renderPanel(keepScroll){
     ${tile("user", "t-fire", nudge.length, "Need a nudge", `No lessons yet, or none in ${NUDGE_DAYS}+ days`)}
     ${tile("check", "t-sea", answers >= 20 ? `${pct(right, answers)}%` : "–", "Right answers", answers >= 20 ? `${nf(answers)} answers in lessons` : "Shows once they've answered 20")}
   </section>
+  <section class="tp-card" aria-labelledby="lbH"><div class="tp-card-h"><h2 id="lbH">${icon("bolt")} Lightning board</h2>
+    <button class="btn small" id="board">Copy for the group</button></div>
+    ${boardHTML(people)}</section>
   <section class="tp-card" aria-labelledby="kwH">
     <div class="tp-card-h"><h2 id="kwH">Who knows what</h2>
       <div class="tp-sort" role="group" aria-label="Sort the team">${[["progress", "Progress"], ["active", "Last active"], ["name", "Name"]].map(([k, l]) => `<button data-sort="${k}" aria-pressed="${TEAM.sort === k}">${l}</button>`).join("")}</div></div>
@@ -212,13 +215,12 @@ function renderPanel(keepScroll){
     <li>Street practice: chats with an AI tourist couple. Shoco scores stopping them, each of the 7 pitch steps and finding out who they are, and checks the gift they called.</li>
     <li>Progress arrives from each phone after every answer, when it has internet.</li></ul></details>
   <details class="card"><summary>Change the manager code</summary><form class="name-form" id="newCode"><input class="field" id="nc" autocomplete="off" autocapitalize="characters" placeholder="New code, 6+ letters or numbers" aria-label="New manager code"><button class="btn small">Save</button></form><p class="small muted">Every manager will need the new code.</p></details>
-  <p class="foot"><button class="btn" id="board">Copy Lightning board for the group</button></p>
   <p class="foot"><button class="link" id="forget">Forget the code on this phone</button></p>`, { full: true, wide: true, keepScroll });
   on("#back", closePanel); on("#refresh", coach);
   on("#board", async b => {
     const txt = boardText(people);
     try { await navigator.clipboard.writeText(txt); b.textContent = "Copied ✓";
-          setTimeout(() => { b.textContent = "Copy Lightning board for the group"; }, 2500); }
+          setTimeout(() => { b.textContent = "Copy for the group"; }, 2500); }
     catch { toast("Couldn't copy. Long-press to select it instead."); }
   });
   on("#forget", () => { S.mgr = ""; save(false); Object.assign(TEAM, { people: [], at: 0, err: "", open: "" }); coachLogin(); });
@@ -253,11 +255,19 @@ function matrixHTML(people){
 
    Only people who have actually set a record appear. A board padded with
    zeroes tells eight people they are last. */
+/* On screen as well as in the clipboard. A manager reading out a board from a
+   paste buffer is the manager looking at their phone instead of their floor. */
+function boardHTML(people){
+  const ranked = lgRanked(people);
+  if (!ranked.length) return `<p class="muted">Nobody has set a Lightning record yet. The first one on the board takes it.</p>`;
+  return `<ol class="lb">${ranked.map((p, i) => `<li${i < 3 ? ' class="top"' : ""}><span class="rk">${["🥇", "🥈", "🥉"][i] || i + 1}</span>
+    <span class="nm">${esc(p.name)}</span><span class="sc">${p.st.l}</span></li>`).join("")}</ol>
+    <p class="small muted">Best Lightning round, couples in a row. Top ten.</p>`;
+}
+const lgRanked = people => people.filter(p => (p.st && p.st.l) > 0).sort((a, b) => b.st.l - a.st.l).slice(0, 10);
+
 function boardText(people){
-  const ranked = people
-    .filter(p => (p.st && p.st.l) > 0)
-    .sort((a, b) => b.st.l - a.st.l)
-    .slice(0, 10);
+  const ranked = lgRanked(people);
   if (!ranked.length) return "⚡ Lightning board\n\nNobody has set a record yet. First one on the board takes it.";
   return "⚡ Lightning board\n\n" + ranked.map((p, i) => `${i + 1}. ${p.name} ${p.st.l}`).join("\n");
 }
@@ -267,7 +277,8 @@ function logText(e){
   if (k === "rp") return `Street practice: ${RP_MOOD[id].toLowerCase()} couple, ${v} of 100${n ? "" : ", wrong gift"}`;
   const name = id === "daily" ? "Daily 10" : id === "lightning" ? "Lightning round" : `"${byId(id).name}"`;
   return { m: `Mastered ${name}`, r: `Review done: ${name}`, p: `Practiced ${name}`, d: "Finished a Daily 10",
-    f: `${name}: ${v} of ${n} in a row, then a mistake`, lg: `Lightning round: ${plural(v, "couple")}` }[k];
+    f: `${name}: ${v} of ${n} in a row, then a mistake`, lg: `Lightning round: ${plural(v, "couple")}`,
+    gt: `Gauntlet: ${plural(v, "question")} before running out of lives` }[k];
 }
 function renderWorker(device, keepScroll){
   const p = TEAM.people.find(x => x.device === device); if (!p) return renderPanel();

@@ -616,6 +616,14 @@ body.wide #app{max-width:1080px}
 .rp-transcript .cue{font-style:italic;color:var(--muted);font-size:14px}
 .rp-end-acts{padding-bottom:12px}
 .tp-sub{font-size:16px;margin-top:4px}
+.lb{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.lb li{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;min-height:44px;padding:8px 0;border-top:1px solid var(--line)}
+.lb li:first-child{border-top:0;padding-top:0}
+.lb .rk{text-align:center;font-weight:900;color:var(--muted)}
+.lb .nm{font-weight:900;overflow-wrap:anywhere}
+.lb .sc{font-weight:900;font-variant-numeric:tabular-nums}
+.lb .top .rk{font-size:19px}
+.lb .top .sc{color:var(--good-ink)}
 .tp-bar.rp-sbar{display:flex}
 .rp-sbar i{border-radius:0} .rp-sbar i.w{background:var(--sun)}
 
@@ -1674,7 +1682,7 @@ function levelTotal(L){ return L.map ? MAP_STEPS.length*2 : (L.count || (L.qs||[
 const KEY = "showup.v1";
 const blank = () => ({ name:"", mastered:{}, best:{}, misses:{}, sound:true, xp:0, lightning:0, daily:{ last:"", streak:0, best:0 },
   listened:{}, intro:false, days:[], today:{ d:"", xp:0 }, said:{}, sync:{ device:"", secret:"", last:0, ok:null }, mgr:"", tab:"learn",
-  lv:{}, log:[], rp:{ n:0, best:0, res:[] }, rpVoice:true, rpFocus:"any", rpLang:"en" });
+  lv:{}, log:[], gaunt:0, rp:{ n:0, best:0, res:[] }, rpVoice:true, rpFocus:"any", rpLang:"en" });
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e){}
 for (const [k, v] of Object.entries(blank())) if (typeof S[k] !== typeof v || (Array.isArray(v) && !Array.isArray(S[k]))) S[k] = v;
@@ -1988,7 +1996,7 @@ function payload(){
     ml:Object.fromEntries(LEVEL_IDS.map(id => [id, S.mastered[id]?.last||0])),
     b:Object.fromEntries(LEVEL_IDS.map(id => [id, S.best[id]||0])),
     a:Object.fromEntries(LEVEL_IDS.map(id => { const v = S.lv[id] || {}; return [id, [v.r||0, v.w||0, v.t||0]]; })),
-    l:S.lightning||0, d:streakDays(), h:CLIPS.filter(c => S.listened[c.id]).length,
+    l:S.lightning||0, gt:S.gaunt||0, d:streakDays(), h:CLIPS.filter(c => S.listened[c.id]).length,
     sl:linesPracticed(), w:topMisses(20), lg:S.log.slice(-20), dd:S.days.slice(-30), t:Date.now(), ld:S.days[S.days.length-1] || "",
     rp:{ n:S.rp.n, b:S.rp.best, s:S.rp.res.slice(-10) } };
 }
@@ -2199,10 +2207,42 @@ function buildDaily(){
 }
 function startDaily(missed){ startRun(DAILY, retryEarly(buildDaily(), missed)); }
 function startRun(L, list){ if (LEVEL_IDS.includes(L.id)) lvOf(L.id).t++; game = { kind:"run", L, list, idx:0, streak:0, xp:0, t0:Date.now() }; renderItem(); }
+
+/* ---------- Gauntlet ---------- */
+/* Every other mode has a last question, so somebody who studies properly runs
+   out of app in about a week, and then stops opening it. This one deals from
+   the whole course and ends only when the three lives are gone. It leans
+   harder on couple cards the longer the run lasts, and starts pulling in the
+   questions this phone has got wrong before, so a long run is a different
+   run, not just more of the same one. */
+const GAUNTLET = { id:"gaunt", name:"Gauntlet", sub:"Endless. Three lives.", notes:[] };
+const gauntOpen = () => LEVEL_IDS.filter(id => S.mastered[id]).length >= 3;
+function gauntletBatch(score){
+  const scen = Math.min(6, 2 + Math.floor(score / 10));
+  const missed = ALL_QS.filter(q => S.misses[q.id]);
+  return shuffle(shuffle(ALL_QS.slice()).slice(0, Math.max(3, 10 - scen))
+    .concat(shuffle(missed).slice(0, Math.min(3, Math.floor(score / 15))))
+    .concat(buildScenarios(scen)));
+}
+function startGauntlet(){
+  game = { kind:"run", L:GAUNTLET, list:gauntletBatch(0), idx:0, streak:0, xp:0,
+           t0:Date.now(), endless:true, lives:3, score:0 };
+  renderItem();
+}
+function gauntletOver(){
+  const g = game, record = g.score > (S.gaunt||0);
+  if (record) S.gaunt = g.score;
+  logEvent("gt", "gaunt", g.score, 0);
+  addXP(g.score * 3);
+  const extended = markActive(); save();
+  celebrate({ title: record ? "New Gauntlet record!" : "Out of lives", xp: g.score * 3,
+              time: Date.now() - g.t0, row: g.score, L: GAUNTLET, extended });
+}
 function lessonTop(pct){
+  const g = game, endless = g && g.endless;
   return `<div class="l-top"><button class="icon-btn" id="quit" aria-label="Quit">${icon("x")}</button>
-    <div class="l-bar" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><i style="width:${pct}%"></i></div>
-    <span class="heart" id="heart" title="One mistake and you start over">${icon("heart")}<b>1</b></span></div>`;
+    <div class="l-bar" role="progressbar" aria-label="${endless ? "Lives left" : "Progress"}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><i style="width:${pct}%"></i></div>
+    <span class="heart" id="heart" title="${endless ? "Lives left" : "One mistake and you start over"}">${icon("heart")}<b>${endless ? g.lives : 1}</b></span></div>`;
 }
 function renderItem(){
   view = "lesson";
@@ -2211,8 +2251,8 @@ function renderItem(){
   const kind = it.type === "build" ? "Put the words in order" : it.type === "match" ? "Match the pairs" : it.type === "listen" ? "Listen" : it.scen ? "Which gift?" : it.line ? "Fill in the blank" : it.pic ? "Look and answer" : "Choose the answer";
   show(`<div class="lesson">
     <h1 class="sr-only">${esc(g.L.name)}</h1>
-    ${lessonTop(g.idx / n * 100)}
-    <p class="l-kind">${kind}</p>
+    ${lessonTop(g.endless ? g.lives / 3 * 100 : g.idx / n * 100)}
+    <p class="l-kind">${kind}${g.endless ? ` <span class="secs">${g.score} in a row</span>` : ""}</p>
     <div class="l-body" id="lbody">${itemBody(it)}</div>
     <div class="l-foot" id="lfoot">${it.type === "match" ? `<p class="hint">Tap the matching pairs</p>` : `<button class="btn wide" id="check" disabled>Check</button>`}</div>
   </div><div class="sheet" id="sheet" aria-live="polite"></div>`, { full: true });
@@ -2315,16 +2355,22 @@ function verdict(ok){
   if (!ok) logEvent("f", g.L.id, g.idx, g.list.length);
   if (ok){
     g.streak++; g.xp += 10; addXP(10); sfx("ok"); buzz(15);
-    const bar = app.querySelector(".l-bar i"); if (bar) bar.style.width = ((g.idx + 1) / g.list.length * 100) + "%";
+    if (g.endless) g.score++;
+    const bar = app.querySelector(".l-bar i"); if (bar && !g.endless) bar.style.width = ((g.idx + 1) / g.list.length * 100) + "%";
     if ([3,5,10,15,20].includes(g.streak)) combo(g.streak);
   } else {
     sfx("bad"); buzz([40,60,40]);
-    const h = $("#heart"); if (h){ h.classList.add("broken"); h.querySelector("b").textContent = "0"; }
+    if (g.endless) g.lives--;
+    const h = $("#heart"); if (h){ if (!g.endless || !g.lives) h.classList.add("broken"); h.querySelector("b").textContent = g.endless ? g.lives : "0"; }
+    const bar = app.querySelector(".l-bar i"); if (bar && g.endless) bar.style.width = (g.lives / 3 * 100) + "%";
     if (QBY[it.id]) S.misses[it.id] = (S.misses[it.id]||0) + 1;
-    if (g.L.id !== "daily" && g.idx > (S.best[g.L.id]||0)) S.best[g.L.id] = g.idx;
+    if (!g.endless && g.L.id !== "daily" && g.idx > (S.best[g.L.id]||0)) S.best[g.L.id] = g.idx;
   }
   save();
   const best = Math.max(g.idx, S.best[g.L.id]||0);
+  const endMsg = !g.endless ? "" : g.lives
+    ? `${g.lives === 1 ? "1 life" : g.lives + " lives"} left. Your run so far: ${g.score}.`
+    : `Run over at ${g.score}. Your record: ${Math.max(g.score, S.gaunt || 0)}.`;
   const sheet = $("#sheet");
   sheet.className = "sheet " + (ok ? "good" : "bad");
   sheet.innerHTML = `<div class="sheet-in">
@@ -2332,13 +2378,21 @@ function verdict(ok){
     ${ok ? "" : `<p class="sh-ans">Correct answer: <b>${esc(answerText(it))}</b></p>`}
     <p class="sh-why">${esc(it.why || "")}</p>
     ${it.hear ? `<div class="acts"><button class="btn small ghost" data-seg="${it.hear.clip}:${it.hear.from}:${it.hear.to}" data-key="hear-${it.id}">${icon("play")} Hear the line</button></div>` : ""}
-    ${ok ? "" : `<p class="small">${g.L.id === "daily" ? `You got ${g.idx} in a row.` : `You got ${g.idx} in a row. Your best: ${best} of ${g.list.length}.`} New order next time, and this one comes back early.</p>`}
-    <button class="btn wide ${ok ? "good" : "bad"}" id="cont">${ok ? (last ? "Finish" : "Continue") : "Start over"}</button>
+    ${ok ? "" : g.endless ? `<p class="small">${endMsg}</p>`
+      : `<p class="small">${g.L.id === "daily" ? `You got ${g.idx} in a row.` : `You got ${g.idx} in a row. Your best: ${best} of ${g.list.length}.`} New order next time, and this one comes back early.</p>`}
+    <button class="btn wide ${ok ? "good" : "bad"}" id="cont">${g.endless ? (ok || g.lives ? "Keep going" : "See your run") : ok ? (last ? "Finish" : "Continue") : "Start over"}</button>
     ${!ok && g.L.id !== "daily" && ((g.L.notes && g.L.notes.length) || g.L.script) ? `<button class="link" id="gb">${icon("book")} Open the guidebook first</button>` : ""}
   </div>`;
   requestAnimationFrame(() => sheet.classList.add("show"));
   bindSegButtons(sheet);
-  on("#cont", () => { sfx("tap"); ok ? (last ? complete() : (g.idx++, renderItem())) : (g.L.id === "daily" ? startDaily(it) : play(g.L.id, it)); });
+  on("#cont", () => { sfx("tap");
+    if (g.endless){
+      if (!ok && !g.lives) return gauntletOver();
+      g.idx++;
+      if (g.idx >= g.list.length - 1) g.list = g.list.concat(gauntletBatch(g.score));
+      return renderItem();
+    }
+    ok ? (last ? complete() : (g.idx++, renderItem())) : (g.L.id === "daily" ? startDaily(it) : play(g.L.id, it)); });
   on("#gb", () => guidebook(g.L.id));
   timers.push(setTimeout(() => $("#cont")?.focus({ preventScroll: true }), 80));
 }
@@ -2633,10 +2687,11 @@ function renderGames(){
   <header class="stack" style="padding-top:12px"><h1>Games</h1><p class="muted">Speed, memory and the real conversation. Every game you finish counts for your streak.</p></header>
   <article class="tile-card c-flamingo rp-tile"><div class="ico">${icon("couple")}</div><div><h2>Street practice</h2><p class="small muted">Pitch a tourist couple by voice or text. Shoco scores you after.${S.rp.n ? ` Best: ${S.rp.best}.` : ""}</p></div><button class="btn small flamingo" id="rp">Start</button></article>
   <article class="tile-card c-lagoon" style="--c:var(--sea);--soft:var(--sea-soft)"><div class="ico">${icon("bolt")}</div><div><h2>Lightning round</h2><p class="small muted">${lightningOpen() ? `60 seconds. Record: ${S.lightning||0} couples.` : 'Opens after "Who qualifies?"'}</p></div>${lightningOpen() ? `<button class="btn small sea" id="lg">Play</button>` : icon("lock")}</article>
+  <article class="tile-card c-good"><div class="ico">${icon("flame")}</div><div><h2>Gauntlet</h2><p class="small muted">${gauntOpen() ? `No last question. Three lives, anything from the whole course including what you haven't studied yet, and harder the longer you last. Record: ${S.gaunt||0}.` : "Opens once you've mastered three levels."}</p></div>${gauntOpen() ? `<button class="btn small good" id="gt">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-sun"><div class="ico">${icon("calendar")}</div><div><h2>Daily 10</h2><p class="small muted">${dailyOpen() ? (S.daily.last === today() ? "Done today. Play again for practice." : "Ten questions. Your misses come back more.") : "Opens after your first mastered level."}</p></div>${dailyOpen() ? `<button class="btn small sun" id="dy">Play</button>` : icon("lock")}</article>
   <article class="tile-card c-flamingo"><div class="ico">${icon("route")}</div><div><h2>Pitch map</h2><p class="small muted">${unlocked("map") ? "Put the pitch in order, then the lines." : `Opens after "${byId(before("map")).name}"`}</p></div>${unlocked("map") ? `<button class="btn small flamingo" id="mp">Play</button>` : icon("lock")}</article>
   <article class="tile-card"><div class="ico">${icon("headphones")}</div><div><h2>Voice notes</h2><p class="small muted">${CLIPS.filter(c => S.listened[c.id]).length} of ${CLIPS.length} heard</p></div><button class="btn small ghost" id="vn">Listen</button></article>`);
-  on("#rp", streetIntro); on("#lg", lightningIntro); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
+  on("#rp", streetIntro); on("#lg", lightningIntro); on("#gt", startGauntlet); on("#dy", () => startDaily()); on("#mp", () => play("map")); on("#vn", () => tab("script", "notes"));
 }
 
 /* ---------- Me tab ---------- */
@@ -2651,6 +2706,7 @@ function renderMe(){
     <div class="statbox" style="color:var(--fire)">${icon("flame")}<b style="color:var(--ink)">${streakDays()}</b><span>day streak</span></div>
     <div class="statbox" style="color:var(--sun-2)">${icon("star")}<b style="color:var(--ink)">${nf(S.xp)}</b><span>total XP</span></div>
     <div class="statbox" style="color:var(--sea)">${icon("bolt")}<b style="color:var(--ink)">${S.lightning||0}</b><span>Lightning record</span></div>
+    <div class="statbox" style="color:var(--good-ink)">${icon("flame")}<b style="color:var(--ink)">${S.gaunt||0}</b><span>Gauntlet record</span></div>
     <div class="statbox" style="color:var(--flamingo)">${icon("mic")}<b style="color:var(--ink)">${linesPracticed()}</b><span>script lines said</span></div>
     <div class="statbox" style="color:var(--flamingo)">${icon("couple")}<b style="color:var(--ink)">${S.rp.n}</b><span>street practice chats</span></div>
     <div class="statbox" style="color:var(--good)">${icon("trophy")}<b style="color:var(--ink)">${S.rp.n ? S.rp.best : "–"}</b><span>best street score</span></div>
@@ -4700,6 +4756,9 @@ function renderPanel(keepScroll){
     ${tile("user", "t-fire", nudge.length, "Need a nudge", `No lessons yet, or none in ${NUDGE_DAYS}+ days`)}
     ${tile("check", "t-sea", answers >= 20 ? `${pct(right, answers)}%` : "–", "Right answers", answers >= 20 ? `${nf(answers)} answers in lessons` : "Shows once they've answered 20")}
   </section>
+  <section class="tp-card" aria-labelledby="lbH"><div class="tp-card-h"><h2 id="lbH">${icon("bolt")} Lightning board</h2>
+    <button class="btn small" id="board">Copy for the group</button></div>
+    ${boardHTML(people)}</section>
   <section class="tp-card" aria-labelledby="kwH">
     <div class="tp-card-h"><h2 id="kwH">Who knows what</h2>
       <div class="tp-sort" role="group" aria-label="Sort the team">${[["progress", "Progress"], ["active", "Last active"], ["name", "Name"]].map(([k, l]) => `<button data-sort="${k}" aria-pressed="${TEAM.sort === k}">${l}</button>`).join("")}</div></div>
@@ -4741,13 +4800,12 @@ function renderPanel(keepScroll){
     <li>Street practice: chats with an AI tourist couple. Shoco scores stopping them, each of the 7 pitch steps and finding out who they are, and checks the gift they called.</li>
     <li>Progress arrives from each phone after every answer, when it has internet.</li></ul></details>
   <details class="card"><summary>Change the manager code</summary><form class="name-form" id="newCode"><input class="field" id="nc" autocomplete="off" autocapitalize="characters" placeholder="New code, 6+ letters or numbers" aria-label="New manager code"><button class="btn small">Save</button></form><p class="small muted">Every manager will need the new code.</p></details>
-  <p class="foot"><button class="btn" id="board">Copy Lightning board for the group</button></p>
   <p class="foot"><button class="link" id="forget">Forget the code on this phone</button></p>`, { full: true, wide: true, keepScroll });
   on("#back", closePanel); on("#refresh", coach);
   on("#board", async b => {
     const txt = boardText(people);
     try { await navigator.clipboard.writeText(txt); b.textContent = "Copied ✓";
-          setTimeout(() => { b.textContent = "Copy Lightning board for the group"; }, 2500); }
+          setTimeout(() => { b.textContent = "Copy for the group"; }, 2500); }
     catch { toast("Couldn't copy. Long-press to select it instead."); }
   });
   on("#forget", () => { S.mgr = ""; save(false); Object.assign(TEAM, { people: [], at: 0, err: "", open: "" }); coachLogin(); });
@@ -4782,11 +4840,19 @@ function matrixHTML(people){
 
    Only people who have actually set a record appear. A board padded with
    zeroes tells eight people they are last. */
+/* On screen as well as in the clipboard. A manager reading out a board from a
+   paste buffer is the manager looking at their phone instead of their floor. */
+function boardHTML(people){
+  const ranked = lgRanked(people);
+  if (!ranked.length) return `<p class="muted">Nobody has set a Lightning record yet. The first one on the board takes it.</p>`;
+  return `<ol class="lb">${ranked.map((p, i) => `<li${i < 3 ? ' class="top"' : ""}><span class="rk">${["🥇", "🥈", "🥉"][i] || i + 1}</span>
+    <span class="nm">${esc(p.name)}</span><span class="sc">${p.st.l}</span></li>`).join("")}</ol>
+    <p class="small muted">Best Lightning round, couples in a row. Top ten.</p>`;
+}
+const lgRanked = people => people.filter(p => (p.st && p.st.l) > 0).sort((a, b) => b.st.l - a.st.l).slice(0, 10);
+
 function boardText(people){
-  const ranked = people
-    .filter(p => (p.st && p.st.l) > 0)
-    .sort((a, b) => b.st.l - a.st.l)
-    .slice(0, 10);
+  const ranked = lgRanked(people);
   if (!ranked.length) return "⚡ Lightning board\n\nNobody has set a record yet. First one on the board takes it.";
   return "⚡ Lightning board\n\n" + ranked.map((p, i) => `${i + 1}. ${p.name} ${p.st.l}`).join("\n");
 }
@@ -4796,7 +4862,8 @@ function logText(e){
   if (k === "rp") return `Street practice: ${RP_MOOD[id].toLowerCase()} couple, ${v} of 100${n ? "" : ", wrong gift"}`;
   const name = id === "daily" ? "Daily 10" : id === "lightning" ? "Lightning round" : `"${byId(id).name}"`;
   return { m: `Mastered ${name}`, r: `Review done: ${name}`, p: `Practiced ${name}`, d: "Finished a Daily 10",
-    f: `${name}: ${v} of ${n} in a row, then a mistake`, lg: `Lightning round: ${plural(v, "couple")}` }[k];
+    f: `${name}: ${v} of ${n} in a row, then a mistake`, lg: `Lightning round: ${plural(v, "couple")}`,
+    gt: `Gauntlet: ${plural(v, "question")} before running out of lives` }[k];
 }
 function renderWorker(device, keepScroll){
   const p = TEAM.people.find(x => x.device === device); if (!p) return renderPanel();

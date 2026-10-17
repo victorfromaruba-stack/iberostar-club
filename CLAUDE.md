@@ -50,7 +50,7 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   grammar slips, including in 300 generated guest cards) and whenever answer length would give
   the right option away (it may not be the longest by more than 5 characters, and may be the
   longest option in at most 35% of questions). Test with
-  `node academy/src/e2e.js <url> <outdir>` and `node academy/src/street_e2e.js <url> <outdir>`, `node academy/src/ear_e2e.js <url> <outdir>` and `node academy/src/live_e2e.js <url> <outdir>` (Playwright; serve `academy/`
+  `node academy/src/e2e.js <url> <outdir>` and `node academy/src/street_e2e.js <url> <outdir>`, `node academy/src/ear_e2e.js <url> <outdir>`, `node academy/src/live_e2e.js <url> <outdir>` and `node academy/src/gauntlet_e2e.js <url>` (the Gauntlet's lives/score loop) (Playwright; serve `academy/`
   with Range support, e.g. `npx http-server academy`, and use a `localhost` url). Media: `academy/audio/` (voice notes, MP3), `academy/img/` (two slides
   from the Open House pitch deck, `photos/`), `academy/video/` (golf loop, H.264 MP4). It has `noindex`. Progress is
   per device in `localStorage['showup.v1']`. Once a worker saves a name, the phone also sends its
