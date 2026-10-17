@@ -53,7 +53,7 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   grammar slips, including in 300 generated guest cards) and whenever answer length would give
   the right option away (it may not be the longest by more than 5 characters, and may be the
   longest option in at most 35% of questions). Test with
-  `node academy/src/e2e.js <url> <outdir>` and `node academy/src/street_e2e.js <url> <outdir>`, `node academy/src/ear_e2e.js <url> <outdir>`, `node academy/src/live_e2e.js <url> <outdir>` and `node academy/src/gauntlet_e2e.js <url>` (the Gauntlet's lives/score loop), `node academy/src/board_e2e.js <url>` (the team board), `node academy/src/panel_e2e.js <url>` (the manager panel against old-shape rows) and `node academy/src/account_e2e.js <url>` (getting your progress back on a new phone) (Playwright; serve `academy/`
+  `node academy/src/e2e.js <url> <outdir>` and `node academy/src/street_e2e.js <url> <outdir>`, `node academy/src/ear_e2e.js <url> <outdir>`, `node academy/src/live_e2e.js <url> <outdir>` and `node academy/src/gauntlet_e2e.js <url>` (the Gauntlet's lives/score loop), `node academy/src/board_e2e.js <url>` (the team board), `node academy/src/panel_e2e.js <url>` (the manager panel against old-shape rows) and `node academy/src/account_e2e.js <url>` (getting your progress back on a new phone) and `node academy/src/watch_e2e.js <url>` (the embedded video items) (Playwright; serve `academy/`
   with Range support, e.g. `npx http-server academy`, and use a `localhost` url). Media: `academy/audio/` (voice notes, MP3), `academy/img/` (two slides
   from the Open House pitch deck, `photos/`), `academy/video/` (golf loop, H.264 MP4). It has `noindex`. Progress lives in
   `localStorage['showup.v1']` and is mirrored to Supabase project `cdkopyphjvfxjqhasrae` once a
@@ -71,6 +71,12 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   four numbers (levels, xp, lightning, gauntlet) — `sua_team` stays behind the manager code because
   it carries everything. It drops test-looking names and merges one person's devices into a single
   row; the page filters test names again (`TEST_NAME`) because only Victor can change the database.
+  **Tips and tricks (unit 5):** `tip1`/`tip2`, built from the Timeshare OPC University videos, using a
+  `WATCH(id, vid, from, q, a, w, why)` item that embeds the video at the second the coach says the
+  thing (youtube-nocookie, `?start=`). **Nothing is downloaded** — YouTube refuses this server's IP
+  for all media (see the memory `project_youtube_blocked_on_this_vps`), and an embed is the
+  platform's own player, so the channel keeps its view and we copy nothing. Embeddability was
+  checked per video with the oEmbed endpoint, which does work from here.
   **Gauntlet:** endless run in Games, three lives, dealt from every question, leaning harder on
   couple cards and the phone's own past misses as the run grows.
   The SQL for all of this is in `academy/server/migration.sql` and is **not** applied from here —

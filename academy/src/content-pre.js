@@ -11,12 +11,18 @@ const PIC = (id, img, alt, q, a, w, why) => ({ id, img, alt, q, a, w, why, pic: 
 const BUILD = (id, q, text, extra, why, alts) => ({ id, type: "build", q, text, extra, why, a: text, alts: alts || [] });
 const MATCH = (id, q, pairs, why) => ({ id, type: "match", q, pairs, why, a: pairs.map(p => `${p[0]}: ${p[1]}`).join("; ") });
 const LISTEN = (id, clip, from, to, q, a, w, why) => ({ id, type: "listen", clip, from, to, q, a, w, why });
+/* A moment from one of the Timeshare OPC University videos, played in place
+   from YouTube at the second it happens. Nothing is downloaded or copied: the
+   embed is the platform's own player, the channel keeps its view, and the
+   worker watches the coach say it rather than reading my summary of it. */
+const WATCH = (id, vid, from, q, a, w, why) => ({ id, type: "watch", vid, from, q, a, w, why });
 
 const UNITS = [
   { id: "qualify", n: 1, title: "Qualify", sub: "Who gets which gift", color: "lagoon", levels: ["q", "ctnq", "who"] },
   { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "cash", "house", "solid", "words", "close", "map"] },
   { id: "nlp", n: 3, title: "NLP", sub: "Rapport, words that lead, reading people", color: "sea", levels: ["nlp1", "nlp2", "nlp3", "nlp4"], after: "why" },
   { id: "street", n: 4, title: "Street skills", sub: "Stopping people, small talk, objections", color: "good", levels: ["ready", "st2", "st3", "st4"], after: "q" },
-  { id: "final", n: 5, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
+  { id: "tips", n: 5, title: "Tips and tricks", sub: "From the street, with the videos", color: "sun", levels: ["tip1", "tip2"], after: "st2" },
+  { id: "final", n: 6, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
 ];
 const TRACKS = UNITS.filter(u => u.id !== "final");

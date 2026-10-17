@@ -17,8 +17,8 @@ const GOAL = 50;
    2026-10-17. ORDER is the learning sequence and decides what a worker is
    pointed at next; a level missing there is never offered and silently locks
    the Final, which needs every unit finished. */
-const ORDER = ["q","why","ready","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","ready","st2","st3","st4","final"];
+const ORDER = ["q","why","ready","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","tip1","tip2","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","ready","st2","st3","st4","tip1","tip2","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];
@@ -729,7 +729,7 @@ function renderItem(){
   view = "lesson";
   const g = game, it = g.list[g.idx], n = g.list.length;
   g.sel = null; g.checked = false; g.opts = null;
-  const kind = it.type === "build" ? "Put the words in order" : it.type === "match" ? "Match the pairs" : it.type === "listen" ? "Listen" : it.scen ? "Which gift?" : it.line ? "Fill in the blank" : it.pic ? "Look and answer" : "Choose the answer";
+  const kind = it.type === "build" ? "Put the words in order" : it.type === "match" ? "Match the pairs" : it.type === "listen" ? "Listen" : it.type === "watch" ? "Watch, then answer" : it.scen ? "Which gift?" : it.line ? "Fill in the blank" : it.pic ? "Look and answer" : "Choose the answer";
   show(`<div class="lesson">
     <h1 class="sr-only">${esc(g.L.name)}</h1>
     ${lessonTop(g.endless ? g.lives / 3 * 100 : g.idx / n * 100)}
@@ -753,6 +753,10 @@ function itemBody(it){
     const left = shuffle(it.pairs.map((p,i) => ({ i, t:p[0] }))), right = shuffle(it.pairs.map((p,i) => ({ i, t:p[1] })));
     return bubbleRow(esc(it.q), "think") + `<div class="match"><div class="col">${left.map(x => `<button class="mt" data-side="l" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div><div class="col">${right.map(x => `<button class="mt" data-side="r" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div></div>`;
   }
+  if (it.type === "watch")
+    return `<div class="ytbox"><iframe src="https://www.youtube-nocookie.com/embed/${esc(it.vid)}?start=${Math.max(0, it.from|0)}&rel=0&modestbranding=1&playsinline=1"
+      title="Timeshare OPC University" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <p class="small muted">Timeshare OPC University. Needs internet.</p>` + bubbleRow(esc(it.q), "think") + optionsHTML(it);
   if (it.type === "listen")
     return `<div class="listen"><button class="speak" id="hear" data-key="item" aria-label="Play the voice note">${icon("speaker")}</button><button class="speak slow" id="hearSlow" data-key="item-slow" aria-label="Play slower">0.75×</button></div><p class="read-it" id="readIt" hidden></p>` + bubbleRow(esc(it.q), "idle") + optionsHTML(it);
   if (it.scen) return scenarioHTML(it) + optionsHTML(it);

@@ -692,6 +692,67 @@ const LEVELS = [
     Q("r5","A guest asks where the nearest good beach is. You don't know.","You just lost their trust",["No harm, send them to a hostess","Name any beach, they won't check","Tell them you only do invitations"],"Know the beaches, the shops, the restaurants. Helping first is what earns the conversation."),
     Q("r6","Two people say the same opener. Why does only one book?","It's not what you say, it's how",["One of them had a better corner","One of them talks much faster","One of them was simply luckier"],"Nobody stops for a flat \"hi, how are you\". Say it like you mean it.")
   ]
+},
+{
+  id: "tip1", name: "Tricks of the trade", sub: "Small things that change the day", icon: "target",
+  notes: [
+    { h: "Four things, fast", li: [
+      "A sales rep has 90 minutes to build trust, find the need, help and create urgency.",
+      "On the street you do all four in about ninety seconds.",
+      "Trust first. Nothing else lands without it." ] },
+    { h: "Describe it like you were there", li: [
+      "Not \"a boat trip that takes you out and back\".",
+      "The time it leaves, where it stops, what is on the table, what they will see, when they are back.",
+      "Read it, picture it, then tell it. People say yes to what they can see in their heads." ] },
+    { h: "Look first, talk second", li: [
+      "The hat, the shirt, the kids, whether they are holding hands.",
+      "You do not approach a young couple the way you approach a family.",
+      "Say something real. People feel a line that is not meant." ] },
+    { h: "Watch it yourself", li: [
+      "These are moments from the Timeshare OPC University videos. Tap play and hear him say it.",
+      "youtube.com/channel/UCpSASqNj-Q7vSrimzaibkCQ" ] }
+  ],
+  qs: [
+    WATCH("t1a","zp-uEN9GZ3A",243,"He names the four steps of any sale. Which is first?","Trust",["Need","Hurry","Help"],"Trust, need, help, hurry. A closer has 90 minutes for it. You have about ninety seconds."),
+    Q("t1b","Why does trust have to come first?","Nothing else lands without it",["It is the easiest one to do","The others take much longer","Guests ask for it by name"],"They will not hear the offer from someone they do not believe yet."),
+    WATCH("t1c","Vmes1BQKMKk",285,"Two people use the same words. What makes the difference?","How they say it",["Which corner they have","How fast they talk","How long they have worked"],"Nobody stops for a flat greeting. Say it like you mean it."),
+    Q("t1d","How should you describe the morning to a guest?","Like something you have seen",["In as few words as possible","Exactly as the deck writes it","Louder than the street noise"],"Read it, picture it, then tell it. The time, the stops, the food, the view."),
+    WATCH("t1e","Vmes1BQKMKk",208,"What does he tell you to do before you speak to anyone?","Look at them as they come",["Count how many walk past","Check your invitations","Get your opener ready"],"The hat, the shirt, the kids, holding hands. You do not approach a family like a young couple."),
+    Q("t1f","Your opener should be something that is…","Real, and about them",["Funny, so they stop walking","The same every time, so it's quick","About the gift, so it's clear"],"People feel a line that is not meant. Say something you actually noticed."),
+    Q("t1g","A guest asks where something is and you are not sure.","Find out. Guessing costs the trust",["Point them roughly the right way","Tell them to ask at their hotel","Change the subject to the offer"],"Fumbling or guessing loses you the one thing the rest depends on.")
+  ]
+},
+{
+  id: "tip2", name: "Your head in the game", sub: "The part nobody sees", icon: "flame",
+  notes: [
+    { h: "The corner is not the problem", li: [
+      "The best spot is where people stop trying. It is comfortable, so they coast.",
+      "Take the quiet one and make it work, and everybody will want it.",
+      "One couple is all you need from a morning." ] },
+    { h: "Protect your head", li: [
+      "There is always someone telling you it is slow, it is hot, nobody is booking today.",
+      "They are describing their morning, not yours.",
+      "Rejection is the job, not a verdict on you." ] },
+    { h: "The objection you could not answer", li: [
+      "Write it down. Do not carry it around all day.",
+      "At home, ask yourself how you would have wanted someone to answer it.",
+      "That answer is yours for the rest of your career." ] },
+    { h: "Know what you are offering", li: [
+      "People who join travel better for years, in a proper room, eating properly, for less.",
+      "If you are not sure about it, they hear it in your voice before they hear the words." ] },
+    { h: "Watch it yourself", li: [
+      "Moments from the Timeshare OPC University videos.",
+      "youtube.com/channel/UCpSASqNj-Q7vSrimzaibkCQ" ] }
+  ],
+  qs: [
+    WATCH("t2a","zp-uEN9GZ3A",79,"What does his old supervisor tell him about a bad location?","The spot is not the problem",["Ask to be moved quickly","Slow spots are for new staff","Work shorter hours there"],"It's not the cage, it's the monkey. A quiet corner still walks people past you."),
+    Q("t2b","What is the risk of having the best corner?","You stop working as hard",["Everyone else gets jealous","You get moved off it sooner","The guests are more spoiled"],"The best spot is comfortable, and comfortable is where people coast."),
+    WATCH("t2c","iokvIuTiVII",208,"You get an objection you can't answer. What does he say to do?","Write it down and solve it later",["Ask a colleague on the spot","Let that couple walk away","Use the same answer next time"],"At home, ask how you would have wanted it answered. That answer is yours from then on."),
+    Q("t2d","A colleague keeps saying it's slow and nobody's booking.","That's their morning, not yours",["They know the street better","It's useful information to have","Match their pace for a while"],"There is always one. Their morning is not your morning."),
+    Q("t2e","What is rejection on the street?","The job itself",["A sign your pitch is wrong","Something to take personally","A reason to try a new spot"],"Most people keep walking. That is the shape of the work, not a verdict on you."),
+    WATCH("t2f","Pip_9yVjvAE",227,"Why does he say you should be proud of what you offer?","It changes how people travel",["It is the biggest resort here","The gift is worth a lot","Nobody else offers it"],"People who join travel better for years and pay less for it. If you doubt it, they hear it."),
+    Q("t2g","You believe in the Open House. What does that do?","They hear it before the words",["It makes the pitch shorter","It gets you better corners","It stops them asking questions"],"Conviction carries. So does the lack of it.")
+  ]
 }
 ];
 
