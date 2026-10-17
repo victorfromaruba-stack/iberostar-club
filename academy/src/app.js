@@ -846,9 +846,27 @@ function completeMap(){
    The floor is 2s rather than something crueller: below that it stops testing
    whether you can qualify a couple and starts testing your thumb. */
 const LG_START_MS = 6000;   // the first couple, generous on purpose
-const LG_FLOOR_MS = 2000;   // fast, still readable
 const LG_STEP_MS  = 150;    // tightening per correct answer
-const lgWindow = (score) => Math.max(LG_FLOOR_MS, LG_START_MS - score * LG_STEP_MS);
+const LG_HARD_MS  = 1200;   // nobody is ever asked to beat this
+const LG_SLOW_MS  = 2600;   // and nobody is left with more than this either
+
+/* The floor is the player's own pace, not a number I picked.
+   A fixed floor is a guess about a stranger: set it at 2s and a quick reader
+   plateaus again in a week while someone still sounding out the chips never
+   gets past ten. Instead each player's recent answer times are kept, and the
+   floor lands just inside their own comfortable speed -- so the run ends at
+   the edge of THIS person, and keeps moving as they get quicker.
+   Clamped at both ends: never crueller than LG_HARD_MS, never slacker than
+   LG_SLOW_MS, so a run of lucky guesses cannot make the game trivial and a
+   bad day cannot make it impossible. */
+function lgPace(){
+  const t = (S.lgTimes || []).slice(-30);
+  if (t.length < 6) return 2000;                       // not enough to judge yet
+  const sorted = [...t].sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)];
+  return Math.min(LG_SLOW_MS, Math.max(LG_HARD_MS, Math.round(median * 0.8)));
+}
+const lgWindow = (score) => Math.max(lgPace(), LG_START_MS - score * LG_STEP_MS);
 function lightningIntro(){
   view = "lightning"; game = null;
   show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button><span></span><span></span></div>
@@ -856,7 +874,7 @@ function lightningIntro(){
     ${shoco("think")}
     <h1 style="color:var(--sea-ink)">Lightning round</h1>
     <p>Qualify couple after couple. Every one gives you less time than the last. One mistake ends it.</p>
-    <div class="stats"><div class="stat c-sun"><div class="h">Record</div><div class="v">${icon("bolt")}${S.lightning||0}</div></div><div class="stat c-lagoon"><div class="h">Clock</div><div class="v">${(LG_START_MS/1000)}s &rarr; ${(LG_FLOOR_MS/1000)}s</div></div><div class="stat" style="--c:var(--bad);--t:var(--on-bad)"><div class="h">Mistakes</div><div class="v">${icon("heart")}1</div></div></div>
+    <div class="stats"><div class="stat c-sun"><div class="h">Record</div><div class="v">${icon("bolt")}${S.lightning||0}</div></div><div class="stat c-lagoon"><div class="h">Clock</div><div class="v">${(LG_START_MS/1000)}s &rarr; ${(lgPace()/1000).toFixed(1)}s</div></div><div class="stat" style="--c:var(--bad);--t:var(--on-bad)"><div class="h">Mistakes</div><div class="v">${icon("heart")}1</div></div></div>
     <button class="btn wide sea" id="go">Start</button>
   </section>`, { full: true });
   on("#back", () => tab("games"));
@@ -920,6 +938,11 @@ function answerL(choice, btn){
   if (choice === g.cur.g){
     g.score++; addXP(5); sfx("ok"); buzz(10); plusOne("+1");
     $("#sc").textContent = g.score;
+    // How long that one actually took. Only correct answers are recorded: a
+    // wrong one ends the run anyway, and timing a panic would drag the pace
+    // estimate somewhere that does not describe how fast they can really read.
+    const used = g.win - (g.end - Date.now());
+    if (used > 150) S.lgTimes = (S.lgTimes || []).concat(Math.min(used, g.win)).slice(-40);
     // Earn the next couple and a smaller window to answer it in.
     g.win = lgWindow(g.score); g.end = Date.now() + g.win; g.lastSec = 0;
     g.cur = nextCouple(g.seen); drawCouple();
