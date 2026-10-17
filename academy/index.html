@@ -870,7 +870,7 @@ const UNITS = [
   { id: "pitch", n: 2, title: "The pitch", sub: "Bookings that show up", color: "flamingo", levels: ["why", "offer", "cash", "house", "solid", "words", "close", "map"] },
   { id: "nlp", n: 3, title: "NLP", sub: "Rapport, words that lead, reading people", color: "sea", levels: ["nlp1", "nlp2", "nlp3", "nlp4"], after: "why" },
   { id: "street", n: 4, title: "Street skills", sub: "Stopping people, small talk, objections", color: "good", levels: ["ready", "st2", "st3", "st4"], after: "q" },
-  { id: "tips", n: 5, title: "Tips and tricks", sub: "From the street, with the videos", color: "sun", levels: ["tip1", "tip2"] },
+  { id: "tips", n: 5, title: "Tips and tricks", sub: "From the street, with the videos", color: "sun", levels: ["tip1", "tip2", "tip3"] },
   { id: "final", n: 6, title: "Final", sub: "Everything mixed", color: "sun", levels: ["final"] }
 ];
 const TRACKS = UNITS.filter(u => u.id !== "final");
@@ -1566,7 +1566,10 @@ const LEVELS = [
     Q("r3","Why does how you look matter out there?","They decide if they like you fast",["The hostesses check the uniform","It is in the staff handbook","Guests ask to see your ID"],"Clean, uniform, ID showing. People buy from people they like and they decide in seconds."),
     Q("r4","What is ready before your shift starts?","Pen, invitations and a number",["A list of couples to avoid","The gift amounts written out","Your break times for the day"],"Hunting for a pen in front of a couple loses them. And go out aiming at a number, not hoping for one."),
     Q("r5","A guest asks where the nearest good beach is. You don't know.","You just lost their trust",["No harm, send them to a hostess","Name any beach, they won't check","Tell them you only do invitations"],"Know the beaches, the shops, the restaurants. Helping first is what earns the conversation."),
-    Q("r6","Two people say the same opener. Why does only one book?","It's not what you say, it's how",["One of them had a better corner","One of them talks much faster","One of them was simply luckier"],"Nobody stops for a flat \"hi, how are you\". Say it like you mean it.")
+    Q("r6","Two people say the same opener. Why does only one book?","It's not what you say, it's how",["One of them had a better corner","One of them talks much faster","One of them was simply luckier"],"Nobody stops for a flat \"hi, how are you\". Say it like you mean it."),
+    WATCH("r7","zp-uEN9GZ3A",79,101,"What does he say about being put on a bad spot?","The spot is not the problem",["Ask to be moved that day","New people start there","Work fewer hours on it"],"It's not the cage, it's the monkey."),
+    Q("r8","You're new to this part of the island. What do you do?","Walk it, and ask the others",["Wait until a guest asks you","Keep to what you already know","Send them to their own hotel"],"Walk the street, ask your colleagues, look it up. Knowing the area is the basic tool of the job."),
+    Q("r9","Why does your spot need to look tidy?","They judge you by it in a second",["The supervisor checks it daily","There is a rule about it","Guests ask to sit down there"],"A messy table and a lost pen say more about you than anything you say.")
   ]
 },
 {
@@ -1628,6 +1631,36 @@ const LEVELS = [
     Q("t2e","What is rejection on the street?","The job itself",["A sign your pitch is wrong","Something to take personally","A reason to try a new spot"],"Most people keep walking. That is the shape of the work, not a verdict on you."),
     WATCH("t2f","Pip_9yVjvAE",227,256,"Why does he say you should be proud of what you offer?","It changes how people travel",["It is the biggest resort here","The gift is worth a lot","Nobody else offers it"],"People who join travel better for years and pay less for it. If you doubt it, they hear it."),
     Q("t2g","You believe in the Open House. What does that do?","They hear it before the words",["It makes the pitch shorter","It gets you better corners","It stops them asking questions"],"Conviction carries. So does the lack of it.")
+  ]
+},
+{
+  id: "tip3", name: "The questions they ask", sub: "The five you will hear every week", icon: "chat",
+  notes: [
+    { h: "\"Is this a timeshare?\"", li: [
+      "No. Our deck promises it in writing: no timeshare.",
+      "It is a membership, a club, a different way to book the holidays they already take.",
+      "Say no clearly. Hesitating here is what makes people think you are hiding something." ] },
+    { h: "\"What's the catch? Why give all this away?\"", li: [
+      "Because we would rather spend it on you than on advertising.",
+      "Come, look at the place, and tell people what you thought of it.",
+      "Every hotel pays for adverts nobody watches. We pay the guest instead." ],
+      watch: { vid: "OE2MCuHM9go", from: 155, to: 178 } },
+    { h: "\"Do we have to buy something?\"", li: [
+      "No obligation. That is one of our four promises and it is not a figure of speech.",
+      "Ninety minutes, breakfast, the tour, and then it is their decision and nobody else's." ],
+      watch: { vid: "OE2MCuHM9go", from: 201, to: 230 } },
+    { h: "Answer straight", li: [
+      "Every one of these has a true answer that works. None of them needs a dodge.",
+      "A guest who gets a straight answer on the street arrives ready to listen." ] }
+  ],
+  qs: [
+    Q("p1","\"Is this a timeshare?\" What do you say?","No. It's a membership club",["Something close to one, yes","Better than a timeshare","Not exactly, it's complicated"],"Our own deck promises no timeshare. Say no clearly: hesitating makes them think you're hiding something."),
+    Q("p2","\"So what's the catch?\" What's the honest answer?","We'd rather spend it on you",["There's no catch at all, really","You just have to show up","It's our marketing budget"],"Other hotels buy adverts nobody watches. We put that money into the guest instead."),
+    WATCH("p3","OE2MCuHM9go",155,178,"Why does he say the resort gives the promotion?","So guests go home and talk",["To fill the rooms in low season","Because the adverts are costly","To beat the other resorts"],"You looked at the place, so tell your family what you thought of it. That is worth more than a billboard."),
+    Q("p4","\"Do we have to buy anything?\" What do you tell them?","No. That's one of our promises",["Only if you really like it","Almost nobody buys anything","You decide on the day itself"],"No obligation is written into the offer. It is not a figure of speech, so say it plainly."),
+    WATCH("p5","OE2MCuHM9go",201,230,"What does he compare the promotion to?","Paying for cable, then ads",["A free sample in a shop","A hotel loyalty card scheme","Entering a prize draw"],"They pay for TV and still watch the adverts. Here we pay them for their attention instead."),
+    Q("p6","\"How long before we can go?\" What do you say?","Ninety minutes, plus breakfast",["It depends on the morning","Until you have seen it all","As long as you want to stay"],"Ninety minutes and breakfast. Then it is their decision and nobody holds them."),
+    Q("p7","You're not sure of the answer to something they ask.","Say so, then find out",["Give your best guess quickly","Move them on to the gift","Tell them the desk will know"],"A guess that turns out wrong is found out tomorrow, and it was your name on the invitation.")
   ]
 }
 ];
@@ -1798,8 +1831,8 @@ const GOAL = 50;
    2026-10-17. ORDER is the learning sequence and decides what a worker is
    pointed at next; a level missing there is never offered and silently locks
    the Final, which needs every unit finished. */
-const ORDER = ["q","why","ready","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","tip1","tip2","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","ready","st2","st3","st4","tip1","tip2","final"];
+const ORDER = ["q","why","ready","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","close","nlp2","map","nlp3","nlp4","tip1","tip2","tip3","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","close","map","nlp1","nlp2","nlp3","nlp4","ready","st2","st3","st4","tip1","tip2","tip3","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];
