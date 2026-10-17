@@ -636,7 +636,7 @@ function togglePop(id){
 function ytCut(w){
   return `<div class="ytbox"><iframe src="https://www.youtube-nocookie.com/embed/${esc(w.vid)}?start=${Math.max(0, w.from|0)}&end=${w.to|0}&rel=0&modestbranding=1&playsinline=1"
     title="Timeshare OPC University" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-    <p class="small muted">${(w.to - w.from)} second clip, Timeshare OPC University.</p>`;
+    <p class="small muted">${(w.to - w.from)} second clip, Timeshare OPC University. <a href="https://www.youtube.com/watch?v=${esc(w.vid)}&t=${w.from|0}s" target="_blank" rel="noopener">Won't play? Open it on YouTube</a></p>`;
 }
 function noteHTML(nt){
   return `<section class="note"><h2>${esc(nt.h)}</h2><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
@@ -764,7 +764,7 @@ function itemBody(it){
   if (it.type === "watch")
     return `<div class="ytbox"><iframe src="https://www.youtube-nocookie.com/embed/${esc(it.vid)}?start=${Math.max(0, it.from|0)}${it.to ? `&end=${it.to|0}` : ""}&rel=0&modestbranding=1&playsinline=1"
       title="Timeshare OPC University" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-      <p class="small muted">${it.to ? `${(it.to - it.from)} second clip. ` : ""}Timeshare OPC University. Needs internet.</p>` + bubbleRow(esc(it.q), "think") + optionsHTML(it);
+      <p class="small muted">${it.to ? `${(it.to - it.from)} second clip. ` : ""}Timeshare OPC University. <a href="https://www.youtube.com/watch?v=${esc(it.vid)}&t=${it.from|0}s" target="_blank" rel="noopener">Won't play? Open it on YouTube</a></p>` + bubbleRow(esc(it.q), "think") + optionsHTML(it);
   if (it.type === "listen")
     return `<div class="listen"><button class="speak" id="hear" data-key="item" aria-label="Play the voice note">${icon("speaker")}</button><button class="speak slow" id="hearSlow" data-key="item-slow" aria-label="Play slower">0.75×</button></div><p class="read-it" id="readIt" hidden></p>` + bubbleRow(esc(it.q), "idle") + optionsHTML(it);
   if (it.scen) return scenarioHTML(it) + optionsHTML(it);
