@@ -631,9 +631,17 @@ function togglePop(id){
 }
 
 /* ---------- Guidebook ---------- */
+/* One cut, in the guidebook as well as in the questions — the same idea as the
+   "Hear the line" button on the team's own voice notes. */
+function ytCut(w){
+  return `<div class="ytbox"><iframe src="https://www.youtube-nocookie.com/embed/${esc(w.vid)}?start=${Math.max(0, w.from|0)}&end=${w.to|0}&rel=0&modestbranding=1&playsinline=1"
+    title="Timeshare OPC University" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+    <p class="small muted">${(w.to - w.from)} second clip, Timeshare OPC University.</p>`;
+}
 function noteHTML(nt){
   return `<section class="note"><h2>${esc(nt.h)}</h2><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
     ${nt.hear ? `<div class="acts"><button class="btn small ghost" data-seg="${nt.hear.clip}:${nt.hear.from}:${nt.hear.to}">${icon("play")} ${esc(nt.hear.label || "Hear it in the voice notes")}</button></div>` : ""}
+    ${nt.watch ? ytCut(nt.watch) : ""}
     ${nt.sayId ? lineHTML(NLP_LINES[nt.sayId]) : nt.say ? `<p class="line"><span class="quote">"${esc(nt.say)}"</span></p>` : ""}
     ${nt.src ? [].concat(nt.src).map(x => `<p class="small"><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a></p>`).join("") : ""}</section>`;
 }
@@ -754,9 +762,9 @@ function itemBody(it){
     return bubbleRow(esc(it.q), "think") + `<div class="match"><div class="col">${left.map(x => `<button class="mt" data-side="l" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div><div class="col">${right.map(x => `<button class="mt" data-side="r" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div></div>`;
   }
   if (it.type === "watch")
-    return `<div class="ytbox"><iframe src="https://www.youtube-nocookie.com/embed/${esc(it.vid)}?start=${Math.max(0, it.from|0)}&rel=0&modestbranding=1&playsinline=1"
+    return `<div class="ytbox"><iframe src="https://www.youtube-nocookie.com/embed/${esc(it.vid)}?start=${Math.max(0, it.from|0)}${it.to ? `&end=${it.to|0}` : ""}&rel=0&modestbranding=1&playsinline=1"
       title="Timeshare OPC University" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-      <p class="small muted">Timeshare OPC University. Needs internet.</p>` + bubbleRow(esc(it.q), "think") + optionsHTML(it);
+      <p class="small muted">${it.to ? `${(it.to - it.from)} second clip. ` : ""}Timeshare OPC University. Needs internet.</p>` + bubbleRow(esc(it.q), "think") + optionsHTML(it);
   if (it.type === "listen")
     return `<div class="listen"><button class="speak" id="hear" data-key="item" aria-label="Play the voice note">${icon("speaker")}</button><button class="speak slow" id="hearSlow" data-key="item-slow" aria-label="Play slower">0.75×</button></div><p class="read-it" id="readIt" hidden></p>` + bubbleRow(esc(it.q), "idle") + optionsHTML(it);
   if (it.scen) return scenarioHTML(it) + optionsHTML(it);

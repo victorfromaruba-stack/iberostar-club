@@ -72,8 +72,9 @@ There is no backend — everything is static HTML/CSS/JS plus a local media libr
   it carries everything. It drops test-looking names and merges one person's devices into a single
   row; the page filters test names again (`TEST_NAME`) because only Victor can change the database.
   **Tips and tricks (unit 5):** `tip1`/`tip2`, built from the Timeshare OPC University videos, using a
-  `WATCH(id, vid, from, q, a, w, why)` item that embeds the video at the second the coach says the
-  thing (youtube-nocookie, `?start=`). **Nothing is downloaded** — YouTube refuses this server's IP
+  `WATCH(id, vid, from, to, q, a, w, why)` item that plays a **cut** — twenty to thirty seconds of
+  the coach saying the one thing (youtube-nocookie, `?start=&end=`), the same idea as the voice
+  notes playing a line and stopping. A guidebook note can carry one too via `watch: {vid, from, to}`. **Nothing is downloaded** — YouTube refuses this server's IP
   for all media (see the memory `project_youtube_blocked_on_this_vps`), and an embed is the
   platform's own player, so the channel keeps its view and we copy nothing. Embeddability was
   checked per video with the oEmbed endpoint, which does work from here.

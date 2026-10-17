@@ -14,8 +14,10 @@ const LISTEN = (id, clip, from, to, q, a, w, why) => ({ id, type: "listen", clip
 /* A moment from one of the Timeshare OPC University videos, played in place
    from YouTube at the second it happens. Nothing is downloaded or copied: the
    embed is the platform's own player, the channel keeps its view, and the
-   worker watches the coach say it rather than reading my summary of it. */
-const WATCH = (id, vid, from, q, a, w, why) => ({ id, type: "watch", vid, from, q, a, w, why });
+   worker watches the coach say it rather than reading my summary of it.
+   from/to make it a CUT, not the whole video: twenty seconds of the man
+   saying the one thing, the same way the voice notes play a line and stop. */
+const WATCH = (id, vid, from, to, q, a, w, why) => ({ id, type: "watch", vid, from, to, q, a, w, why });
 
 const UNITS = [
   { id: "qualify", n: 1, title: "Qualify", sub: "Who gets which gift", color: "lagoon", levels: ["q", "ctnq", "who"] },

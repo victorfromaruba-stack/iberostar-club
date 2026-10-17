@@ -51,9 +51,15 @@ const mastered = () => ({ count: 1, last: Date.now() });
   if (!frame) fail("no watch item appeared in 12 items of the level");
 
   const src = await frame.getAttribute('src');
-  const m = /youtube-nocookie\.com\/embed\/([A-Za-z0-9_-]{11})\?start=(\d+)/.exec(src || "");
-  if (!m) fail("the embed src is not a nocookie embed with a start time: " + src);
-  if (+m[2] <= 0) fail("the video starts at 0 instead of the moment it is about: " + src);
+  const m = /youtube-nocookie\.com\/embed\/([A-Za-z0-9_-]{11})\?start=(\d+)&end=(\d+)/.exec(src || "");
+  if (!m) fail("the embed src is not a nocookie embed with both a start and an end: " + src);
+  const from = +m[2], to = +m[3];
+  if (from <= 0) fail("the clip starts at 0 instead of the moment it is about: " + src);
+  /* A cut, not the whole video: long enough to say something, short enough
+     that nobody watches six minutes to answer one question. */
+  if (to <= from) fail(`the clip ends before it starts (${from} to ${to})`);
+  if (to - from < 8) fail(`the clip is only ${to - from}s, too short to hear the point`);
+  if (to - from > 60) fail(`the clip is ${to - from}s, that is a video not a cut`);
 
   /* The question around it must still work. */
   const opts = await page.$$('.opt');
@@ -65,6 +71,6 @@ const mastered = () => ({ count: 1, last: Date.now() });
 
   if (errors.length) fail("page error: " + errors[0]);
   if (process.argv[3]) await page.screenshot({ path: process.argv[3], fullPage: true });
-  console.log(`PASS  watch item plays ${m[1]} from ${m[2]}s and answers like any other question`);
+  console.log(`PASS  cut of ${to - from}s from ${m[1]} (${from}-${to}s), answers like any other question`);
   await b.close();
 })().catch(e => fail(e.message));
