@@ -6,7 +6,14 @@ const code = html.slice(html.indexOf('"use strict";'), html.lastIndexOf("</scrip
 const body = code.slice(0, code.indexOf("/* ---------- Scenario generator"));
 const ctx = {}; vm.createContext(ctx);
 vm.runInContext(body.replace(/^const /gm, "var "), ctx);
-const { LEVELS, CLIPS, SCRIPT, NLP_LINES, MAP_STEPS } = ctx;
+const { LEVELS, CLIPS, SCRIPT, NLP_LINES, MAP_STEPS, UNITS } = ctx;
+/* LEVEL_IDS and ORDER live further down the bundle than the slice evaluated
+   above, so read them straight out of the source text. */
+const idList = name => {
+  const m = code.match(new RegExp(`\\b(?:const|var) ${name}\\s*=\\s*\\[([^\\]]*)\\]`));
+  return m ? m[1].split(",").map(s => s.trim().replace(/^"|"$/g, "")).filter(Boolean) : null;
+};
+const LEVEL_IDS = idList("LEVEL_IDS"), ORDER = idList("ORDER");
 const errors = [], warns = [];
 const clip = id => CLIPS.find(c => c.id === id);
 const seg = (where, c, a, b) => { const k = clip(c); if (!k || !(a >= 0) || !(b >= a) || b >= k.s.length) errors.push(`${where}: bad voice note range ${c}:${a}-${b}`); };
@@ -59,6 +66,18 @@ for (const L of LEVELS) {
 }
 for (const st of SCRIPT) { for (const l of st.lines) seg(`script ${l.id}`, l.clip, l.from, l.to); if (st.dont) seg(`script ${st.step} don't`, st.dont.clip, st.dont.from, st.dont.to); if (st.extra) seg(`script ${st.step} extra`, st.extra.clip, st.extra.from, st.extra.to); }
 if (SCRIPT.length !== MAP_STEPS.length || SCRIPT.some((s, i) => s.step !== MAP_STEPS[i].t)) errors.push("Script steps don't match the pitch map steps");
+
+/* A level named by a unit but missing from LEVEL_IDS has no stats entry, and
+   the manager panel throws mid-render the moment it draws that level's cell —
+   which is what adding "cash" and "house" did on 2026-10-17. Missing from
+   ORDER is quieter and worse: nobody is ever pointed at the level, so the
+   Final, which needs every unit finished, can never unlock. */
+if (!LEVEL_IDS || !ORDER) errors.push("could not read LEVEL_IDS/ORDER out of the bundle — the unit/level consistency check did not run");
+else for (const u of UNITS) for (const id of u.levels) {
+  if (!LEVEL_IDS.includes(id)) errors.push(`level "${id}" is in unit "${u.title}" but not in LEVEL_IDS (app.js) — the manager panel will crash on it`);
+  if (!ORDER.includes(id)) errors.push(`level "${id}" is in unit "${u.title}" but not in ORDER (app.js) — nobody will ever be sent to it and the Final stays locked`);
+}
+for (const id of LEVEL_IDS) if (!UNITS.some(u => u.levels.includes(id))) errors.push(`LEVEL_IDS has "${id}" but no unit lists it`);
 // Writing checks over everything a worker reads (not the voice note transcripts, which are the team's own words),
 // including 300 generated guest cards.
 const gen = code.slice(code.indexOf("/* ---------- Scenario generator"), code.indexOf("/* =====================================================================\n   CONFIG"));

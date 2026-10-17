@@ -1639,8 +1639,16 @@ const SB = { url: "https://cdkopyphjvfxjqhasrae.supabase.co", key: "sb_publishab
 const TEAM_URL = "https://victorfromaruba-stack.github.io/iberostar-club/academy/";
 const TEAM_HOST = /github\.io$/.test(location.hostname) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 const GOAL = 50;
-const ORDER = ["q","why","st2","ctnq","offer","st3","nlp1","who","st4","solid","words","nlp2","map","nlp3","nlp4","final"];
-const LEVEL_IDS = ["q","ctnq","who","why","offer","solid","words","map","nlp1","nlp2","nlp3","nlp4","st2","st3","st4","final"];
+/* Both lists must carry every level in UNITS. The manager panel builds a cell
+   for each level a unit names, but every per-level stat is keyed off
+   LEVEL_IDS, so a level that is in one and not the other renders a cell whose
+   stats do not exist and the whole panel throws mid-render — which is how
+   "cash" and "house" left managers staring at "Loading the team…" on
+   2026-10-17. ORDER is the learning sequence and decides what a worker is
+   pointed at next; a level missing there is never offered and silently locks
+   the Final, which needs every unit finished. */
+const ORDER = ["q","why","st2","ctnq","offer","cash","house","st3","nlp1","who","st4","solid","words","nlp2","map","nlp3","nlp4","final"];
+const LEVEL_IDS = ["q","ctnq","who","why","offer","cash","house","solid","words","map","nlp1","nlp2","nlp3","nlp4","st2","st3","st4","final"];
 const GAPS = [1,3,7,14,30];
 const DAY = 864e5;
 const PRAISE = ["Nice!", "Exactly.", "You got it.", "Spot on.", "That's it.", "Great."];
