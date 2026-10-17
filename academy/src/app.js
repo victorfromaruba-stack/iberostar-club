@@ -61,7 +61,7 @@ function levelTotal(L){ return L.map ? MAP_STEPS.length*2 : (L.count || (L.qs||[
 const KEY = "showup.v1";
 const blank = () => ({ name:"", mastered:{}, best:{}, misses:{}, sound:true, xp:0, lightning:0, daily:{ last:"", streak:0, best:0 },
   listened:{}, intro:false, days:[], today:{ d:"", xp:0 }, said:{}, sync:{ device:"", secret:"", last:0, ok:null }, mgr:"", tab:"learn",
-  lv:{}, log:[], gaunt:0, rank:{}, rp:{ n:0, best:0, res:[] }, rpVoice:true, rpFocus:"any", rpLang:"en" });
+  lv:{}, log:[], gaunt:0, rank:{}, pinSet:false, rp:{ n:0, best:0, res:[] }, rpVoice:true, rpFocus:"any", rpLang:"en" });
 let S = blank();
 try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e){}
 for (const [k, v] of Object.entries(blank())) if (typeof S[k] !== typeof v || (Array.isArray(v) && !Array.isArray(S[k]))) S[k] = v;
@@ -363,6 +363,106 @@ function newId(){
   const h = [...b].map(x => x.toString(16).padStart(2,"0")).join("");
   return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
 }
+/* ---------- Accounts ---------- */
+/* Victor, 2026-10-17: "if they use a different device they don't lose their
+   progress." Until now the person WAS the phone — install the app properly,
+   change handset, clear the browser, and seventeen levels were gone. The
+   progress was never lost (it is in Supabase after every answer), there was
+   just no way to prove you were the same person.
+   So: a name and a four digit code. Nothing to remember but four digits, and
+   no email or password on a floor that works from their phones. */
+function restoreFrom(st){
+  if (!st || typeof st !== "object") return false;
+  const o = k => (st[k] && typeof st[k] === "object" && !Array.isArray(st[k])) ? st[k] : {};
+  const n = (v, max) => Math.max(0, Math.min(max, parseInt(v, 10) || 0));
+  const m = o("m"), ml = o("ml"), b = o("b"), a = o("a");
+  S.xp = n(st.x, 1e7); S.lightning = n(st.l, 9999); S.gaunt = n(st.gt, 9999);
+  S.mastered = {}; S.best = {}; S.lv = {};
+  LEVEL_IDS.forEach(id => {
+    if (n(m[id], 999)) S.mastered[id] = { count: n(m[id], 999), last: n(ml[id], Date.now() + DAY) };
+    if (n(b[id], 999)) S.best[id] = n(b[id], 999);
+    const v = Array.isArray(a[id]) ? a[id] : [];
+    if (v.some(x => n(x, 1e6))) S.lv[id] = { r: n(v[0], 1e6), w: n(v[1], 1e6), t: n(v[2], 1e6) };
+  });
+  S.misses = {};
+  (Array.isArray(st.w) ? st.w : []).forEach(x => { if (Array.isArray(x) && typeof x[0] === "string") S.misses[x[0]] = n(x[1], 999); });
+  S.log = Array.isArray(st.lg) ? st.lg.slice(-25) : [];
+  S.days = (Array.isArray(st.dd) ? st.dd : []).filter(d => typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(-60);
+  const rp = o("rp");
+  S.rp = { n: n(rp.n, 9999), best: n(rp.b, 100), res: Array.isArray(rp.s) ? rp.s.slice(-10) : [] };
+  return true;
+}
+async function claimAccount(name, pin){
+  /* A fresh id for this phone, which the server then points the account at —
+     so the old phone stops writing to it and two handsets cannot fight. */
+  S.sync.device = ""; S.sync.secret = ""; ident();
+  const res = await rpc("sua_claim", { p_name: name, p_pin: pin, p_device: S.sync.device, p_secret: S.sync.secret });
+  const r = (res && typeof res === "object" && res.stats) ? res : { stats: res, must_change: false };
+  restoreFrom(r.stats);
+  S.name = name.trim().slice(0, 30); S.intro = true; S.pinSet = true;
+  save(false);
+  /* Everyone who was already using the Academy got 1234, so the first thing
+     they see after getting their progress back is picking their own. */
+  return !!r.must_change;
+}
+async function setPin(pin){
+  ident();
+  await rpc("sua_set_pin", { p_device: S.sync.device, p_secret: S.sync.secret, p_pin: pin });
+  S.pinSet = true; save(false);
+}
+function restoreScreen(msg){
+  view = "restore"; game = null;
+  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button>
+    <div><p class="eyebrow">Your progress</p><h1>Get it back</h1></div><span></span></div>
+  <section class="card">
+    <div class="say-row">${shoco("think")}<div class="bubble">Used the Academy on another phone? Put in the same name and the four digit code you picked, and everything comes back.</div></div>
+    <form class="name-form" id="rsForm">
+      <label for="rnm" class="eyebrow" style="flex-basis:100%">Your name</label>
+      <input class="field" id="rnm" autocomplete="name" maxlength="30" placeholder="The name you used">
+      <label for="rpin" class="eyebrow" style="flex-basis:100%">Your 4 digit code</label>
+      <input class="field" id="rpin" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="••••">
+      <button class="btn">Get my progress</button>
+    </form>
+    ${msg ? `<p class="small" style="color:var(--bad-ink)">${esc(msg)}</p>` : ""}
+    <p class="small muted">No code yet? Open the Academy on the phone you normally use, go to Me, and pick one there first.</p>
+  </section>`, { full: true });
+  on("#back", () => tab("learn"));
+  $("#rsForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const nm = $("#rnm").value.trim(), pin = $("#rpin").value.trim();
+    if (!nm || !/^\d{4}$/.test(pin)) return restoreScreen("Put in your name and your four digit code.");
+    try {
+      const mustChange = await claimAccount(nm, pin);
+      sfx("win");
+      if (mustChange){ S.pinSet = false; save(false); pinScreen(); toast("Welcome back. Now pick your own code."); }
+      else { tab("learn"); toast("Welcome back. Your progress is here."); }
+    }
+    catch(err){ restoreScreen(/wrong name or pin/i.test(err.message) ? "That name and code don't match. Check both and try again." : "Couldn't reach the server. Check the internet and try again."); }
+  });
+}
+function pinScreen(){
+  view = "pin"; game = null;
+  show(`<div class="l-top"><button class="icon-btn" id="back" aria-label="Back">${icon("x")}</button>
+    <div><p class="eyebrow">Your progress</p><h1>${S.pinSet ? "Change your code" : "Keep your progress safe"}</h1></div><span></span></div>
+  <section class="card">
+    <div class="say-row">${shoco("idle")}<div class="bubble">Pick four digits you'll remember. If you change phone, install the app, or clear your browser, that code brings all of this back.</div></div>
+    <form class="name-form" id="pinForm">
+      <label for="pn" class="eyebrow" style="flex-basis:100%">4 digit code</label>
+      <input class="field" id="pn" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="••••">
+      <button class="btn">Save</button>
+    </form>
+    <p class="small muted">Don't use your birthday, and don't share it. Anyone with your name and this code can open your progress.</p>
+  </section>`, { full: true });
+  on("#back", () => tab("me"));
+  $("#pinForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const pin = $("#pn").value.trim();
+    if (!/^\d{4}$/.test(pin)) return toast("Four digits, nothing else.");
+    try { await setPin(pin); sfx("ok"); tab("me"); toast("Saved. That code gets your progress back on any phone."); }
+    catch(err){ toast(/4 digits/i.test(err.message) ? "Four digits, nothing else." : "Couldn't save it. Check the internet and try again."); }
+  });
+}
+
 function ident(){
   if (S.sync.device && S.sync.secret) return;
   const b = new Uint8Array(16); crypto.getRandomValues(b);
@@ -473,6 +573,7 @@ function renderLearn(){
         <div class="say-row">${shoco("happy")}<div class="bubble">Hi, I'm Shoco, Aruba's burrowing owl. I'll help you learn the qualifications, the pitch and NLP, one short lesson at a time. What's your name?</div></div>
         <form class="name-form" id="nameForm"><label for="nm" class="eyebrow" style="flex-basis:100%">Your name</label><input class="field" id="nm" autocomplete="name" maxlength="30" placeholder="First name + last initial"><button class="btn">Save</button></form>
         <p class="small muted">Your manager sees your progress, so use the name they know you by, like Maria G.</p>
+        <p class="foot"><button class="link" id="haveAcct">I've used this on another phone</button></p>
       </section>`}
   ${UNITS.map(u => `
     <section class="unit">
@@ -485,6 +586,7 @@ function renderLearn(){
   <p class="foot">Sources: Qualifications Aruba (2 March 2026), the team's voice notes (29 Sept 2026), and the Open House pitch deck. Street skills uses ideas from the Timeshare OPC University videos and the OPC Secrets By Suz audiobook, in our own words.</p>`);
   const nfm = $("#nameForm");
   if (nfm) nfm.addEventListener("submit", e => { e.preventDefault(); const v = $("#nm").value.trim().slice(0,30); if (v){ S.name = v; save(false); pushSync(); sfx("ok"); renderLearn(); } });
+  on("#haveAcct", () => restoreScreen());
   on("#toScript", () => tab("script"));
   app.querySelectorAll("[data-node]").forEach(b => b.onclick = () => togglePop(b.dataset.node));
   const cur = currentId(); if (cur && S.name) setTimeout(() => app.querySelector(`[data-node="${cur}"]`)?.scrollIntoView({ block: "center", behavior: "auto" }), 20);
@@ -1186,6 +1288,14 @@ function renderMe(){
       <li>Hear the lines from the voice notes, then say them out loud in the Script tab.</li>
       <li>Street practice in Games puts it all together: a real conversation with a tourist couple, then your score.</li>
     </ul></section>
+  ${S.name ? `<section class="card">
+    <p class="eyebrow">Your progress on other phones</p>
+    ${S.pinSet
+      ? `<p>Your four digit code is set. On a new phone, tap "I've used this on another phone" and put in your name and that code.</p>
+         <p class="row"><button class="btn small ghost" id="pin">Change my code</button></p>`
+      : `<div class="say-row">${shoco("think")}<div class="bubble">Pick a four digit code and your progress follows you. Change phone, install the app or clear your browser, and it all comes back. Without one, it only lives on this phone.</div></div>
+         <p class="row"><button class="btn small" id="pin">Pick my code</button></p>`}
+  </section>` : ""}
   <section class="row">
     <button class="btn small ghost" id="snd">${icon(S.sound ? "sound" : "mute")} Sound ${S.sound ? "on" : "off"}</button>
     ${S.name ? `<button class="btn small ghost" id="rename">Change name</button>` : ""}
@@ -1195,6 +1305,7 @@ function renderMe(){
   const nfm = $("#nameForm");
   if (nfm) nfm.addEventListener("submit", e => { e.preventDefault(); const v = $("#nm").value.trim().slice(0,30); if (v){ S.name = v; save(false); pushSync(); renderMe(); } });
   on("#mgr", coach);
+  on("#pin", pinScreen);
   on("#snd", () => { S.sound = !S.sound; save(false); sfx("tap"); renderMe(); });
   on("#rename", () => { S.name = ""; save(false); renderMe(); });
   on("#reset", () => {

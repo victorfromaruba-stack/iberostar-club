@@ -199,3 +199,82 @@ $$;
 
 revoke all on function public.sua_board() from public;
 grant execute on function public.sua_board() to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Accounts: the person, not the phone.
+--
+-- Progress was keyed to a device id generated in the browser, so installing
+-- the app properly, changing handset or clearing the browser lost everything.
+-- The progress itself was never lost — it is written to sua_people after every
+-- answer — there was simply no way to prove you were the same person.
+--
+-- A name and four digits. No email and no password, on a floor that works
+-- from their phones between guests.
+-- ---------------------------------------------------------------------------
+alter table public.sua_people add column if not exists pin_hash text;
+
+create or replace function public.sua_pin_hash(p_name text, p_pin text)
+returns text language sql immutable
+set search_path = public as $$
+  select encode(sha256(convert_to(lower(btrim(p_name)) || ':' || btrim(p_pin) || ':sua', 'UTF8')), 'hex');
+$$;
+
+-- Everyone already using the Academy starts on 1234, and sua_claim tells the
+-- app to make them choose their own the moment they sign in.
+update public.sua_people
+   set pin_hash = public.sua_pin_hash(name, '1234')
+ where pin_hash is null and coalesce(name, '') <> '';
+
+create or replace function public.sua_set_pin(p_device uuid, p_secret text, p_pin text)
+returns void language plpgsql security definer
+set search_path = public, extensions as $$
+declare v_name text;
+begin
+  if btrim(coalesce(p_pin, '')) !~ '^[0-9]{4}$' then
+    raise exception 'pin must be 4 digits';
+  end if;
+  -- Same device check as sua_save and sua_rp_who: the secret is stored as a
+  -- sha256 in secret_hash, never in the clear.
+  select name into v_name from public.sua_people
+   where device_id = p_device
+     and secret_hash = encode(extensions.digest(coalesce(p_secret, ''), 'sha256'), 'hex');
+  if v_name is null then raise exception 'not your record'; end if;
+  update public.sua_people
+     set pin_hash = public.sua_pin_hash(v_name, p_pin)
+   where device_id = p_device;
+end; $$;
+
+-- Point the account at the phone in front of us. The old device id stops
+-- working on purpose, so two handsets never write over each other.
+create or replace function public.sua_claim(p_name text, p_pin text, p_device uuid, p_secret text)
+returns jsonb language plpgsql security definer
+set search_path = public, extensions as $$
+declare r record;
+begin
+  if btrim(coalesce(p_pin, '')) !~ '^[0-9]{4}$' then
+    raise exception 'wrong name or pin';
+  end if;
+  select p.device_id, p.stats, p.pin_hash, p.name into r
+    from public.sua_people p
+   where lower(btrim(p.name)) = lower(btrim(p_name))
+     and p.pin_hash is not null
+     and p.pin_hash = public.sua_pin_hash(p.name, p_pin)
+   limit 1;
+  if r.device_id is null then raise exception 'wrong name or pin'; end if;
+
+  update public.sua_people
+     set device_id = p_device,
+         secret_hash = encode(extensions.digest(coalesce(p_secret, ''), 'sha256'), 'hex')
+   where device_id = r.device_id;
+
+  return jsonb_build_object(
+    'stats', coalesce(r.stats, '{}'::jsonb),
+    'must_change', r.pin_hash = public.sua_pin_hash(r.name, '1234')
+  );
+end; $$;
+
+revoke all on function public.sua_pin_hash(text, text) from public, anon, authenticated;
+revoke all on function public.sua_set_pin(uuid, text, text) from public;
+revoke all on function public.sua_claim(text, text, uuid, text) from public;
+grant execute on function public.sua_set_pin(uuid, text, text) to anon, authenticated;
+grant execute on function public.sua_claim(text, text, uuid, text) to anon, authenticated;
