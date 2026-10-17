@@ -152,7 +152,7 @@
          but nothing linked to it, so on the street the QR did not exist. The
          code is the one already generated for this site, inlined rather than
          pulled from a QR library: no extra request, no extra weight. -->
-    <div class="qr-sheet" id="qrSheet" hidden role="dialog" aria-modal="true" aria-labelledby="qrHead">
+    <div class="qr-sheet" id="qrSheet" hidden role="dialog" aria-modal="true" aria-labelledby="qrHead" onclick="if(event.target===this)closeQr()">
       <div class="qr-card">
         <button class="qr-close" onclick="closeQr()" aria-label="Close">&times;</button>
         <h3 id="qrHead">Scan to keep this guide</h3>

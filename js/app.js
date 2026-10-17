@@ -104,6 +104,10 @@
             return inHouseMode ? GUIDE_URL + '?inhouse=1' : GUIDE_URL;
         }
 
+        // Focus is moved in on open and put back on close, and Escape closes it
+        // -- the same contract the detail modal and the lightbox already keep.
+        let qrLastFocus = null;
+
         function openQr() {
             const s = document.getElementById('qrSheet');
             if (!s) return;
@@ -112,12 +116,18 @@
                 const msg = 'Iberostar Aruba — everywhere you can use your Iberocash: ' + guideLink();
                 wa.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
             }
+            qrLastFocus = document.activeElement;
             s.hidden = false;
+            const first = s.querySelector('.qr-close');
+            if (first) first.focus();
         }
 
         function closeQr() {
             const s = document.getElementById('qrSheet');
-            if (s) s.hidden = true;
+            if (!s) return;
+            s.hidden = true;
+            if (qrLastFocus && qrLastFocus.focus) qrLastFocus.focus();
+            qrLastFocus = null;
         }
 
         function copyGuideLink(btn) {
@@ -274,6 +284,9 @@
                 } else if(modalOpen) {
                     if(e.key === 'Escape') closeModal();
                     if(e.key === 'Tab') trapFocus(document.querySelector('.modal'), e);
+                } else if(!document.getElementById('qrSheet').hidden) {
+                    if(e.key === 'Escape') closeQr();
+                    if(e.key === 'Tab') trapFocus(document.querySelector('.qr-card'), e);
                 }
             });
 
