@@ -87,6 +87,49 @@
             if (b) b.hidden = !inHouseMode;
         }
 
+        // THE QR, BACK WHERE IT GETS USED.
+        //
+        // Victor, 2026-10-16: "I want to bring back the QR code for them to
+        // scan and send to the WhatsApp." qr.html has always existed as a
+        // printable page, but nothing in the app linked to it, so standing on
+        // the street with a guest there was no QR at all.
+        //
+        // The WhatsApp link carries the mode the OPC is currently in, so an
+        // in-house guest is sent the in-house link and lands on Red Sail. The
+        // QR itself is the plain address: it was generated once for that URL,
+        // and a stranger scanning it is not an in-house guest anyway.
+        const GUIDE_URL = 'https://victorfromaruba-stack.github.io/iberostar-club/';
+
+        function guideLink() {
+            return inHouseMode ? GUIDE_URL + '?inhouse=1' : GUIDE_URL;
+        }
+
+        function openQr() {
+            const s = document.getElementById('qrSheet');
+            if (!s) return;
+            const wa = document.getElementById('qrWa');
+            if (wa) {
+                const msg = 'Iberostar Aruba — everywhere you can use your Iberocash: ' + guideLink();
+                wa.href = 'https://wa.me/?text=' + encodeURIComponent(msg);
+            }
+            s.hidden = false;
+        }
+
+        function closeQr() {
+            const s = document.getElementById('qrSheet');
+            if (s) s.hidden = true;
+        }
+
+        function copyGuideLink(btn) {
+            const link = guideLink();
+            const done = () => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = 'Copy link'; }, 2000); };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(link).then(done, () => { btn.textContent = link; });
+            } else {
+                btn.textContent = link;
+            }
+        }
+
         // THE PITCH FOLLOWS YOU THROUGH THE APP.
         //
         // Only the home screen said anything about Iberocash, so on the five
@@ -181,7 +224,7 @@
         let currentPdfBlobUrl = null;
         
         // Bump whenever js/data.js's schema or paths change, to flush stale localStorage copies.
-        const DATA_VERSION = 309;
+        const DATA_VERSION = 310;
 
         window.onload = function() {
             const saved = localStorage.getItem('ib_app_data');

@@ -226,6 +226,46 @@
             background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.5); }
         .cash-here b { font-weight: 900; letter-spacing: 1.1px; text-transform: uppercase; }
         .cash-here[hidden] { display: none; }
+
+        /* THE QR, BACK IN THE APP.
+           The card stays white and the code stays black in BOTH themes on
+           purpose: a phone camera reads a QR by contrast, and the night theme
+           would have handed the guest a dim code to squint at on a dark street.
+           Brand colour lives on the buttons, never on the code itself. */
+        .qr-btn { margin-left: auto; width: 44px; height: 44px; flex: none;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; border: 1px solid rgba(212,175,55,0.5);
+            background: rgba(212,175,55,0.14); cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        .qr-btn:active { transform: scale(0.9); }
+        .qr-btn svg { width: 22px; height: 22px; fill: var(--gold-text); }
+        body.dark-theme .qr-btn svg { fill: var(--gold-light); }
+
+        .qr-sheet { position: fixed; inset: 0; z-index: 400; display: flex;
+            align-items: center; justify-content: center; padding: 24px;
+            background: rgba(4,16,30,0.72); backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px); }
+        .qr-sheet[hidden] { display: none; }
+        .qr-card { position: relative; width: 100%; max-width: 340px;
+            background: #FFFFFF; border-radius: 28px; padding: 26px 22px 22px;
+            text-align: center; box-shadow: 0 30px 70px rgba(0,0,0,0.45); }
+        /* Padded clear of the close button: at 1.5rem the last word ran under
+           the x in the corner. */
+        .qr-card h3 { font-family: var(--font-head); font-size: 1.35rem;
+            color: #06121E; margin: 0 0 6px; padding: 0 30px; line-height: 1.2; }
+        .qr-sub { font-family: var(--font-body); font-size: 0.86rem;
+            color: #4A5A6B; margin: 0 0 16px; line-height: 1.4; }
+        .qr-code { width: 220px; height: 220px; margin: 0 auto 16px; }
+        .qr-code svg { width: 100%; height: 100%; display: block; }
+        .qr-wa, .qr-copy { display: block; width: 100%; padding: 14px;
+            border-radius: 14px; font-family: var(--font-body); font-weight: 800;
+            font-size: 0.95rem; cursor: pointer; border: 0; text-decoration: none; }
+        .qr-wa { background: #25D366; color: #06121E; margin-bottom: 9px; }
+        .qr-copy { background: rgba(6,18,30,0.07); color: #06121E;
+            border: 1px solid rgba(6,18,30,0.12); }
+        .qr-close { position: absolute; top: 10px; right: 12px; width: 38px;
+            height: 38px; border-radius: 50%; border: 0; background: transparent;
+            font-size: 26px; line-height: 1; color: #6B7A89; cursor: pointer; }
         body.dark-theme .cash-here, .modal .cash-here { color: #FFE9A8;
             background: rgba(212,175,55,0.18); border-color: rgba(238,210,132,0.5); }
         body.dark-theme .cash-line { color: #FFF1C9;

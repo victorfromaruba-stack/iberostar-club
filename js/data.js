@@ -339,13 +339,7 @@ const defaultData = {
         "title": "Gianni's Ristorante",
         "sub": "Italian",
         "desc": "Famous for the Spaghetti al Formaggio Parmigiano. Watch as your pasta is prepared tableside in a giant wheel of cheese, a true Italian classic.",
-        "gallery": [
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_1.jpg",
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_2.jpg",
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_3.jpg",
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_4.jpg",
-            "assets/Restaurants/Gianni's Ristorante/rest_giannis_5.jpg"
-        ],
+        "gallery": ["assets/Restaurants/Gianni's Ristorante/rest_giannis_2.jpg","assets/Restaurants/Gianni's Ristorante/rest_giannis_3.jpg","assets/Restaurants/Gianni's Ristorante/rest_giannis_4.jpg","assets/Restaurants/Gianni's Ristorante/rest_giannis_5.jpg","assets/Restaurants/Gianni's Ristorante/rest_giannis_1.jpg"],
         "pdf": "assets/Restaurants/Gianni's Ristorante/menu_giannis.pdf"
     },
     "Daniels": {
@@ -353,13 +347,7 @@ const defaultData = {
         "title": "Daniel's Steak & Chop",
         "sub": "Steakhouse",
         "desc": "Premium Certified Angus Beef and wood-fired chops. A classic steakhouse experience with a rustic touch, perfect for meat lovers seeking quality cuts.",
-        "gallery": [
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_1.jpg",
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_2.jpg",
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_3.jpg",
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_4.jpg",
-            "assets/Restaurants/Daniel's Steak & Chop/rest_daniels_5.jpg"
-        ],
+        "gallery": ["assets/Restaurants/Daniel's Steak & Chop/rest_daniels_2.jpg","assets/Restaurants/Daniel's Steak & Chop/rest_daniels_3.jpg","assets/Restaurants/Daniel's Steak & Chop/rest_daniels_4.jpg","assets/Restaurants/Daniel's Steak & Chop/rest_daniels_5.jpg","assets/Restaurants/Daniel's Steak & Chop/rest_daniels_1.jpg"],
         "pdf": "assets/Restaurants/Daniel's Steak & Chop/menu_daniels.pdf"
     },
     "Gaya": {
@@ -391,13 +379,7 @@ const defaultData = {
         "title": "Azia Restaurant & Lounge",
         "sub": "Asian Fusion",
         "desc": "A journey through Asia with Tapas and modern atmosphere. Exquisite sushi, dim sum, and Asian-fusion dishes in a stylish, Zen-inspired environment.",
-        "gallery": [
-            "assets/Restaurants/Azia Restaurant/rest_azia_1.jpg",
-            "assets/Restaurants/Azia Restaurant/rest_azia_2.jpg",
-            "assets/Restaurants/Azia Restaurant/rest_azia_3.jpg",
-            "assets/Restaurants/Azia Restaurant/rest_azia_4.jpg",
-            "assets/Restaurants/Azia Restaurant/rest_azia_5.jpg"
-        ],
+        "gallery": ["assets/Restaurants/Azia Restaurant/rest_azia_2.jpg","assets/Restaurants/Azia Restaurant/rest_azia_3.jpg","assets/Restaurants/Azia Restaurant/rest_azia_4.jpg","assets/Restaurants/Azia Restaurant/rest_azia_5.jpg","assets/Restaurants/Azia Restaurant/rest_azia_1.jpg"],
         "pdf": "assets/Restaurants/Azia Restaurant/menu_azia.pdf"
     },
     "Azzurro": {
@@ -405,13 +387,7 @@ const defaultData = {
         "title": "Azzurro Ristorante",
         "sub": "Seafood",
         "desc": "Located right on the beach, serving authentic Italian seafood. Enjoy panoramic ocean views and fresh catches prepared with traditional Italian flair.",
-        "gallery": [
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_1.jpg",
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_2.jpg",
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_3.jpg",
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_4.jpg",
-            "assets/Restaurants/Azzurro Ristorante/rest_azzurro_5.jpg"
-        ],
+        "gallery": ["assets/Restaurants/Azzurro Ristorante/rest_azzurro_2.jpg","assets/Restaurants/Azzurro Ristorante/rest_azzurro_3.jpg","assets/Restaurants/Azzurro Ristorante/rest_azzurro_4.jpg","assets/Restaurants/Azzurro Ristorante/rest_azzurro_5.jpg","assets/Restaurants/Azzurro Ristorante/rest_azzurro_1.jpg"],
         "pdf": "assets/Restaurants/Azzurro Ristorante/menu_azzurro.pdf"
     },
     "AmoreMio": {
@@ -419,13 +395,7 @@ const defaultData = {
         "title": "Amore Mio",
         "sub": "Pizzeria",
         "desc": "Authentic Neapolitan pizza with a crispy, airy crust. A cozy pizzeria offering a variety of traditional toppings and Italian comfort food.",
-        "gallery": [
-            "assets/Restaurants/Amore Mio/rest_amoremio_1.jpg",
-            "assets/Restaurants/Amore Mio/rest_amoremio_2.jpg",
-            "assets/Restaurants/Amore Mio/rest_amoremio_3.jpg",
-            "assets/Restaurants/Amore Mio/rest_amoremio_4.jpg",
-            "assets/Restaurants/Amore Mio/rest_amoremio_5.jpg"
-        ],
+        "gallery": ["assets/Restaurants/Amore Mio/rest_amoremio_2.jpg","assets/Restaurants/Amore Mio/rest_amoremio_3.jpg","assets/Restaurants/Amore Mio/rest_amoremio_4.jpg","assets/Restaurants/Amore Mio/rest_amoremio_5.jpg","assets/Restaurants/Amore Mio/rest_amoremio_1.jpg"],
         "pdf": "assets/Restaurants/Amore Mio/menu_amoremio.pdf"
     },
     "Dushi": {
@@ -433,13 +403,7 @@ const defaultData = {
         "title": "Dushi Bagels",
         "sub": "Casual",
         "desc": "The go-to spot for New York style bagels and hearty burgers. A casual, friendly eatery perfect for breakfast or a quick, delicious lunch.",
-        "gallery": [
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_1.jpg",
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_2.jpg",
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_3.jpg",
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_4.jpg",
-            "assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_5.jpg"
-        ],
+        "gallery": ["assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_2.jpg","assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_3.jpg","assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_4.jpg","assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_5.jpg","assets/Restaurants/Dushi Bagels & Burgers/rest_dushi_1.jpg"],
         "pdf": "assets/Restaurants/Dushi Bagels & Burgers/menu_dushi.pdf"
     },
     "Zima": {
