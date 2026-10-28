@@ -64,6 +64,25 @@ for (const L of LEVELS) {
     if (a >= 12 && a > avg * 1.2) warns.push(`${it.id}: right answer is a bit long (${a} vs ${Math.round(avg)})`);
   }
 }
+/* A WATCH item or a note's watch plays video/clips/<vid>-<from>-<to>.mp4 (cutSrc in app.js). Nothing else
+   checked the file exists, so a mistyped second gave a dead player and a green build. Resolved from this
+   script's folder (academy/), not from the html, because build.py can write the page elsewhere with --out. */
+{
+  const dir = require("path").join(__dirname, "..", "video", "clips");
+  const seenClip = new Set();
+  const needClip = (where, w) => {
+    if (!w || !w.vid) return;
+    if (!(w.from >= 0) || !(w.to > w.from) || w.to - w.from > 90) { errors.push(`${where}: odd clip range ${w.from}-${w.to}`); return; }
+    const f = `${w.vid}-${w.from}-${w.to}.mp4`;
+    if (seenClip.has(f)) return; seenClip.add(f);
+    if (!fs.existsSync(require("path").join(dir, f))) errors.push(`${where}: video/clips/${f} does not exist — the player would be dead`);
+  };
+  for (const L of LEVELS) {
+    for (const nt of L.notes || []) needClip(`${L.id} note "${nt.h}"`, nt.watch);
+    for (const it of L.qs || []) if (it.type === "watch") needClip(it.id, it);
+  }
+  console.log(`  ${seenClip.size} distinct video clips checked on disk`);
+}
 for (const st of SCRIPT) { for (const l of st.lines) seg(`script ${l.id}`, l.clip, l.from, l.to); if (st.dont) seg(`script ${st.step} don't`, st.dont.clip, st.dont.from, st.dont.to); if (st.extra) seg(`script ${st.step} extra`, st.extra.clip, st.extra.from, st.extra.to); }
 if (SCRIPT.length !== MAP_STEPS.length || SCRIPT.some((s, i) => s.step !== MAP_STEPS[i].t)) errors.push("Script steps don't match the pitch map steps");
 
