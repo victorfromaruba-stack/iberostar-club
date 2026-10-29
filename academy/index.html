@@ -2485,13 +2485,13 @@ function togglePop(id){
    instantly, and keep working with no bars. The link to the original stays
    underneath, because crediting the channel is the least we owe it. */
 const cutSrc = (w) => `video/clips/${w.vid}-${w.from}-${w.to}.mp4`;
-function clipHTML(w){
+function cutHTML(w){
   return `<div class="ytbox"><video src="${esc(cutSrc(w))}" controls playsinline preload="metadata"
     ${w.poster ? `poster="${esc(w.poster)}"` : ""}></video></div>
     <p class="small muted">${(w.to - w.from)} second clip from Timeshare OPC University.
     <a href="https://www.youtube.com/watch?v=${esc(w.vid)}&t=${w.from|0}s" target="_blank" rel="noopener">Watch the whole video</a></p>`;
 }
-const ytCut = clipHTML;
+const ytCut = cutHTML;
 function noteHTML(nt){
   return `<section class="note"><h2>${esc(nt.h)}</h2><ul>${nt.li.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
     ${nt.hear ? `<div class="acts"><button class="btn small ghost" data-seg="${nt.hear.clip}:${nt.hear.from}:${nt.hear.to}">${icon("play")} ${esc(nt.hear.label || "Hear it in the voice notes")}</button></div>` : ""}
@@ -2616,7 +2616,7 @@ function itemBody(it){
     return bubbleRow(esc(it.q), "think") + `<div class="match"><div class="col">${left.map(x => `<button class="mt" data-side="l" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div><div class="col">${right.map(x => `<button class="mt" data-side="r" data-i="${x.i}" aria-pressed="false">${esc(x.t)}</button>`).join("")}</div></div>`;
   }
   if (it.type === "watch")
-    return clipHTML(it) + bubbleRow(esc(it.q), "think") + optionsHTML(it);
+    return cutHTML(it) + bubbleRow(esc(it.q), "think") + optionsHTML(it);
   if (it.type === "listen")
     return `<div class="listen"><button class="speak" id="hear" data-key="item" aria-label="Play the voice note">${icon("speaker")}</button><button class="speak slow" id="hearSlow" data-key="item-slow" aria-label="Play slower">0.75×</button></div><p class="read-it" id="readIt" hidden></p>` + bubbleRow(esc(it.q), "idle") + optionsHTML(it);
   if (it.scen) return scenarioHTML(it) + optionsHTML(it);

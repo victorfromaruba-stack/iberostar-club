@@ -33,6 +33,11 @@ clips_js = json.dumps(clips, ensure_ascii=False, separators=(",", ":"))
 script, n = re.subn(r"/\*CLIPS\*/\[\]/\*CLIPS-END\*/", lambda m: f"/*CLIPS*/{clips_js}/*CLIPS-END*/", script)
 assert n == 1, "CLIPS marker not found in content-post.js"
 assert "</script" not in script.lower(), "a </script> inside the code would end the script tag"
+# One script, so a second top-level function with the same name silently replaces the first: two
+# clipHTML()s (the voice notes' and the lesson videos') made the "All voice notes" list show dead video boxes.
+names = re.findall(r"^(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)\s*\(", script, re.M)
+twice = sorted({x for x in names if names.count(x) > 1})
+assert not twice, f"declared twice across src/*.js (the later one wins): {', '.join(twice)}"
 
 HEAD = """<!doctype html>
 <html lang="en">
