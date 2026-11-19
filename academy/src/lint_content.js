@@ -96,7 +96,23 @@ else for (const u of UNITS) for (const id of u.levels) {
   if (!LEVEL_IDS.includes(id)) errors.push(`level "${id}" is in unit "${u.title}" but not in LEVEL_IDS (app.js) — the manager panel will crash on it`);
   if (!ORDER.includes(id)) errors.push(`level "${id}" is in unit "${u.title}" but not in ORDER (app.js) — nobody will ever be sent to it and the Final stays locked`);
 }
-for (const id of LEVEL_IDS) if (!UNITS.some(u => u.levels.includes(id))) errors.push(`LEVEL_IDS has "${id}" but no unit lists it`);
+if (LEVEL_IDS && ORDER) {
+  for (const id of LEVEL_IDS) if (!UNITS.some(u => u.levels.includes(id))) errors.push(`LEVEL_IDS has "${id}" but no unit lists it`);
+  /* The two lists are written by hand in app.js and must hold the same ids, once
+     each. A level in ORDER but not LEVEL_IDS is walked to but has no stats; the
+     reverse is never reached. Also every level that levels.js defines must be in
+     both, even if no unit names it (it would be playable by id yet uncounted). */
+  for (const [nm, list] of [["LEVEL_IDS", LEVEL_IDS], ["ORDER", ORDER]]) {
+    const dup = list.filter((id, i) => list.indexOf(id) !== i);
+    if (dup.length) errors.push(`${nm} lists ${[...new Set(dup)].join(", ")} more than once`);
+  }
+  for (const id of ORDER) if (!LEVEL_IDS.includes(id)) errors.push(`"${id}" is in ORDER but not LEVEL_IDS (app.js)`);
+  for (const id of LEVEL_IDS) if (!ORDER.includes(id)) errors.push(`"${id}" is in LEVEL_IDS but not ORDER (app.js)`);
+  for (const L of LEVELS) {
+    if (!LEVEL_IDS.includes(L.id)) errors.push(`level "${L.id}" is defined in levels.js but not in LEVEL_IDS (app.js)`);
+    if (!ORDER.includes(L.id)) errors.push(`level "${L.id}" is defined in levels.js but not in ORDER (app.js)`);
+  }
+}
 // Writing checks over everything a worker reads (not the voice note transcripts, which are the team's own words),
 // including 300 generated guest cards.
 const gen = code.slice(code.indexOf("/* ---------- Scenario generator"), code.indexOf("/* =====================================================================\n   CONFIG"));

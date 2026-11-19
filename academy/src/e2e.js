@@ -79,7 +79,7 @@ const EVIL = [
   ok("loads with no errors", p.errors.length === 0, p.errors.join(" | "));
   ok("9 voice notes loaded", await p.evaluate(() => CLIPS.length === 9 && CLIPS.every(c => c.s.length > 3)));
   ok("Learn tab with name form", await p.isVisible("#nm"));
-  ok("every level has a node on the path", await p.evaluate(() => document.querySelectorAll("[data-node]").length === LEVEL_IDS.length && LEVEL_IDS.length === 16));
+  ok("every level has a node on the path", await p.evaluate(() => document.querySelectorAll("[data-node]").length === LEVEL_IDS.length && LEVEL_IDS.length === LEVELS.length && ORDER.length === LEVEL_IDS.length));
   ok("Street skills unit with credit", await p.evaluate(() => /Street skills/.test(document.querySelector("#app").textContent) && /Timeshare OPC University/.test(document.querySelector(".foot").textContent)));
   ok("start node is Qualified guests", await p.evaluate(() => document.querySelector(".node.current")?.dataset.node) === "q");
   ok("both tracks open at the start", await p.evaluate(() => !document.querySelector('[data-node="why"]').classList.contains("locked") && document.querySelector('[data-node="ctnq"]').classList.contains("locked")));
