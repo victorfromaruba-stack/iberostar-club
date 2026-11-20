@@ -4,6 +4,8 @@
 //   1. A gallery/pdf/video/logo path in js/data.js that doesn't exist on disk.
 //   2. A responsive CSS rule that resets a safe-area-aware padding/margin via a
 //      shorthand without re-declaring the longhand, silently dropping notch clearance.
+//   3. A background painted with a token that the night theme flips (--ocean-deep turns
+//      white) under a hard-coded text colour, which is white on white after dark.
 
 const fs = require('fs');
 const path = require('path');
@@ -130,6 +132,37 @@ safeAreaSelectors.forEach(sel => {
 if (![...safeAreaSelectors].some(sel => rules.some(r => r.selector === sel && /\b(padding|margin)\s*:/.test(r.body) && !/(padding|margin)-top\s*:/.test(r.body)))) {
     ok(`safe-area cascade — ${safeAreaSelectors.size} selector(s) using --safe-top, no shorthand silently overrides them`);
 }
+
+// ---------- 4. Night theme can't turn a token background into white-on-white ----------
+// body.dark-theme is switched on by the visitor's clock (updateTimeVibe in js/app.js), so
+// every guest who opens the app in the evening gets it. It flips several tokens: --ocean-deep
+// goes from navy to #FFFFFF. A rule that paints its background with a flipped token but types
+// its text colour as a literal ("color: white") keeps the text and loses the background:
+// white on white at night. That shipped on .skip-link. .btn-primary has the same pattern and
+// only survives because it has its own body.dark-theme override. So: a rule may use a flipped
+// token as its background with a literal text colour only if body.dark-theme overrides it.
+const norm = (s) => s.replace(/\s+/g, ' ').trim();
+const flipped = new Set();
+rules.filter(r => norm(r.selector) === 'body.dark-theme').forEach(r => {
+    for (const m of r.body.matchAll(/(--[\w-]+)\s*:/g)) flipped.add(m[1]);
+});
+let flipChecked = 0;
+const flipErrorsBefore = errors;
+rules.forEach(r => {
+    const sel = norm(r.selector);
+    if (sel.includes('dark-theme')) return;
+    const bg = /background(?:-color)?\s*:\s*var\((--[\w-]+)\)/.exec(r.body);
+    if (!bg || !flipped.has(bg[1])) return;
+    const fg = /(?:^|[;\s{])color\s*:\s*([^;]+)/.exec(r.body); // the [;\s{] guard skips background-color
+    if (!fg || /var\(/.test(fg[1])) return; // text colour from a token flips along with it
+    flipChecked++;
+    const overridden = rules.some(d => norm(d.selector) === 'body.dark-theme ' + sel && /(background|color)\s*:/.test(d.body));
+    if (!overridden) {
+        fail(`css/styles.css: "${sel}" paints its background with ${bg[1]}, which body.dark-theme flips, but types its text colour as "${fg[1].trim()}" with no body.dark-theme override. At night that is unreadable. Use --ink for a surface that must stay dark, or add a body.dark-theme rule for it.`);
+    }
+});
+if (flipped.size === 0) fail('css/styles.css: found no body.dark-theme token block. The night-theme check has nothing to compare against, so it would pass without checking anything.');
+else if (errors === flipErrorsBefore) ok(`night-theme contrast — ${flipped.size} token(s) flipped at night, ${flipChecked} rule(s) with a literal text colour over one, all overridden`);
 
 console.log('');
 if (errors > 0) {
